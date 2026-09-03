@@ -10,3 +10,12 @@
 - Participó en la discusión inicial de arquitectura y tecnologías. El equipo acordó React para el Frontend Web, Java con Spring Boot para el Backend, PostgreSQL como base de datos y Monolito Modular como arquitectura principal.
 - Comenzó a organizar la base colaborativa del Entregable Nº 1, centrada en los diagramas C4 y los ADR.
 - Quedaron decisiones y detalles del entregable pendientes de validación con el profesor.
+
+#### Bautista — 03/09/2026
+
+- Revisó el ADR-002 correspondiente a la decisión de utilizar PostgreSQL como base de datos relacional.
+- Contrastó la redacción del ADR con la consigna del caso FitZone Sports y con la definición técnica provista por la cátedra.
+- Se ajustó el contexto para reflejar la necesidad de integridad de datos, transaccionalidad en pagos y consistencia de reservas ante operaciones concurrentes.
+- Se dejó explícito que PostgreSQL no resuelve automáticamente la concurrencia, el rendimiento, la disponibilidad ni la escalabilidad, sino que estas características dependen del diseño de transacciones, restricciones, índices y decisiones arquitectónicas adicionales.
+- Se confirmó que PostgreSQL es una decisión establecida por la cátedra, por lo que no corresponde documentar motores alternativos como si hubieran sido evaluados por el equipo.
+- Se completó la fecha del ADR con 03/09/2026.
