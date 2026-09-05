@@ -35,3 +35,4 @@
 - Justificó la elección de React en función de las necesidades del sistema: construcción de una interfaz web mantenible, reutilización de componentes, manejo de información dinámica e integración con la API REST del backend desarrollado con Spring Boot.
 - Relacionó la decisión con la evolución prevista del frontend del proyecto.
 - Analizó los costos y limitaciones de la decisión, incluyendo la incorporación de una tecnología adicional, la necesidad de definir criterios para el manejo del estado y el riesgo de una organización inadecuada de los componentes.
+
