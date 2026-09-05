@@ -19,3 +19,11 @@
 - Se dejó explícito que PostgreSQL no resuelve automáticamente la concurrencia, el rendimiento, la disponibilidad ni la escalabilidad, sino que estas características dependen del diseño de transacciones, restricciones, índices y decisiones arquitectónicas adicionales.
 - Se confirmó que PostgreSQL es una decisión establecida por la cátedra, por lo que no corresponde documentar motores alternativos como si hubieran sido evaluados por el equipo.
 - Se completó la fecha del ADR con 03/09/2026.
+
+#### Ignacio — 04/09/2026
+
+- Redactó el ADR-001 correspondiente a la adopción de una arquitectura de Monolito Modular para el backend de FitZone Sports.
+- Desarrolló el contexto, la decisión, las alternativas consideradas y las consecuencias (positivas y negativas) del patrón arquitectónico.
+- Justificó la decisión basándose en el tamaño del equipo (4 desarrolladores), la necesidad de velocidad de desarrollo (Time-to-Market) y la menor complejidad operativa frente a microservicios.
+- Priorizó la garantía de transacciones ACID fuertes compartidas en el mismo proceso para asegurar la consistencia en las reservas de canchas y evitar la sobreventa.
+- Documentó explícitamente las limitaciones de la decisión, incluyendo el acoplamiento de despliegue, la escalabilidad horizontal global y el riesgo de degradación hacia un monolito tradicional si no se respetan las fronteras entre módulos.
