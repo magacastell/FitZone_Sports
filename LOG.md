@@ -27,3 +27,11 @@
 - Justificó la decisión basándose en el tamaño del equipo (4 desarrolladores), la necesidad de velocidad de desarrollo (Time-to-Market) y la menor complejidad operativa frente a microservicios.
 - Priorizó la garantía de transacciones ACID fuertes compartidas en el mismo proceso para asegurar la consistencia en las reservas de canchas y evitar la sobreventa.
 - Documentó explícitamente las limitaciones de la decisión, incluyendo el acoplamiento de despliegue, la escalabilidad horizontal global y el riesgo de degradación hacia un monolito tradicional si no se respetan las fronteras entre módulos.
+
+#### Magali — 05/09/2026
+
+- Redactó el ADR-004 correspondiente a la elección de React para el Frontend Web de FitZone Sports.
+- Desarrolló el contexto, la decisión, las consecuencias positivas y negativas y las alternativas consideradas.
+- Justificó la elección de React en función de las necesidades del sistema: construcción de una interfaz web mantenible, reutilización de componentes, manejo de información dinámica e integración con la API REST del backend desarrollado con Spring Boot.
+- Relacionó la decisión con la evolución prevista del frontend del proyecto.
+- Analizó los costos y limitaciones de la decisión, incluyendo la incorporación de una tecnología adicional, la necesidad de definir criterios para el manejo del estado y el riesgo de una organización inadecuada de los componentes.
