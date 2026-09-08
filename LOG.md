@@ -36,3 +36,11 @@
 - Relacionó la decisión con la evolución prevista del frontend del proyecto.
 - Analizó los costos y limitaciones de la decisión, incluyendo la incorporación de una tecnología adicional, la necesidad de definir criterios para el manejo del estado y el riesgo de una organización inadecuada de los componentes.
 
+#### Valentina Martínez — 05/09/2026
+
+- Redactó el ADR-003 correspondiente a la elección de Spring Boot y Spring Data JPA como framework y mecanismo de persistencia del Backend API de FitZone Sports.
+- Desarrolló el contexto, la decisión, las consecuencias (positivas, negativas y neutras) y las alternativas consideradas.
+- Justificó la decisión en función del requisito de ORM del trabajo práctico, del control de concurrencia en la reserva de canchas y la inyección de dependencias necesaria para los patrones que deben adoptarse.
+- Evaluó como alternativas NestJS, Express.js, JDBC directo y Hibernate nativo, descartando cada una según restricciones concretas del equipo.
+- Dejó pendiente, en un ADR separado, la decisión sobre el uso de Spring Security para autenticación y autorización para debatir en grupo.
+- Dejó pendientes sugerencias de posibles ADRs para elegir en grupo y redactar.
