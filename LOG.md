@@ -44,3 +44,11 @@
 - Evaluó como alternativas NestJS, Express.js, JDBC directo y Hibernate nativo, descartando cada una según restricciones concretas del equipo.
 - Dejó pendiente, en un ADR separado, la decisión sobre el uso de Spring Security para autenticación y autorización para debatir en grupo.
 - Dejó pendientes sugerencias de posibles ADRs para elegir en grupo y redactar.
+
+#### Claudio — 03/09/2026
+
+- Construyó el diagrama C4 de Contexto de FitZone Sports en Archi, mostrando el sistema en alcance, las personas que interactúan con él y el sistema externo.
+- Modeló como personas (Business Actor) al Socio activo, Cliente externo, Recepcionista/Administrador de sede y Gerente central, y como sistema externo (Application Component) a la Pasarela de pago simulada.
+- Etiquetó las cinco relaciones de forma unidireccional, con un texto que tiene sentido en la dirección de la flecha (por ejemplo, "Reserva clases y canchas, gestiona su membresía" desde Socio activo hacia FitZone Sports).
+- No incluyó tecnologías, protocolos ni detalles internos del sistema, respetando el alcance del nivel de Contexto.
+- Completó Documentation (responsabilidad/descripción) para los seis elementos del diagrama y agregó título y leyenda a la vista.
