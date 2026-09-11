@@ -23,9 +23,9 @@ Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas 
    ```
    Esto crea un contenedor de PostgreSQL 18 con la base `fitzone` ya creada (usuario/password `postgres`/`postgres`).
 
-2. Correr el backend:
+2. Correr el backend (el perfil `SPRING_PROFILES_ACTIVE` es obligatorio, no tiene default):
    ```bash
-   ./mvnw spring-boot:run
+   SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
    ```
    La API queda disponible en `http://localhost:3000/api/v1`.
 
