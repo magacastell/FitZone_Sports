@@ -1,0 +1,10 @@
+target/
+.idea/
+*.iml
+.git/
+.gitignore
+docs/
+docker-compose.yml
+README.md
+LOG.md
+Cejas-LOG.md
