@@ -2,6 +2,10 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
+# mvnw descarga el .tar.gz en vez del .zip si no hay "unzip" instalado, lo que rompe
+# la validacion de distributionSha256Sum (queda comparando contra el archivo equivocado)
+RUN apt-get update && apt-get install -y --no-install-recommends unzip && rm -rf /var/lib/apt/lists/*
+
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN ./mvnw dependency:go-offline -B
