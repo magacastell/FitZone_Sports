@@ -28,10 +28,18 @@ public class Usuario {
 
     private String nombre;
 
+    private String apellido;
+
+    @Column(unique = true)
+    private String dni;
+
     @Column(unique = true)
     private String email;
 
     private String password;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rol_id", nullable = false)
