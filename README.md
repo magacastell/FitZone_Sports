@@ -88,4 +88,4 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 ## Documentación
 
 - Diagramas C4 y ADR: `docs/`
-- Bitácora del equipo: `LOGs/LOG.md`
+- Bitácoras del equipo: `LOGs/`
