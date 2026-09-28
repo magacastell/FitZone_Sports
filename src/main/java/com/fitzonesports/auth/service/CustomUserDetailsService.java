@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(usuario.getEmail())
-                .password(usuario.getPassword())
+                .password(usuario.getContrasenia())
                 .authorities(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().getNombre()))
                 .disabled(!usuario.isActivo())
                 .build();

@@ -5,8 +5,10 @@ import com.fitzonesports.auth.dto.LoginResponse;
 import com.fitzonesports.auth.dto.RegisterRequest;
 import com.fitzonesports.auth.dto.RegisterResponse;
 import com.fitzonesports.auth.model.Rol;
+import com.fitzonesports.auth.model.Sede;
 import com.fitzonesports.auth.model.Usuario;
 import com.fitzonesports.auth.repository.RolRepository;
+import com.fitzonesports.auth.repository.SedeRepository;
 import com.fitzonesports.auth.repository.UsuarioRepository;
 import com.fitzonesports.auth.service.CustomUserDetailsService;
 import com.fitzonesports.auth.service.JwtService;
@@ -38,6 +40,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
+    private final SedeRepository sedeRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
 
@@ -60,15 +63,18 @@ public class AuthController {
 
         Rol rol = rolRepository.findByNombre(ROL_REGISTRO_PUBLICO)
                 .orElseThrow(() -> new IllegalStateException("Falta seedear el rol " + ROL_REGISTRO_PUBLICO));
+        Sede sede = sedeRepository.findById(request.sedeId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe"));
 
         Usuario usuario = new Usuario();
         usuario.setNombre(request.nombre());
         usuario.setApellido(request.apellido());
         usuario.setDni(request.dni());
         usuario.setEmail(request.email());
-        usuario.setPassword(passwordEncoder.encode(request.password()));
+        usuario.setContrasenia(passwordEncoder.encode(request.password()));
         usuario.setActivo(true);
         usuario.setRol(rol);
+        usuario.setSede(sede);
         usuarioRepository.save(usuario);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getEmail());
