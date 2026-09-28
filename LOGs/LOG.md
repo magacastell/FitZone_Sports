@@ -52,3 +52,19 @@
 - Etiquetó las cinco relaciones de forma unidireccional, con un texto que tiene sentido en la dirección de la flecha (por ejemplo, "Reserva clases y canchas, gestiona su membresía" desde Socio activo hacia FitZone Sports).
 - No incluyó tecnologías, protocolos ni detalles internos del sistema, respetando el alcance del nivel de Contexto.
 - Completó Documentation (responsabilidad/descripción) para los seis elementos del diagrama y agregó título y leyenda a la vista.
+
+#### Bautista — 28/09/2026
+
+- Implementó Flyway para versionar y aplicar los cambios del esquema PostgreSQL según lo definido en el ADR-005.
+- Incorporó las dependencias de Flyway para Spring Boot y PostgreSQL, configuró la ubicación y validación de las migraciones y dejó deshabilitadas las operaciones de limpieza desde la aplicación.
+- Reemplazó la modificación automática del esquema por Hibernate con `ddl-auto=validate`, de modo que Flyway sea la única herramienta responsable de modificar la base de datos.
+- Ajustó la migración inicial `V1__crear_esquema_inicial.sql` antes de su primera aplicación compartida: agregó el estado activo del usuario y corrigió tipos e índices para PostgreSQL.
+- Creó `V2__insertar_roles.sql` para cargar los roles obligatorios `SOCIO_ACTIVO`, `CLIENTE_EXTERNO`, `RECEPCIONISTA` y `GERENTE` en todos los ambientes.
+- Alineó las entidades `Usuario` y `Rol`, sus repositorios y el servicio de autenticación con los nombres, columnas y tipos del modelo de datos acordado.
+- Incorporó la entidad y el repositorio de `Sede`; el registro público ahora exige `dni` y `sedeId`, valida que la sede exista y asigna el rol `CLIENTE_EXTERNO` sin permitir elegir roles internos.
+- Actualizó el seed exclusivo de desarrollo para insertar una sede y cuatro usuarios ficticios asociados a los roles versionados por Flyway.
+- Eliminó el esquema SQL alternativo de `docs/schema.sql` y actualizó el README para documentar a Flyway como fuente única del esquema y explicar el procedimiento para futuras migraciones.
+- Verificó la implementación sobre una base PostgreSQL limpia con Java 21: Flyway aplicó `V1` y `V2`, Hibernate validó el esquema y el backend inició correctamente.
+- Comprobó que un segundo arranque no repite migraciones ya aplicadas y que Flyway utiliza `flyway_schema_history` para ejecutar solamente las versiones pendientes.
+- Probó el login, el registro válido, el rechazo de una sede inexistente y el rechazo de un email duplicado; también ajustó Spring Security para conservar las respuestas HTTP correctas durante el despacho a `/error`.
+- Confirmó que la base y el historial de Flyway persisten en el volumen Docker `fitzone_pgdata`, salvo que el volumen sea eliminado explícitamente con `docker compose down --volumes`.
