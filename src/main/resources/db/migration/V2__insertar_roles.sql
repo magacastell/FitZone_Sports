@@ -1,0 +1,6 @@
+INSERT INTO rol (nombre) VALUES
+    ('SOCIO_ACTIVO'),
+    ('CLIENTE_EXTERNO'),
+    ('RECEPCIONISTA'),
+    ('GERENTE')
+ON CONFLICT (nombre) DO NOTHING;

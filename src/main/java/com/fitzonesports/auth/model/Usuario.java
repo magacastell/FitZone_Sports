@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuario")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,16 +24,33 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
+    @Column(nullable = false)
     private String nombre;
 
-    @Column(unique = true)
+    @Column(nullable = false)
+    private String apellido;
+
+    @Column(unique = true, nullable = false)
+    private String dni;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
-    private String password;
+    @Column(nullable = false)
+    private String contrasenia;
+
+    private String foto;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rol_id", nullable = false)
+    @JoinColumn(name = "rolid", nullable = false)
     private Rol rol;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sedeid", nullable = false)
+    private Sede sede;
 }

@@ -12,3 +12,9 @@
 ### Claudio — 11/09/2026
 
 - Ajustó detalles de seguridad y calidad del módulo de autenticación (manejo de errores, permisos, configuración).
+
+### Claudio — 27/09/2026
+
+- Completó la entidad Usuario (apellido, DNI, flag de activo) y actualizó el esquema/seed del módulo de autenticación.
+- Agregó el endpoint de registro (`/auth/register`) con sus propios DTOs de request y response, hasheo de password y asignación automática del rol de cliente externo.
+- Corrigió `CustomUserDetailsService` para que el login respete el estado activo/inactivo del usuario.
