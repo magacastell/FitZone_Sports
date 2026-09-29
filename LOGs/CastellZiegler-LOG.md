@@ -21,7 +21,6 @@
 
 ### 22/09/2026
 
-- **[S1 · Arquitectura] Preparación del C4 nivel 3 por módulos**
   - Retomó la arquitectura definida durante el primer período.
   - Repasó los cinco módulos principales de FitZone Sports y sus responsabilidades.
   - Revisó las dependencias entre módulos necesarias para avanzar con los C4 nivel 3.
@@ -29,8 +28,17 @@
 
 ### 25/09/2026
 
-- **[S1 · Arquitectura] Revisión de la Definición de Módulos**
   - Revisó el documento de definición de módulos realizado por Valentina.
   - Analizó las responsabilidades, funcionalidades y relaciones propuestas para cada módulo.
   - Dejó comentarios y dudas sobre puntos que todavía necesitan definición del equipo.
   - Quedó pendiente continuar la revisión antes de avanzar con los C4 nivel 3.
+
+### 27/09/2026
+- Participó en la revisión y ajuste de la planificación del equipo, reorganizando las tareas de las próximas semanas en el tablero Kanban.
+- Avanzó en la definición del enfoque para el diseño de los contratos de API y su posterior consolidación mediante OpenAPI.
+- Participó junto a Valentina en la revisión de los diagramas C4 y en la identificación de ajustes pendientes de arquitectura.
+- Se reorganizaron las tareas de frontend, backend, persistencia e integración para permitir un avance progresivo y en paralelo.
+
+### 28/09/2026
+- Participó en la reorganización de las tareas correspondientes al Período 3 y en la estimación de tiempos de trabajo y estudio por actividad.
+- Preparó y actualizó el Plan de Trabajo y Seguimiento del Período 3 para su entrega al docente.
