@@ -18,9 +18,9 @@ CREATE TABLE rol (id SERIAL NOT NULL, nombre varchar(50) NOT NULL UNIQUE, PRIMAR
 CREATE TABLE sede (id SERIAL NOT NULL, nombre varchar(255) NOT NULL, direccion varchar(255), capacidad_maxima int4 NOT NULL, PRIMARY KEY (id));
 CREATE TABLE tipo_cancha (id SERIAL NOT NULL, nombre varchar(255) NOT NULL, PRIMARY KEY (id));
 CREATE TABLE tipo_clase (id SERIAL NOT NULL, nombre varchar(255) NOT NULL, PRIMARY KEY (id));
-CREATE TABLE turno_cancha (id SERIAL NOT NULL, fecha date NOT NULL, hora_inicio time(7) NOT NULL, hora_fin time(7) NOT NULL, canchaid int4 NOT NULL, PRIMARY KEY (id));
-CREATE TABLE usuario (id SERIAL NOT NULL, dni varchar(255) NOT NULL UNIQUE, email varchar(255) NOT NULL UNIQUE, rolid int4 NOT NULL, sedeid int4 NOT NULL, nombre varchar(255) NOT NULL, apellido varchar(255) NOT NULL, foto varchar(255), contrasenia varchar(255) NOT NULL, PRIMARY KEY (id));
-CREATE UNIQUE INDEX turno_cancha ON turno_cancha (canchaid, fecha, hora_inicio);
+CREATE TABLE turno_cancha (id SERIAL NOT NULL, fecha date NOT NULL, hora_inicio time NOT NULL, hora_fin time NOT NULL, canchaid int4 NOT NULL, PRIMARY KEY (id));
+CREATE TABLE usuario (id SERIAL NOT NULL, dni varchar(255) NOT NULL UNIQUE, email varchar(255) NOT NULL UNIQUE, rolid int4 NOT NULL, sedeid int4 NOT NULL, nombre varchar(255) NOT NULL, apellido varchar(255) NOT NULL, foto varchar(255), contrasenia varchar(255) NOT NULL, activo boolean NOT NULL DEFAULT true, PRIMARY KEY (id));
+CREATE UNIQUE INDEX uk_turno_cancha_horario ON turno_cancha (canchaid, fecha, hora_inicio);
 ALTER TABLE usuario ADD CONSTRAINT FKusuario32982 FOREIGN KEY (rolid) REFERENCES rol (id);
 ALTER TABLE membresia ADD CONSTRAINT FKmembresia738723 FOREIGN KEY (usuarioid) REFERENCES usuario (id);
 ALTER TABLE membresia ADD CONSTRAINT FKmembresia60619 FOREIGN KEY (plan_membresiaid) REFERENCES plan_membresia (id);
