@@ -7,7 +7,7 @@ export default function SocioQRModal({ isOpen, onClose, usuarioId }) {
     <div style={modalOverlayStyle}>
       <div style={modalContentStyle}>
         <h2>Acceso a Sede - Credencial Digital</h2>
-        <p>Escanea este código QR en el molinete de ingreso.</p>
+        <p>Vista de ejemplo: aquí se mostrará el QR de acceso cuando esa funcionalidad esté implementada.</p>
         
         {/* Simulación de QR */}
         <div style={qrContainerStyle}>
