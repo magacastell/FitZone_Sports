@@ -27,3 +27,8 @@ target/
 .idea/
 *.iml
 .DS_Store
+
+# Frontend dependencies and generated artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
