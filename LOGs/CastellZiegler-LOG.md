@@ -42,3 +42,10 @@
 ### 28/09/2026
 - Participó en la reorganización de las tareas correspondientes al Período 3 y en la estimación de tiempos de trabajo y estudio por actividad.
 - Preparó y actualizó el Plan de Trabajo y Seguimiento del Período 3 para su entrega al docente.
+
+#### 30/09/2026
+
+- Avanzó en el C4 Nivel 3 de FitZone Sports.
+- Revisó los límites, responsabilidades y relaciones entre los módulos M1 a M5.
+- Se elaboró una propuesta inicial del diagrama de componentes del Backend.
+- Se dejaron pendientes algunas definiciones para consultar con el profesor antes de cerrar el C4.
