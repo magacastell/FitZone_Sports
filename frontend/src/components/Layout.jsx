@@ -60,7 +60,7 @@ export default function Layout() {
               {rolActivo === 'SOCIO' && (
                 <>
                   <NavigationLink to="/clases" icon={CalendarDays} module="M3">Clases grupales</NavigationLink>
-                  <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR dinámico</NavigationLink>
+                  <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR (simulado)</NavigationLink>
                 </>
               )}
               <NavigationLink to="/perfil" icon={UserRound} module="M1">Perfil y membresía</NavigationLink>
@@ -92,6 +92,7 @@ export default function Layout() {
 
       <main id="contenido" className="app-main" tabIndex={-1}>
         <div className="app-content">
+          <p className="demo-notice">Vista de demostración: datos simulados. Las reservas, pagos y validaciones todavía no están implementados.</p>
           <Outlet context={{ rolActivo }} />
         </div>
       </main>

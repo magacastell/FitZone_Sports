@@ -123,3 +123,13 @@ a:hover {
 .feature-placeholder p {
   color: var(--color-muted);
 }
+
+.demo-notice {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}

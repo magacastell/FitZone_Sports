@@ -32,8 +32,9 @@ export default function LoginPage() {
         {error && <p style={{ color: '#ef4444', fontSize: '0.9rem', marginBottom: '1rem', textAlign: 'center' }}>{error}</p>}
         
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>Email</label>
+          <label htmlFor="login-email" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>Email</label>
           <input 
+            id="login-email"
             type="email" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
@@ -43,8 +44,9 @@ export default function LoginPage() {
         </div>
         
         <div style={{ marginBottom: '2rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>Contraseña</label>
+          <label htmlFor="login-password" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>Contraseña</label>
           <input 
+            id="login-password"
             type="password" 
             value={password} 
             onChange={(e) => setPassword(e.target.value)} 
@@ -53,7 +55,7 @@ export default function LoginPage() {
           />
         </div>
         
-        <button type="submit" style={{ width: '100%', padding: '0.75rem', background: '#38bdf8', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem' }}>
+        <button type="submit" className="button button--primary" style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', fontWeight: 'bold', fontSize: '1rem' }}>
           Ingresar
         </button>
         <p style={{ textAlign: 'center', marginTop: '1rem', color: '#64748b', fontSize: '0.8rem' }}>Usa: socio@fitzone.com / 1234</p>
