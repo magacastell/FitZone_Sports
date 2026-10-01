@@ -29,7 +29,7 @@
 
 ### 01/10/2026
 
-- **[S2] Construir estructura base React modular y navegación — [X hs — confirmar por Augusto]**
+- **[S2] Construir estructura base React modular y navegación — 2.5 hs**
   - Revisó la estructura React modular existente, las rutas y la navegación con los actores simulados SOCIO, EXTERNO, RECEPCION y GERENTE.
   - Ajustó los destinos de mantenimiento y reportes con placeholders explícitos y el cierre del QR con retorno a canchas; eliminó un proveedor de sesión redundante.
   - Mejoró la coherencia de la experiencia de navegación con iconografía consistente, estado activo, foco visible y estilos compartidos; corrigió el foco del modal QR, las etiquetas y el contraste del botón del login y el desbordamiento de la tabla de comprobantes en ventanas angostas.
