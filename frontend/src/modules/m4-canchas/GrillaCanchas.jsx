@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Info } from 'lucide-react';
 
 export default function GrillaCanchas() {
   const { rolActivo } = useOutletContext();
@@ -26,7 +27,8 @@ export default function GrillaCanchas() {
       {/* Banner de Precio Dinámico Strategy */}
       <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '1rem', borderRadius: '6px', marginBottom: '1.5rem' }}>
         <p style={{ margin: 0, color: '#166534' }}>
-          💡 <strong>Reglas de Precio:</strong> Costo base por tipo de cancha. {rolActivo === 'SOCIO' ? '✅ Tenés 15% de descuento aplicado por ser Socio.' : 'ℹ️ Precio estándar (Registrate como socio para 15% OFF).'} Recargo hora pico entre las 19:00 y 21:00.
+          <Info className="inline-icon" size={18} aria-hidden="true" />
+          <strong>Reglas de Precio:</strong> Costo base por tipo de cancha. {rolActivo === 'SOCIO' ? 'Tenés 15% de descuento aplicado por ser Socio.' : 'Precio estándar (Registrate como socio para 15% OFF).'} Recargo hora pico entre las 19:00 y 21:00.
         </p>
       </div>
 
