@@ -18,3 +18,9 @@
 - Completó la entidad Usuario (apellido, DNI, flag de activo) y actualizó el esquema/seed del módulo de autenticación.
 - Agregó el endpoint de registro (`/auth/register`) con sus propios DTOs de request y response, hasheo de password y asignación automática del rol de cliente externo.
 - Corrigió `CustomUserDetailsService` para que el login respete el estado activo/inactivo del usuario.
+
+### Claudio — 04/10/2026
+
+- Conectó el login del frontend con el backend (`POST /auth/login`), reemplazando el mock de `AuthContext`; el rol del usuario se lee del JWT.
+- Agregó un proxy de Vite hacia el backend (que no tiene CORS) y corrigió la URL base de la API.
+- Manejó la expiración de sesión: descarta el token vencido al cargar la app y cierra sesión automáticamente ante un 401.
