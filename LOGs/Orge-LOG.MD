@@ -86,10 +86,11 @@
   - Incorporó `EndpointAuthorizationTest` para verificar el acceso del gerente a todos los métodos, el rechazo de roles desconocidos y permisos representativos de clientes, socios y recepción.
   - Delimitó el alcance de esas pruebas: verifican autorización de métodos, sin probar solicitudes HTTP, validación de JWT ni reglas de pertenencia, sede o membresía.
   - Comprobó estáticamente que las 53 rutas poseen anotaciones de autorización y permiten el rol `GERENTE`; verificó el formato de los cambios con `git diff --check`.
-  - Intentó compilar y ejecutar las pruebas, pero el wrapper de Maven no pudo iniciar. En el entorno se encontró JDK 12 y no se dispuso de JDK 21 configurado; la compilación y las pruebas quedaron pendientes de ejecución.
-  - Actualizó el README en español con el listado de endpoints, sus roles permitidos, las validaciones pendientes y el alcance de las pruebas.
+  - Actualizó el README con el listado de endpoints, sus roles permitidos, las validaciones pendientes y el alcance de las pruebas.
 
 - **Versionado y publicación**
   - Creó la rama `feature/bautista-first-endpoint-implementation` y conservó en ella los cambios de endpoints y documentación.
   - Registró el commit `b58ee7c`: `feat: agregar endpoints iniciales y autorización por roles`.
-  - Publicó la rama en `origin` (GitHub) y configuró su seguimiento remoto. No integró los cambios a `main`.
+  - Publicó la rama en `origin` (GitHub) y configuró su seguimiento remoto.
+  - Integró los cambios a `main` sin conflictos mediante el commit `a7504c3`: `merge: integrar endpoints iniciales y autorización por roles`, y publicó el resultado en GitHub.
+  - Eliminó la rama de trabajo local y remota después de confirmar la integración en `main`.
