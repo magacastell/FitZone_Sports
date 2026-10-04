@@ -58,7 +58,7 @@ export default function LoginPage() {
         <button type="submit" className="button button--primary" style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', fontWeight: 'bold', fontSize: '1rem' }}>
           Ingresar
         </button>
-        <p style={{ textAlign: 'center', marginTop: '1rem', color: '#64748b', fontSize: '0.8rem' }}>Usa: socio@fitzone.com / 1234</p>
+        <p style={{ textAlign: 'center', marginTop: '1rem', color: '#64748b', fontSize: '0.8rem' }}>Usa: socio@fitzone.com / socio123</p>
       </form>
     </div>
   );
