@@ -56,3 +56,40 @@
   - Comprobó que un segundo arranque no repite migraciones ya aplicadas y que Flyway utiliza `flyway_schema_history` para ejecutar solamente las versiones pendientes.
   - Probó el login, el registro válido, el rechazo de una sede inexistente y el rechazo de un email duplicado.
   - Confirmó que la base y el historial de Flyway persisten en el volumen Docker `fitzone_pgdata`, salvo que el volumen sea eliminado explícitamente con `docker compose down --volumes`.
+
+## Período 3 — Backend API
+
+### 04/10/2026
+
+- **Revisión de documentación y alcance de la API**
+  - Consultó la documentación compartida en Google Drive, incluyendo el documento de arquitectura y la definición de módulos, y contrastó su alcance con el repositorio.
+  - Identificó los dos endpoints implementados de autenticación: `POST /api/v1/auth/login` y `POST /api/v1/auth/register`.
+  - Revisó los roles existentes (`SOCIO_ACTIVO`, `CLIENTE_EXTERNO`, `RECEPCIONISTA` y `GERENTE`) y distinguió los permisos por rol de las condiciones de membresía y las reglas de negocio.
+  - Registró que la definición de módulos considera al socio activo una condición de membresía; mantuvo los roles actuales sin modificar el esquema ni las migraciones.
+
+- **Organización inicial de endpoints por módulo**
+  - Incorporó inicialmente 18 rutas y amplió el esquema hasta completar 53 endpoints de negocio, además de los dos endpoints existentes de autenticación.
+  - Organizó los controladores por usuarios, sedes, planes y membresías, accesos, clases, canchas y reservas, pagos y reportes.
+  - Incluyó rutas para consultas personales, administración de sedes y planes, renovación de membresías, ingresos y salidas, asistencia a clases, listas de espera, turnos, mantenimiento, comprobantes y solicitudes de reembolso.
+  - Definió las rutas como implementaciones pendientes: devuelven `501 Not Implemented` sin cuerpo cuando el usuario tiene permiso, sin consultar ni modificar datos.
+  - Conservó el prefijo `/api/v1` y dejó pendientes los contratos de solicitud y respuesta, los filtros y la conexión de estas rutas con el frontend.
+
+- **Autorización por roles y validaciones pendientes**
+  - Agregó restricciones `@PreAuthorize` a los 53 endpoints de negocio utilizando la configuración existente de Spring Security y `@EnableMethodSecurity`.
+  - Habilitó el acceso de `GERENTE` a todos los endpoints de negocio y separó las acciones de clientes y socios de las operaciones de recepción y administración.
+  - Documentó las respuestas previstas: `401` sin autenticación válida, `403` para roles no permitidos y `501` para solicitudes autorizadas a las rutas pendientes.
+  - Dejó para los servicios de cada caso de uso la verificación de propiedad de reservas, membresías, ofertas y pagos; la restricción de recepción a su sede; y la comprobación de vigencia de membresía y suspensiones de clases.
+  - Aclaró que el acceso global del gerente no elimina las reglas de capacidad, horarios, precios, concurrencia ni devoluciones.
+  - Dejó pendientes la definición de pagos asistidos y los permisos de recepción sobre pagos y reembolsos; no habilitó acceso de recepción a M5 en esta primera versión.
+
+- **Pruebas y documentación**
+  - Incorporó `EndpointAuthorizationTest` para verificar el acceso del gerente a todos los métodos, el rechazo de roles desconocidos y permisos representativos de clientes, socios y recepción.
+  - Delimitó el alcance de esas pruebas: verifican autorización de métodos, sin probar solicitudes HTTP, validación de JWT ni reglas de pertenencia, sede o membresía.
+  - Comprobó estáticamente que las 53 rutas poseen anotaciones de autorización y permiten el rol `GERENTE`; verificó el formato de los cambios con `git diff --check`.
+  - Intentó compilar y ejecutar las pruebas, pero el wrapper de Maven no pudo iniciar. En el entorno se encontró JDK 12 y no se dispuso de JDK 21 configurado; la compilación y las pruebas quedaron pendientes de ejecución.
+  - Actualizó el README en español con el listado de endpoints, sus roles permitidos, las validaciones pendientes y el alcance de las pruebas.
+
+- **Versionado y publicación**
+  - Creó la rama `feature/bautista-first-endpoint-implementation` y conservó en ella los cambios de endpoints y documentación.
+  - Registró el commit `b58ee7c`: `feat: agregar endpoints iniciales y autorización por roles`.
+  - Publicó la rama en `origin` (GitHub) y configuró su seguimiento remoto. No integró los cambios a `main`.
