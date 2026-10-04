@@ -85,7 +85,105 @@ com.fitzonesports/
 
 Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue esta misma organización interna.
 
+## Endpoints iniciales de los módulos
+
+Borrador para organizar el trabajo. Las 53 rutas de negocio usan el prefijo
+`/api/v1` y devuelven `501 Not Implemented` sin cuerpo si el rol tiene permiso.
+Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
+No consultan ni modifican datos. Los contratos de solicitud/respuesta y filtros
+están pendientes. Las anotaciones `@PreAuthorize` usan el soporte existente de
+Spring Security (`@EnableMethodSecurity`).
+
+Roles: **S** = SOCIO_ACTIVO, **C** = CLIENTE_EXTERNO,
+**R** = RECEPCIONISTA, **G** = GERENTE. GERENTE tiene acceso a todas las rutas.
+Se conservan los roles actuales; en los documentos, socio activo se considera
+una condición de membresía y su futura representación requiere revisión.
+
+Pendiente antes de implementar operaciones reales:
+
+- Validar propiedad de perfiles, membresías, reservas, ofertas y pagos.
+- Restringir recepción a su sede; permitir al gerente operar en todas.
+- Consultar vigencia de membresía y suspensión de clases, sin confiar solo en el rol.
+- Permitir cancelar reservas propias aunque la membresía haya vencido: revisar
+  la política al separar condición de membresía y rol.
+- Aplicar reglas de capacidad, horarios, precios y devoluciones también al gerente.
+- Definir pagos asistidos y acceso de recepción a pagos/reembolsos. Por ahora,
+  recepción no tiene acceso a M5; los clientes solicitan reembolsos propios.
+- Agregar actualización de tarifas por tipo de cancha cuando se acuerde su contrato;
+  la modificación de cancha no define todavía ese contrato global.
+
+| Módulo | Método | Ruta (sin prefijo) | Roles | Caso previsto |
+|---|---|---|---|---|
+| usuario | GET | `/usuarios/me` | S, C, R, G | consultarPerfil |
+| usuario | PATCH | `/usuarios/me` | S, C, R, G | actualizarPerfil |
+| usuario | GET | `/usuarios` | R, G | listarUsuarios |
+| usuario | GET | `/usuarios/{usuarioId}` | R, G | consultarUsuario |
+| usuario | PATCH | `/usuarios/{usuarioId}` | R, G | actualizarUsuario |
+| sede | GET | `/sedes` | S, C, R, G | listarSedes |
+| sede | POST | `/sedes` | G | crearSede |
+| sede | PATCH | `/sedes/{sedeId}` | G | actualizarSede |
+| membresia | GET | `/planes` | S, C, R, G | listarPlanes |
+| membresia | POST | `/planes` | G | crearPlan |
+| membresia | PATCH | `/planes/{planId}` | G | actualizarPlan |
+| membresia | GET | `/membresias/me` | S, C, G | consultarMembresia |
+| membresia | POST | `/membresias` | S, C, G | crearMembresia |
+| membresia | POST | `/membresias/{membresiaId}/renovaciones` | S, C, G | renovarMembresia |
+| membresia | GET | `/membresias/{membresiaId}` | R, G | consultarMembresiaPorId |
+| membresia | PATCH | `/membresias/{membresiaId}/estado` | R, G | actualizarEstado |
+| membresia | PUT | `/membresias/{membresiaId}/renovacion-automatica` | S, C, G | configurarRenovacionAutomatica |
+| acceso | GET | `/accesos/qr` | S, G | obtenerQr |
+| acceso | POST | `/accesos/ingresos` | R, G | registrarIngreso |
+| acceso | POST | `/accesos/salidas` | R, G | registrarSalida |
+| acceso | GET | `/accesos/sedes/{sedeId}/aforo` | R, G | consultarAforo |
+| acceso | GET | `/accesos` | R, G | listarAccesos |
+| acceso | PATCH | `/accesos/{accesoId}` | R, G | corregirAcceso |
+| clase | GET | `/clases` | S, G, R | listarClases |
+| clase | POST | `/clases/{claseId}/reservas` | S, G | reservarClase |
+| clase | DELETE | `/clases/{claseId}/reservas/{reservaId}` | S, G, R | cancelarReserva |
+| clase | POST | `/clases` | R, G | crearClase |
+| clase | PATCH | `/clases/{claseId}` | R, G | actualizarClase |
+| clase | POST | `/clases/{claseId}/cancelacion` | R, G | cancelarClase |
+| clase | GET | `/clases/{claseId}/reservas` | R, G | listarReservasClase |
+| clase | PUT | `/clases/{claseId}/reservas/{reservaId}/asistencia` | R, G | registrarAsistencia |
+| clase | POST | `/clases/{claseId}/lista-espera` | S, G | incorporarListaEspera |
+| clase | DELETE | `/clases/{claseId}/lista-espera/me` | S, G | salirListaEspera |
+| clase | POST | `/clases/{claseId}/ofertas/{ofertaId}/respuesta` | S, G | responderOferta |
+| reserva | GET | `/canchas` | S, C, R, G | listarCanchas |
+| reserva | GET | `/canchas/{canchaId}/turnos` | S, C, R, G | listarTurnos |
+| reserva | POST | `/canchas/{canchaId}/reservas` | S, C, G | reservarTurno |
+| reserva | DELETE | `/canchas/{canchaId}/reservas/{reservaId}` | S, C, R, G | cancelarReserva |
+| reserva | POST | `/canchas` | R, G | crearCancha |
+| reserva | PATCH | `/canchas/{canchaId}` | R, G | actualizarCancha |
+| reserva | POST | `/canchas/{canchaId}/turnos` | R, G | crearTurno |
+| reserva | POST | `/canchas/{canchaId}/mantenimientos` | R, G | crearMantenimiento |
+| reserva | DELETE | `/canchas/{canchaId}/mantenimientos/{mantenimientoId}` | R, G | eliminarMantenimiento |
+| reserva | GET | `/reservas/me` | S, C, G | listarMisReservas |
+| reserva | GET | `/reservas` | R, G | listarReservas |
+| pago | POST | `/pagos` | S, C, G | crearPago |
+| pago | GET | `/pagos/me` | S, C, G | listarMisPagos |
+| pago | GET | `/pagos/{pagoId}/comprobante` | S, C, G | consultarComprobante |
+| pago | GET | `/pagos/{pagoId}` | S, C, G | consultarPago |
+| pago | GET | `/pagos` | G | listarPagos |
+| pago | POST | `/pagos/{pagoId}/reembolsos` | S, C, G | solicitarReembolso |
+| reporte | GET | `/reportes/ocupacion` | G | consultarOcupacion |
+| reporte | GET | `/reportes/ingresos` | G | consultarIngresos |
+
+La autenticación existente (`POST /auth/login` y `POST /auth/register`) sigue
+implementada y pública. Los stubs no están conectados todavía al frontend.
+
+### Pruebas de autorización
+
+`EndpointAuthorizationTest` verifica las restricciones por rol con la seguridad
+de métodos de Spring: acceso del gerente a todas las rutas, rechazo de roles
+desconocidos y permisos representativos de clientes, socios y recepción.
+No prueba solicitudes HTTP, validación de JWT ni reglas de pertenencia o membresía.
+
+Ejecutar con JDK 21: `./mvnw test` (Windows: `.\mvnw.cmd test`). En el entorno
+utilizado para preparar este cambio, el wrapper de Maven no pudo iniciar;
+las pruebas quedaron pendientes de ejecución.
+
 ## Documentación
+
 
 - Diagramas C4 y ADR: `docs/`
 - Bitácoras del equipo: `LOGs/`
