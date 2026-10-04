@@ -26,3 +26,17 @@
 * **[S1] Revisión de Diagramas C4 y Soporte Offline** — *1.5 hs*
   * Inconsistencia en C4 delimitando a `Usuario` como entidad base única con relación opcional hacia `Membresia`.
   * Componentes necesarios en C4 Nivel 3 para el Módulo M2 (Acceso al Gimnasio) para soportar la contingencia offline (caché local de socios y servicio de sincronización diferida).
+
+  ### 28/09/2026
+
+* **[S3] Inicialización y Configuración de Entorno Frontend (React + Vite)** — *1.5 hs*
+  * Creación y estructuración de la aplicación en la subcarpeta `frontend` utilizando Vite.
+  * Solución de errores de compilación por configuración en `vite.config.js` y verificación del servidor de desarrollo local (`npm run dev`).
+
+* **[S3] Implementación de Manejo Inicial de Sesión y Autenticación** — *2.5 hs*
+  * Creación e integración de `AuthContext` para la gestión global de la sesión y almacenamiento del token JWT en `localStorage`.
+  * Desarrollo del componente `ProtectedRoute` y la vista `LoginPage` para proteger el acceso a las vistas principales del sistema.
+  * Actualización del componente `Layout` para habilitar el botón funcional de cierre de sesión (*Logout*) y la persistencia de roles.
+
+* **[S3] Control de Versiones y Sincronización Git** — *0.5 hs*
+  * Gestión de ramas de trabajo (`front-ignacion`), resolución de *merges* locales con `main` y validación del grafo de commits en el entorno de desarrollo.
