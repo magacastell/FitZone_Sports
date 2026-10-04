@@ -1,7 +1,7 @@
 package com.fitzonesports.auth.service;
 
-import com.fitzonesports.auth.model.Usuario;
-import com.fitzonesports.auth.repository.UsuarioRepository;
+import com.fitzonesports.usuario.model.Usuario;
+import com.fitzonesports.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

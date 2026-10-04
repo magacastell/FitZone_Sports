@@ -1,5 +1,7 @@
-package com.fitzonesports.auth.model;
+package com.fitzonesports.usuario.model;
 
+import com.fitzonesports.auth.model.Rol;
+import com.fitzonesports.auth.model.Sede;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +21,7 @@ import lombok.Setter;
 @Table(name = "usuario")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
@@ -43,6 +47,7 @@ public class Usuario {
 
     private String foto;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean activo = true;
 

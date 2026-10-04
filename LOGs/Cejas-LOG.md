@@ -24,3 +24,6 @@
 - Conectó el login del frontend con el backend (`POST /auth/login`), reemplazando el mock de `AuthContext`; el rol del usuario se lee del JWT.
 - Agregó un proxy de Vite hacia el backend (que no tiene CORS) y corrigió la URL base de la API.
 - Manejó la expiración de sesión: descarta el token vencido al cargar la app y cierra sesión automáticamente ante un 401.
+- Implementó el módulo `usuario` (perfil propio en `/usuarios/me`, y listado, consulta y modificación de usuarios) con sus DTOs, reemplazando los stubs 501.
+- Movió la lógica de alta de `AuthController` a `UsuarioService`, y `Usuario`, `UsuarioRepository` y `RegisterRequest` al módulo `usuario`.
+- Definió las reglas de acceso: recepción opera solo sobre socios y clientes de su sede y puede activar o desactivar cuentas; el gerente opera sobre todo; nadie puede desactivar su propia cuenta.

@@ -1,4 +1,4 @@
-package com.fitzonesports.auth.dto;
+package com.fitzonesports.usuario.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

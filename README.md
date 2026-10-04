@@ -77,10 +77,19 @@ com.fitzonesports/
 └── auth/
     ├── controller/   AuthController
     ├── service/      JwtService, CustomUserDetailsService
-    ├── repository/   UsuarioRepository, RolRepository
-    ├── model/        Usuario, Rol, Sede
+    ├── repository/   RolRepository, SedeRepository
+    ├── model/        Rol, Sede
     ├── security/      SecurityConfig, JwtAuthenticationFilter
     └── dto/          LoginRequest, LoginResponse
+```
+
+```
+com.fitzonesports/
+└── usuario/
+    ├── controller/   UsuarioController
+    ├── service/      UsuarioService (alta de clientes)
+    ├── repository/   UsuarioRepository
+    └── model/        Usuario
 ```
 
 Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue esta misma organización interna.
@@ -88,7 +97,8 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 ## Endpoints iniciales de los módulos
 
 Borrador para organizar el trabajo. Las 53 rutas de negocio usan el prefijo
-`/api/v1` y devuelven `501 Not Implemented` sin cuerpo si el rol tiene permiso.
+`/api/v1`. Las 5 del módulo `usuario` ya están implementadas; las demás devuelven
+`501 Not Implemented` sin cuerpo si el rol tiene permiso.
 Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
 No consultan ni modifican datos. Los contratos de solicitud/respuesta y filtros
 están pendientes. Las anotaciones `@PreAuthorize` usan el soporte existente de
@@ -111,6 +121,12 @@ Pendiente antes de implementar operaciones reales:
   recepción no tiene acceso a M5; los clientes solicitan reembolsos propios.
 - Agregar actualización de tarifas por tipo de cancha cuando se acuerde su contrato;
   la modificación de cancha no define todavía ese contrato global.
+
+Reglas de `usuario`: recepción solo lista, consulta y modifica usuarios de su sede, y
+solo SOCIO_ACTIVO o CLIENTE_EXTERNO. Puede activar/desactivar cuentas (`activo`) con
+`PATCH /usuarios/{usuarioId}`. Nadie puede desactivar su propia cuenta, y
+`PATCH /usuarios/me` no permite cambiar `activo`. El gerente opera sobre todas las
+sedes y roles. `GET /usuarios` acepta `?sedeId=` (recepción solo con su propia sede).
 
 | Módulo | Método | Ruta (sin prefijo) | Roles | Caso previsto |
 |---|---|---|---|---|
