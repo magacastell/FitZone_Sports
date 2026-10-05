@@ -1,4 +1,4 @@
-package com.fitzonesports.auth.model;
+package com.fitzonesports.sede.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

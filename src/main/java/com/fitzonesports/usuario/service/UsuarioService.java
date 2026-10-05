@@ -2,9 +2,9 @@ package com.fitzonesports.usuario.service;
 
 import com.fitzonesports.usuario.dto.RegisterRequest;
 import com.fitzonesports.auth.model.Rol;
-import com.fitzonesports.auth.model.Sede;
+import com.fitzonesports.sede.model.Sede;
 import com.fitzonesports.auth.repository.RolRepository;
-import com.fitzonesports.auth.repository.SedeRepository;
+import com.fitzonesports.sede.repository.SedeRepository;
 import com.fitzonesports.usuario.dto.ActualizarPerfilRequest;
 import com.fitzonesports.usuario.dto.ActualizarUsuarioRequest;
 import com.fitzonesports.usuario.dto.UsuarioResponse;

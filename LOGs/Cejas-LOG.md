@@ -27,3 +27,10 @@
 - Implementó el módulo `usuario` (perfil propio en `/usuarios/me`, y listado, consulta y modificación de usuarios) con sus DTOs, reemplazando los stubs 501.
 - Movió la lógica de alta de `AuthController` a `UsuarioService`, y `Usuario`, `UsuarioRepository` y `RegisterRequest` al módulo `usuario`.
 - Definió las reglas de acceso: recepción opera solo sobre socios y clientes de su sede y puede activar o desactivar cuentas; el gerente opera sobre todo; nadie puede desactivar su propia cuenta.
+
+### Claudio — 05/10/2026
+
+- Implementó la lógica inicial del módulo `sede` (listar, crear y modificar sedes) con sus DTOs y servicio, reemplazando los stubs 501. Por ahora es solo la base; quedan pendientes reglas adicionales.
+- Definió las reglas de acceso: todos los roles listan las sedes, solo el gerente las crea o modifica, y el nombre es único.
+- Movió `Sede` y `SedeRepository` del módulo `auth` al módulo `sede`.
+- Hizo que el menú del frontend se muestre según el rol del usuario logueado (leído del JWT), manteniendo el desplegable de vista de desarrollo para previsualizar otros roles.

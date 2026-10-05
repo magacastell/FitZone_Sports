@@ -16,10 +16,20 @@ function NavigationLink({ to, icon: Icon, children, module }) {
   );
 }
 
+// Rol del JWT (nombre en backend) -> clave de vista que usa el menú
+const VISTA_POR_ROL = {
+  SOCIO_ACTIVO: 'SOCIO',
+  CLIENTE_EXTERNO: 'EXTERNO',
+  RECEPCIONISTA: 'RECEPCION',
+  GERENTE: 'GERENTE',
+};
+
 export default function Layout() {
-  // Simulación de rol activo para desarrollo: 'SOCIO', 'EXTERNO', 'RECEPCION', 'GERENTE'
-  const [rolActivo, setRolActivo] = useState('SOCIO');
-  const { logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
+  // Por defecto se muestra la vista del rol real; el desplegable de desarrollo
+  // permite previsualizar otro rol sin cambiar de sesión.
+  const [vistaForzada, setVistaForzada] = useState(null);
+  const rolActivo = vistaForzada ?? VISTA_POR_ROL[user?.rol] ?? 'SOCIO';
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -43,7 +53,7 @@ export default function Layout() {
 
           <div className="actor-preview">
             <label htmlFor="vista-desarrollo">Vista de desarrollo</label>
-            <select id="vista-desarrollo" value={rolActivo} onChange={(e) => setRolActivo(e.target.value)}>
+            <select id="vista-desarrollo" value={rolActivo} onChange={(e) => setVistaForzada(e.target.value)}>
               <option value="SOCIO">Socio Activo</option>
               <option value="EXTERNO">Cliente Externo</option>
               <option value="RECEPCION">Recepcionista / Admin Sede</option>

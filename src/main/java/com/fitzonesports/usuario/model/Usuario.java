@@ -1,7 +1,7 @@
 package com.fitzonesports.usuario.model;
 
 import com.fitzonesports.auth.model.Rol;
-import com.fitzonesports.auth.model.Sede;
+import com.fitzonesports.sede.model.Sede;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

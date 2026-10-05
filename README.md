@@ -77,8 +77,8 @@ com.fitzonesports/
 └── auth/
     ├── controller/   AuthController
     ├── service/      JwtService, CustomUserDetailsService
-    ├── repository/   RolRepository, SedeRepository
-    ├── model/        Rol, Sede
+    ├── repository/   RolRepository
+    ├── model/        Rol
     ├── security/      SecurityConfig, JwtAuthenticationFilter
     └── dto/          LoginRequest, LoginResponse
 ```
@@ -97,7 +97,7 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 ## Endpoints iniciales de los módulos
 
 Borrador para organizar el trabajo. Las 53 rutas de negocio usan el prefijo
-`/api/v1`. Las 5 del módulo `usuario` ya están implementadas; las demás devuelven
+`/api/v1`. Las del módulo `usuario` y `sede` ya están implementadas; las demás devuelven
 `501 Not Implemented` sin cuerpo si el rol tiene permiso.
 Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
 No consultan ni modifican datos. Los contratos de solicitud/respuesta y filtros
@@ -127,6 +127,8 @@ solo SOCIO_ACTIVO o CLIENTE_EXTERNO. Puede activar/desactivar cuentas (`activo`)
 `PATCH /usuarios/{usuarioId}`. Nadie puede desactivar su propia cuenta, y
 `PATCH /usuarios/me` no permite cambiar `activo`. El gerente opera sobre todas las
 sedes y roles. `GET /usuarios` acepta `?sedeId=` (recepción solo con su propia sede).
+
+Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente crea o modifica. El nombre es único (sin distinguir mayúsculas, `409` si se repite) y `capacidadMaxima` debe ser positiva. `Sede` y `SedeRepository` pasaron de `auth` al módulo `sede`.
 
 | Módulo | Método | Ruta (sin prefijo) | Roles | Caso previsto |
 |---|---|---|---|---|
