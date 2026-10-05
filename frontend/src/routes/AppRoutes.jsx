@@ -10,6 +10,7 @@ import GrillaCanchas from '../modules/m4-canchas/GrillaCanchas';
 import HistorialComprobante from '../modules/m5-pagos/HistorialComprobante';
 
 import LoginPage from '../modules/auth/LoginPage';
+import RegisterPage from '../modules/auth/RegisterPage';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 function SocioQRRoute() {
@@ -23,7 +24,8 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
           <Route path="/login" element={<LoginPage />} />
-          
+          <Route path="/registro" element={<RegisterPage />} />
+
           {/* Todas las rutas del Layout ahora están protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>

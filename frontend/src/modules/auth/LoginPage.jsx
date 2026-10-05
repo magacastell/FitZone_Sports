@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
@@ -58,6 +58,9 @@ export default function LoginPage() {
         <button type="submit" className="button button--primary" style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', fontWeight: 'bold', fontSize: '1rem' }}>
           Ingresar
         </button>
+        <Link to="/registro" className="button button--secondary" style={{ display: 'block', boxSizing: 'border-box', textAlign: 'center', textDecoration: 'none', width: '100%', padding: '0.75rem', borderRadius: '6px', fontWeight: 'bold', fontSize: '1rem', marginTop: '0.75rem' }}>
+          Registrarse
+        </Link>
         <p style={{ textAlign: 'center', marginTop: '1rem', color: '#64748b', fontSize: '0.8rem' }}>Usa: socio@fitzone.com / socio123</p>
       </form>
     </div>

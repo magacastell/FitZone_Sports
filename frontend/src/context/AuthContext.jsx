@@ -57,6 +57,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // El registro público devuelve un JWT: el usuario queda con sesión iniciada
+  const register = async (datos) => {
+    try {
+      const data = await fetchAPI('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(datos),
+      });
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -64,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated: !!token }}>
       {children}
     </AuthContext.Provider>
   );
