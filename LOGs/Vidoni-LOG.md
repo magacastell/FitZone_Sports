@@ -39,7 +39,7 @@
 
 ### 06/10/2026
 
-- **Cierre de la tarjeta de contratos API/OpenAPI**
+- **Cierre de la tarjeta de contratos API/OpenAPI - 4 hs**
   - Consolidó en la rama `docs/openapi-contratos` el contrato de las 55 operaciones existentes de FitZone Sports.
   - Separó el estado de implementación (`implemented`/`stub`) de la madurez del contrato (`stable`/`draft`).
   - El resultado final comprende 10 operaciones implemented, 45 stub, 11 contratos stable y 44 draft.
