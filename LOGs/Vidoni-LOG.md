@@ -36,3 +36,14 @@
   - Retiró las dependencias instaladas del control de versiones y excluyó `node_modules/`, `dist/` y `.vite/`, conservando los archivos de declaración y bloqueo de dependencias.
   - Verificó la instalación con `npm ci`, el build de producción y las rutas en navegador, incluyendo navegación con teclado y vistas desktop y angostas.
   - Documentó en `frontend/README.md` la ejecución local, estructura, rutas, navegación y límites de los datos simulados y funcionalidades pendientes.
+
+### 06/10/2026
+
+- **Cierre de la tarjeta de contratos API/OpenAPI**
+  - Consolidó en la rama `docs/openapi-contratos` el contrato de las 55 operaciones existentes de FitZone Sports.
+  - Separó el estado de implementación (`implemented`/`stub`) de la madurez del contrato (`stable`/`draft`).
+  - El resultado final comprende 10 operaciones implemented, 45 stub, 11 contratos stable y 44 draft.
+  - Documentó en `docs/openapi/DECISIONES.md` las decisiones todavía no confirmadas para revisión del equipo, diferenciándolas de la evidencia del proyecto y las decisiones técnicas del contrato.
+  - Validó OpenAPI con Redocly sin errores; quedaron únicamente las advertencias conocidas de licencia y servidor localhost.
+  - No modificó backend, frontend, migraciones ni persistencia; el alcance se limitó al contrato, sus decisiones, los enlaces del README y esta bitácora.
+  - Dejó el trabajo listo para revisión mediante Pull Request.
