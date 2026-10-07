@@ -203,5 +203,7 @@ las pruebas quedaron pendientes de ejecución.
 ## Documentación
 
 
+- Contrato objetivo API v1: [OpenAPI](docs/openapi/openapi.yaml)
+- Decisiones del contrato: [D1-D20](docs/openapi/DECISIONES.md)
 - Diagramas C4 y ADR: `docs/`
 - Bitácoras del equipo: `LOGs/`
