@@ -7,29 +7,170 @@ Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas 
 ## Stack
 
 - **Backend:** Java 21 + Spring Boot 4.1.1 (Maven), PostgreSQL, Flyway, Spring Data JPA, Spring Security + JWT
-- **Frontend:** React (pendiente)
+- **Frontend:** React + Vite + React Router; login y registro conectados a la API, pantallas de negocio con datos de ejemplo.
 - **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, y a futuro `membresia`, `clase`, `reserva`, `pago`)
 
 ## Requisitos
 
 - JDK 21
-- Docker (para levantar PostgreSQL)
+- Docker Desktop con Docker Compose, o PostgreSQL 18 instalado localmente
+- Node.js y npm para el frontend (base comprobada con Node.js 24.15.0 y npm 11.12.1)
+- PowerShell o una terminal equivalente. Maven se incluye mediante `mvnw`; no hace falta instalarlo aparte.
 
 ## Cómo levantar el proyecto localmente
 
-1. Levantar la base de datos:
-   ```bash
-   docker compose up -d
-   ```
-   Esto crea un contenedor de PostgreSQL 18 con la base `fitzone` ya creada (usuario/password `postgres`/`postgres`).
+Los comandos de PowerShell se ejecutan desde la raíz del repositorio, salvo que se indique otra carpeta. Para probar solo la API, completá los pasos de base de datos y backend; el frontend es opcional.
 
-2. Correr el backend (el perfil `SPRING_PROFILES_ACTIVE` es obligatorio, no tiene default):
-   ```bash
-   SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
-   ```
-   La API queda disponible en `http://localhost:3000/api/v1`.
+### 1. Preparar Java
+
+Verificá que Maven encuentre JDK 21:
+
+```powershell
+.\mvnw.cmd -version
+```
+
+Si aparece `JAVA_HOME is not defined correctly` o una versión distinta de 21, configurá la ruta de tu JDK (reemplazá el ejemplo por la carpeta real que contiene `bin`):
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+& "$env:JAVA_HOME\bin\java.exe" -version
+.\mvnw.cmd -version
+```
+
+Las variables definidas con `$env:` se aplican a esa terminal. Si abrís otra para ejecutar Maven, volvé a configurarlas allí.
+
+### 2. Levantar PostgreSQL (elegir una opción)
+
+**Opción A: Docker.** Abrí Docker Desktop y esperá a que esté listo. Luego:
+
+```powershell
+docker compose up -d
+docker compose ps
+```
+
+El contenedor `fitzone-postgres` debe estar en ejecución. Compose crea la base `fitzone` y usa usuario `postgres`, contraseña `postgres` y puerto `5432`.
+
+**Opción B: PostgreSQL instalado localmente.** Iniciá el servicio y creá una base llamada `fitzone` en pgAdmin, o ejecutá lo siguiente en Query Tool conectado a la base `postgres`:
+
+```sql
+CREATE DATABASE fitzone;
+```
+
+Usá una base dedicada al desarrollo. No hace falta crear las tablas manualmente. En la terminal donde vas a iniciar el backend, configurá tus credenciales reales:
+
+```powershell
+$env:DB_URL = "jdbc:postgresql://localhost:5432/fitzone"
+$env:DB_USERNAME = "postgres"
+$env:DB_PASSWORD = "TU_CONTRASEÑA_DE_POSTGRESQL"
+```
+
+La contraseña del servidor PostgreSQL puede ser distinta de la contraseña maestra de pgAdmin. Si ya existe la base `fitzone`, no repitas su creación. Docker y PostgreSQL local no pueden ocupar el mismo puerto en la misma dirección; elegí una opción y verificá a qué servidor apunta `DB_URL`.
+
+### 3. Iniciar el backend (terminal 1)
+
+Con Docker y las credenciales de Compose, configurá explícitamente los valores para evitar que variables anteriores apunten a otra base:
+
+```powershell
+$env:DB_URL = "jdbc:postgresql://localhost:5432/fitzone"
+$env:DB_USERNAME = "postgres"
+$env:DB_PASSWORD = "postgres"
+```
+
+Con PostgreSQL local, conservá los valores del paso anterior. Luego, para ambas opciones:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = "dev"
+.\mvnw.cmd spring-boot:run
+```
+
+El perfil `dev` es obligatorio para esta configuración local. Esperá los mensajes `Tomcat started on port 3000` y `Started FitZoneSportsApplication`. Dejá esta terminal abierta: la API queda disponible en `http://localhost:3000/api/v1`. La primera ejecución puede tardar mientras Maven descarga dependencias.
+
+En Linux/macOS, el comando equivalente con los valores locales predeterminados es:
+
+```bash
+SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
+```
 
 Al levantar por primera vez, Flyway aplica las migraciones de `src/main/resources/db/migration`. Hibernate valida el esquema sin modificarlo (`ddl-auto=validate`). En dev, `data.sql` agrega una sede y usuarios de prueba.
+
+### 4. Probar la API (terminal 2)
+
+Con el backend en ejecución, abrí otra terminal PowerShell y ejecutá estos bloques por separado. Primero, iniciá sesión como gerente:
+
+```powershell
+$login = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/v1/auth/login" -ContentType "application/json" -Body '{"email":"gerente@fitzone.com","password":"gerente123"}'
+```
+
+Prepará el encabezado de autorización con el JWT recibido:
+
+```powershell
+$headers = @{ Authorization = "Bearer $($login.token)" }
+```
+
+Consultá el perfil, las sedes, los usuarios y los planes:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/api/v1/usuarios/me" -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:3000/api/v1/sedes" -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:3000/api/v1/usuarios" -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:3000/api/v1/planes" -Headers $headers
+```
+
+El perfil debe devolver los datos del gerente. Los listados devuelven los datos existentes; `/planes` puede devolver `[]` si todavía no hay planes. Para probar una escritura, creá un plan con nombre único:
+
+```powershell
+$plan = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/v1/planes" -Headers $headers -ContentType "application/json" -Body '{"nombre":"Plan de prueba local","duracionMeses":1,"precio":15000}'
+$plan
+```
+
+Esto guarda un plan en la base local. Repetir el mismo nombre devuelve `409`; usá otro nombre para una nueva prueba. Para desactivarlo:
+
+```powershell
+Invoke-RestMethod -Method Delete -Uri "http://localhost:3000/api/v1/planes/$($plan.id)" -Headers $headers
+```
+
+También podés usar Postman: hacé el mismo POST de login con cuerpo JSON y copiá `token` en Authorization → Bearer Token para las demás solicitudes. El JWT vence en una hora; repetí el login si expiró.
+
+Resultados útiles para probar: sin token, las rutas protegidas devuelven `401`; con un rol sin permisos, `403`; muchas operaciones pendientes devuelven `501`. Más abajo está la tabla de endpoints y roles. Podés repetir el login con los otros usuarios de prueba para verificar permisos.
+
+### 5. Iniciar el frontend (otra terminal)
+
+Desde la raíz del repositorio:
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Abrí la URL que muestre Vite, normalmente `http://localhost:5173`. Dejá también esta terminal abierta y entrá con `socio@fitzone.com` / `socio123`, o con otro usuario de la tabla de prueba.
+
+El login y el registro llaman al backend real, por lo que debe estar en ejecución. Vite redirige las solicitudes `/api` a `http://localhost:3000`; no hace falta definir `VITE_API_URL` para este flujo. Las pantallas de negocio todavía usan datos e interacciones de ejemplo: iniciar ambos servidores no implementa reservas, pagos ni QR reales.
+
+Para verificar la compilación del frontend, desde `frontend/`:
+
+```powershell
+npm run build
+```
+
+Para ejecutar las pruebas automatizadas del backend, desde la raíz con JDK 21:
+
+```powershell
+.\mvnw.cmd test
+```
+
+Las pruebas de persistencia requieren una base aparte, vacía y descartable, configurada mediante `PLAN_TEST_DB_URL`; sin esa variable se omiten. Consultá la sección «Pruebas de planes» antes de habilitarlas.
+
+### Problemas frecuentes y cómo detener el entorno
+
+- **Conexión rechazada al llamar a la API:** el backend no está escuchando en `3000`. Revisá su terminal y esperá el mensaje de inicio. `BUILD SUCCESS` por sí solo no confirma que el servidor siga en ejecución.
+- **`password authentication failed`:** revisá `DB_USERNAME`, `DB_PASSWORD` y el servidor que ocupa `5432`. Un PostgreSQL instalado en Windows puede tener credenciales distintas de Docker.
+- **`database "fitzone" does not exist`:** creá la base en el servidor indicado por `DB_URL`.
+- **Docker no inicia por puerto ocupado:** verificá si PostgreSQL local usa `5432` y elegí cuál ejecutar.
+- **Error de PowerShell al pegar el login:** ejecutá por separado la asignación de `$login` y la de `$headers`, como en los ejemplos.
+- **El frontend no puede iniciar sesión:** verificá que el backend esté activo en `3000` y usá las credenciales de prueba de la API; la contraseña del socio es `socio123`.
+
+Detené backend y frontend con `Ctrl+C` en sus respectivas terminales. Si usaste Docker, desde la raíz ejecutá `docker compose down`; conserva los datos del volumen. No agregues `--volumes` salvo que quieras eliminar toda la base local.
 
 ## Migraciones de base de datos
 
