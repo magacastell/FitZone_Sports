@@ -358,9 +358,9 @@ incompatibles, falla con un mensaje para revisarlos; no elimina planes.
 
 La contratación/renovación deberá comprobar que el plan esté activo y conservar
 el precio y duración contratados al implementarse ese flujo.
-El contrato OpenAPI de la rama `docs/openapi-contratos` deberá alinearse con estos
-campos, reglas y el nuevo DELETE antes de integrarse; sus propuestas de moneda
-como objeto, sedes habilitadas y beneficios no corresponden a esta implementación.
+El contrato OpenAPI refleja estos campos, reglas y las cuatro operaciones de
+planes, incluido DELETE. La representación monetaria como objeto de otros módulos
+sigue siendo draft; no agrega sedes habilitadas ni beneficios al DTO de planes.
 
 ### Pruebas de planes
 
@@ -378,5 +378,7 @@ Sin la variable se omiten.
 ## Documentación
 
 
+- Contrato objetivo API v1: [OpenAPI](docs/openapi/openapi.yaml)
+- Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
 - Diagramas C4 y ADR: `docs/`
 - Bitácoras del equipo: `LOGs/`
