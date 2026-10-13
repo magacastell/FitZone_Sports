@@ -16,7 +16,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 function SocioQRRoute() {
   const navigate = useNavigate();
 
-  return <SocioQRModal isOpen={true} onClose={() => navigate('/canchas')} usuarioId="42" />;
+  return <SocioQRModal isOpen={true} onClose={() => navigate('/canchas')} />;
 }
 
 export default function AppRoutes() {

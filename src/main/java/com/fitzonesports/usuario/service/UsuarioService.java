@@ -64,6 +64,12 @@ public class UsuarioService {
         return UsuarioResponse.from(cargarPorEmail(email));
     }
 
+    /** Consulta interna de M2 (acceso): sin restriccion de sede, porque el QR de un socio vale en todas (RF-03). */
+    @Transactional(readOnly = true)
+    public UsuarioResponse consultarParaAcceso(Integer usuarioId) {
+        return UsuarioResponse.from(cargarPorId(usuarioId));
+    }
+
     @Transactional
     public UsuarioResponse actualizarPerfil(String email, ActualizarPerfilRequest request) {
         Usuario usuario = cargarPorEmail(email);

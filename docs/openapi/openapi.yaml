@@ -972,15 +972,21 @@ paths:
       tags:
       - M2 · Accesos
       summary: Obtener QR de acceso propio
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P04.'
+      description: |-
+        SOCIO_ACTIVO y GERENTE. Emite el QR del usuario autenticado (RF-04): un token firmado con vigencia de 60 segundos.
+        Cada pedido reemplaza al QR anterior, que deja de ser válido aunque no haya vencido; se guarda un único QR por
+        usuario en codigo_qr. El cliente debe pedir uno nuevo antes de que venza (el frontend lo hace 5 s antes).
+        La respuesta lleva Cache-Control: no-store. El token se firma con una clave derivada de jwt.secret, distinta
+        de la del login: no sirve como Bearer.
+        Usuario inactivo o con un rol sin ingreso habilitado recibe 403. Hoy "habilitado" se decide por rol
+        (SOCIO_ACTIVO y GERENTE); reemplazarlo por la membresía vigente queda pendiente (P01).
       operationId: obtenerQrAcceso
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: AccesoController, AccesoService, QrTokenService, CodigoQrRepository y migración V4.
       responses:
         '200':
-          description: Resultado de la operación.
+          description: QR vigente del usuario.
           content:
             application/json:
               schema:
@@ -989,41 +995,43 @@ paths:
           $ref: '#/components/responses/NoAutenticado'
         '403':
           $ref: '#/components/responses/SinPermiso'
-        '409':
-          $ref: '#/components/responses/Conflicto'
       x-roles-actuales:
       - SOCIO_ACTIVO
       - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
-      x-contract-status: draft
+      x-permisos-objetivo:
+      - SOCIO_ACTIVO
+      - GERENTE
       x-contract-pending:
       - P01
-      - P02
-      - P04
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente con membresía vigente y habilitada para ingreso. Gerente no omite validación de vigencia
-          para su QR propio. Sedes autorizadas dependen del plan; no sólo del registro.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-source:
+      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
+      - src/main/java/com/fitzonesports/acceso/service/AccesoService.java
+      - src/main/java/com/fitzonesports/acceso/service/QrTokenService.java
+      - src/main/resources/db/migration/V4__qr_y_accesos_abiertos.sql
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
   /accesos/ingresos:
     post:
       tags:
       - M2 · Accesos
       summary: Registrar ingreso a sede
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P04.'
+      description: |-
+        RECEPCIONISTA y GERENTE. Valida el qrToken y abre un acceso (fecha_hora_salida nula).
+        Validaciones, en orden: QR auténtico (firma y tipo; 400 si no lo es), no vencido (409), y que sea el último QR
+        emitido para ese titular (409 si se emitió uno más nuevo). El titular sale del QR, no de un usuarioId enviado.
+        El titular debe estar activo y con un rol habilitado (403); hoy por rol, pendiente de membresía vigente (P01).
+        RN-01: si el titular ya tiene un ingreso abierto, en cualquier sede, responde 409; también ante escaneos
+        simultáneos, por el índice único parcial uk_registro_acceso_abierto (V4).
+        Sede: RECEPCIONISTA opera la de su usuario (si envía otra sedeId, 403). GERENTE debe indicar sedeId (400 si
+        falta, 404 si no existe). El aforo es informativo: no rechaza por capacidad máxima.
+        La respuesta incluye el titular (nombre, apellido y foto) para el control visual en recepción.
       operationId: registrarIngreso
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: AccesoController, AccesoService, DTO de acceso y migración V4.
       responses:
         '201':
-          description: Recurso creado.
+          description: Ingreso registrado.
           content:
             application/json:
               schema:
@@ -1039,48 +1047,51 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO actual de ingreso.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarIngresoRequest'
-        x-propuesta-required: true
       x-roles-actuales:
       - RECEPCIONISTA
       - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
-      x-contract-status: draft
+      x-permisos-objetivo:
+      - RECEPCIONISTA
+      - GERENTE
       x-contract-pending:
       - P01
       - P02
       - P04
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Recepción opera sede de sesión; Gerente indica sedeId. Valida QR, membresía y autorización
-          del servicio en esa sede. Impide accesos abiertos incompatibles (409). Aforo informativo: no rechaza por
-          capacidad máxima.'
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-source:
+      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
+      - src/main/java/com/fitzonesports/acceso/dto/RegistrarIngresoRequest.java
+      - src/main/java/com/fitzonesports/acceso/dto/AccesoResponse.java
+      - src/main/java/com/fitzonesports/acceso/service/AccesoService.java
+      - src/main/resources/db/migration/V4__qr_y_accesos_abiertos.sql
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
   /accesos/salidas:
     post:
       tags:
       - M2 · Accesos
       summary: Registrar salida de sede
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P04.'
+      description: |-
+        RECEPCIONISTA y GERENTE. Cierra el acceso abierto identificado por accesoId o por qrToken (el titular vuelve a
+        mostrar su QR). Debe venir exactamente uno de los dos; ambos o ninguno producen 400.
+        Con qrToken se valida como en el ingreso (400 si no es auténtico; 409 si venció o fue reemplazado) y se busca
+        el ingreso abierto del titular (404 si no tiene uno). Con accesoId: 404 si no existe.
+        Un acceso que ya tiene salida responde 409 y no registra otra. RECEPCIONISTA sólo cierra accesos de su sede (403).
+        No exige que el titular siga habilitado para ingresar: quien está adentro siempre puede salir.
+        Cierre diario: a las 23:59 (America/Argentina/Buenos_Aires) los ingresos que siguen abiertos se cierran
+        solos con esa hora como salida, y el aforo de todas las sedes vuelve a 0.
       operationId: registrarSalida
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: AccesoController, AccesoService, CierreDiarioAccesos y DTO de acceso.
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Acceso cerrado, con la hora de salida.
           content:
             application/json:
               schema:
@@ -1096,46 +1107,45 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO actual de salida; accesoId o qrToken, uno solo.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrarSalidaRequest'
-        x-propuesta-required: true
       x-roles-actuales:
       - RECEPCIONISTA
       - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
-      x-contract-status: draft
+      x-permisos-objetivo:
+      - RECEPCIONISTA
+      - GERENTE
       x-contract-pending:
       - P02
       - P04
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Actualiza el acceso abierto identificado, no crea un recurso adicional. Recepción sólo su sede;
-          Gerente cualquiera. Si ya está cerrado con la misma intención devuelve el acceso sin registrar otra salida.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-source:
+      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
+      - src/main/java/com/fitzonesports/acceso/dto/RegistrarSalidaRequest.java
+      - src/main/java/com/fitzonesports/acceso/service/AccesoService.java
+      - src/main/java/com/fitzonesports/acceso/service/CierreDiarioAccesos.java
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
   /accesos/sedes/{sedeId}/aforo:
     get:
       tags:
       - M2 · Accesos
       summary: Consultar ocupación actual de sede
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P04, P11.'
+      description: |-
+        RECEPCIONISTA y GERENTE (RF-05). ocupacionActual es la cantidad de ingresos sin salida en la sede
+        (de cualquier persona) y capacidadMaxima la capacidad de la sede. Es informativo: superar la capacidad no
+        bloquea ingresos. RECEPCIONISTA sólo consulta su sede (403); GERENTE cualquiera (404 si no existe).
+        Vuelve a 0 con el cierre diario de las 23:59. No incluye movimientos offline (P04, no implementado).
       operationId: consultarAforo
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: AccesoController, AccesoService, SedeService y RegistroAccesoRepository.
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Aforo actual de la sede.
           content:
             application/json:
               schema:
@@ -1151,22 +1161,19 @@ paths:
       x-roles-actuales:
       - RECEPCIONISTA
       - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
-      x-contract-status: draft
+      x-permisos-objetivo:
+      - RECEPCIONISTA
+      - GERENTE
       x-contract-pending:
       - P02
       - P04
       - P11
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo su sede; Gerente cualquiera. Aforo informativo actual basado en accesos conocidos;
-          no es el reporte histórico ni una barrera de admisión.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-source:
+      - src/main/java/com/fitzonesports/acceso/controller/AccesoController.java
+      - src/main/java/com/fitzonesports/acceso/service/AccesoService.java
+      - src/main/java/com/fitzonesports/acceso/repository/RegistroAccesoRepository.java
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
     parameters:
     - $ref: '#/components/parameters/sedeId'
   /accesos:
@@ -3594,119 +3601,140 @@ components:
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
     QrAcceso:
       type: object
-      additionalProperties: false
-      properties:
-        token:
-          type: string
-          example: qr-firmado-opaco
-        venceEn:
-          type: string
-          format: date-time
-          example: '2026-10-06T18:00:00-03:00'
-        usuarioId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
+      description: |-
+        QR de acceso del usuario autenticado. token es opaco para el cliente: se muestra tal cual como código QR
+        (el lector lo transcribe) y se envía como qrToken en ingreso y salida. Vence a los 60 s (RF-04).
+      required:
       - token
       - venceEn
       - usuarioId
-      x-propuesta-descripcion: Credencial firmada y temporal para el titular autenticado con membresía vigente.
-        No expone secretos de firma.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      properties:
+        token:
+          type: string
+          description: JWT firmado con una clave propia del QR (distinta de la del login); no sirve como Bearer.
+          example: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidHlwIjoicXIiLCJpYXQiOjE3OTE5MjA2NTgsImV4cCI6MTc5MTkyMDcxOH0.NyIF8Zp05TMIIZPQc-JYiCUmeK2bxFYX11Ak_3Ntdek
+        venceEn:
+          type: string
+          format: date-time
+          description: Instante de vencimiento, 60 segundos después de la emisión.
+          example: '2026-10-13T16:57:38-03:00'
+        usuarioId:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+      x-contract-status: stable
     RegistrarIngresoRequest:
       type: object
-      additionalProperties: false
+      description: |-
+        qrToken es el token leído del QR; el titular se obtiene de él, no de un usuarioId enviado por el cliente.
+        sedeId: RECEPCIONISTA no lo envía (se toma de su usuario; si lo envía debe coincidir o recibe 403).
+        GERENTE debe indicarlo.
+      required:
+      - qrToken
       properties:
         qrToken:
           type: string
-          example: qr-firmado-opaco
-          x-propuesta-validacion:
-            minLength: 1
+          minLength: 1
+          pattern: '[\s\S]*\S[\s\S]*'
+          example: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidHlwIjoicXIi...
         sedeId:
           type: integer
           format: int32
+          minimum: 1
+          nullable: true
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
-      - qrToken
-      x-propuesta-descripcion: 'Recepción: sede derivada de su sesión; no enviar sedeId. Gerente: sedeId requerido.
-        El titular se obtiene del QR validado, no de un usuarioId enviado libremente.'
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     RegistrarSalidaRequest:
       type: object
-      additionalProperties: false
+      description: |-
+        Identifica el acceso a cerrar por accesoId o por qrToken (el titular vuelve a mostrar su QR).
+        Debe venir exactamente uno de los dos; ambos o ninguno producen 400.
       properties:
         accesoId:
           type: integer
           format: int32
+          minimum: 1
+          nullable: true
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
-      - accesoId
-      x-propuesta-descripcion: Sede y titular derivados del acceso abierto.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+        qrToken:
+          type: string
+          nullable: true
+          example: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidHlwIjoicXIi...
+      oneOf:
+      - required:
+        - accesoId
+      - required:
+        - qrToken
+      x-contract-status: stable
     Acceso:
       type: object
-      additionalProperties: false
-      properties:
-        id:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        usuarioId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        sedeId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        ingreso:
-          type: string
-          format: date-time
-          example: '2026-10-06T18:00:00-03:00'
-        salida:
-          type: string
-          format: date-time
-          nullable: true
-          example: '2026-10-06T18:00:00-03:00'
-        origen:
-          type: string
-          example: ONLINE
-          x-propuesta-valores:
-          - ONLINE
-          - OFFLINE
-        corregido:
-          type: boolean
-          example: false
-      x-propuesta-required:
+      description: |-
+        Registro de acceso a una sede. salida es null mientras la persona sigue adentro.
+        titular lo devuelven hoy el ingreso y la salida (datos para el control visual en recepción).
+        origen y corregido están reservados para la contingencia offline (P04) y la corrección manual:
+        el backend todavía no los devuelve, porque no tienen columna en registro_acceso.
+      required:
       - id
       - usuarioId
       - sedeId
       - ingreso
       - salida
-      - origen
-      - corregido
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      - titular
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        usuarioId:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        sedeId:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        ingreso:
+          type: string
+          format: date-time
+          example: '2026-10-13T16:56:54-03:00'
+        salida:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-10-13T19:30:00-03:00'
+        titular:
+          type: object
+          required:
+          - nombre
+          - apellido
+          - foto
+          properties:
+            nombre:
+              type: string
+              example: Socio
+            apellido:
+              type: string
+              example: de Prueba
+            foto:
+              type: string
+              nullable: true
+              example: null
+        origen:
+          type: string
+          description: Reservado (P04); todavía no se devuelve.
+          x-propuesta-valores:
+          - ONLINE
+          - OFFLINE
+          example: ONLINE
+        corregido:
+          type: boolean
+          description: Reservado para la corrección manual; todavía no se devuelve.
+          example: false
+      x-contract-status: stable
     CorregirAccesoRequest:
       type: object
       additionalProperties: false
@@ -3735,40 +3763,35 @@ components:
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
     Aforo:
       type: object
-      additionalProperties: false
-      properties:
-        sedeId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        ocupacionActual:
-          type: integer
-          format: int32
-          example: 25
-          x-propuesta-validacion:
-            minimum: 0
-        capacidadMaxima:
-          type: integer
-          format: int32
-          example: 100
-          x-propuesta-validacion:
-            minimum: 1
-        calculadoEn:
-          type: string
-          format: date-time
-          example: '2026-10-06T18:00:00-03:00'
-      x-propuesta-required:
+      description: |-
+        Aforo informativo (RF-05): ingresos sin salida en la sede, de cualquier persona, frente a su capacidad máxima.
+        No bloquea ingresos. Vuelve a 0 con el cierre diario de las 23:59. El offline (P04) no está implementado.
+      required:
       - sedeId
       - ocupacionActual
       - capacidadMaxima
       - calculadoEn
-      x-propuesta-descripcion: Conteo de accesos abiertos conocidos por el servidor. Informativo; no rechaza ingresos
-        por capacidad. Durante una desconexión puede no incluir movimientos aún no sincronizados.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      properties:
+        sedeId:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        ocupacionActual:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 25
+        capacidadMaxima:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 100
+        calculadoEn:
+          type: string
+          format: date-time
+          example: '2026-10-13T16:57:08-03:00'
+      x-contract-status: stable
     ClaseRequest:
       type: object
       additionalProperties: false

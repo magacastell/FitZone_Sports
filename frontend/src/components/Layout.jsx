@@ -70,7 +70,7 @@ export default function Layout() {
               {rolActivo === 'SOCIO' && (
                 <>
                   <NavigationLink to="/clases" icon={CalendarDays} module="M3">Clases grupales</NavigationLink>
-                  <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR (simulado)</NavigationLink>
+                  <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR</NavigationLink>
                 </>
               )}
               <NavigationLink to="/perfil" icon={UserRound} module="M1">Perfil y membresía</NavigationLink>

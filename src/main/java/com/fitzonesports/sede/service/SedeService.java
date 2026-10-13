@@ -19,6 +19,17 @@ public class SedeService {
     private final SedeRepository sedeRepository;
 
     @Transactional(readOnly = true)
+    public SedeResponse consultarSede(Integer sedeId) {
+        return sedeRepository.findById(sedeId).map(SedeResponse::from)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe"));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existe(Integer sedeId) {
+        return sedeRepository.existsById(sedeId);
+    }
+
+    @Transactional(readOnly = true)
     public List<SedeResponse> listarSedes() {
         return sedeRepository.findAll().stream().map(SedeResponse::from).toList();
     }

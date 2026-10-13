@@ -34,3 +34,11 @@
 - Definió las reglas de acceso: todos los roles listan las sedes, solo el gerente las crea o modifica, y el nombre es único.
 - Movió `Sede` y `SedeRepository` del módulo `auth` al módulo `sede`.
 - Hizo que el menú del frontend se muestre según el rol del usuario logueado (leído del JWT), manteniendo el desplegable de vista de desarrollo para previsualizar otros roles.
+
+### Claudio — 13/10/2026
+
+- Implementó el QR de acceso del socio: `GET /accesos/qr` emite un token firmado que vence a los 60 s (RF-04) y lo guarda en `codigo_qr`, una sola fila por socio, así que cada renovación invalida el QR anterior. Se firma con una clave derivada de `jwt.secret` para que no sirva como Bearer del login.
+- Implementó el ingreso (`POST /accesos/ingresos`): valida firma, vencimiento y que sea el último QR emitido; aplica RN-01 (409 si ya hay un ingreso abierto, con índice único parcial en la migración V4); recepción opera su sede y el gerente indica la sede. El ingreso se decide por rol (SOCIO_ACTIVO y GERENTE) hasta que exista la membresía.
+- Implementó la salida (`POST /accesos/salidas`, por `accesoId` o volviendo a escanear el QR) y el aforo real por sede (`GET /accesos/sedes/{id}/aforo`: ingresos sin salida frente a la capacidad máxima, informativo).
+- Agregó el cierre diario `CierreDiarioAccesos`: a las 23:59 (zona de Buenos Aires) cierra los ingresos olvidados y el aforo vuelve a 0. Fijó la zona horaria en el `Clock` porque el servidor corre en UTC.
+- Frontend: `SocioQRModal` muestra el QR real con cuenta regresiva y se renueva solo (`qrcode.react`); `ControlAccesoSede` valida ingreso y salida con lo que escribe el lector 2D y muestra el aforo real, reemplazando el simulado.
