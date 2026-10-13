@@ -11,7 +11,7 @@ Se separan dos ejes por operación:
 
 El estado no se deriva del otro: descargar comprobante es `stub + stable` para su representación PDF; registrar ingreso es `stub + draft`; consultar perfil es `implemented + stable`. `stable` no garantiza que el runtime ya cumpla todas las decisiones técnicas objetivo; las diferencias se explicitan en metadata.
 
-La revisión conserva las **55 operaciones actuales**: **11 stable, 44 draft; 10 implemented, 45 stub**. No quedan rutas nuevas en `paths`. El 501 actual de los stubs aparece únicamente en `x-implementation-note`, nunca en `responses` del contrato objetivo.
+La revisión contra `main` incorpora la baja lógica de planes y cubre las **56 operaciones actuales**: **15 stable, 41 draft; 14 implemented, 42 stub**. Todas las operaciones de `paths` existen en los controllers actuales. El 501 actual de los stubs aparece únicamente en `x-implementation-note`, nunca en `responses` del contrato objetivo.
 
 Los D1–D20 del intercambio anterior fueron antecedentes de diseño. Esta revisión **no los presenta como acta ni aprobación inequívoca del equipo**. Sus aspectos técnicos se conservan y sus alternativas funcionales se trazan en P01–P12. No se encontraron en el checkout los textos completos de requisitos/ADR citados por las bitácoras; no se atribuye aprobación a documentos no leídos. Los prototipos frontend sólo aportan contexto.
 
@@ -21,17 +21,18 @@ Se considera confirmado lo verificable en estas fuentes locales, con su alcance 
 
 | Evidencia | Qué confirma | Límite de la evidencia |
 |---|---|---|
-| Controladores de Auth, usuario, sede, membresía, acceso, clase, reserva, pago y reporte en `src/main/java/com/fitzonesports/` | Existen las 55 operaciones incluidas y sus anotaciones de autorización. 45 retornan 501 sin caso de uso. | Una anotación de rol no implementa propiedad, sede, vigencia, precios ni cupos. |
+| Controladores de Auth, usuario, sede, membresía, acceso, clase, reserva, pago y reporte en `src/main/java/com/fitzonesports/` | Existen las 56 operaciones incluidas y sus anotaciones de autorización. 42 retornan 501 sin caso de uso. | Una anotación de rol no implementa propiedad, sede, vigencia, precios ni cupos. |
 | `auth/controller/AuthController.java`, `auth/dto/`, `usuario/dto/RegisterRequest.java`, `auth/security/SecurityConfig.java` | Login/registro públicos con JWT; campos de sus DTO; registro devuelve token con 201. Las demás rutas requieren autenticación en la configuración actual. | No confirma apertura pública de sedes ni una separación nueva de actores/roles. |
 | `usuario/service/UsuarioService.java`, `usuario/dto/` | Registro asigna CLIENTE_EXTERNO; email duplicado produce 409; sede inexistente 404. Perfil propio deriva del JWT. Recepción lista/consulta usuarios de su sede, incluidos miembros del personal; sólo puede modificar SOCIO_ACTIVO/CLIENTE_EXTERNO. Gerente opera todas las sedes/roles. Nadie desactiva su propia cuenta. PATCH omitido/null no modifica. | Reglas de sede verificadas en usuarios no se generalizan automáticamente a los stubs de otros módulos. DNI único no tiene traducción explícita de excepción a 409. |
 | `sede/service/SedeService.java`, `sede/dto/` | DTO de sede, nombre único sin distinguir mayúsculas, capacidad positiva y creación/modificación sólo Gerente. Lectura hoy autenticada. | No confirma una regla de rechazo de acceso por capacidad ni que capacidad sea pública. |
+| `membresia/controller/PlanController.java`, `membresia/service/PlanService.java`, DTO de planes, V3 y pruebas de planes | GET/POST/PATCH/DELETE funcionales. Plan global con precio decimal en ARS, duración 1/3/12, nombre único sin distinguir mayúsculas y baja/reactivación lógica. Lectura activa por defecto; incluir inactivos sólo Recepción/Gerente; escrituras sólo Gerente. | No implementa contratación, renovación, beneficios, restricciones por sede ni conservación de condiciones contratadas. |
 | V1/V2 en `src/main/resources/db/migration/` | Hay registros de usuario/sede, roles actuales, tablas iniciales de membresía/plan, acceso, clase, espera, penalización, cancha/turno, reservas, pago y comprobante; unicidad de DNI/email y de comienzo de turno por cancha. `duracion_meses` está en el esquema inicial. | Las tablas no prueban un workflow completo, reglas temporales, períodos históricos separados, fórmula de tarifa, compensación ni estado funcional definitivo. No equivalen a servicios implementados. |
 | README y `LOGs/Orge-LOG.MD`, 04/10/2026 | Alcance modular, endpoints iniciales y validaciones de propiedad/sede/membresía pendientes; definición de acceso de Recepción a pagos/reembolsos pendiente. | Son documentación de baseline, no cierre de nuevas reglas funcionales. |
 | `LOGs/Denis-LOG.md`, 18 y 23/09/2026 | Se investigó RN-02, diseño de errores/contratos, distintas opciones de concurrencia y contingencia offline con sincronización posterior. | No cierra estrategia de bloqueo, endpoint batch, límites, caché, tolerancia de reloj ni contratos concretos. |
 
-Operaciones stable: `iniciarSesion`, `registrarCliente`, `consultarPerfil`, `actualizarPerfil`, `listarUsuarios`, `consultarUsuario`, `actualizarUsuario`, `listarSedes`, `crearSede`, `actualizarSede` y `descargarComprobantePago`. Las diez primeras conservan DTO y reglas funcionales del código; la última estabiliza ruta/representación PDF como decisión técnica, dejando emisión/elegibilidad pendientes.
+Operaciones stable: `iniciarSesion`, `registrarCliente`, `consultarPerfil`, `actualizarPerfil`, `listarUsuarios`, `consultarUsuario`, `actualizarUsuario`, `listarSedes`, `crearSede`, `actualizarSede`, `listarPlanes`, `crearPlan`, `actualizarPlan`, `desactivarPlan` y `descargarComprobantePago`. Las catorce primeras conservan DTO y reglas funcionales del código, con las divergencias técnicas objetivo indicadas abajo y en el YAML; la última estabiliza ruta/representación PDF como decisión técnica, dejando emisión/elegibilidad pendientes.
 
-Las restantes 44 operaciones mantienen sus schemas útiles como draft. Su ruta y roles actuales están confirmados; sus propuestas de workflow, entradas/respuestas y alcance funcional se identifican por tema pendiente en el YAML.
+Las restantes 41 operaciones mantienen sus schemas útiles como draft. Su ruta y roles actuales están confirmados; sus propuestas de workflow, entradas/respuestas y alcance funcional se identifican por tema pendiente en el YAML.
 
 ## 2. Decisiones técnicas del contrato
 
@@ -39,7 +40,7 @@ Estas decisiones estructuran la interfaz y **no adjudican al equipo reglas comer
 
 - OpenAPI 3.0.3, único punto de entrada `openapi.yaml`, servidor local `http://localhost:3000/api/v1`, paths relativos al prefijo, textos en español y operationId camelCase únicos.
 - JWT/Bearer global, login/registro públicos. La seguridad de `GET /sedes` queda como en el código actual; apertura pública sólo como `x-propuesta-security: []` y P12. `x-roles-actuales` no se usa para inferir nuevos permisos. `x-propuesta-permisos` contiene alternativas futuras, sin ampliar autorización por sí mismo.
-- Reutilización de schemas, responses, parameters, headers y securitySchemes. Los diez DTO implementados conservan campos/tipos/restricciones. Se mantiene `application/json` en PATCH con omitido/null = no modificar; no es JSON Merge Patch.
+- Reutilización de schemas, responses, parameters, headers y securitySchemes. Los trece DTO implementados conservan campos/tipos/restricciones. Los DTO de planes usan precio numérico en ARS, no el objeto monetario draft de otros módulos. Se mantiene `application/json` en PATCH con omitido/null = no modificar; no es JSON Merge Patch.
 - Errores objetivo Problem Details con `code` y errores de campo: 400 formato/validación, 401 autenticación, 403 autorización, 404 inexistente, 409 conflicto, 412 sólo precondición de versión vieja. Backend actual aún no garantiza esa representación uniforme.
 - 201 al crear, 200 con representación, 204 sin cuerpo. 501 no es respuesta del caso de uso objetivo; sólo información del estado actual del stub.
 - Paginación selectiva base 0, size por defecto 20 y máximo 100. `/usuarios` usa envoltorio objetivo con items del DTO exacto; hoy devuelve array. Orden/detalles funcionales de colecciones futuras se conservan como propuesta.
@@ -51,7 +52,7 @@ Estas decisiones estructuran la interfaz y **no adjudican al equipo reglas comer
 
 Para trabajar en paralelo: implementar/consumir lo stable teniendo en cuenta divergencias del runtime; usar lo draft como interfaz de discusión y mocks, validando los temas indicados antes de depender de reglas, valores internos o campos comerciales. Una validación YAML exitosa no equivale a aprobación del equipo. Tras un acuerdo documentado, actualizar la propuesta y sólo entonces pasar esa operación/schema a stable.
 
-Validación técnica: Redocly sin agregar dependencias, sintaxis YAML y claves duplicadas, referencias, path parameters, operationId, seguridad efectiva, cobertura de controllers, DTO, estados y ausencia de 501 funcional. README conserva exclusivamente los dos enlaces de esta tarjeta; no se modifican código, migraciones, frontend, dependencias ni configuración.
+Validación técnica: Redocly sin agregar dependencias al proyecto, sintaxis YAML y claves duplicadas, referencias, path parameters, operationId, seguridad efectiva, cobertura de controllers, DTO, estados y ausencia de 501 funcional. README enlaza el contrato y las decisiones y describe su alineación con los planes actuales; no se modifican código, migraciones, frontend, dependencias ni configuración.
 
 ## 3. Propuestas pendientes de validación
 
@@ -124,9 +125,9 @@ Validación técnica: Redocly sin agregar dependencias, sintaxis YAML y claves d
 ### P07 — Tarifas, planes y precio (D15 y prototipos)
 
 - **Tema:** precio final y su configuración.
-- **Qué está confirmado:** esquema con precio de plan, costo base por cancha y precio aplicado a reserva; hay tipos de cancha. El prototipo muestra descuentos/horas pico sin servicio real.
-- **Qué falta decidir:** fórmula, tarifas por tipo o por cancha, descuentos, horario pico, sedes, moneda/redondeo, vigencia de un precio consultado y administración del catálogo.
-- **Propuesta actual:** servidor calcula precio final; cliente selecciona turno y no envía importe definitivo. Plan/tarifa/configuración y representación monetaria del borrador deben validarse. No se fija 15%, ventana pico, importe ni endpoint de tarifas globales.
+- **Qué está confirmado:** catálogo de planes global implementado con `id`, `nombre`, `duracionMeses`, `precio` decimal en ARS y `activo`; duración 1/3/12, precio positivo de hasta 19 dígitos enteros y dos decimales, nombre único sin distinguir mayúsculas, baja lógica y reactivación. El catálogo no configura beneficios ni sedes habilitadas. El esquema también tiene costo base por cancha y precio aplicado a reserva; el prototipo muestra descuentos/horas pico sin servicio real.
+- **Qué falta decidir:** fórmula y configuración de tarifas de canchas, descuentos, horario pico, alcance por sede, moneda/redondeo fuera del catálogo de planes, vigencia del precio consultado y conservación de precio/duración al contratar o renovar. No se reabren los campos ni validaciones del catálogo ya implementado.
+- **Propuesta actual:** servidor calcula precio final; cliente selecciona turno y no envía importe definitivo. Tarifas y representación monetaria draft de M4/M5 requieren validación; no sustituyen el DTO numérico actual de planes. No se fija 15%, ventana pico, importe ni endpoint de tarifas globales.
 - **Motivo de la propuesta:** evitar importes manipulables y preservar el precio efectivamente contratado.
 - **Módulos afectados:** M1, M4, M5 y frontend.
 - **Impacto si cambia:** DTO monetario, consulta de turnos, altas administrativas y cálculo/conciliación de pagos.

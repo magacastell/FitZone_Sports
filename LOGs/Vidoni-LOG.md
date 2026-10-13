@@ -47,3 +47,13 @@
   - Validó OpenAPI con Redocly sin errores; quedaron únicamente las advertencias conocidas de licencia y servidor localhost.
   - No modificó backend, frontend, migraciones ni persistencia; el alcance se limitó al contrato, sus decisiones, los enlaces del README y esta bitácora.
   - Dejó el trabajo listo para revisión mediante Pull Request.
+
+### 12/10/2026
+
+- **Revisión final del contrato contra main actualizado**
+  - Integró `origin/main` en `docs/openapi-contratos` sin conflictos y revisó la implementación nueva de planes de membresía.
+  - Alineó GET/POST/PATCH/DELETE de planes con sus DTO, precio decimal en ARS, duraciones 1/3/12, permisos, validaciones, filtro de inactivos y baja/reactivación lógica.
+  - Recalculó la cobertura: 56 operaciones, 14 implemented, 42 stub, 15 stable y 41 draft; conservó las decisiones funcionales todavía pendientes.
+  - Verificó YAML sin claves duplicadas, referencias resolubles, operationId únicos, cobertura de controllers, trece DTO y seguridad; Redocly terminó sin errores y con las dos advertencias conocidas.
+  - Ejecutó las pruebas: 12 aprobadas y 7 de persistencia omitidas por no configurar una base PostgreSQL vacía y descartable; sin fallos ni errores.
+  - Limitó las correcciones a OpenAPI, decisiones, README y esta bitácora; no modificó código funcional, migraciones ni configuración.

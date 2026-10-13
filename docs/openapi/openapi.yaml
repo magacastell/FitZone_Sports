@@ -451,21 +451,24 @@ paths:
       tags:
       - M1 · Membresías
       summary: Listar planes
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P07.'
+      description: |-
+        Lista planes globales activos, ordenados por duracionMeses y nombre; devuelve [] si no hay resultados.
+        incluirInactivos=false por defecto. Sólo RECEPCIONISTA y GERENTE pueden usar incluirInactivos=true;
+        SOCIO_ACTIVO y CLIENTE_EXTERNO reciben 403 si solicitan incluir planes inactivos.
+        No hay filtro por sede ni paginación en la implementación actual.
       operationId: listarPlanes
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: PlanController, PlanService, DTO y migración V3 de la implementación actual.
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Array de planes; los precios se expresan como números decimales en ARS.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Plan'
+                  $ref: '#/components/schemas/PlanResponse'
         '400':
           $ref: '#/components/responses/Validacion'
         '401':
@@ -473,46 +476,52 @@ paths:
         '403':
           $ref: '#/components/responses/SinPermiso'
       parameters:
-      - $ref: '#/components/parameters/SedeFiltro'
+      - name: incluirInactivos
+        in: query
+        required: false
+        description: Incluye planes inactivos sólo para RECEPCIONISTA o GERENTE; otros roles reciben 403.
+        schema:
+          type: boolean
+          default: false
+          example: false
       x-roles-actuales:
+      - SOCIO_ACTIVO
+      - CLIENTE_EXTERNO
+      - RECEPCIONISTA
+      - GERENTE
+      x-permisos-objetivo:
       - SOCIO_ACTIVO
       - CLIENTE_EXTERNO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/membresia/controller/PlanController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P02
-      - P07
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Array de planes; condiciones por sede explícitas. Recepción opera su sede; clientes consultan
-          planes habilitados para contratar.
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      - src/main/java/com/fitzonesports/membresia/service/PlanService.java
+      - src/main/java/com/fitzonesports/membresia/dto/PlanResponse.java
+      - src/main/resources/db/migration/V3__planes_membresia.sql
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
     post:
       tags:
       - M1 · Membresías
       summary: Crear plan
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P03, P07.'
+      description: |-
+        Sólo GERENTE. Requiere nombre, duracionMeses y precio; crea activo=true.
+        El nombre se recorta y es único sin distinguir mayúsculas, incluso entre planes inactivos.
+        duracionMeses permite 1, 3 o 12. precio es decimal positivo en ARS, con hasta 19 dígitos enteros y dos decimales.
+        Datos inválidos producen 400; nombre duplicado o conflicto de integridad al guardar produce 409.
+        No configura sedes habilitadas ni beneficios y no establece todavía el flujo de contratación.
       operationId: crearPlan
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: PlanRequest, PlanResponse, PlanService y restricciones de V3.
       responses:
         '201':
-          description: Recurso creado.
+          description: Plan creado y activo.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Plan'
+                $ref: '#/components/schemas/PlanResponse'
         '400':
           $ref: '#/components/responses/Validacion'
         '401':
@@ -522,48 +531,46 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO actual de creación de plan.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PlanRequest'
-        x-propuesta-required: true
       x-roles-actuales:
+      - GERENTE
+      x-permisos-objetivo:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/membresia/controller/PlanController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P03
-      - P07
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Sólo Gerente configura precio, duración y sedes habilitadas. Reglas de precio no se delegan
-          al cliente.
-      x-propuesta-permisos:
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      - src/main/java/com/fitzonesports/membresia/dto/PlanRequest.java
+      - src/main/java/com/fitzonesports/membresia/service/PlanService.java
+      - src/main/resources/db/migration/V3__planes_membresia.sql
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
   /planes/{planId}:
     patch:
       tags:
       - M1 · Membresías
       summary: Actualizar plan
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P03, P07.'
+      description: |-
+        Sólo GERENTE. Actualiza nombre, duracionMeses, precio y/o activo.
+        Campo omitido o null significa no modificar; {} conserva el plan. application/json, no JSON Merge Patch.
+        activo=true permite reactivar un plan. Mismas validaciones de nombre, duración y precio que en creación.
+        Plan inexistente produce 404; nombre duplicado o conflicto de integridad al guardar produce 409.
+        Esta operación modifica el catálogo: no implementa renovación ni una política de períodos contratados.
+        No se exige If-Match ni se emite ETag en el backend actual.
       operationId: actualizarPlan
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: ActualizarPlanRequest, PlanResponse y PlanService actuales.
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Representación del plan después de la actualización.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Plan'
+                $ref: '#/components/schemas/PlanResponse'
         '400':
           $ref: '#/components/responses/Validacion'
         '401':
@@ -575,30 +582,56 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO actual de actualización parcial; todos sus campos son opcionales y admiten null.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ActualizarPlanRequest'
-        x-propuesta-required: true
       x-roles-actuales:
+      - GERENTE
+      x-permisos-objetivo:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/membresia/controller/PlanController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P03
-      - P07
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Sólo Gerente; omitido/null no modifica. No altera retroactivamente períodos históricos ni importes
-          ya contratados. Sin ETag por ausencia de GET individual.
-      x-propuesta-permisos:
+      - src/main/java/com/fitzonesports/membresia/dto/ActualizarPlanRequest.java
+      - src/main/java/com/fitzonesports/membresia/service/PlanService.java
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
+    delete:
+      tags:
+      - M1 · Membresías
+      summary: Desactivar plan
+      description: |-
+        Sólo GERENTE. Baja lógica: establece activo=false y devuelve 204 sin cuerpo,
+        incluso si el plan ya estaba inactivo. Un plan inexistente produce 404.
+        No elimina el plan ni las membresías/referencias existentes. PATCH con activo=true lo reactiva.
+      operationId: desactivarPlan
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: PlanController.desactivarPlan y PlanService.desactivarPlan actuales.
+      responses:
+        '204':
+          description: Plan desactivado; respuesta sin cuerpo.
+        '400':
+          $ref: '#/components/responses/Validacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+      x-roles-actuales:
       - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-permisos-objetivo:
+      - GERENTE
+      x-contract-source:
+      - src/main/java/com/fitzonesports/membresia/controller/PlanController.java
+      - src/main/java/com/fitzonesports/membresia/service/PlanService.java
+      - src/test/java/com/fitzonesports/membresia/PlanServiceTest.java
+      - src/test/java/com/fitzonesports/membresia/PlanPersistenceTest.java
+      x-divergencias-backend:
+      - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
     parameters:
     - $ref: '#/components/parameters/planId'
   /membresias/me:
@@ -3179,170 +3212,103 @@ components:
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
     PlanRequest:
       type: object
-      additionalProperties: false
-      properties:
-        nombre:
-          type: string
-          example: Mensual
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 255
-        duracionMeses:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        precio:
-          $ref: '#/components/schemas/Dinero'
-        sedesHabilitadas:
-          type: array
-          items:
-            type: integer
-            format: int32
-            example: 1
-            x-propuesta-validacion:
-              minimum: 1
-          x-propuesta-validacion:
-            minItems: 1
-            uniqueItems: true
-        incluyeClases:
-          type: boolean
-          example: true
-        activo:
-          type: boolean
-          example: true
-      x-propuesta-required:
+      description: |-
+        DTO actual de creación. Nombre no vacío, recortado por el servicio y único sin distinguir mayúsculas.
+        Precio como número decimal en ARS, no como objeto Dinero. Crea un plan activo.
+      required:
       - nombre
       - duracionMeses
       - precio
-      - sedesHabilitadas
-      - incluyeClases
-      x-propuesta-descripcion: Sólo Gerente configura precios de planes. El precio de una contratación se calcula
-        en el servidor. Duración en meses calendario, consistente con plan_membresia; si falta el día al finalizar
-        el mes se usa su último día.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    DineroNullable:
-      type: object
-      additionalProperties: false
-      properties:
-        importe:
-          type: number
-          example: 15000
-          x-propuesta-validacion:
-            minimum: 0
-            multipleOf: 0.01
-        moneda:
-          type: string
-          example: ARS
-          x-propuesta-descripcion: Código ISO 4217; los reportes no suman monedas diferentes.
-          x-propuesta-validacion:
-            pattern: ^[A-Z]{3}$
-      nullable: true
-      x-propuesta-required:
-      - importe
-      - moneda
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    ActualizarPlanRequest:
-      type: object
-      additionalProperties: false
       properties:
         nombre:
           type: string
+          minLength: 1
+          maxLength: 255
+          pattern: '[\s\S]*\S[\s\S]*'
           example: Mensual
-          nullable: true
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 255
         duracionMeses:
           type: integer
           format: int32
+          enum: [1, 3, 12]
           example: 1
-          nullable: true
-          x-propuesta-validacion:
-            minimum: 1
         precio:
-          $ref: '#/components/schemas/DineroNullable'
-        sedesHabilitadas:
-          type: array
-          items:
-            type: integer
-            format: int32
-            example: 1
-            x-propuesta-validacion:
-              minimum: 1
+          type: number
+          description: ARS; positivo, hasta 19 dígitos enteros y dos decimales (@Digits y numeric(21,2)).
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 10000000000000000000
+          exclusiveMaximum: true
+          multipleOf: 0.01
+          example: 15000.50
+      x-contract-status: stable
+    ActualizarPlanRequest:
+      type: object
+      description: |-
+        DTO actual. Omitido o null significa no modificar; {} conserva el plan.
+        application/json, no JSON Merge Patch. activo=true permite reactivar un plan.
+      properties:
+        nombre:
+          type: string
           nullable: true
-          x-propuesta-validacion:
-            minItems: 1
-            uniqueItems: true
-        incluyeClases:
-          type: boolean
-          example: true
+          maxLength: 255
+          pattern: '[\s\S]*\S[\s\S]*'
+          example: Mensual
+        duracionMeses:
+          type: integer
+          format: int32
           nullable: true
+          enum: [1, 3, 12, null]
+          example: 1
+        precio:
+          type: number
+          nullable: true
+          description: ARS; positivo, hasta 19 dígitos enteros y dos decimales.
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 10000000000000000000
+          exclusiveMaximum: true
+          multipleOf: 0.01
+          example: 15000.50
         activo:
           type: boolean
-          example: true
           nullable: true
-      x-propuesta-descripcion: Campo omitido o null significa no modificar. application/json; no es JSON Merge Patch.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    Plan:
+          example: true
+      x-contract-status: stable
+    PlanResponse:
       type: object
-      additionalProperties: false
+      description: DTO actual de plan global. Precio decimal en ARS; activo distingue baja lógica de eliminación.
+      required:
+      - id
+      - nombre
+      - duracionMeses
+      - precio
+      - activo
       properties:
         id:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         nombre:
           type: string
           example: Mensual
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 255
         duracionMeses:
           type: integer
           format: int32
+          enum: [1, 3, 12]
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         precio:
-          $ref: '#/components/schemas/Dinero'
-        sedesHabilitadas:
-          type: array
-          items:
-            type: integer
-            format: int32
-            example: 1
-            x-propuesta-validacion:
-              minimum: 1
-          x-propuesta-validacion:
-            minItems: 1
-            uniqueItems: true
-        incluyeClases:
-          type: boolean
-          example: true
+          type: number
+          description: Importe decimal en ARS, persistido como numeric(21,2).
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 10000000000000000000
+          exclusiveMaximum: true
+          multipleOf: 0.01
+          example: 15000.50
         activo:
           type: boolean
           example: true
-      x-propuesta-required:
-      - id
-      - nombre
-      - duracionMeses
-      - precio
-      - sedesHabilitadas
-      - incluyeClases
-      - activo
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     PeriodoMembresia:
       type: object
       additionalProperties: false
