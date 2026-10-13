@@ -96,11 +96,11 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 
 ## Endpoints iniciales de los módulos
 
-Borrador para organizar el trabajo. Las 53 rutas de negocio usan el prefijo
-`/api/v1`. Las del módulo `usuario` y `sede` ya están implementadas; las demás devuelven
+Borrador para organizar el trabajo. Las 54 rutas de negocio usan el prefijo
+`/api/v1`. Las del módulo `usuario`, `sede` y planes de membresía ya están implementadas; las demás devuelven
 `501 Not Implemented` sin cuerpo si el rol tiene permiso.
 Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
-No consultan ni modifican datos. Los contratos de solicitud/respuesta y filtros
+Los stubs no consultan ni modifican datos. Sus contratos de solicitud/respuesta y filtros
 están pendientes. Las anotaciones `@PreAuthorize` usan el soporte existente de
 Spring Security (`@EnableMethodSecurity`).
 
@@ -143,6 +143,7 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 | membresia | GET | `/planes` | S, C, R, G | listarPlanes |
 | membresia | POST | `/planes` | G | crearPlan |
 | membresia | PATCH | `/planes/{planId}` | G | actualizarPlan |
+| membresia | DELETE | `/planes/{planId}` | G | desactivarPlan |
 | membresia | GET | `/membresias/me` | S, C, G | consultarMembresia |
 | membresia | POST | `/membresias` | S, C, G | crearMembresia |
 | membresia | POST | `/membresias/{membresiaId}/renovaciones` | S, C, G | renovarMembresia |
@@ -189,16 +190,49 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 La autenticación existente (`POST /auth/login` y `POST /auth/register`) sigue
 implementada y pública. Los stubs no están conectados todavía al frontend.
 
-### Pruebas de autorización
+### Planes de membresía
 
-`EndpointAuthorizationTest` verifica las restricciones por rol con la seguridad
-de métodos de Spring: acceso del gerente a todas las rutas, rechazo de roles
-desconocidos y permisos representativos de clientes, socios y recepción.
-No prueba solicitudes HTTP, validación de JWT ni reglas de pertenencia o membresía.
+Los planes son globales para todas las sedes. La representación contiene `id`,
+`nombre`, `duracionMeses`, `precio` (número decimal en ARS) y `activo`.
+La duración permite únicamente 1, 3 o 12 meses; el precio debe ser positivo,
+con hasta 19 dígitos enteros y dos decimales. El nombre es obligatorio, se recortan
+espacios exteriores y tiene hasta 255 caracteres. Es único sin distinguir
+mayúsculas, incluso entre planes inactivos.
 
-Ejecutar con JDK 21: `./mvnw test` (Windows: `.\mvnw.cmd test`). En el entorno
-utilizado para preparar este cambio, el wrapper de Maven no pudo iniciar;
-las pruebas quedaron pendientes de ejecución.
+- `GET /planes`: array de planes activos, ordenado por duración y nombre; `[]` si no hay planes.
+  Solo recepción y gerente pueden usar `?incluirInactivos=true`; para clientes devuelve `403`.
+- `POST /planes`: solo gerente; requiere `nombre`, `duracionMeses` y `precio`.
+  Crea un plan activo y devuelve `201` con su representación.
+- `PATCH /planes/{planId}`: solo gerente; acepta los mismos campos y `activo`.
+  Omitido/null no modifica; `{}` conserva el plan. Devuelve `200`.
+- `DELETE /planes/{planId}`: solo gerente; marca `activo=false` y devuelve `204`,
+  incluso si ya estaba inactivo. No elimina membresías ni referencias. PATCH con
+  `activo=true` permite reactivarlo.
+
+Datos inválidos devuelven `400`, plan inexistente `404` y nombre duplicado `409`.
+Las escrituras concurrentes también están protegidas por un índice único.
+La migración V3 valida datos existentes, agrega `activo` y restricciones y amplía
+`precio` a `numeric(21,2)`, conservando el rango entero anterior. Si detecta datos
+incompatibles, falla con un mensaje para revisarlos; no elimina planes.
+
+La contratación/renovación deberá comprobar que el plan esté activo y conservar
+el precio y duración contratados al implementarse ese flujo.
+El contrato OpenAPI de la rama `docs/openapi-contratos` deberá alinearse con estos
+campos, reglas y el nuevo DELETE antes de integrarse; sus propuestas de moneda
+como objeto, sedes habilitadas y beneficios no corresponden a esta implementación.
+
+### Pruebas de planes
+
+Ejecutar con JDK 21: `./mvnw test` (Windows: `.\mvnw.cmd test`).
+Las pruebas cubren validación HTTP, respuestas, autorización de métodos y servicio.
+No prueban la validación de JWT.
+
+Para activar las pruebas de persistencia, definir `PLAN_TEST_DB_URL` con una URL
+JDBC hacia una base PostgreSQL **vacía y descartable**, usuario `postgres` y sin
+contraseña (solo entorno local de pruebas). Flyway aplica V1–V3 y Hibernate valida
+el mapeo. Estas pruebas verifican decimales, restricciones, orden y conservación
+de referencias de membresía al desactivar, concurrencia y actualización desde V2.
+Sin la variable se omiten.
 
 ## Documentación
 

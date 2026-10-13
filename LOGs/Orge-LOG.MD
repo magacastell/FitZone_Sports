@@ -94,3 +94,32 @@
   - Publicó la rama en `origin` (GitHub) y configuró su seguimiento remoto.
   - Integró los cambios a `main` sin conflictos mediante el commit `a7504c3`: `merge: integrar endpoints iniciales y autorización por roles`, y publicó el resultado en GitHub.
   - Eliminó la rama de trabajo local y remota después de confirmar la integración en `main`.
+
+### 11/10/2026
+
+- **Revisión de documentación y planificación de planes de membresía**
+  - Identificó las funcionalidades implementadas y los endpoints pendientes, y definió un alcance de gestión de planes globales para todas las sedes.
+  - Acordó duraciones de 1, 3 y 12 meses, precios positivos en ARS con hasta dos decimales y un indicador `activo` para baja lógica y reactivación.
+
+- **Implementación de gestión de planes en M1**
+  - Incorporó la entidad JPA `PlanMembresia`, su repositorio, los DTO de creación, actualización y respuesta, y el servicio transaccional `PlanService`.
+  - Reemplazó los stubs de `GET /planes`, `POST /planes` y `PATCH /planes/{planId}` por operaciones con persistencia real, y agregó `DELETE /planes/{planId}` para desactivar sin eliminar el registro ni sus referencias.
+  - Permitió listar planes activos a todos los roles autenticados, ordenados por duración y nombre; restringió `incluirInactivos=true` a recepción y gerente.
+  - Restringió creación, modificación, baja lógica y reactivación al gerente. La creación devuelve `201`, la actualización `200` y la baja lógica `204`, incluso si el plan ya estaba inactivo.
+  - Implementó actualización parcial: los campos omitidos o nulos conservan su valor; `activo=true` permite reactivar un plan.
+  - Validó nombres obligatorios y de hasta 255 caracteres, recorte de espacios exteriores, duración permitida y precisión del precio mediante `BigDecimal`.
+  - Conservó la unicidad del nombre sin distinguir mayúsculas, incluidos los planes inactivos, y las respuestas `400` para datos inválidos, `404` para planes inexistentes y `409` para conflictos.
+
+- **Evolución del esquema con Flyway**
+  - Agregó `V3__planes_membresia.sql` sin modificar V1 ni V2: incorporó `activo` con valor inicial verdadero, restricciones de duración, precio y nombre, y un índice único sobre el nombre en minúsculas.
+  - Amplió `precio` a `numeric(21,2)` para admitir centavos y conservar el rango entero anterior.
+  - Incorporó comprobaciones previas de datos incompatibles y nombres duplicados; la migración detiene su ejecución con un mensaje explícito si requiere revisión de datos existentes.
+
+- **Verificación y documentación**
+  - Ejecutó con Java 21 las 19 pruebas de `PlanServiceTest`, `PlanControllerTest`, `PlanAuthorizationTest` y `PlanPersistenceTest`: todas finalizaron sin fallos, errores ni omisiones.
+  - Verificó validación HTTP, representaciones y códigos de respuesta, permisos mediante seguridad de métodos, actualización parcial, baja lógica y reactivación. Estas pruebas no verifican la validación de JWT.
+  - Utilizó una instancia PostgreSQL 18 aislada para comprobar Flyway sobre una base limpia, validación del mapeo JPA, actualización desde V2 con datos existentes, persistencia de centavos y restricciones de base de datos.
+  - Comprobó que dos creaciones concurrentes del mismo nombre producen un único plan: una operación exitosa y otra con conflicto `409`.
+  - Verificó que la baja lógica conserva las referencias de membresías y detuvo la instancia de pruebas al finalizar.
+  - Actualizó el README con el contrato de planes, permisos, migración y ejecución de pruebas, y comprobó los cambios con `git diff --check`.
+  - Dejó indicada la alineación pendiente del contrato OpenAPI de la rama de documentación con los campos acordados y el nuevo endpoint DELETE. La contratación, renovación y preservación de condiciones históricas corresponden a trabajos posteriores.
