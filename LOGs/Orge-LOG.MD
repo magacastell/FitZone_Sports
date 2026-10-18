@@ -123,3 +123,13 @@
   - Verificó que la baja lógica conserva las referencias de membresías y detuvo la instancia de pruebas al finalizar.
   - Actualizó el README con el contrato de planes, permisos, migración y ejecución de pruebas, y comprobó los cambios con `git diff --check`.
   - Dejó indicada la alineación pendiente del contrato OpenAPI de la rama de documentación con los campos acordados y el nuevo endpoint DELETE. La contratación, renovación y preservación de condiciones históricas corresponden a trabajos posteriores.
+
+### 18/10/2026
+
+- Implementó contratación, consulta propia/administrativa, renovación manual y automática, suspensión/reactivación auditada e historial de períodos de membresía.
+- Incorporó V5 sin cambiar V1–V4, snapshots de precio/duración/nombre, cuenta única por usuario y prevención de períodos superpuestos.
+- Agregó un adaptador mínimo de M5 con pasarela fake que aprueba cobros y devoluciones; los pagos aprobados y reembolsos quedan registrados. La pasarela real y los comprobantes PDF siguen en M5.
+- Implementó claves de idempotencia persistentes y bloqueo por titular, permisos por sede/propiedad y arrepentimiento dentro de 24 horas sin borrar historial.
+- Integró la elegibilidad de acceso con la vigencia real de membresía y bloqueó JWT de usuarios desactivados.
+- Actualizó OpenAPI y la guía de prueba manual `docs/membresias.md`. Incorporó pruebas HTTP/JWT y de integración PostgreSQL para calendario, estados, pagos, renovaciones, reembolsos, concurrencia y migración desde V4.
+- Verificó la suite completa contra una base PostgreSQL 18 aislada: 37 pruebas, sin fallos, errores ni omisiones. Validó sintaxis YAML y referencias locales de OpenAPI, y el formato con `git diff --check`.

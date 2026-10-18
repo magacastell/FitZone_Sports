@@ -9,8 +9,7 @@ info:
     openapi.yaml es la fuente técnica de las partes stable. Las partes draft sirven para revisión y mocks; no obligan a otros módulos ni deben usarse como acuerdos definitivos para generar validaciones de negocio. x-contract-pending referencia temas P01–P12 de DECISIONES.md. x-propuesta-* preserva alternativas anteriores como metadata no normativa.
     JWT/Bearer global. Login y registro públicos. GET /sedes conserva la autorización actual; su apertura pública está propuesta en P12. x-roles-actuales registra las anotaciones del controller, sin afirmar que existan validaciones funcionales de propiedad/sede en stubs. Las modificaciones de permisos se separan como propuestas.
     DTO implementados exactos; PATCH application/json con omitido/null = no modificar. Problem Details con code y errores de campo es objetivo técnico, no garantía del runtime actual. Paginación selectiva base 0, size 20 y máximo 100; operationId únicos en español.
-    Campos/precios/estados futuros, coordinación entre módulos, métricas y políticas permanecen draft cuando falta acuerdo. No se adjudica autoridad de equipo a D1–D20 del intercambio anterior. Las propuestas de nuevas rutas de sincronización y cancelación de membresía están sólo en DECISIONES.md.
-    No se modifica backend, frontend, migraciones, dependencias ni configuración.
+    Campos/precios/estados futuros, coordinación entre módulos, métricas y políticas permanecen draft cuando falta implementación o acuerdo. Las rutas de membresías reflejan el backend con cobros fake y arrepentimiento por período; ver docs/membresias.md. La sincronización offline continúa como propuesta en DECISIONES.md.
 servers:
 - url: http://localhost:3000/api/v1
   description: Servidor local; los paths son relativos a /api/v1.
@@ -636,344 +635,260 @@ paths:
     - $ref: '#/components/parameters/planId'
   /membresias/me:
     get:
-      tags:
-      - M1 · Membresías
-      summary: Consultar mi membresía vigente
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P03.'
+      tags: [M1 · Membresías]
+      summary: Consultar membresía propia e historial, incluso vencida
       operationId: consultarMiMembresia
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
       responses:
         '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Membresia'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-      x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/membresia/controller/MembresiaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P03
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Titular del JWT. Devuelve membresía con período temporalmente vigente, incluso si está suspendida;
-          404 si no existe período vigente, sólo hay períodos futuros o está cancelada. Actor cliente independiente
-          del rol legado SOCIO_ACTIVO. No usa sede de registro como límite funcional.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /membresias:
-    post:
-      tags:
-      - M1 · Membresías
-      summary: Solicitar membresía
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P03, P08.'
-      operationId: crearMembresia
-      x-implementation-status: stub
-      responses:
-        '201':
-          description: Recurso creado.
+          description: Membresía con estado e historial actualizado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Membresia'
         '400':
-          $ref: '#/components/responses/Validacion'
+          description: Solicitud o clave inválida.
         '401':
-          $ref: '#/components/responses/NoAutenticado'
+          description: Sin autenticación válida.
         '403':
-          $ref: '#/components/responses/SinPermiso'
+          description: Sin permisos, cuenta inactiva o membresía ajena.
         '404':
-          $ref: '#/components/responses/NoEncontrado'
+          description: Recurso inexistente.
         '409':
-          $ref: '#/components/responses/Conflicto'
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /membresias:
+    post:
+      tags: [M1 · Membresías]
+      summary: Contratar un plan activo con cobro fake aprobado
+      operationId: crearMembresia
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
+        Idempotency-Key es un UUID obligatorio. Reutilizarlo para reintentar la misma operación; otro plan devuelve 409.
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CrearMembresiaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/membresia/controller/MembresiaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P02
-      - P03
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Crea recurso PENDIENTE_PAGO propio. Servidor deriva titular/sede y calcula importe del plan.
-          Se paga por M5; 201 no crea vigencia. No se puede contratar otra membresía incompatible simultánea.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /membresias/{membresiaId}/renovaciones:
-    post:
-      tags:
-      - M1 · Membresías
-      summary: Solicitar renovación de membresía
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P03, P08.'
-      operationId: solicitarRenovacion
-      x-implementation-status: stub
       responses:
         '201':
-          description: Recurso creado.
+          description: Membresía con estado e historial actualizado.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SolicitudRenovacion'
+                $ref: '#/components/schemas/Membresia'
         '400':
-          $ref: '#/components/responses/Validacion'
+          description: Solicitud o clave inválida.
         '401':
-          $ref: '#/components/responses/NoAutenticado'
+          description: Sin autenticación válida.
         '403':
-          $ref: '#/components/responses/SinPermiso'
+          description: Sin permisos, cuenta inactiva o membresía ajena.
         '404':
-          $ref: '#/components/responses/NoEncontrado'
+          description: Recurso inexistente.
         '409':
-          $ref: '#/components/responses/Conflicto'
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
+        '402':
+          description: Cobro no aprobado; se revierte la operación y no se otorga vigencia.
+  /membresias/{membresiaId}/renovaciones:
+    parameters:
+    - $ref: '#/components/parameters/membresiaId'
+    post:
+      tags: [M1 · Membresías]
+      summary: Renovar sin sobrescribir períodos anteriores
+      operationId: solicitarRenovacion
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
+        Idempotency-Key es un UUID obligatorio. Reutilizarlo para reintentar la misma operación; otro plan devuelve 409.
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RenovarMembresiaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/membresia/controller/MembresiaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P03
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente sólo membresía propia; Gerente cualquier sede. Crea solicitud pagable, no sobrescribe
-          el período anterior. Pago aprobado crea nuevo período histórico; rechazado no crea vigencia. Fechas calculadas
-          por servidor para evitar superponer vigencias.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/membresiaId'
-  /membresias/{membresiaId}:
-    get:
-      tags:
-      - M1 · Membresías
-      summary: Consultar membresía e historial
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P03.'
-      operationId: consultarMembresiaPorId
-      x-implementation-status: stub
       responses:
-        '200':
-          description: Resultado de la operación.
+        '201':
+          description: Membresía con estado e historial actualizado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Membresia'
-          headers:
-            ETag:
-              $ref: '#/components/headers/ETag'
         '400':
-          $ref: '#/components/responses/Validacion'
+          description: Solicitud o clave inválida.
         '401':
-          $ref: '#/components/responses/NoAutenticado'
+          description: Sin autenticación válida.
         '403':
-          $ref: '#/components/responses/SinPermiso'
+          description: Sin permisos, cuenta inactiva o membresía ajena.
         '404':
-          $ref: '#/components/responses/NoEncontrado'
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/membresia/controller/MembresiaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P03
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo sede administrativa de la membresía; Gerente cualquiera. Devuelve períodos históricos
-          y ETag de la representación para administrar suspensión.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/membresiaId'
-  /membresias/{membresiaId}/estado:
-    patch:
-      tags:
-      - M1 · Membresías
-      summary: Administrar suspensión de membresía
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P03.'
-      operationId: administrarEstadoMembresia
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Membresia'
-          headers:
-            ETag:
-              $ref: '#/components/headers/ETag'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
+          description: Recurso inexistente.
         '409':
-          $ref: '#/components/responses/Conflicto'
-        '412':
-          $ref: '#/components/responses/PrecondicionFallida'
-      parameters:
-      - $ref: '#/components/parameters/IfMatchBorrador'
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
+        '402':
+          description: Cobro no aprobado; se revierte la operación y no se otorga vigencia.
+  /membresias/{membresiaId}:
+    parameters:
+    - $ref: '#/components/parameters/membresiaId'
+    get:
+      tags: [M1 · Membresías]
+      summary: Consulta administrativa; recepción sólo su sede y gerente global
+      operationId: consultarMembresiaPorId
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
+      responses:
+        '200':
+          description: Membresía con estado e historial actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membresia'
+        '400':
+          description: Solicitud o clave inválida.
+        '401':
+          description: Sin autenticación válida.
+        '403':
+          description: Sin permisos, cuenta inactiva o membresía ajena.
+        '404':
+          description: Recurso inexistente.
+        '409':
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /membresias/{membresiaId}/estado:
+    parameters:
+    - $ref: '#/components/parameters/membresiaId'
+    patch:
+      tags: [M1 · Membresías]
+      summary: Suspender o levantar suspensión sin otorgar vigencia adicional
+      operationId: administrarEstadoMembresia
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ActualizarEstadoMembresiaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/membresia/controller/MembresiaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P03
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo su sede, Gerente cualquiera. Comando auditable SUSPENDER/REACTIVAR, sin asignación
-          libre de estados. If-Match corresponde a GET /membresias/{membresiaId}. Reactivar no cambia la fecha de
-          vencimiento ni habilita una vigencia impaga.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/membresiaId'
-  /membresias/{membresiaId}/renovacion-automatica:
-    put:
-      tags:
-      - M1 · Membresías
-      summary: Configurar renovación automática
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P03, P08.'
-      operationId: configurarRenovacionAutomatica
-      x-implementation-status: stub
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Membresía con estado e historial actualizado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Membresia'
         '400':
-          $ref: '#/components/responses/Validacion'
+          description: Solicitud o clave inválida.
         '401':
-          $ref: '#/components/responses/NoAutenticado'
+          description: Sin autenticación válida.
         '403':
-          $ref: '#/components/responses/SinPermiso'
+          description: Sin permisos, cuenta inactiva o membresía ajena.
         '404':
-          $ref: '#/components/responses/NoEncontrado'
+          description: Recurso inexistente.
         '409':
-          $ref: '#/components/responses/Conflicto'
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /membresias/{membresiaId}/renovacion-automatica:
+    parameters:
+    - $ref: '#/components/parameters/membresiaId'
+    put:
+      tags: [M1 · Membresías]
+      summary: Habilitar o deshabilitar renovación automática simulada
+      operationId: configurarRenovacionAutomatica
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RenovacionAutomaticaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/membresia/controller/MembresiaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P03
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente sólo propia; Gerente cualquier sede. Sustituye de forma idempotente la preferencia;
-          no crea pagos ni vigencia por sí sola.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      responses:
+        '200':
+          description: Membresía con estado e historial actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membresia'
+        '400':
+          description: Solicitud o clave inválida.
+        '401':
+          description: Sin autenticación válida.
+        '403':
+          description: Sin permisos, cuenta inactiva o membresía ajena.
+        '404':
+          description: Recurso inexistente.
+        '409':
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /membresias/{membresiaId}/periodos/{periodoId}/cancelacion:
     parameters:
     - $ref: '#/components/parameters/membresiaId'
+    - name: periodoId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    post:
+      tags: [M1 · Membresías]
+      summary: Arrepentimiento dentro de 24 h del cobro; reembolso fake completo
+      operationId: cancelarPeriodoMembresia
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
+        Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
+      responses:
+        '200':
+          description: Membresía con estado e historial actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membresia'
+        '400':
+          description: Solicitud o clave inválida.
+        '401':
+          description: Sin autenticación válida.
+        '403':
+          description: Sin permisos, cuenta inactiva o membresía ajena.
+        '404':
+          description: Recurso inexistente.
+        '409':
+          description: Conflicto de estado, plan inactivo o reintento incompatible.
   /accesos/qr:
     get:
       tags:
       - M2 · Accesos
       summary: Obtener QR de acceso propio
       description: |-
-        SOCIO_ACTIVO y GERENTE. Emite el QR del usuario autenticado (RF-04): un token firmado con vigencia de 60 segundos.
+        SOCIO_ACTIVO, CLIENTE_EXTERNO y GERENTE con membresía vigente. Emite el QR del usuario autenticado (RF-04): un token firmado con vigencia de 60 segundos.
         Cada pedido reemplaza al QR anterior, que deja de ser válido aunque no haya vencido; se guarda un único QR por
         usuario en codigo_qr. El cliente debe pedir uno nuevo antes de que venza (el frontend lo hace 5 s antes).
         La respuesta lleva Cache-Control: no-store. El token se firma con una clave derivada de jwt.secret, distinta
@@ -3318,287 +3233,95 @@ components:
       x-contract-status: stable
     PeriodoMembresia:
       type: object
-      additionalProperties: false
+      required: [id, planId, nombrePlan, duracionMeses, precio, inicio, fin, estado]
       properties:
         id:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
+        planId:
+          type: integer
+        nombrePlan:
+          type: string
+        duracionMeses:
+          type: integer
+          enum: [1, 3, 12]
+        precio:
+          type: number
+          description: Precio histórico contratado en ARS, hasta dos decimales.
         inicio:
           type: string
           format: date-time
-          example: '2026-10-06T18:00:00-03:00'
         fin:
           type: string
           format: date-time
-          example: '2026-11-05T18:00:00-03:00'
         pagoId:
           type: integer
-          format: int32
-          example: 50
-          x-propuesta-validacion:
-            minimum: 1
-        planId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
+          nullable: true
+          description: Nulo únicamente para períodos importados desde V4 sin pago identificado.
         estado:
           type: string
-          example: PROGRAMADA
-          x-propuesta-valores:
-          - PROGRAMADA
-          - ACTIVA
-          - VENCIDA
-          - SUSPENDIDA
-          - CANCELADA
-      x-propuesta-required:
-      - id
-      - inicio
-      - fin
-      - pagoId
-      - planId
-      - estado
-      x-propuesta-descripcion: Período histórico creado sólo por pago aprobado. Intervalo [inicio, fin); renovar
-        no sobrescribe períodos anteriores. PROGRAMADA indica período aprobado cuyo inicio es futuro. Cancelar conserva
-        fechas/pago históricos y marca el período CANCELADA, sin borrarlo.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    PeriodoMembresiaNullable:
-      type: object
-      additionalProperties: false
-      properties:
-        id:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        inicio:
-          type: string
-          format: date-time
-          example: '2026-10-06T18:00:00-03:00'
-        fin:
-          type: string
-          format: date-time
-          example: '2026-11-05T18:00:00-03:00'
-        pagoId:
-          type: integer
-          format: int32
-          example: 50
-          x-propuesta-validacion:
-            minimum: 1
-        planId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        estado:
-          type: string
-          example: PROGRAMADA
-          x-propuesta-valores:
-          - PROGRAMADA
-          - ACTIVA
-          - VENCIDA
-          - SUSPENDIDA
-          - CANCELADA
-      nullable: true
-      x-propuesta-required:
-      - id
-      - inicio
-      - fin
-      - pagoId
-      - planId
-      - estado
-      x-propuesta-descripcion: Período histórico creado sólo por pago aprobado. Intervalo [inicio, fin); renovar
-        no sobrescribe períodos anteriores. PROGRAMADA indica período aprobado cuyo inicio es futuro. Cancelar conserva
-        fechas/pago históricos y marca el período CANCELADA, sin borrarlo.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+          enum: [PROGRAMADA, ACTIVA, VENCIDA, SUSPENDIDA, CANCELADA]
     Membresia:
       type: object
-      additionalProperties: false
+      required: [id, usuarioId, sedeId, planId, estado, renovacionAutomatica, periodoVigente, periodos]
       properties:
         id:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
         usuarioId:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
         sedeId:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
+          description: Sede administrativa; no limita el acceso multi-sede.
         planId:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
+          description: Plan del último período contratado no cancelado, usado para renovación automática.
         estado:
           type: string
-          example: PENDIENTE_PAGO
-          x-propuesta-valores:
-          - PENDIENTE_PAGO
-          - ACTIVA
-          - VENCIDA
-          - SUSPENDIDA
-          - CANCELADA
+          enum: [ACTIVA, VENCIDA, SUSPENDIDA]
         renovacionAutomatica:
           type: boolean
-          example: false
-        importePendiente:
-          $ref: '#/components/schemas/Dinero'
         periodoVigente:
-          $ref: '#/components/schemas/PeriodoMembresiaNullable'
+          allOf:
+          - $ref: '#/components/schemas/PeriodoMembresia'
+          nullable: true
         periodos:
           type: array
           items:
             $ref: '#/components/schemas/PeriodoMembresia'
-      x-propuesta-required:
-      - id
-      - usuarioId
-      - sedeId
-      - planId
-      - estado
-      - renovacionAutomatica
-      - periodoVigente
-      - periodos
-      x-propuesta-descripcion: Titular derivado del JWT; sede administrativa derivada del usuario, sin restringir
-        sedes habilitadas por el plan. Sin pago aprobado no hay vigencia. Un pago rechazado no extiende el período;
-        al vencer el anterior queda VENCIDA.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      description: Cuenta única por usuario con períodos históricos. /me devuelve 404 sólo si no existe cuenta; una cuenta vencida conserva su historial. Fechas por meses calendario e intervalo [inicio, fin).
     CrearMembresiaRequest:
       type: object
-      additionalProperties: false
+      required: [planId]
       properties:
         planId:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
-      - planId
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+          minimum: 1
     RenovarMembresiaRequest:
       type: object
-      additionalProperties: false
       properties:
         planId:
           type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-descripcion: Omitir planId conserva el plan. No se reciben fechas, titular, sede ni precio.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    SolicitudRenovacion:
-      type: object
-      additionalProperties: false
-      properties:
-        id:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        membresiaId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        planId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        estado:
-          type: string
-          example: PENDIENTE_PAGO
-          x-propuesta-valores:
-          - PENDIENTE_PAGO
-          - APLICADA
-          - RECHAZADA
-        precio:
-          $ref: '#/components/schemas/Dinero'
-        periodoCreadoId:
-          type: integer
-          format: int32
-          example: 1
+          minimum: 1
           nullable: true
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
-      - id
-      - membresiaId
-      - planId
-      - estado
-      - precio
-      x-propuesta-descripcion: Solicitud previa al pago; el nuevo período se crea únicamente al aprobarse el pago
-        y conserva el historial. Si el período previo sigue vigente, el siguiente comienza al terminar éste; si
-        ya venció, comienza al aprobarse el pago. El historial incluye períodos futuros aprobados; periodoVigente
-        sólo señala el que contiene el instante actual.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      description: Omitir o enviar planId nulo conserva el último plan contratado. El backend calcula precio y fechas.
     ActualizarEstadoMembresiaRequest:
       type: object
-      additionalProperties: false
+      required: [accion, motivo]
       properties:
         accion:
           type: string
-          example: SUSPENDER
-          x-propuesta-valores:
-          - SUSPENDER
-          - REACTIVAR
+          enum: [SUSPENDER, REACTIVAR]
         motivo:
           type: string
-          example: Suspensión administrativa
-          x-propuesta-validacion:
-            minLength: 1
-      x-propuesta-required:
-      - accion
-      - motivo
-      x-propuesta-descripcion: Comando administrativo auditable, no asignación libre del estado. REACTIVAR sólo
-        levanta suspensión; no crea vigencia ni reemplaza un pago.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+          minLength: 1
+          maxLength: 500
+      description: Acción auditada. Reactivar levanta suspensión y puede dejar estado VENCIDA; no genera períodos ni pagos.
     RenovacionAutomaticaRequest:
       type: object
-      additionalProperties: false
+      required: [habilitada]
       properties:
         habilitada:
           type: boolean
-          example: true
-      x-propuesta-required:
-      - habilitada
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      description: Consentimiento explícito; el medio de pago reutilizable es temporalmente simulado.
     QrAcceso:
       type: object
       description: |-

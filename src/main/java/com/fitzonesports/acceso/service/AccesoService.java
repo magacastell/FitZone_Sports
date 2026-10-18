@@ -15,7 +15,7 @@ import com.fitzonesports.usuario.service.UsuarioService;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Set;
+import com.fitzonesports.membresia.service.MembresiaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -27,8 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class AccesoService {
 
-    // Por ahora "puede ingresar" se decide por rol. Cuando exista la membresia, el cambio es solo este metodo.
-    private static final Set<String> ROLES_CON_INGRESO = Set.of("SOCIO_ACTIVO", "GERENTE");
     private static final String ROL_RECEPCIONISTA = "RECEPCIONISTA";
 
     private final UsuarioService usuarioService;
@@ -37,6 +35,7 @@ public class AccesoService {
     private final RegistroAccesoRepository registroAccesoRepository;
     private final QrTokenService qrTokenService;
     private final Clock clock;
+    private final MembresiaService membresiaService;
 
     /** Emite el QR del usuario autenticado; reemplaza al anterior, que deja de ser valido. */
     @Transactional
@@ -164,8 +163,8 @@ public class AccesoService {
         if (!usuario.activo()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario esta inactivo");
         }
-        if (!ROLES_CON_INGRESO.contains(usuario.rol())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no esta habilitado para ingresar");
+        if (!membresiaService.tieneMembresiaVigente(usuario.id())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no tiene una membresia vigente");
         }
     }
 

@@ -30,7 +30,7 @@ public class AccesoController {
     private final AccesoService accesoService;
 
     @GetMapping("/qr")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
     public ResponseEntity<QrAccesoResponse> obtenerQr(Authentication authentication) {
         // El QR es una credencial: no debe quedar en cachés del navegador ni de proxies.
         return ResponseEntity.ok().cacheControl(CacheControl.noStore())

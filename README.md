@@ -198,7 +198,17 @@ Los valores por defecto sirven para desarrollo local sin configurar nada. Para p
 | `DB_PASSWORD` | `postgres` | Password de PostgreSQL |
 | `JWT_SECRET` | clave de desarrollo compartida | Clave de firma de los JWT |
 
+## Pasarela de pagos fake (temporal)
+
+El backend incluye el puerto `PasarelaPago` y su implementacion `PasarelaPagoFake`, seleccionada mediante `pagos.pasarela=fake` (valor predeterminado, configurable con `PAGOS_PASARELA`). Aprueba siempre los cobros validos en ARS, sin red, datos de tarjeta ni movimientos de dinero reales. Devuelve estado `APROBADO`, proveedor `FAKE` y una referencia estable para la misma clave de idempotencia.
+
+Los servicios de pagos deben inyectar `PasarelaPago` y enviar una `SolicitudCobro` con clave de idempotencia, monto positivo calculado por el backend (hasta dos decimales) y moneda `ARS`. El simulador no persiste pagos ni activa membresias: esas responsabilidades siguen en los servicios de M5 y M1. Tampoco implementa los endpoints pendientes de `/pagos`.
+
+Para reemplazarla, agregar un adaptador que implemente la misma interfaz y activarlo con otro valor de `pagos.pasarela`. El adaptador real debera convertir sus resultados a `APROBADO`, `RECHAZADO` o `PENDIENTE`. La persistencia de idempotencia y la validacion de reintentos con distinto importe corresponden a M5; una referencia fake estable no reemplaza esos controles.
+
 ## Usuarios de prueba (seed)
+
+La contratación, renovación manual/automática, consulta histórica, suspensión/reactivación y arrepentimiento están implementados con pagos fake. Ver [guía y ejemplos de membresías](docs/membresias.md). El QR requiere membresía vigente; el rol por sí solo no habilita acceso.
 
 | Email | Password | Rol |
 |---|---|---|
@@ -237,8 +247,8 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 
 ## Endpoints iniciales de los módulos
 
-Borrador para organizar el trabajo. Las 54 rutas de negocio usan el prefijo
-`/api/v1`. Las del módulo `usuario`, `sede` y planes de membresía ya están implementadas; las demás devuelven
+Borrador para organizar el trabajo. Las rutas de negocio usan el prefijo
+`/api/v1`. Usuarios, sedes, planes, membresías y QR/ingresos/salidas/aforo ya tienen implementación; las rutas pendientes devuelven
 `501 Not Implemented` sin cuerpo si el rol tiene permiso.
 Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
 Los stubs no consultan ni modifican datos. Sus contratos de solicitud/respuesta y filtros
@@ -291,7 +301,8 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 | membresia | GET | `/membresias/{membresiaId}` | R, G | consultarMembresiaPorId |
 | membresia | PATCH | `/membresias/{membresiaId}/estado` | R, G | actualizarEstado |
 | membresia | PUT | `/membresias/{membresiaId}/renovacion-automatica` | S, C, G | configurarRenovacionAutomatica |
-| acceso | GET | `/accesos/qr` | S, G | obtenerQr |
+| membresia | POST | `/membresias/{membresiaId}/periodos/{periodoId}/cancelacion` | S, C, G | arrepentimiento con reembolso fake dentro de 24 h |
+| acceso | GET | `/accesos/qr` | S, C, G | obtenerQr con membresía vigente |
 | acceso | POST | `/accesos/ingresos` | R, G | registrarIngreso |
 | acceso | POST | `/accesos/salidas` | R, G | registrarSalida |
 | acceso | GET | `/accesos/sedes/{sedeId}/aforo` | R, G | consultarAforo |
@@ -356,8 +367,8 @@ La migración V3 valida datos existentes, agrega `activo` y restricciones y ampl
 `precio` a `numeric(21,2)`, conservando el rango entero anterior. Si detecta datos
 incompatibles, falla con un mensaje para revisarlos; no elimina planes.
 
-La contratación/renovación deberá comprobar que el plan esté activo y conservar
-el precio y duración contratados al implementarse ese flujo.
+La contratación y renovación comprueban que el plan esté activo y conservan
+el nombre, precio y duración contratados en períodos históricos separados.
 El contrato OpenAPI refleja estos campos, reglas y las cuatro operaciones de
 planes, incluido DELETE. La representación monetaria como objeto de otros módulos
 sigue siendo draft; no agrega sedes habilitadas ni beneficios al DTO de planes.
@@ -370,7 +381,7 @@ No prueban la validación de JWT.
 
 Para activar las pruebas de persistencia, definir `PLAN_TEST_DB_URL` con una URL
 JDBC hacia una base PostgreSQL **vacía y descartable**, usuario `postgres` y sin
-contraseña (solo entorno local de pruebas). Flyway aplica V1–V3 y Hibernate valida
+contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V5 y Hibernate valida
 el mapeo. Estas pruebas verifican decimales, restricciones, orden y conservación
 de referencias de membresía al desactivar, concurrencia y actualización desde V2.
 Sin la variable se omiten.
