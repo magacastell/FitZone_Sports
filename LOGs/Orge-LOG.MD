@@ -133,3 +133,28 @@
 - Integró la elegibilidad de acceso con la vigencia real de membresía y bloqueó JWT de usuarios desactivados.
 - Actualizó OpenAPI y la guía de prueba manual `docs/membresias.md`. Incorporó pruebas HTTP/JWT y de integración PostgreSQL para calendario, estados, pagos, renovaciones, reembolsos, concurrencia y migración desde V4.
 - Verificó la suite completa contra una base PostgreSQL 18 aislada: 37 pruebas, sin fallos, errores ni omisiones. Validó sintaxis YAML y referencias locales de OpenAPI, y el formato con `git diff --check`.
+
+### 25/10/2026
+
+- **Comprobantes PDF de pagos de membresías**
+  - Incorporó Apache PDFBox y la emisión automática de un comprobante al contratar o renovar una membresía.
+  - Implementó `GET /pagos/{pagoId}/comprobante` con descarga directa en `application/pdf`, encabezado `Content-Disposition` y política `Cache-Control: no-store`.
+  - Incluyó número, fecha, titular, DNI, email, plan, período e importe en ARS. Identificó el documento como comprobante académico sin validez fiscal.
+  - Guardó el PDF original en PostgreSQL para conservar su contenido aunque cambien los datos del usuario o del plan; evitó duplicar comprobantes en descargas repetidas.
+  - Permitió generar al descargar los comprobantes faltantes de pagos históricos de membresías y conservar el documento original después de un reembolso.
+
+- **Reembolsos e integración con M1**
+  - Implementó `POST /pagos/{pagoId}/reembolsos`, reutilizando la cancelación de períodos de M1 y el plazo de arrepentimiento menor a 24 horas desde el cobro.
+  - Aplicó devolución completa, cancelación del período y actualización de vigencia, conservando el historial y las condiciones de los otros períodos.
+  - Compartió la idempotencia con la ruta de cancelación de membresías: los reintentos y solicitudes concurrentes no duplican la devolución.
+  - Registró monto, fecha, referencia externa y proveedor del reembolso, manteniendo la pasarela simulada siempre aprobada.
+  - Restringió ambas operaciones al titular del pago o al gerente; el gerente respeta el mismo plazo de devolución. Recepción no tiene acceso.
+  - Dejó pendiente la integración con reservas de cancha para su implementación junto con M4; las operaciones generales de pagos conservan sus stubs.
+
+- **Persistencia, documentación y verificación**
+  - Agregó `V6__comprobantes_y_reembolsos.sql` sin modificar migraciones anteriores: unicidad de comprobante por pago y número, almacenamiento del PDF, precisión de centavos en detalles y una devolución registrada por pago.
+  - Incorporó `ComprobantePdfRendererTest` y `PagosIntegrationTest`, y adaptó la limpieza de datos de las pruebas existentes a las nuevas referencias.
+  - Ejecutó la suite completa con PostgreSQL 18 aislado: 49 pruebas sin fallos, errores ni omisiones, incluyendo descarga HTTP con JWT, propiedad, roles, plazo exacto de 24 horas, concurrencia, reintentos y consistencia ante fallos de pasarela.
+  - Verificó lectura y paginación del PDF, acentos, importes y conservación del contenido original; inspeccionó visualmente un comprobante de ejemplo.
+  - Actualizó README, OpenAPI y decisiones del contrato para reflejar el alcance implementado de membresías y distinguir la integración futura con canchas.
+  - Comprobó el formato mediante `git diff --check` y detuvo la instancia PostgreSQL de pruebas al finalizar.

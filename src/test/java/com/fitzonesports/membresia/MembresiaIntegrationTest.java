@@ -224,6 +224,9 @@ class MembresiaIntegrationTest {
         if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) return;
         jdbc.update("DELETE FROM auditoria_membresia WHERE membresia_id IN (SELECT id FROM membresia WHERE usuarioid=?)",usuario);
         jdbc.update("DELETE FROM periodo_membresia WHERE membresia_id IN (SELECT id FROM membresia WHERE usuarioid=?)",usuario);
+        jdbc.update("DELETE FROM detalle_facturacion WHERE comprobanteid IN (SELECT c.id FROM comprobante c JOIN pago p ON p.id=c.pagoid WHERE p.usuarioid=?)",usuario);
+        jdbc.update("DELETE FROM comprobante WHERE pagoid IN (SELECT id FROM pago WHERE usuarioid=?)",usuario);
+        jdbc.update("DELETE FROM reembolso_pago WHERE pago_id IN (SELECT id FROM pago WHERE usuarioid=?)",usuario);
         jdbc.update("DELETE FROM pago WHERE usuarioid=?",usuario);
         jdbc.update("DELETE FROM membresia WHERE usuarioid=?",usuario);
         jdbc.update("DELETE FROM usuario WHERE email IN (?,?,?)",email,recepcion,gerente);

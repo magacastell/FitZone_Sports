@@ -2587,19 +2587,25 @@ paths:
     get:
       tags:
       - M5 · Pagos
-      summary: Descargar comprobante PDF
-      description: Entrega bytes del comprobante en application/pdf con descarga directa. Ruta y roles actuales
-        respaldados por PagoController. No define como requisito el estado del pago ni el momento de emisión; esas
-        condiciones se resolverán con el equipo (P09/P10). La representación PDF es estable aunque el backend aún
-        sea stub.
+      summary: Descargar comprobante PDF de membresía
+      description: >-
+        Entrega el PDF original, emitido automáticamente al contratar o renovar una membresía.
+        Cliente sólo pago propio; gerente cualquier pago. Pago aprobado o previamente reembolsado;
+        el PDF acredita el cobro original y no la vigencia actual. Recupera pagos históricos de
+        membresías sin PDF al descargar. Reservas de cancha pendientes de integración con M4 (409).
       operationId: descargarComprobantePago
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
       responses:
         '200':
-          description: Comprobante PDF descargable.
+          description: Comprobante PDF original descargable.
           headers:
             Content-Disposition:
               $ref: '#/components/headers/ContentDisposition'
+            Cache-Control:
+              schema:
+                type: string
+                enum: [no-store]
           content:
             application/pdf:
               schema:
@@ -2615,44 +2621,35 @@ paths:
           $ref: '#/components/responses/NoEncontrado'
         '409':
           $ref: '#/components/responses/Conflicto'
-      x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
+      x-roles-actuales: [SOCIO_ACTIVO, CLIENTE_EXTERNO, GERENTE]
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      x-contract-status: stable
-      x-contract-basis: Ruta y autorización existentes; representación PDF de comprobante definida como decisión
-        técnica de interfaz, sin fijar reglas de emisión.
-      x-permisos-objetivo:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-      x-propuesta-pending:
-      - P09
-      - P10
+      - src/main/java/com/fitzonesports/pago/service/ComprobanteService.java
     parameters:
     - $ref: '#/components/parameters/pagoId'
   /pagos/{pagoId}/reembolsos:
     post:
       tags:
       - M5 · Pagos
-      summary: Solicitar reembolso de pago
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P09, P10.'
+      summary: Reembolsar un pago de membresía dentro de 24 horas
+      description: >-
+        Sin cuerpo ni Idempotency-Key: una devolución completa por pago, con clave interna estable.
+        Cliente sólo pago propio; gerente cualquier pago, sujeto al mismo plazo estricto menor a 24 h
+        desde el cobro. M1 cancela el período y recalcula la vigencia; M5 registra el reembolso
+        simulado aprobado. Reintentos, incluso concurrentes o por la ruta de cancelación de M1,
+        no duplican la devolución. La repetición de una devolución completada devuelve 200
+        incluso después del plazo. No admite excepciones, importes parciales ni reservas de cancha;
+        estas últimas requieren integración con M4 (409). La pasarela fake sigue siempre aprobando.
       operationId: solicitarReembolsoPago
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
       responses:
-        '201':
-          description: Recurso creado.
+        '200':
+          description: Reembolso completo confirmado o resultado de una devolución ya realizada.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reembolso'
+                $ref: '#/components/schemas/ReembolsoMembresiaResponse'
         '400':
           $ref: '#/components/responses/Validacion'
         '401':
@@ -2663,44 +2660,10 @@ paths:
           $ref: '#/components/responses/NoEncontrado'
         '409':
           $ref: '#/components/responses/Conflicto'
-      x-divergencias-backend:
-      - 'Comparación con la propuesta anterior, sujeta a validación: @PreAuthorize actual no permite RECEPCIONISTA;
-        D19 requiere operación normal por sede.'
-      parameters:
-      - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SolicitarReembolsoRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
-      - GERENTE
+      x-roles-actuales: [SOCIO_ACTIVO, CLIENTE_EXTERNO, GERENTE]
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P09
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente sólo pago propio. Recepción operación automática normal de su sede, sin forzar excepción.
-          Gerente cualquier sede y única identidad que autoriza excepciones financieras con motivo auditable. M1/M4
-          define elegibilidad y M5 calcula/ejecuta movimiento. >= 2 h a tiempo; < 2 h tardía; la condición temporal
-          no sustituye la política. 409 si no corresponde o saldo incompatible. Idempotency-Key evita duplicación
-          y 201 no implica reembolso completado.
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      - src/main/java/com/fitzonesports/pago/service/ReembolsoService.java
     parameters:
     - $ref: '#/components/parameters/pagoId'
   /reportes/ocupacion:
@@ -4505,6 +4468,33 @@ components:
       x-contract-status: draft
       description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+    ReembolsoMembresiaResponse:
+      type: object
+      required: [pagoId, estado, monto, moneda, fechaReembolso, referenciaExterna]
+      properties:
+        pagoId:
+          type: integer
+          format: int32
+        estado:
+          type: string
+          enum: [REEMBOLSADO]
+        monto:
+          type: number
+          minimum: 0.01
+          multipleOf: 0.01
+          example: 15000.50
+        moneda:
+          type: string
+          enum: [ARS]
+        fechaReembolso:
+          type: string
+          format: date-time
+          nullable: true
+          description: Nula sólo para devoluciones históricas anteriores a V6 sin fecha registrada.
+        referenciaExterna:
+          type: string
+          nullable: true
+          description: Referencia fake; nula para devoluciones históricas sin referencia registrada.
     Reembolso:
       type: object
       additionalProperties: false

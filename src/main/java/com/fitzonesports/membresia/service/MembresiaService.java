@@ -23,12 +23,13 @@ public class MembresiaService {
     private final CobroMembresiaService cobros;
     private final JdbcTemplate jdbc;
     private final Clock clock;
+    private final com.fitzonesports.pago.service.ComprobanteService comprobantes;
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager entityManager;
 
     public MembresiaService(MembresiaRepository membresias, PeriodoMembresiaRepository periodos,
             PlanMembresiaRepository planes, UsuarioService usuarios, CobroMembresiaService cobros,
-            JdbcTemplate jdbc, Clock clock) {
+            JdbcTemplate jdbc, Clock clock, com.fitzonesports.pago.service.ComprobanteService comprobantes) {
         this.membresias = membresias;
         this.periodos = periodos;
         this.planes = planes;
@@ -36,6 +37,7 @@ public class MembresiaService {
         this.cobros = cobros;
         this.jdbc = jdbc;
         this.clock = clock;
+        this.comprobantes = comprobantes;
     }
 
     @Transactional(readOnly=true)
@@ -226,6 +228,7 @@ public class MembresiaService {
         membresia.setPlanId(plan.getId());
         membresia.setFechaFin(periodo.getFin());
         actualizarEstadoGuardado(membresia);
+        comprobantes.emitir(pagoId);
     }
 
     private MembresiaResponse respuesta(Membresia membresia) {

@@ -9,9 +9,21 @@ Se separan dos ejes por operación:
 | `x-implementation-status` | `implemented` / `stub` | Existe lógica funcional / existe la ruta, pero no el caso de uso. |
 | `x-contract-status` | `stable` / `draft` | Interfaz suficientemente respaldada / hay reglas o representación funcional que el equipo debe validar. |
 
-El estado no se deriva del otro: descargar comprobante es `stub + stable` para su representación PDF; registrar ingreso es `stub + draft`; consultar perfil es `implemented + stable`. `stable` no garantiza que el runtime ya cumpla todas las decisiones técnicas objetivo; las diferencias se explicitan en metadata.
+El estado no se deriva del otro: una interfaz puede ser estable antes de implementarse. Consultar perfil y descargar comprobantes de membresías son `implemented + stable`. `stable` no garantiza que el runtime ya cumpla todas las decisiones técnicas objetivo; las diferencias se explicitan en metadata.
 
 La revisión incorpora la baja lógica de planes y la implementación de membresías con períodos, pagos fake y arrepentimiento. Las operaciones de membresías están marcadas `implemented + stable`; las demás conservan su clasificación por módulo. El 501 de las rutas pendientes se registra como nota de implementación.
+
+Actualización M5 (25/10/2026): se implementaron la descarga del PDF original y el reembolso
+completo de pagos de membresías. El comprobante se emite al contratar/renovar y queda almacenado;
+los pagos históricos sin documento lo generan al descargar. Titular y gerente pueden operar,
+con control de propiedad y el mismo plazo de arrepentimiento menor a 24 h. POST reembolsos
+no recibe cuerpo ni Idempotency-Key: la clave interna es estable por pago y la respuesta es
+200, también en reintentos. La devolución conserva el historial, cancela el período en M1 y
+registra monto, fecha y referencia en M5. El PDF original se conserva tras reembolso.
+La pasarela sigue siempre aprobada. P09/P10 continúan pendientes para reservas de cancha,
+devoluciones parciales, excepciones y procesamiento asíncrono; no se generalizan las reglas
+de membresías a M4. Los schemas anteriores de reembolso siguen como propuestas para esos flujos;
+la respuesta implementada usa `ReembolsoMembresiaResponse`.
 
 Los D1–D20 del intercambio anterior fueron antecedentes de diseño. Esta revisión **no los presenta como acta ni aprobación inequívoca del equipo**. Sus aspectos técnicos se conservan y sus alternativas funcionales se trazan en P01–P12. No se encontraron en el checkout los textos completos de requisitos/ADR citados por las bitácoras; no se atribuye aprobación a documentos no leídos. Los prototipos frontend sólo aportan contexto.
 

@@ -381,10 +381,51 @@ No prueban la validación de JWT.
 
 Para activar las pruebas de persistencia, definir `PLAN_TEST_DB_URL` con una URL
 JDBC hacia una base PostgreSQL **vacía y descartable**, usuario `postgres` y sin
-contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V5 y Hibernate valida
+contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V6 y Hibernate valida
 el mapeo. Estas pruebas verifican decimales, restricciones, orden y conservación
 de referencias de membresía al desactivar, concurrencia y actualización desde V2.
 Sin la variable se omiten.
+
+### Comprobantes PDF y reembolsos de membresías (M5)
+
+La pasarela simulada mantiene la aprobación de cobros y devoluciones. Al contratar
+o renovar una membresía se emite un comprobante único por pago, con número, fecha,
+titular, DNI, email, plan, período e importe en ARS. Apache PDFBox genera el PDF;
+se guarda en PostgreSQL para conservar los datos originales aunque luego cambien
+el usuario o el plan. Es un comprobante académico, sin validez fiscal.
+
+- `GET /pagos/{pagoId}/comprobante`: devuelve `200 application/pdf`,
+  `Content-Disposition: attachment` y `Cache-Control: no-store`. El titular consulta
+  sus pagos y el gerente cualquiera. Para pagos anteriores sin documento, se emite
+  al descargar usando el período histórico y los datos disponibles del titular.
+  Un pago pendiente/rechazado no genera comprobante (`409`). El PDF de un pago
+  reembolsado se conserva como constancia del cobro original, sin acreditar vigencia actual.
+- `POST /pagos/{pagoId}/reembolsos`: sin cuerpo ni clave de idempotencia externa;
+  solicita la devolución completa del pago de una membresía dentro de las primeras
+  24 horas del cobro (a las 24 horas exactas ya no se permite). Devuelve `200` con
+  `pagoId`, `estado=REEMBOLSADO`, `monto`, `moneda=ARS`, `fechaReembolso` y
+  `referenciaExterna`. Titular y gerente respetan el mismo plazo. M1 cancela el
+  período, recalcula beneficios y conserva el historial; M5 registra la devolución.
+  La operación comparte la regla con `/membresias/{id}/periodos/{periodoId}/cancelacion`.
+  Repetir cualquiera de las dos rutas no duplica la devolución, incluso en concurrencia
+  o cuando el plazo venció después del primer reembolso. Los reembolsos anteriores
+  a V6 pueden carecer de fecha y referencia; se devuelven nulas, sin inventar datos.
+
+Sin sesión se devuelve `401`, por pago ajeno o rol no autorizado `403`, pago
+inexistente `404`, y plazo vencido o pago incompatible `409`. Recepción no tiene
+acceso a estas dos operaciones. Los casos de reservas de cancha devuelven `409`
+hasta su integración con M4. La creación y las consultas generales de pagos siguen
+en `501`; no se modifica el flujo de reservas.
+
+V6 agrega unicidad por pago y número de comprobante, almacenamiento del PDF,
+centavos en detalle de facturación y el registro de una devolución por pago.
+Ante comprobantes preexistentes duplicados, la migración se detiene para revisión.
+
+`ComprobantePdfRendererTest` comprueba lectura de PDF, acentos, ajuste de textos y
+paginación. Con `PLAN_TEST_DB_URL`, `PagosIntegrationTest` verifica emisión,
+descarga HTTP autenticada, permisos, recuperación de PDFs históricos, plazo,
+concurrencia y consistencia de membresías/reembolsos. Usa exclusivamente una base
+local de pruebas descartable, con las mismas condiciones indicadas arriba.
 
 ## Documentación
 

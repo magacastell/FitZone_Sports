@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class CobroMembresiaService {
     private final PasarelaPago pasarela;
     private final JdbcTemplate jdbc;
+    private final java.time.Clock clock;
 
     @Transactional(propagation=Propagation.MANDATORY)
     public void reembolsar(Integer pagoId) {
@@ -26,6 +27,8 @@ public class CobroMembresiaService {
                 (String)pago.get("referencia_externa"),(BigDecimal)pago.get("monto")));
         if (resultado.estado()!=ResultadoCobro.Estado.APROBADO)
             throw new ResponseStatusException(HttpStatus.CONFLICT,"No se pudo confirmar el reembolso");
+        jdbc.update("INSERT INTO reembolso_pago(pago_id,monto,fecha,referencia_externa,proveedor) VALUES (?,?,?,?,?)",
+                pagoId,pago.get("monto"),LocalDateTime.now(clock),resultado.referenciaExterna(),resultado.proveedor());
         jdbc.update("UPDATE pago SET estado='REEMBOLSADO' WHERE id=?",pagoId);
     }
 
