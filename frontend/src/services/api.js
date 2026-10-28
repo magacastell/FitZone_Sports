@@ -23,7 +23,10 @@ export async function fetchAPI(endpoint, options = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || errorData.message || 'Error en la petición');
+    const error = new Error(errorData?.detail || errorData?.message || 'Error en la petición');
+    error.status = response.status;
+    error.data = errorData;
+    throw error;
   }
 
   return response.status !== 204 ? response.json() : null;
