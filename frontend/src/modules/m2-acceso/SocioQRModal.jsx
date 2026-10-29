@@ -18,7 +18,7 @@ const vigenciaMs = (token) => {
   }
 };
 
-export default function SocioQRModal({ isOpen, onClose }) {
+export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
   const dialogRef = useRef(null);
   const [token, setToken] = useState(null);
   const [vence, setVence] = useState(0);
@@ -53,6 +53,7 @@ export default function SocioQRModal({ isOpen, onClose }) {
         if (!activo) return;
         setToken(null);
         setError(err.message || 'No pudimos generar tu QR.');
+        if (err.status === 403) onAccesoDenegado?.(err);
       }
     };
 
@@ -61,7 +62,7 @@ export default function SocioQRModal({ isOpen, onClose }) {
       activo = false;
       clearTimeout(timer);
     };
-  }, [isOpen]);
+  }, [isOpen, onAccesoDenegado]);
 
   useEffect(() => {
     if (!token) return;

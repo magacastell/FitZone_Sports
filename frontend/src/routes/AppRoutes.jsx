@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useCallback, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useOutletContext } from 'react-router-dom';
 import Layout from '../components/Layout';
 import FeaturePlaceholder from '../components/FeaturePlaceholder';
 import PerfilUsuario from '../modules/m1-usuarios/PerfilUsuario';
@@ -15,8 +15,27 @@ import ProtectedRoute from '../components/ProtectedRoute';
 
 function SocioQRRoute() {
   const navigate = useNavigate();
+  const { membresia, refrescarMembresia, puedeAbrirQr } = useOutletContext();
+  const [errorQr, setErrorQr] = useState('');
+  const alDenegarAcceso = useCallback((error) => {
+    setErrorQr(error.message || 'El backend denegó la generación del QR.');
+    refrescarMembresia();
+  }, [refrescarMembresia]);
 
-  return <SocioQRModal isOpen={true} onClose={() => navigate('/canchas')} />;
+  if (membresia.estado === 'cargando') return <p role="status">Consultando membresía para abrir Mi QR...</p>;
+  if (!puedeAbrirQr) return (
+    <div>
+      {errorQr && <p role="alert">{errorQr}</p>}
+      {membresia.estado === 'error' ? (
+        <>
+          <p role="alert">No pudimos consultar tu membresía. {membresia.mensaje}</p>
+          <button type="button" onClick={refrescarMembresia}>Reintentar consulta de membresía</button>
+        </>
+      ) : <p>Mi QR no está disponible con el estado actual de tu membresía.</p>}
+      <Link to="/perfil">Ver perfil y membresía</Link>
+    </div>
+  );
+  return <SocioQRModal isOpen={true} onClose={() => navigate('/canchas')} onAccesoDenegado={alDenegarAcceso} />;
 }
 
 export default function AppRoutes() {

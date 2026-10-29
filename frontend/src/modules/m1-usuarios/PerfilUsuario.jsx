@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { consultarMiPerfil, consultarMiMembresia, listarPlanes, contratarMembresia, renovarMembresia } from '../../services/m1Service';
+import { useOutletContext } from 'react-router-dom';
+import { consultarMiPerfil, listarPlanes, contratarMembresia, renovarMembresia } from '../../services/m1Service';
 
 function RenovacionMembresia({ perfil, membresia, onRenovada }) {
   const [renovacion, setRenovacion] = useState({ estado: 'cargando' });
@@ -219,7 +220,7 @@ function RenovacionMembresia({ perfil, membresia, onRenovada }) {
 
 export default function PerfilUsuario() {
   const [perfil, setPerfil] = useState({ estado: 'cargando' });
-  const [membresia, setMembresia] = useState({ estado: 'cargando' });
+  const { membresia, actualizarMembresia: setMembresia, refrescarMembresia } = useOutletContext();
   const [planes, setPlanes] = useState({ estado: 'inicial' });
   const [planSeleccionado, setPlanSeleccionado] = useState('');
   const [contratacion, setContratacion] = useState({ estado: 'inicial' });
@@ -237,17 +238,6 @@ export default function PerfilUsuario() {
       },
       (error) => {
         if (activo) setPerfil({ estado: 'error', mensaje: error.message });
-      },
-    );
-
-    consultarMiMembresia().then(
-      (datos) => {
-        if (activo) setMembresia({ estado: 'cargada', datos });
-      },
-      (error) => {
-        if (activo) setMembresia(error.status === 404
-          ? { estado: 'sin-membresia' }
-          : { estado: 'error', mensaje: error.message });
       },
     );
 
@@ -279,21 +269,15 @@ export default function PerfilUsuario() {
 
   const reconciliarMembresia = async (mensajeConflicto) => {
     setContratacion({ estado: 'reconciliando' });
-    try {
-      const datos = await consultarMiMembresia();
-      if (!montado.current) return;
-      setMembresia({ estado: 'cargada', datos });
+    const estado = await refrescarMembresia();
+    if (!montado.current) return;
+    if (estado.estado === 'cargada') {
       setContratacion({ estado: 'actualizada' });
       intento.current = null;
-    } catch (errorConsulta) {
-      if (!montado.current) return;
-      if (errorConsulta.status === 404) {
-        setMembresia({ estado: 'sin-membresia' });
-        setContratacion({ estado: 'error', status: 409, mensaje: mensajeConflicto, reconciliada: true });
-      } else {
-        setMembresia({ estado: 'error', mensaje: errorConsulta.message });
-        setContratacion({ estado: 'error', status: 409, mensaje: 'No pudimos verificar la membresía después del conflicto.', mensajeConflicto });
-      }
+    } else if (estado.estado === 'sin-membresia') {
+      setContratacion({ estado: 'error', status: 409, mensaje: mensajeConflicto, reconciliada: true });
+    } else {
+      setContratacion({ estado: 'error', status: 409, mensaje: 'No pudimos verificar la membresía después del conflicto.', mensajeConflicto });
     }
   };
 
@@ -437,7 +421,12 @@ export default function PerfilUsuario() {
             {puedeReintentar && contratacion.status !== 402 && <p>No se pudo confirmar el resultado. Reintentá con el mismo plan, sin cerrar esta pantalla.</p>}
           </>
         )}
-        {membresia.estado === 'error' && contratacion.estado !== 'reconciliando' && <p role="alert">No pudimos cargar tu membresía. {membresia.mensaje}</p>}
+        {membresia.estado === 'error' && contratacion.estado !== 'reconciliando' && (
+          <>
+            <p role="alert">No pudimos cargar tu membresía. {membresia.mensaje}</p>
+            <button type="button" onClick={refrescarMembresia}>Reintentar consulta de membresía</button>
+          </>
+        )}
         {contratacion.estado === 'exito' && <p role="status">Contratación confirmada.</p>}
         {contratacion.estado === 'actualizada' && <p role="status">Se actualizó el estado de tu membresía.</p>}
         {membresia.estado === 'cargada' && (
