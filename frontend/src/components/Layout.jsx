@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound } from 'lucide-react';
+import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, List } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { consultarMiMembresia } from '../services/m1Service';
 import './Layout.css';
@@ -138,6 +138,7 @@ function LayoutAutenticado() {
             <div className="app-nav__group">
               <p className="app-nav__heading" id="nav-gestion">Operación y gestión</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
+                {rolActivo === 'GERENTE' && <NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink>}
                 <NavigationLink to="/recepcion/acceso" icon={DoorOpen} module="M2">Control de acceso y aforo</NavigationLink>
               </ul>
             </div>

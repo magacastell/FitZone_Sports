@@ -1,4 +1,5 @@
 import { fetchAPI } from './api';
+export { listarPlanes } from './planesService';
 
 export function consultarMiPerfil() {
   return fetchAPI('/usuarios/me');
@@ -6,10 +7,6 @@ export function consultarMiPerfil() {
 
 export function consultarMiMembresia() {
   return fetchAPI('/membresias/me');
-}
-
-export function listarPlanes() {
-  return fetchAPI('/planes');
 }
 
 export function contratarMembresia(planId, idempotencyKey) {
