@@ -57,3 +57,13 @@
   - Verificó YAML sin claves duplicadas, referencias resolubles, operationId únicos, cobertura de controllers, trece DTO y seguridad; Redocly terminó sin errores y con las dos advertencias conocidas.
   - Ejecutó las pruebas: 12 aprobadas y 7 de persistencia omitidas por no configurar una base PostgreSQL vacía y descartable; sin fallos ni errores.
   - Limitó las correcciones a OpenAPI, decisiones, README y esta bitácora; no modificó código funcional, migraciones ni configuración.
+
+### 29/10/2026
+
+- **[S4] Integración frontend de perfil y membresía — 2.0 hs aproximadamente**
+  - Integró el frontend de M1 con los endpoints reales de perfil, membresía y planes, reemplazando la información simulada e incorporando contratación y renovación manual.
+  - Trabajó el manejo de errores y la idempotencia para evitar operaciones duplicadas, conservando la intención de renovación mediante `sessionStorage` frente a recargas.
+  - Compartió el estado real de membresía con la navegación y ajustó Mi QR para que dependa de una membresía `ACTIVA`, no únicamente del rol del usuario.
+  - Verificó el comportamiento con pruebas aisladas temporales, build frontend y revisión manual básica. No pudo completar manualmente la contratación contra PostgreSQL porque no había planes activos ni una UI administrativa de planes disponible; las pruebas aisladas utilizaron servicios simulados.
+  - Durante la revisión manual detectó problemas generales de navegación, datos simulados y coherencia entre módulos, que quedaron fuera de esta tarea para abordarlos por separado.
+  - Commits funcionales: `65e1d54`, `9617656`, `117a6f0`, `05c312c`, `355ec45` y `7802bac`.
