@@ -43,7 +43,7 @@ function EscanerQr({ titulo, etiquetaBoton, ruta, tituloExito, sedeId, deshabili
         autoComplete="off"
         value={qrToken}
         onChange={(e) => setQrToken(e.target.value)}
-        placeholder="Escanear QR Dinámico..."
+        placeholder="Escanear código QR..."
         aria-label={`Contenido del código QR (${etiquetaBoton})`}
         style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem', boxSizing: 'border-box' }}
       />
@@ -81,7 +81,6 @@ export default function ControlAccesoSede() {
   const [sedeId, setSedeId] = useState(null);
   const [aforo, setAforo] = useState(null);
   const [errorAforo, setErrorAforo] = useState('');
-  const [modoOffline, setModoOffline] = useState(false);
 
   // Recepción opera la sede de su usuario; el gerente elige entre todas.
   useEffect(() => {
@@ -128,12 +127,6 @@ export default function ControlAccesoSede() {
     <div style={{ maxWidth: '800px', background: '#fff', padding: '1.5rem', borderRadius: '8px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
         <h2>M2 — Control de Acceso{sedeActual && !esGerente ? ` (${sedeActual.nombre})` : ''}</h2>
-        <button
-          onClick={() => setModoOffline(!modoOffline)}
-          style={{ padding: '0.4rem 0.8rem', background: modoOffline ? '#ef4444' : '#10b981', color: '#fff', border: 'none', borderRadius: '4px' }}
-        >
-          {modoOffline ? 'Modo Offline (Caché)' : 'Servidor en Línea'}
-        </button>
       </div>
 
       {esGerente && (
@@ -164,8 +157,8 @@ export default function ControlAccesoSede() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
         <EscanerQr
-          titulo="Ingreso Socio (Lector QR 2D)"
-          etiquetaBoton="Validar Socio"
+          titulo="Validar acceso (lector QR 2D)"
+          etiquetaBoton="Validar ingreso"
           ruta="/accesos/ingresos"
           tituloExito="Ingreso registrado"
           sedeId={sedeParaEnviar}
@@ -183,11 +176,6 @@ export default function ControlAccesoSede() {
           onRegistrado={refrescarAforo}
         />
 
-        <div style={{ border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '6px' }}>
-          <h4>Ingreso Cliente Externo</h4>
-          <input type="text" placeholder="Buscar por DNI o Email..." style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem', boxSizing: 'border-box' }} />
-          <button style={{ width: '100%', padding: '0.5rem', background: '#475569', color: '#fff', border: 'none' }}>Verificar Reserva Cancha</button>
-        </div>
       </div>
     </div>
   );

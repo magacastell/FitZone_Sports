@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { consultarMiPerfil, listarPlanes, contratarMembresia, renovarMembresia } from '../../services/m1Service';
 
 function RenovacionMembresia({ perfil, membresia, onRenovada }) {
@@ -219,6 +220,14 @@ function RenovacionMembresia({ perfil, membresia, onRenovada }) {
 }
 
 export default function PerfilUsuario() {
+  const { user } = useAuth();
+  const esCliente = user?.rol === 'CLIENTE_EXTERNO' || user?.rol === 'SOCIO_ACTIVO';
+  const nombreRol = {
+    CLIENTE_EXTERNO: 'Cliente externo',
+    SOCIO_ACTIVO: 'Socio',
+    RECEPCIONISTA: 'Recepcionista',
+    GERENTE: 'Gerente',
+  }[user?.rol];
   const [perfil, setPerfil] = useState({ estado: 'cargando' });
   const { membresia, actualizarMembresia: setMembresia, refrescarMembresia } = useOutletContext();
   const [planes, setPlanes] = useState({ estado: 'inicial' });
@@ -245,7 +254,7 @@ export default function PerfilUsuario() {
   }, []);
 
   useEffect(() => {
-    if (membresia.estado !== 'sin-membresia') return;
+    if (!esCliente || membresia.estado !== 'sin-membresia') return;
     let activo = true;
     setPlanes({ estado: 'cargando' });
     listarPlanes().then(
@@ -257,7 +266,7 @@ export default function PerfilUsuario() {
       },
     );
     return () => { activo = false; };
-  }, [membresia.estado]);
+  }, [membresia.estado, esCliente]);
 
   const uuidDisponible = typeof globalThis.crypto?.randomUUID === 'function';
   const puedeCambiarPlan = contratacion.estado === 'error' && contratacion.status === 402;
@@ -294,7 +303,7 @@ export default function PerfilUsuario() {
 
   const contratar = async (event) => {
     event.preventDefault();
-    if (enviando.current || membresia.estado !== 'sin-membresia' || envioBloqueado) return;
+    if (!esCliente || enviando.current || membresia.estado !== 'sin-membresia' || envioBloqueado) return;
     if (!intento.current) {
       const plan = planes.estado === 'cargados'
         ? planes.datos.find((p) => String(p.id) === planSeleccionado) : null;
@@ -354,10 +363,11 @@ export default function PerfilUsuario() {
 
   return (
     <div style={{ maxWidth: '600px', background: '#fff', padding: '1.5rem', borderRadius: '8px' }}>
-      <h2>M1 — Perfil y Membresía</h2>
+      <h2>{esCliente ? 'M1 — Perfil y Membresía' : 'Perfil de cuenta'}</h2>
 
       <section aria-labelledby="perfil-titulo" aria-busy={perfil.estado === 'cargando'}>
         <h3 id="perfil-titulo">Mi perfil</h3>
+        {nombreRol && <p><strong>Rol:</strong> {nombreRol}</p>}
         {perfil.estado === 'cargando' && <p role="status">Cargando perfil...</p>}
         {perfil.estado === 'error' && <p role="alert">No pudimos cargar tu perfil. {perfil.mensaje}</p>}
         {perfil.estado === 'cargado' && (
@@ -370,12 +380,12 @@ export default function PerfilUsuario() {
         )}
       </section>
 
-      <section aria-labelledby="membresia-titulo" aria-busy={membresia.estado === 'cargando'} style={{ border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '6px', marginTop: '1rem' }}>
+      {esCliente && <section aria-labelledby="membresia-titulo" aria-busy={membresia.estado === 'cargando'} style={{ border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '6px', marginTop: '1rem' }}>
         <h3 id="membresia-titulo">Mi membresía</h3>
         {membresia.estado === 'cargando' && <p role="status">Cargando membresía...</p>}
         {membresia.estado === 'sin-membresia' && contratacion.estado !== 'reconciliando' && <p>No tenés una membresía.</p>}
         {contratacion.estado === 'reconciliando' && <p role="status">Verificando el estado actual de tu membresía...</p>}
-        {membresia.estado === 'sin-membresia' && (
+        {esCliente && membresia.estado === 'sin-membresia' && (
           <>
             {planes.estado === 'cargando' && <p role="status">Cargando planes...</p>}
             {planes.estado === 'error' && <p role="alert">No pudimos cargar los planes. {planes.mensaje}</p>}
@@ -450,7 +460,7 @@ export default function PerfilUsuario() {
                 onRenovada={(datos) => setMembresia({ estado: 'cargada', datos })} />
             : <p role="alert">No se puede renovar: el perfil y la membresía no corresponden a la misma cuenta.</p>
         )}
-      </section>
+      </section>}
     </div>
   );
 }

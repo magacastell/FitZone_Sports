@@ -12,6 +12,13 @@ import HistorialComprobante from '../modules/m5-pagos/HistorialComprobante';
 import LoginPage from '../modules/auth/LoginPage';
 import RegisterPage from '../modules/auth/RegisterPage';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { useAuth } from '../context/AuthContext';
+
+function InicioPorRol() {
+  const { user, loading } = useAuth();
+  if (loading || !user) return <p role="status">Cargando sesión de FitZone...</p>;
+  return <Navigate to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'} replace />;
+}
 
 function SocioQRRoute() {
   const navigate = useNavigate();
@@ -35,7 +42,7 @@ function SocioQRRoute() {
       <Link to="/perfil">Ver perfil y membresía</Link>
     </div>
   );
-  return <SocioQRModal isOpen={true} onClose={() => navigate('/canchas')} onAccesoDenegado={alDenegarAcceso} />;
+  return <SocioQRModal isOpen={true} onClose={() => navigate('/')} onAccesoDenegado={alDenegarAcceso} />;
 }
 
 export default function AppRoutes() {
@@ -48,7 +55,7 @@ export default function AppRoutes() {
           {/* Todas las rutas del Layout ahora están protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>
-              <Route index element={<Navigate to="/canchas" replace />} />
+              <Route index element={<InicioPorRol />} />
               <Route path="canchas" element={<GrillaCanchas />} />
               <Route path="clases" element={<AgendaClases />} />
               <Route path="mi-qr" element={<SocioQRRoute />} />
@@ -71,7 +78,7 @@ export default function AppRoutes() {
             </Route>
           </Route>
           
-          <Route path="*" element={<Navigate to="/canchas" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

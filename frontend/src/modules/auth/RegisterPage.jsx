@@ -43,7 +43,7 @@ export default function RegisterPage() {
     setEnviando(false);
 
     if (result.success) {
-      navigate('/canchas');
+      navigate('/', { replace: true });
     } else {
       setError(result.message);
     }

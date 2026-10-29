@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { CalendarDays, ChartColumn, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, Wrench } from 'lucide-react';
+import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { consultarMiMembresia } from '../services/m1Service';
 import './Layout.css';
@@ -32,7 +32,9 @@ export default function Layout() {
 
 function LayoutAutenticado() {
   const { user, logout, isAuthenticated } = useAuth();
-  const [membresia, setMembresia] = useState({ estado: 'cargando' });
+  const rolActivo = VISTA_POR_ROL[user?.rol];
+  const esCliente = rolActivo === 'SOCIO' || rolActivo === 'EXTERNO';
+  const [membresia, setMembresia] = useState({ estado: esCliente ? 'cargando' : 'no-aplica' });
   const ultimaMembresia = useRef(membresia);
   const consulta = useRef(null);
   const revision = useRef(0);
@@ -47,8 +49,9 @@ function LayoutAutenticado() {
   }, []);
 
   const refrescarMembresia = useCallback(() => {
+    if (!esCliente) return Promise.resolve(ultimaMembresia.current);
     if (consulta.current) return consulta.current;
-    if (ultimaMembresia.current.estado === 'error') {
+    if (ultimaMembresia.current.estado === 'error' || ultimaMembresia.current.estado === 'no-aplica') {
       ultimaMembresia.current = { estado: 'cargando' };
       if (montado.current) setMembresia(ultimaMembresia.current);
     }
@@ -69,28 +72,25 @@ function LayoutAutenticado() {
     });
     consulta.current = tarea;
     return tarea;
-  }, []);
+  }, [esCliente]);
 
   useEffect(() => {
     montado.current = true;
-    refrescarMembresia();
+    if (esCliente) refrescarMembresia();
+    else actualizarMembresia({ estado: 'no-aplica' });
     const alRecuperarFoco = () => {
       if (document.visibilityState === 'visible') refrescarMembresia();
     };
-    window.addEventListener('focus', alRecuperarFoco);
+    if (esCliente) window.addEventListener('focus', alRecuperarFoco);
     return () => {
       montado.current = false;
       revision.current++;
       consulta.current = null;
       window.removeEventListener('focus', alRecuperarFoco);
     };
-  }, [refrescarMembresia]);
+  }, [esCliente, actualizarMembresia, refrescarMembresia]);
 
   const puedeAbrirQr = membresia.estado === 'cargada' && membresia.datos.estado === 'ACTIVA';
-  // Por defecto se muestra la vista del rol real; el desplegable de desarrollo
-  // permite previsualizar otro rol sin cambiar de sesión.
-  const [vistaForzada, setVistaForzada] = useState(null);
-  const rolActivo = vistaForzada ?? VISTA_POR_ROL[user?.rol] ?? 'SOCIO';
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -111,43 +111,34 @@ function LayoutAutenticado() {
               <p className="app-brand__description">Gestión de gimnasio</p>
             </div>
           </div>
-
-          <div className="actor-preview">
-            <label htmlFor="vista-desarrollo">Vista de desarrollo</label>
-            <select id="vista-desarrollo" value={rolActivo} onChange={(e) => setVistaForzada(e.target.value)}>
-              <option value="SOCIO">Socio Activo</option>
-              <option value="EXTERNO">Cliente Externo</option>
-              <option value="RECEPCION">Recepcionista / Admin Sede</option>
-              <option value="GERENTE">Gerente Central</option>
-            </select>
-          </div>
         </div>
 
         <nav className="app-nav" aria-label="Navegación principal">
           <div className="app-nav__group">
-            <p className="app-nav__heading" id="nav-usuario">Módulos del usuario</p>
+            <p className="app-nav__heading" id="nav-usuario">Mi cuenta</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
-              <NavigationLink to="/canchas" icon={LayoutGrid} module="M4">Canchas</NavigationLink>
+              <NavigationLink to="/perfil" icon={UserRound} module="M1">{esCliente ? 'Perfil y membresía' : 'Perfil'}</NavigationLink>
+              {esCliente && <NavigationLink to="/canchas" icon={LayoutGrid} module="M4">Canchas</NavigationLink>}
               {rolActivo === 'SOCIO' && (
                 <>
                   <NavigationLink to="/clases" icon={CalendarDays} module="M3">Clases grupales</NavigationLink>
                 </>
               )}
-              {puedeAbrirQr && <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR</NavigationLink>}
-              <NavigationLink to="/perfil" icon={UserRound} module="M1">Perfil y membresía</NavigationLink>
-              <NavigationLink to="/comprobantes" icon={ReceiptText} module="M5">Mis comprobantes</NavigationLink>
+              {esCliente && <NavigationLink to="/comprobantes" icon={ReceiptText} module="M5">Mis comprobantes</NavigationLink>}
             </ul>
           </div>
+
+          {puedeAbrirQr && (
+            <ul className="app-nav__list">
+              <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR</NavigationLink>
+            </ul>
+          )}
 
           {(rolActivo === 'RECEPCION' || rolActivo === 'GERENTE') && (
             <div className="app-nav__group">
               <p className="app-nav__heading" id="nav-gestion">Operación y gestión</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
                 <NavigationLink to="/recepcion/acceso" icon={DoorOpen} module="M2">Control de acceso y aforo</NavigationLink>
-                <NavigationLink to="/admin/canchas/mantenimiento" icon={Wrench} module="M4">Mantenimiento de canchas</NavigationLink>
-                {rolActivo === 'GERENTE' && (
-                  <NavigationLink to="/admin/reportes-consolidados" icon={ChartColumn}>Reportes consolidados</NavigationLink>
-                )}
               </ul>
             </div>
           )}
@@ -163,7 +154,7 @@ function LayoutAutenticado() {
 
       <main id="contenido" className="app-main" tabIndex={-1}>
         <div className="app-content">
-          <p className="demo-notice">Vista de demostración: datos simulados. Las reservas, pagos y validaciones todavía no están implementados.</p>
+          <p className="demo-notice">Las pantallas de clases, canchas y listado de comprobantes todavía muestran datos de demostración.</p>
           <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr }} />
         </div>
       </main>
