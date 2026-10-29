@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, List } from 'lucide-react';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, List, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { consultarMiMembresia } from '../services/m1Service';
+import { consultarMiMembresia, consultarMiPerfil } from '../services/m1Service';
 import './Layout.css';
 
-function NavigationLink({ to, icon: Icon, children, module }) {
+function NavigationLink({ to, icon: Icon, children }) {
   return (
     <li>
       <NavLink to={to} end className={({ isActive }) => `app-nav__link${isActive ? ' app-nav__link--active' : ''}`}>
         <Icon className="app-icon" size={20} strokeWidth={1.75} aria-hidden="true" />
         <span className="app-nav__label">{children}</span>
-        {module && <span className="app-nav__module">{module}</span>}
       </NavLink>
     </li>
   );
@@ -25,6 +24,17 @@ const VISTA_POR_ROL = {
   GERENTE: 'GERENTE',
 };
 
+const NOMBRE_ROL = {
+  CLIENTE_EXTERNO: 'Cliente externo', SOCIO_ACTIVO: 'Socio',
+  RECEPCIONISTA: 'Recepcionista', GERENTE: 'Gerente',
+};
+
+const TITULO_POR_RUTA = {
+  '/perfil': 'Perfil', '/gestion/planes': 'Planes de membresía',
+  '/recepcion/acceso': 'Control de acceso', '/mi-qr': 'Mi QR',
+  '/comprobantes': 'Comprobantes', '/canchas': 'Canchas', '/clases': 'Clases',
+};
+
 export default function Layout() {
   const { token } = useAuth();
   return <LayoutAutenticado key={token} />;
@@ -32,6 +42,31 @@ export default function Layout() {
 
 function LayoutAutenticado() {
   const { user, logout, isAuthenticated } = useAuth();
+  const { pathname } = useLocation();
+  const [perfilCuenta, setPerfilCuenta] = useState(null);
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const menuRef = useRef(null);
+  const botonMenuRef = useRef(null);
+
+  useEffect(() => {
+    let activo = true;
+    setPerfilCuenta(null);
+    if (user?.email) consultarMiPerfil().then(
+      (datos) => { if (activo) setPerfilCuenta(datos); },
+      () => { /* El enlace a Perfil conserva el email real de la sesión como alternativa. */ },
+    );
+    return () => { activo = false; };
+  }, [user?.email]);
+
+  useEffect(() => { setMenuAbierto(false); }, [pathname]);
+  useEffect(() => {
+    if (menuAbierto) menuRef.current?.querySelector('a')?.focus();
+  }, [menuAbierto]);
+
+  const nombreCuenta = perfilCuenta
+    ? `${perfilCuenta.nombre} ${perfilCuenta.apellido}`.trim()
+    : user?.email || 'Mi cuenta';
+  const iniciales = nombreCuenta.split(/\s+/).map((parte) => parte[0]).slice(0, 2).join('').toUpperCase();
   const rolActivo = VISTA_POR_ROL[user?.rol];
   const esCliente = rolActivo === 'SOCIO' || rolActivo === 'EXTERNO';
   const [membresia, setMembresia] = useState({ estado: esCliente ? 'cargando' : 'no-aplica' });
@@ -102,35 +137,44 @@ function LayoutAutenticado() {
     <div className="app-layout">
       <a className="skip-link" href="#contenido">Ir al contenido</a>
 
-      <aside className="app-sidebar" aria-label="Menú de FitZone Sports">
+      <aside id="menu-principal" ref={menuRef} className={`app-sidebar${menuAbierto ? ' app-sidebar--open' : ''}`} aria-label="Menú de FitZone Sports"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') { setMenuAbierto(false); botonMenuRef.current?.focus(); }
+        }}
+        onClick={(event) => { if (event.target.closest('a')) setMenuAbierto(false); }}>
         <div className="app-sidebar__header">
           <div className="app-brand">
             <Dumbbell size={26} strokeWidth={1.75} aria-hidden="true" />
             <div>
-              <p className="app-brand__name">FitZone Sports</p>
-              <p className="app-brand__description">Gestión de gimnasio</p>
+              <p className="app-brand__name">FitZone</p>
+              <p className="app-brand__description">SPORTS</p>
             </div>
           </div>
+        </div>
+
+        <div className="app-sidebar__context">
+          <span>Espacio de trabajo</span>
+          <strong>{NOMBRE_ROL[user?.rol] || 'Mi cuenta'}</strong>
         </div>
 
         <nav className="app-nav" aria-label="Navegación principal">
           <div className="app-nav__group">
             <p className="app-nav__heading" id="nav-usuario">Mi cuenta</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
-              <NavigationLink to="/perfil" icon={UserRound} module="M1">{esCliente ? 'Perfil y membresía' : 'Perfil'}</NavigationLink>
-              {esCliente && <NavigationLink to="/canchas" icon={LayoutGrid} module="M4">Canchas</NavigationLink>}
+              <NavigationLink to="/perfil" icon={UserRound}>{esCliente ? 'Mi membresía' : 'Perfil'}</NavigationLink>
+              {esCliente && <NavigationLink to="/canchas" icon={LayoutGrid}>Canchas</NavigationLink>}
               {rolActivo === 'SOCIO' && (
                 <>
-                  <NavigationLink to="/clases" icon={CalendarDays} module="M3">Clases grupales</NavigationLink>
+                  <NavigationLink to="/clases" icon={CalendarDays}>Clases grupales</NavigationLink>
                 </>
               )}
-              {esCliente && <NavigationLink to="/comprobantes" icon={ReceiptText} module="M5">Mis comprobantes</NavigationLink>}
+              {esCliente && <NavigationLink to="/comprobantes" icon={ReceiptText}>Comprobantes</NavigationLink>}
             </ul>
           </div>
 
           {puedeAbrirQr && (
             <ul className="app-nav__list">
-              <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR</NavigationLink>
+              <NavigationLink to="/mi-qr" icon={QrCode}>Mi QR</NavigationLink>
             </ul>
           )}
 
@@ -139,7 +183,7 @@ function LayoutAutenticado() {
               <p className="app-nav__heading" id="nav-gestion">Operación y gestión</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
                 {rolActivo === 'GERENTE' && <NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink>}
-                <NavigationLink to="/recepcion/acceso" icon={DoorOpen} module="M2">Control de acceso y aforo</NavigationLink>
+                <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>Control de acceso y aforo</NavigationLink>
               </ul>
             </div>
           )}
@@ -153,12 +197,27 @@ function LayoutAutenticado() {
         )}
       </aside>
 
-      <main id="contenido" className="app-main" tabIndex={-1}>
-        <div className="app-content">
-          <p className="demo-notice">Las pantallas de clases, canchas y listado de comprobantes todavía muestran datos de demostración.</p>
-          <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr }} />
-        </div>
-      </main>
+      <div className="app-workspace">
+        <header className="app-topbar">
+          <div className="app-topbar__heading">
+            <button ref={botonMenuRef} type="button" className="app-menu-toggle" aria-expanded={menuAbierto} aria-controls="menu-principal"
+              aria-label={menuAbierto ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'} onClick={() => setMenuAbierto(!menuAbierto)}>
+              {menuAbierto ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+            </button>
+            <div><span className="app-topbar__brand">FitZone Sports</span><h1>{TITULO_POR_RUTA[pathname] || 'Mi espacio'}</h1></div>
+          </div>
+          <Link to="/perfil" className="app-user" aria-label={`Ver perfil de ${nombreCuenta}`}>
+            <span className="app-user__avatar" aria-hidden="true">{iniciales}</span>
+            <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{NOMBRE_ROL[user?.rol] || 'Mi cuenta'}</span></span>
+          </Link>
+        </header>
+        <main id="contenido" className="app-main" tabIndex={-1}>
+          <div className="app-content">
+            <p className="demo-notice">Las pantallas de clases, canchas y listado de comprobantes todavía muestran datos de demostración.</p>
+            <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr }} />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
