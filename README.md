@@ -434,3 +434,22 @@ local de pruebas descartable, con las mismas condiciones indicadas arriba.
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
 - Diagramas C4 y ADR: `docs/`
 - Bitácoras del equipo: `LOGs/`
+
+
+## Dominio Cliente/Socio y comprobantes
+
+V7 unifica las autoridades comerciales en USUARIO sin borrar cuentas, períodos ni pagos.
+Registro y login emiten esa autoridad estable; la membresía decide condición de Socio
+sin volver a iniciar sesión al comprar. La sede habitual no cambia la condición.
+Ambas cuentas demo son USUARIO: sus nombres no garantizan membresía.
+La contratación POST /membresias incluye cobro fake aprobado y comprobante persistido.
+La interfaz consulta pagoId de los períodos y descarga GET /pagos/{id}/comprobante,
+con JWT y control de titularidad; no usa el listado demo ni inventa registros.
+
+Pruebas frontend (sin agregar dependencias): desde frontend, ejecutar
+`node --experimental-vm-modules scripts/test-dominio.mjs`,
+`node --experimental-vm-modules scripts/test-planes.mjs` y
+`node --experimental-vm-modules scripts/test-api.mjs`.
+Las integraciones PostgreSQL se habilitan con PLAN_TEST_DB_URL exclusivamente hacia
+una BD vacía y descartable, con usuario postgres sin contraseña; nunca la BD de desarrollo.
+Usar JAVA_TOOL_OPTIONS=-Duser.timezone=America/Argentina/Buenos_Aires para Java/PostgreSQL.

@@ -3,6 +3,7 @@ import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-do
 import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, List, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { consultarMiMembresia, consultarMiPerfil } from '../services/m1Service';
+import { nombreActor, periodosConPago } from '../modules/m1-usuarios/estadoCuenta';
 import './Layout.css';
 
 function NavigationLink({ to, icon: Icon, children }) {
@@ -18,15 +19,9 @@ function NavigationLink({ to, icon: Icon, children }) {
 
 // Rol del JWT (nombre en backend) -> clave de vista que usa el menú
 const VISTA_POR_ROL = {
-  SOCIO_ACTIVO: 'SOCIO',
-  CLIENTE_EXTERNO: 'EXTERNO',
+  USUARIO: 'USUARIO',
   RECEPCIONISTA: 'RECEPCION',
   GERENTE: 'GERENTE',
-};
-
-const NOMBRE_ROL = {
-  CLIENTE_EXTERNO: 'Cliente externo', SOCIO_ACTIVO: 'Socio',
-  RECEPCIONISTA: 'Recepcionista', GERENTE: 'Gerente',
 };
 
 const TITULO_POR_RUTA = {
@@ -68,7 +63,7 @@ function LayoutAutenticado() {
     : user?.email || 'Mi cuenta';
   const iniciales = nombreCuenta.split(/\s+/).map((parte) => parte[0]).slice(0, 2).join('').toUpperCase();
   const rolActivo = VISTA_POR_ROL[user?.rol];
-  const esCliente = rolActivo === 'SOCIO' || rolActivo === 'EXTERNO';
+  const esCliente = rolActivo === 'USUARIO';
   const [membresia, setMembresia] = useState({ estado: esCliente ? 'cargando' : 'no-aplica' });
   const ultimaMembresia = useRef(membresia);
   const consulta = useRef(null);
@@ -154,25 +149,23 @@ function LayoutAutenticado() {
 
         <div className="app-sidebar__context">
           <span>Espacio de trabajo</span>
-          <strong>{NOMBRE_ROL[user?.rol] || 'Mi cuenta'}</strong>
+          <strong>{nombreActor(user?.rol, membresia)}</strong>
         </div>
 
         <nav className="app-nav" aria-label="Navegación principal">
           <div className="app-nav__group">
             <p className="app-nav__heading" id="nav-usuario">{esCliente ? 'Mi espacio' : 'Mi cuenta'}</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
-              <NavigationLink to={esCliente ? '/membresia' : '/perfil'} icon={UserRound}>{esCliente ? 'Mi membresía' : 'Perfil'}</NavigationLink>
+              <NavigationLink to={esCliente ? '/membresia' : '/perfil'} icon={UserRound}>{esCliente ? (membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : 'Mi membresía') : 'Perfil'}</NavigationLink>
             </ul>
           </div>
 
-          {esCliente && (
+          {esCliente && (puedeAbrirQr || periodosConPago(membresia).length > 0) && (
             <div className="app-nav__group">
               <p className="app-nav__heading" id="nav-servicios">Servicios</p>
               <ul className="app-nav__list" aria-labelledby="nav-servicios">
                 {puedeAbrirQr && <NavigationLink to="/mi-qr" icon={QrCode}>Mi QR</NavigationLink>}
-                <NavigationLink to="/comprobantes" icon={ReceiptText}>Comprobantes · demo</NavigationLink>
-                <NavigationLink to="/canchas" icon={LayoutGrid}>Canchas · demo</NavigationLink>
-                {rolActivo === 'SOCIO' && <NavigationLink to="/clases" icon={CalendarDays}>Clases · demo</NavigationLink>}
+                {periodosConPago(membresia).length > 0 && <NavigationLink to="/comprobantes" icon={ReceiptText}>Comprobantes</NavigationLink>}
               </ul>
             </div>
           )}
@@ -203,16 +196,15 @@ function LayoutAutenticado() {
               aria-label={menuAbierto ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'} onClick={() => setMenuAbierto(!menuAbierto)}>
               {menuAbierto ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
             </button>
-            <div><span className="app-topbar__brand">FitZone Sports</span><h1>{TITULO_POR_RUTA[pathname] || 'Mi espacio'}</h1></div>
+            <div><span className="app-topbar__brand">FitZone Sports</span><h1>{pathname === '/membresia' && membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : TITULO_POR_RUTA[pathname] || 'Mi espacio'}</h1></div>
           </div>
           <Link to="/perfil" className="app-user" aria-label={`Ver perfil de ${nombreCuenta}`}>
             <span className="app-user__avatar" aria-hidden="true">{iniciales}</span>
-            <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{NOMBRE_ROL[user?.rol] || 'Mi cuenta'}</span></span>
+            <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{nombreActor(user?.rol, membresia)}</span></span>
           </Link>
         </header>
         <main id="contenido" className="app-main" tabIndex={-1}>
           <div className="app-content">
-            <p className="demo-notice">Las pantallas de clases, canchas y listado de comprobantes todavía muestran datos de demostración.</p>
             <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr }} />
           </div>
         </main>

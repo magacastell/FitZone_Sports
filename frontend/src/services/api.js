@@ -1,6 +1,7 @@
 const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 export async function fetchAPI(endpoint, options = {}) {
+  const { responseType = 'json', ...fetchOptions } = options;
   const token = localStorage.getItem('token');
 
   const headers = {
@@ -10,7 +11,7 @@ export async function fetchAPI(endpoint, options = {}) {
   };
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
+    ...fetchOptions,
     headers,
   });
 
@@ -29,5 +30,6 @@ export async function fetchAPI(endpoint, options = {}) {
     throw error;
   }
 
-  return response.status !== 204 ? response.json() : null;
+  if (response.status === 204) return null;
+  return responseType === 'blob' ? response.blob() : response.json();
 }

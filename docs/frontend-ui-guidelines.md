@@ -121,12 +121,12 @@ Sin ambas fechas válidas y ordenadas no se dibuja una barra.
 El texto visible es “N días restantes”, acompañado de las fechas exactas.
 Si el backend responde VENCIDA, ese estado se presenta explícitamente.
 El acceso rápido enlaza al modal M2 real; el icono decorativo no es un QR válido.
-Comprobantes no inventa filas: explica la integración pendiente y marca como demo
-el enlace a la pantalla heredada. Las fechas se presentan en horario argentino.
+Comprobantes usa períodos con pagoId y descarga el PDF real autenticado de M5.
+Sin pagoId no se anuncia un comprobante disponible. Las fechas se presentan en horario argentino.
 
 Todo dato debe existir en backend o estar explícitamente marcado como demo/pendiente.
 No copiar los KPI, sede Palermo, usuarios, porcentajes, pagos o QR de v0.
-El aviso actual conserva identificadas las pantallas que todavía usan demostración.
+Clases y canchas quedan como capacidades pendientes explícitas, sin acciones ni descuentos simulados.
 
 - Loading: mensaje o skeleton accesible, sin valores provisionales inventados.
 - Éxito: confirmación de una operación realmente confirmada, con role=status.
@@ -244,3 +244,35 @@ como nueva política de dominio; no se impone unilateralmente desde la UI.
 Se presentan todos los PROGRAMADA del DTO en una lista compacta, una sola vez.
 Los intervalos son [inicio, fin); el trigger V5 rechaza superposición no cancelada.
 En el límite compartido termina el anterior y comienza el siguiente, sin perder vigencia.
+
+
+## Autoridad estable y experiencia comercial (30/10/2026)
+
+ADR-007 sustituye la política histórica de roles de este documento: USUARIO es
+identidad comercial estable; Socio sólo cuando el DTO compartido informa ACTIVA.
+VENCIDA/SUSPENDIDA mantienen historial y acciones existentes, sin beneficios QR.
+Recepción/Gerencia conservan autoridad y perfil sin membresía personal.
+Sin cuenta de membresía se muestra Elegí tu plan, catálogo real activo y confirmación
+usando el flujo S4 extraído a ContratacionMembresia. No se muestran credencial, renovación,
+comprobantes ni demos como capacidades disponibles antes de tener datos reales.
+Se conservan panels, botones, colores y espaciado v0; CatalogoPlanes adapta esos patrones
+sin agregar beneficios o planes mock. El portal aprobado aparece tras el DTO confirmado.
+Los comprobantes usan exclusivamente periodos con pagoId y PDF autenticado de M5;
+no se infieren fecha de pago ni estado financiero desde el inicio/estado del período.
+Layout y Perfil usan nombreActor para evitar etiquetas comerciales derivadas del JWT.
+
+### Comprobantes personales
+
+Cards con heading descriptivo, referencia real de pago, período snapshot e importe
+es-AR/ARS; botones de descarga con nombre accesible único y altura mínima 44 px.
+Grid responsive usando panels/tokens de FitZoneUI, sin una librería adicional.
+Orden descendente por inicio del período, anunciado como tal: no conocemos emisión
+ni fecha de pago desde este DTO. Número de comprobante y fechas de cobro están en PDF.
+No inferir APROBADO/REEMBOLSADO desde un período. CANCELADA se muestra como período
+cancelado y no como resultado financiero. Se conserva el documento del cobro original.
+Feedback de descarga en región viva, temporal (4 s), con texto «Descarga iniciada»;
+el navegador decide dónde guardar. Errores comprensibles, botón PDF habilitado para
+reintentar; bloqueo inmediato por ref y cleanup al desmontar. Loading/error/empty
+son distintos. Cuenta sin membresía vuelve al catálogo por URL directa; roles internos
+reciben una pantalla de no disponibilidad. La seguridad efectiva sigue en M5.
+Clases y Canchas permanecen fuera del menú; sus rutas sólo explican que no están disponibles.

@@ -78,4 +78,25 @@ Los usuarios de desarrollo deben contratar un plan para generar QR; no se les re
 
 `./mvnw test` ejecuta las pruebas sin base. Con `PLAN_TEST_DB_URL` hacia una base PostgreSQL vacía y descartable, usuario `postgres` sin contraseña, se habilitan las pruebas de integración de planes y membresías: calendario, vencimientos, HTTP/JWT, permisos, acceso, idempotencia concurrente, automática, rollback de rechazos, arrepentimiento y migración desde V4.
 
-El adaptador mínimo de M5 persiste cobros aprobados y reembolsos de membresías. Los endpoints generales de pagos y PDF siguen en el alcance de M5. Una pasarela real asincrónica requerirá registro durable de intentos, estados pendientes, notificaciones y reconciliación, además de reemplazar el adaptador fake. M1 sólo otorga períodos si el cobro fue aprobado.
+El adaptador mínimo de M5 persiste cobros aprobados y reembolsos de membresías. El PDF persistido está disponible en GET /pagos/{id}/comprobante con titularidad; el listado general sigue pendiente. Una pasarela real asincrónica requerirá registro durable de intentos, estados pendientes, notificaciones y reconciliación, además de reemplazar el adaptador fake. M1 sólo otorga períodos si el cobro fue aprobado.
+
+Ver ADR-007 para migración de autoridades, tokens, matriz de permisos y limitaciones de la pasarela externa futura.
+
+## Comprobantes personales y PDF
+
+La UI lista períodos con pagoId de `/membresias/me`: plan/precio históricos, período
+y referencia de pago. No consume `/pagos/me`, que sigue 501, ni inventa emisión,
+estado financiero o reembolso. Orden: inicio de período descendente, no fecha de cobro.
+`GET /pagos/{id}/comprobante` devuelve bytes originales, con JWT, titularidad o gerente,
+Content-Type PDF, attachment y no-store; no requiere membresía actualmente vigente.
+`POST /pagos/{id}/reembolsos` conserva su respuesta real: pagoId, estado, monto, moneda,
+fechaReembolso y referencia. No se invoca para consultar estado: es una mutación.
+La UI muestra CANCELADA como estado del período, sin afirmar REEMBOLSADO.
+
+La nueva emisión PDF usa DatosComprobante interno para presentación con márgenes,
+jerarquía, total ARS en formato argentino y aclaración académica/sin validez fiscal.
+Plan, precio y período salen del snapshot contratado. Identidad se captura al emitir
+y se conserva en bytes; cambios posteriores de titular o plan y el reembolso no alteran
+el documento. Los PDF existentes mantienen su diseño anterior. Para pagos antiguos sin
+PDF, el mecanismo previo recupera la identidad actual: no hay snapshot previo de titular
+para reconstruirlo. No se prometen datos históricos inexistentes ni se reescribe el PDF.

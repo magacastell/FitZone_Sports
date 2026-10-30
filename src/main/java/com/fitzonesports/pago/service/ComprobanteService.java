@@ -1,11 +1,11 @@
 package com.fitzonesports.pago.service;
 
 import com.fitzonesports.pago.dto.ComprobantePdf;
+import com.fitzonesports.pago.dto.DatosComprobante;
 import com.fitzonesports.usuario.service.UsuarioService;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,17 +52,13 @@ public class ComprobanteService {
         String numero = existentes.isEmpty() ? "FZ-P-" + pagoId : (String) existentes.getFirst().get("numero_comprobante");
         var fecha = LocalDateTime.now(clock);
         BigDecimal monto = (BigDecimal) pago.get("monto");
-        var formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String concepto = "Membresia: " + periodo.get("nombre_plan");
-        byte[] pdf = renderer.generar(List.of("FITZONE SPORTS", "COMPROBANTE DE PAGO", "Numero: " + numero,
-                "Emitido: " + fecha.format(formato), "Pago: " + pagoId,
-                "Fecha de pago: " + ((java.sql.Timestamp)pago.get("fecha_pago")).toLocalDateTime().format(formato),
-                "Titular: " + titular.nombre() + " " + titular.apellido(), "DNI: " + titular.dni(), "Email: " + titular.email(),
-                concepto, "Periodo: " + ((java.sql.Timestamp)periodo.get("inicio")).toLocalDateTime().format(formato)
-                    + " a " + ((java.sql.Timestamp)periodo.get("fin")).toLocalDateTime().format(formato),
-                "Cantidad: 1", "TOTAL ARS: " + monto.setScale(2).toPlainString(),
-                "Pago aprobado mediante pasarela simulada.", "Comprobante de simulacion academica, sin validez fiscal.",
-                "Este documento acredita el cobro original; no certifica la vigencia actual ni el estado de un reembolso."));
+        byte[] pdf = renderer.generar(new DatosComprobante(numero, pagoId, fecha,
+                ((java.sql.Timestamp)pago.get("fecha_pago")).toLocalDateTime(),
+                titular.nombre() + " " + titular.apellido(), titular.dni(), titular.email(),
+                (String) periodo.get("nombre_plan"),
+                ((java.sql.Timestamp)periodo.get("inicio")).toLocalDateTime(),
+                ((java.sql.Timestamp)periodo.get("fin")).toLocalDateTime(), monto));
         Integer id;
         if (existentes.isEmpty()) {
             id = jdbc.queryForObject("INSERT INTO comprobante(numero_comprobante,fecha_emision,pagoid,contenido_pdf) VALUES (?,?,?,?) RETURNING id",

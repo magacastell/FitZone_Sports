@@ -20,7 +20,7 @@ function InicioPorRol() {
   const { user, loading } = useAuth();
   if (loading || !user) return <p role="status">Cargando sesión de FitZone...</p>;
   if (user.rol === 'GERENTE') return <Navigate to="/gestion/planes" replace />;
-  if (user.rol === 'CLIENTE_EXTERNO' || user.rol === 'SOCIO_ACTIVO') return <Navigate to="/membresia" replace />;
+  if (user.rol === 'USUARIO') return <Navigate to="/membresia" replace />;
   return <Navigate to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'} replace />;
 }
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, ShieldCheck, QrCode, Mail, Fingerprint, MapPin, FileText, ArrowRight, UserRound } from 'lucide-react';
-import { AppLink, AvatarCircle, DataCard, EmptyState, StatusBadge } from '../../components/ui/FitZoneUI';
+import { nombreActor, periodosConPago } from './estadoCuenta';
+import { AppLink, AvatarCircle, DataCard, StatusBadge } from '../../components/ui/FitZoneUI';
 
 export function mensajePortal(mensaje) {
   if (!mensaje) return 'No pudimos completar la consulta. Intentá nuevamente.';
@@ -15,7 +16,7 @@ const fecha = (valor) => valor && Number.isFinite(Date.parse(valor))
   ? new Date(valor).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false }) : 'No disponible';
 const fechaPeriodo = (valor) => new Date(valor).toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: 'numeric', month: 'short', year: 'numeric' });
 const moneda = (valor) => Number(valor).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 });
-const roles = { CLIENTE_EXTERNO: 'Cliente externo', SOCIO_ACTIVO: 'Socio', RECEPCIONISTA: 'Recepcionista', GERENTE: 'Gerente' };
+
 
 // Solo presentación. Nunca determina el estado de membresía ni autoriza acceso.
 export function presentacionVigencia(periodo, ahora = Date.now()) {
@@ -81,7 +82,7 @@ export function ResumenMembresia({ membresia, puedeAbrirQr, children }) {
   </article>;
 }
 
-export function DatosPersonales({ perfil, mostrarEnlace = true, rol }) {
+export function DatosPersonales({ perfil, mostrarEnlace = true, rol, membresia }) {
   const datos = perfil.estado === 'cargado' ? perfil.datos : null;
   const campos = datos ? [{ label: 'Correo electrónico', valor: datos.email, Icon: Mail }, { label: 'DNI', valor: datos.dni, Icon: Fingerprint }, { label: 'Sede', valor: datos.sedeNombre, Icon: MapPin }] : [];
   return <DataCard className="member-profile-panel" title="Datos personales" description="Información asociada a tu cuenta FitZone." action={mostrarEnlace && <Link className="text-link" to="/perfil">Ver perfil <ArrowRight aria-hidden="true" /></Link>} aria-busy={perfil.estado === 'cargando'}>
@@ -90,7 +91,7 @@ export function DatosPersonales({ perfil, mostrarEnlace = true, rol }) {
     {datos && <>
       <div className="member-identity">
         <AvatarCircle initials={`${datos.nombre?.[0] || ''}${datos.apellido?.[0] || ''}`} size="lg" />
-        <div><h4>{datos.nombre} {datos.apellido}</h4><p><UserRound aria-hidden="true" />{roles[rol || datos.rol] || 'Cuenta FitZone'}</p></div>
+        <div><h4>{datos.nombre} {datos.apellido}</h4><p><UserRound aria-hidden="true" />{nombreActor(rol || datos.rol, membresia)}</p></div>
         {typeof datos.activo === 'boolean' && <StatusBadge tone={datos.activo ? 'success' : 'neutral'}>Cuenta {datos.activo ? 'activa' : 'inactiva'}</StatusBadge>}
       </div>
       <dl className="member-data-grid">{campos.map(({ label, valor, Icon }) => <div className="member-data-item" key={label}><dt><Icon aria-hidden="true" />{label}</dt><dd>{valor || 'No disponible'}</dd></div>)}</dl>
@@ -110,9 +111,11 @@ export function AccesoRapido({ puedeAbrirQr, membresia }) {
   </aside>;
 }
 
-export function ComprobantesPendientes() {
-  return <DataCard className="receipts-panel" title="Comprobantes" description="Información de tus pagos.">
-    <EmptyState icon={FileText} title="Historial de comprobantes no disponible" description="Todavía no podés consultar tus comprobantes desde esta pantalla." />
-    <div className="receipt-footer"><span>Vista de demostración</span><Link className="text-link" to="/comprobantes">Ver comprobantes <ArrowRight aria-hidden="true" /></Link></div>
+export function ResumenComprobantes({ membresia }) {
+  const periodos = periodosConPago(membresia);
+  if (!periodos.length) return null;
+  return <DataCard className="receipts-panel" title="Comprobantes" description="Los comprobantes de tus períodos contratados.">
+    <p>{periodos.length} {periodos.length === 1 ? 'período con pago registrado' : 'períodos con pago registrado'}</p>
+    <div className="receipt-footer"><FileText aria-hidden="true" /><Link className="text-link" to="/comprobantes">Ver comprobantes <ArrowRight aria-hidden="true" /></Link></div>
   </DataCard>;
 }

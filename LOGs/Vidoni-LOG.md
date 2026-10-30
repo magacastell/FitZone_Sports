@@ -67,3 +67,13 @@
   - Verificó el comportamiento con pruebas aisladas temporales, build frontend y revisión manual básica. No pudo completar manualmente la contratación contra PostgreSQL porque no había planes activos ni una UI administrativa de planes disponible; las pruebas aisladas utilizaron servicios simulados.
   - Durante la revisión manual detectó problemas generales de navegación, datos simulados y coherencia entre módulos, que quedaron fuera de esta tarea para abordarlos por separado.
   - Commits funcionales: `65e1d54`, `9617656`, `117a6f0`, `05c312c`, `355ec45` y `7802bac`.
+
+### 30/10/2026
+
+- **Integración final — revisión de dominio Cliente/Socio, Canchas y comprobantes**
+  - Separó autoridad estable USUARIO de la condición Socio derivada de membresía; documentó decisión en ADR-007 y verificó migración V7, JWT y permisos sin mutar rol al contratar/vencer.
+  - Conservó contratación/renovación M1/M5 fake, idempotencia y validación QR M2; diferenció catálogo Cliente y Portal Socio con datos reales.
+  - Auditó Canchas/Clases: continúan stub; ocultó capacidades no integradas y mantuvo pantallas honestas sin tarifas/descuentos ni reservas ficticias.
+  - Integró comprobantes de períodos reales con descarga autorizada, cards, importes argentinos, estados recuperables y feedback temporal. Mejoró nuevas emisiones PDF preservando documentos existentes y snapshots; explicitó límites del listado y de pagos antiguos sin PDF.
+  - Ejecutó 56 tests backend (37 con PostgreSQL aislado), 77 verificaciones frontend de dominio/portal/comprobantes, 16 de Planes y 12 de transporte; builds frontend/backend correctos.
+  - Repitió contratación y renovación fake por UI, descarga PDF real y revisión responsive. La auditoría previa quedó sin commit, push ni merge. El cierre fue aprobado para dos commits locales según la sección T de docs/refactor-actores-verificacion.md, con integración conjunta a la rama paraguas y sin push ni merge a main.

@@ -1,39 +1,45 @@
 package com.fitzonesports.pago;
 
+import com.fitzonesports.pago.dto.DatosComprobante;
 import com.fitzonesports.pago.service.ComprobantePdfRenderer;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.time.LocalDateTime;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ComprobantePdfRendererTest {
-    @Test void generaPdfLegibleConAcentosTextosLargosYSimbolos() throws Exception {
-        var lineas = List.of("FITZONE SPORTS", "COMPROBANTE DE PAGO", "Numero: FZ-P-123",
-                "Emitido: 25/10/2026 12:00", "Titular: María Muñoz", "DNI: 12345678",
-                "Membresía: " + "Plan anual áéíóú ".repeat(18), "Periodo: 25/10/2026 a 25/10/2027",
-                "TOTAL ARS: 15000.50", "Referencia de prueba: \uD83C\uDFC0\n",
-                "Comprobante de simulacion academica, sin validez fiscal.");
-        byte[] pdf = new ComprobantePdfRenderer().generar(lineas);
+    private DatosComprobante datos(String plan) {
+        var fecha = LocalDateTime.of(2026, 10, 30, 12, 0);
+        return new DatosComprobante("FZ-P-123", 123, fecha, fecha, "María Muñoz", "12345678",
+                "maria@test.com", plan, fecha, fecha.plusMonths(1), new BigDecimal("16000.75"));
+    }
+
+    @Test void generaPdfLegibleConDatosRealesYFormatoArgentino() throws Exception {
+        byte[] pdf = new ComprobantePdfRenderer().generar(datos("Plan mensual revisión manual"));
         try (var documento = Loader.loadPDF(pdf)) {
             String texto = new PDFTextStripper().getText(documento);
             assertEquals(1, documento.getNumberOfPages());
-            assertTrue(texto.contains("María Muñoz"));
-            assertTrue(texto.contains("15000.50"));
+            for (String dato : new String[]{"María Muñoz", "16.000,75", "FZ-P-123", "30/10/2026", "30/11/2026",
+                    "Cantidad: 1", "PAGO APROBADO", "Sin validez fiscal", "simulación académica"})
+                assertTrue(texto.contains(dato), dato);
             Files.createDirectories(Path.of("target"));
             Files.write(Path.of("target/comprobante-ejemplo.pdf"), pdf);
-            javax.imageio.ImageIO.write(new org.apache.pdfbox.rendering.PDFRenderer(documento).renderImageWithDPI(0, 100),
+            javax.imageio.ImageIO.write(new org.apache.pdfbox.rendering.PDFRenderer(documento).renderImageWithDPI(0, 120),
                     "png", Path.of("target/comprobante-ejemplo.png").toFile());
         }
     }
 
-    @Test void paginaContenidoExtensoSinSalirDeLaHoja() throws Exception {
-        byte[] pdf = new ComprobantePdfRenderer().generar(java.util.Collections.nCopies(100, "Detalle de prueba"));
+    @Test void paginaTextosLargosYNormalizaSimbolosSinPerderElTotal() throws Exception {
+        byte[] pdf = new ComprobantePdfRenderer().generar(datos("Plan anual áéíóú \uD83C\uDFC0\n".repeat(500)));
         try (var documento = Loader.loadPDF(pdf)) {
             assertTrue(documento.getNumberOfPages() > 1);
-            assertEquals(100, new PDFTextStripper().getText(documento).lines().filter(l -> l.equals("Detalle de prueba")).count());
+            String texto = new PDFTextStripper().getText(documento);
+            assertTrue(texto.contains("TOTAL ARS $ 16.000,75"));
+            assertTrue(texto.contains("Sin validez fiscal"));
         }
     }
 }
