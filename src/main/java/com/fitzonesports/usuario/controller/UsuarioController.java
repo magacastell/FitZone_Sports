@@ -26,13 +26,13 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<UsuarioResponse> consultarPerfil(Authentication authentication) {
         return ResponseEntity.ok(usuarioService.consultarPerfil(authentication.getName()));
     }
 
     @PatchMapping("/me")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<UsuarioResponse> actualizarPerfil(Authentication authentication,
             @Valid @RequestBody ActualizarPerfilRequest request) {
         return ResponseEntity.ok(usuarioService.actualizarPerfil(authentication.getName(), request));

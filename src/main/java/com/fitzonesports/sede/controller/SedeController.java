@@ -26,7 +26,7 @@ public class SedeController {
     private final SedeService sedeService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<List<SedeResponse>> listarSedes() {
         return ResponseEntity.ok(sedeService.listarSedes());
     }

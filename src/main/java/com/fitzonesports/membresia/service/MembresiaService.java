@@ -169,7 +169,12 @@ public class MembresiaService {
         return respuesta(membresia);
     }
 
-    /** Consulta publica para M2/M3/M4: sin restriccion por sede ni dependencia del rol legado. */
+    /** Consulta publica para M2/M3/M4: sin restriccion por sede ni dependencia de la autoridad comercial. */
+    @Transactional(readOnly=true)
+    public boolean tieneMembresiaVigentePorEmail(String email) {
+        return tieneMembresiaVigente(usuarios.consultarPerfil(email).id());
+    }
+
     @Transactional(readOnly=true)
     public boolean tieneMembresiaVigente(Integer usuarioId) {
         if (!usuarios.consultarParaAcceso(usuarioId).activo()) return false;
@@ -267,7 +272,7 @@ public class MembresiaService {
     }
     private void validarActivo(UsuarioResponse u) { if (!u.activo()) throw error(403,"El usuario esta inactivo"); }
     private void validarCliente(UsuarioResponse u) {
-        if (!Set.of("CLIENTE_EXTERNO","SOCIO_ACTIVO").contains(u.rol())) throw error(403,"Solo los clientes pueden contratar membresias");
+        if (!"USUARIO".equals(u.rol())) throw error(403,"Solo los clientes pueden contratar membresias");
     }
     private void validarPropietario(UsuarioResponse u,Membresia m) {
         if (!u.id().equals(m.getUsuarioId()) && !"GERENTE".equals(u.rol())) throw error(403,"La membresia pertenece a otro usuario");

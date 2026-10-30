@@ -1,3 +1,5 @@
+> Actualización 30/10/2026: ADR-007 en ../adr/0007-actores-y-membresia.md resuelve P01 para la implementación actual: USUARIO estable, Socio derivado de membresía, migración V7 y rechazo de JWT legados. Las referencias a roles comerciales debajo son antecedentes históricos, no aliases vigentes. M5 ya ofrece PDF persistido; su listado general sigue pendiente.
+
 # Contratos API v1 — evidencia, decisiones técnicas y propuestas
 
 El contrato sigue en `docs/openapi/openapi.yaml`. **Sus partes `stable` son la fuente técnica de referencia. Sus partes `draft` son interfaces de trabajo para revisión y mocks, sin convertir alternativas funcionales en obligaciones para otros módulos.** Los campos y ejemplos de un schema draft tampoco son evidencia de aprobación funcional.

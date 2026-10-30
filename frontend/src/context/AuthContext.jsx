@@ -6,8 +6,9 @@ const AuthContext = createContext(null);
 // El JWT trae "exp" (segundos): si ya venció, no tiene sentido usarlo
 const isExpired = (jwt) => {
   try {
-    const { exp } = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-    return exp * 1000 < Date.now();
+    const { exp, roles } = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return !Number.isFinite(exp) || exp * 1000 <= Date.now() || roles?.length !== 1
+      || !['ROLE_USUARIO', 'ROLE_RECEPCIONISTA', 'ROLE_GERENTE'].includes(roles[0]);
   } catch {
     return true;
   }
@@ -27,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(getStoredToken);
   const [loading, setLoading] = useState(true);
 
-  // El rol viene dentro del JWT (claim "roles", ej: ["ROLE_SOCIO_ACTIVO"])
+  // El rol viene dentro del JWT (claim "roles", ej: ["ROLE_USUARIO"])
   const userFromToken = (jwt) => {
     try {
       const payload = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));

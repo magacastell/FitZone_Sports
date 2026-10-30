@@ -4,7 +4,7 @@ Los seis endpoints iniciales tienen persistencia y se agrega arrepentimiento por
 
 ## Reglas implementadas
 
-- Una cuenta por usuario, con períodos históricos separados. Sólo clientes (`CLIENTE_EXTERNO` o rol legado `SOCIO_ACTIVO`) contratan su primera membresía. Titular y sede administrativa se obtienen del usuario autenticado.
+- Una cuenta por usuario, con períodos históricos separados. Sólo clientes con autoridad `USUARIO` contratan su primera membresía. Titular y sede administrativa se obtienen del usuario autenticado.
 - Cada período aprobado conserva nombre, duración y precio del plan en ARS. Los cambios posteriores al plan no alteran lo contratado. Contratar y renovar requieren un plan activo.
 - Se usan meses calendario e intervalos `[inicio, fin)`: el 31 de enero más un mes termina el 28/29 de febrero; al llegar exactamente a `fin` deja de haber vigencia.
 - Renovar anticipadamente agrega el período al final del último período pagado no cancelado. Si ya venció, comienza al aprobarse el nuevo cobro, sin cobrar meses retroactivos.
@@ -12,7 +12,7 @@ Los seis endpoints iniciales tienen persistencia y se agrega arrepentimiento por
 - Suspender impide beneficios y renovaciones. Reactivar levanta la suspensión sin mover fechas: puede quedar vencida y requerir renovación manual. Las acciones y sus motivos se auditan.
 - Recepción consulta y modifica estados sólo para titulares de su sede actual. Gerente administra todas las sedes y puede renovar/configurar cuentas ajenas. Los clientes sólo operan su propia cuenta.
 - La vigencia es multi-sede. La sede administrativa no restringe dónde se usan los beneficios.
-- El rol legado `SOCIO_ACTIVO` se conserva por compatibilidad; no se asigna ni se quita por comprar o vencer una membresía. M2/M3/M4 pueden consultar `MembresiaService.tieneMembresiaVigente(usuarioId)`.
+- V7 reemplaza los dos roles comerciales legados por `USUARIO`; no cambia al comprar, vencer o suspender. Socio es condición derivada de ACTIVA. M2/M3/M4 pueden consultar `MembresiaService.tieneMembresiaVigente(usuarioId)`.
 - Acceso valida vigencia al emitir y escanear QR: un cliente con membresía activa puede usarlo; el rol sin membresía no habilita acceso. Las salidas siguen disponibles sin exigir vigencia.
 - Un JWT de un usuario desactivado deja de autorizar solicitudes aunque no haya expirado.
 

@@ -59,7 +59,7 @@ class MembresiaIntegrationTest {
         sede = jdbc.queryForObject("INSERT INTO sede(nombre,capacidad_maxima) VALUES (?,10) RETURNING id",Integer.class,"Sede "+sufijo);
         otraSede = jdbc.queryForObject("INSERT INTO sede(nombre,capacidad_maxima) VALUES (?,10) RETURNING id",Integer.class,"Otra "+sufijo);
         email="cliente-"+sufijo+"@test.com"; recepcion="recepcion-"+sufijo+"@test.com"; gerente="gerente-"+sufijo+"@test.com";
-        usuario=crearUsuario(email,"CLIENTE_EXTERNO",sede);
+        usuario=crearUsuario(email,"USUARIO",sede);
         crearUsuario(recepcion,"RECEPCIONISTA",otraSede);
         crearUsuario(gerente,"GERENTE",otraSede);
         plan=jdbc.queryForObject("INSERT INTO plan_membresia(nombre,duracion_meses,precio) VALUES (?,1,15000.50) RETURNING id",Integer.class,"Mensual "+sufijo);
@@ -84,7 +84,7 @@ class MembresiaIntegrationTest {
         assertTrue(service.tieneMembresiaVigente(usuario));
         assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
         assertEquals("APROBADO",jdbc.queryForObject("SELECT estado FROM pago WHERE usuarioid=?",String.class,usuario));
-        assertNotNull(accesos.generarQr(email)); // CLIENTE_EXTERNO con membresia tambien es socio.
+        assertNotNull(accesos.generarQr(email)); // USUARIO con membresia tambien es socio.
     }
 
     @Test void renovacionAnticipadaConservaPrecioAnteriorEHistorial() {
@@ -260,4 +260,87 @@ class MembresiaIntegrationTest {
             assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
         }
     }
+    @Test void variasRenovacionesDistintasSeEncadenanYNoCambianAutoridad() {
+        var primera=contratar();
+        var segunda=service.renovar(email,primera.id(),new RenovarMembresiaRequest(plan),UUID.randomUUID());
+        UUID clave=UUID.randomUUID();
+        var tercera=service.renovar(email,primera.id(),new RenovarMembresiaRequest(plan),clave);
+        assertEquals(3,tercera.periodos().size());
+        assertEquals(primera.periodoVigente().fin(),segunda.periodos().get(1).inicio());
+        assertEquals(segunda.periodos().get(1).fin(),tercera.periodos().get(2).inicio());
+        assertEquals(3,service.renovar(email,primera.id(),new RenovarMembresiaRequest(plan),clave).periodos().size());
+        assertEquals(3,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
+        assertEquals("USUARIO",detalles.loadUserByUsername(email).getAuthorities().iterator().next().getAuthority().replace("ROLE_",""));
+        reloj.fijar(primera.periodoVigente().fin().toInstant().toString());
+        var limite=service.consultarPropia(email);
+        assertEquals("ACTIVA",limite.estado());
+        assertEquals(segunda.periodos().get(1).id(),limite.periodoVigente().id());
+        assertNotNull(accesos.generarQr(email));
+    }
+
+    @Test void autoridadEstableYTokenAnteriorRechazado() throws Exception {
+        var actual=detalles.loadUserByUsername(email);
+        String token=jwt.generateToken(actual);
+        assertTrue(jwt.isTokenValid(token,actual));
+        var viejo=org.springframework.security.core.userdetails.User.withUsername(email).password("test").roles("SOCIO_ACTIVO").build();
+        var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
+                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity()).build();
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/usuarios/me")
+                .header("Authorization","Bearer "+jwt.generateToken(viejo)))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isUnauthorized());
+        contratar();
+        assertTrue(jwt.isTokenValid(token,detalles.loadUserByUsername(email)));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/accesos/qr")
+                .header("Authorization","Bearer "+token))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
+        reloj.fijar("2030-01-01T15:00:00Z");
+        assertTrue(jwt.isTokenValid(token,detalles.loadUserByUsername(email)));
+        assertEquals("VENCIDA",service.consultarPropia(email).estado());
+        status(403,()->accesos.generarQr(email));
+    }
+
+    @Test void ingresoMultisedeSalidaTrasVencerYAforo() {
+        contratar();
+        var qr=accesos.generarQr(email);
+        var ingreso=accesos.registrarIngreso(recepcion,new com.fitzonesports.acceso.dto.RegistrarIngresoRequest(qr.token(),null));
+        assertEquals(otraSede,ingreso.sedeId());
+        assertEquals(1,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
+        reloj.fijar("2030-01-01T15:00:00Z");
+        assertNotNull(accesos.registrarSalida(recepcion,new com.fitzonesports.acceso.dto.RegistrarSalidaRequest(ingreso.id(),null)).salida());
+        assertEquals(0,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
+    }
+
+    @Test void clasesSiguenStubPeroElBeneficioExigeMembresia() throws Exception {
+        var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
+                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity()).build();
+        String bearer="Bearer "+jwt.generateToken(detalles.loadUserByUsername(email));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/clases/1/reservas").header("Authorization",bearer))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isForbidden());
+        contratar();
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/clases/1/reservas").header("Authorization",bearer))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotImplemented());
+        reloj.fijar("2030-01-01T15:00:00Z");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/clases/1/reservas/1").header("Authorization",bearer))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotImplemented());
+    }
+
+    @Test void registroLoginNoPermitenElegirPrivilegios() throws Exception {
+        var usuarios=contexto.getBean(com.fitzonesports.usuario.service.UsuarioService.class);
+        String nuevo="registro-"+UUID.randomUUID()+"@test.com";
+        var registrado=usuarios.registrarCliente(new com.fitzonesports.usuario.dto.RegisterRequest("Nuevo","Cliente",nuevo,nuevo,"password123",sede));
+        assertEquals("USUARIO",registrado.getRol().getNombre());
+        assertFalse(service.tieneMembresiaVigente(registrado.getId()));
+        var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
+                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity()).build();
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/auth/login")
+                .contentType("application/json").content("{\"email\":\""+nuevo+"\",\"password\":\"password123\"}"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.token").isString());
+        String token=jwt.generateToken(detalles.loadUserByUsername(nuevo));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/planes")
+                .header("Authorization","Bearer "+token).contentType("application/json")
+                .content("{\"nombre\":\"Plan ajeno\",\"duracionMeses\":1,\"precio\":100}"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isForbidden());
+    }
+
 }

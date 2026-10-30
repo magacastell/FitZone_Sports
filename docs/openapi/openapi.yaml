@@ -75,7 +75,7 @@ paths:
       tags:
       - Auth
       summary: Registrar cliente
-      description: Crea cliente con rol actual CLIENTE_EXTERNO. No permite elegir roles ni estado de membresía.
+      description: Crea cliente con rol actual USUARIO. No permite elegir roles ni estado de membresía.
         sedeId debe existir; email duplicado produce 409. DNI es único en BD, pero su conflicto todavía no se traduce
         explícitamente en el servicio.
       operationId: registrarCliente
@@ -133,8 +133,7 @@ paths:
         '404':
           $ref: '#/components/responses/NoEncontrado'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -142,8 +141,7 @@ paths:
       x-contract-status: stable
       x-contract-basis: DTO/comportamiento funcional existente y convenciones técnicas del contrato.
       x-permisos-objetivo:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
     patch:
@@ -177,8 +175,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ActualizarPerfilRequest'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -186,8 +183,7 @@ paths:
       x-contract-status: stable
       x-contract-basis: DTO/comportamiento funcional existente y convenciones técnicas del contrato.
       x-permisos-objetivo:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
   /usuarios:
@@ -274,7 +270,7 @@ paths:
       tags:
       - M1 · Usuarios
       summary: Actualizar usuario
-      description: Recepción modifica sólo SOCIO_ACTIVO/CLIENTE_EXTERNO de su sede. Gerente todos los roles/sedes.
+      description: Recepción modifica sólo USUARIO de su sede. Gerente todos los roles/sedes.
         Nadie puede desactivar su propia cuenta (409). Omitido/null no modifica. If-Match objetivo protege la versión
         leída; no sustituye integridad BD.
       operationId: actualizarUsuario
@@ -348,8 +344,7 @@ paths:
         '403':
           $ref: '#/components/responses/SinPermiso'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -357,8 +352,7 @@ paths:
       x-contract-status: stable
       x-contract-basis: DTO/comportamiento funcional existente y convenciones técnicas del contrato.
       x-permisos-objetivo:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-propuesta-security: []
@@ -453,7 +447,7 @@ paths:
       description: |-
         Lista planes globales activos, ordenados por duracionMeses y nombre; devuelve [] si no hay resultados.
         incluirInactivos=false por defecto. Sólo RECEPCIONISTA y GERENTE pueden usar incluirInactivos=true;
-        SOCIO_ACTIVO y CLIENTE_EXTERNO reciben 403 si solicitan incluir planes inactivos.
+        USUARIO reciben 403 si solicitan incluir planes inactivos.
         No hay filtro por sede ni paginación en la implementación actual.
       operationId: listarPlanes
       x-implementation-status: implemented
@@ -484,13 +478,11 @@ paths:
           default: false
           example: false
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-permisos-objetivo:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -888,13 +880,13 @@ paths:
       - M2 · Accesos
       summary: Obtener QR de acceso propio
       description: |-
-        SOCIO_ACTIVO, CLIENTE_EXTERNO y GERENTE con membresía vigente. Emite el QR del usuario autenticado (RF-04): un token firmado con vigencia de 60 segundos.
+        USUARIO y GERENTE con membresía vigente. Emite el QR del usuario autenticado (RF-04): un token firmado con vigencia de 60 segundos.
         Cada pedido reemplaza al QR anterior, que deja de ser válido aunque no haya vencido; se guarda un único QR por
         usuario en codigo_qr. El cliente debe pedir uno nuevo antes de que venza (el frontend lo hace 5 s antes).
         La respuesta lleva Cache-Control: no-store. El token se firma con una clave derivada de jwt.secret, distinta
         de la del login: no sirve como Bearer.
-        Usuario inactivo o con un rol sin ingreso habilitado recibe 403. Hoy "habilitado" se decide por rol
-        (SOCIO_ACTIVO y GERENTE); reemplazarlo por la membresía vigente queda pendiente (P01).
+        La autoridad habilita solicitar QR; cuenta activa y membresía vigente no suspendida son obligatorias.
+        M1/M2 validan períodos reales, sin depender del nombre del actor funcional ni de la sede habitual.
       operationId: obtenerQrAcceso
       x-implementation-status: implemented
       x-contract-status: stable
@@ -911,10 +903,10 @@ paths:
         '403':
           $ref: '#/components/responses/SinPermiso'
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       x-permisos-objetivo:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       x-contract-pending:
       - P01
@@ -934,7 +926,7 @@ paths:
         RECEPCIONISTA y GERENTE. Valida el qrToken y abre un acceso (fecha_hora_salida nula).
         Validaciones, en orden: QR auténtico (firma y tipo; 400 si no lo es), no vencido (409), y que sea el último QR
         emitido para ese titular (409 si se emitió uno más nuevo). El titular sale del QR, no de un usuarioId enviado.
-        El titular debe estar activo y con un rol habilitado (403); hoy por rol, pendiente de membresía vigente (P01).
+        El titular debe tener cuenta activa y membresía vigente no suspendida (403); M1 valida sus períodos.
         RN-01: si el titular ya tiene un ingreso abierto, en cualquier sede, responde 409; también ante escaneos
         simultáneos, por el índice único parcial uk_registro_acceso_abierto (V4).
         Sede: RECEPCIONISTA opera la de su usuario (si envía otra sedeId, 403). GERENTE debe indicar sedeId (400 si
@@ -1222,8 +1214,7 @@ paths:
         '403':
           $ref: '#/components/responses/SinPermiso'
       x-divergencias-backend:
-      - 'Comparación con la propuesta anterior, sujeta a validación: CLIENTE_EXTERNO está bloqueado por @PreAuthorize
-        actual; política objetivo evalúa membresía por separado.'
+      - 'USUARIO puede consultar el stub. Las acciones de reserva/lista de espera requieren vigencia en M1; las cancelaciones conservan autorización para recuperar recursos propios.'
       parameters:
       - $ref: '#/components/parameters/SedeFiltro'
       - $ref: '#/components/parameters/Desde'
@@ -1231,7 +1222,7 @@ paths:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Size'
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       - RECEPCIONISTA
       x-contract-source:
@@ -1452,7 +1443,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
@@ -1547,7 +1538,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       - RECEPCIONISTA
       x-contract-source:
@@ -1660,7 +1651,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
@@ -1705,7 +1696,7 @@ paths:
         '404':
           $ref: '#/components/responses/NoEncontrado'
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
@@ -1762,7 +1753,7 @@ paths:
               $ref: '#/components/schemas/ResponderOfertaRequest'
         x-propuesta-required: true
       x-roles-actuales:
-      - SOCIO_ACTIVO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
@@ -1816,8 +1807,7 @@ paths:
       parameters:
       - $ref: '#/components/parameters/SedeFiltro'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -1979,8 +1969,7 @@ paths:
       - $ref: '#/components/parameters/Desde'
       - $ref: '#/components/parameters/Hasta'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -2096,8 +2085,7 @@ paths:
               $ref: '#/components/schemas/ReservarCanchaRequest'
         x-propuesta-required: true
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
@@ -2149,8 +2137,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
@@ -2308,8 +2295,7 @@ paths:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Size'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/reserva/controller/ReservaController.java
@@ -2419,8 +2405,7 @@ paths:
               $ref: '#/components/schemas/CrearPagoRequest'
         x-propuesta-required: true
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
@@ -2518,8 +2503,7 @@ paths:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Size'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
@@ -2563,8 +2547,7 @@ paths:
         '404':
           $ref: '#/components/responses/NoEncontrado'
       x-roles-actuales:
-      - SOCIO_ACTIVO
-      - CLIENTE_EXTERNO
+      - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
@@ -2621,7 +2604,7 @@ paths:
           $ref: '#/components/responses/NoEncontrado'
         '409':
           $ref: '#/components/responses/Conflicto'
-      x-roles-actuales: [SOCIO_ACTIVO, CLIENTE_EXTERNO, GERENTE]
+      x-roles-actuales: [USUARIO, GERENTE]
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
       - src/main/java/com/fitzonesports/pago/service/ComprobanteService.java
@@ -2660,7 +2643,7 @@ paths:
           $ref: '#/components/responses/NoEncontrado'
         '409':
           $ref: '#/components/responses/Conflicto'
-      x-roles-actuales: [SOCIO_ACTIVO, CLIENTE_EXTERNO, GERENTE]
+      x-roles-actuales: [USUARIO, GERENTE]
       x-contract-source:
       - src/main/java/com/fitzonesports/pago/controller/PagoController.java
       - src/main/java/com/fitzonesports/pago/service/ReembolsoService.java
@@ -2807,7 +2790,7 @@ components:
     RegisterRequest:
       type: object
       description: DTO actual. sedeId es obligatorio sin @Positive; el servidor comprueba existencia. El rol se
-        asigna como CLIENTE_EXTERNO.
+        asigna como USUARIO.
       required:
       - nombre
       - apellido
@@ -2887,9 +2870,9 @@ components:
           example: true
         rol:
           type: string
-          description: 'String del DTO actual. Roles sembrados: SOCIO_ACTIVO, CLIENTE_EXTERNO, RECEPCIONISTA y GERENTE.
-            La política objetivo separa actor cliente de condición de membresía.'
-          example: CLIENTE_EXTERNO
+          description: 'String del DTO actual. Roles sembrados: USUARIO, RECEPCIONISTA y GERENTE.
+            La autoridad es estable; Socio es condición derivada de membresía, no un rol JWT.'
+          example: USUARIO
         sedeId:
           type: integer
           format: int32

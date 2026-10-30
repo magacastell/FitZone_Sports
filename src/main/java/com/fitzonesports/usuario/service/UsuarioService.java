@@ -25,11 +25,11 @@ public class UsuarioService {
 
     // Rol asignado a todo alta hecha via /auth/register: es un endpoint publico,
     // asi que nunca deja elegir un rol interno (RECEPCIONISTA, GERENTE, etc.).
-    private static final String ROL_REGISTRO_PUBLICO = "CLIENTE_EXTERNO";
+    private static final String ROL_REGISTRO_PUBLICO = "USUARIO";
 
     private static final String ROL_RECEPCIONISTA = "RECEPCIONISTA";
     // Roles que recepcion puede modificar; el personal (recepcion/gerente) solo lo gestiona el gerente.
-    private static final Set<String> ROLES_GESTIONABLES_POR_RECEPCION = Set.of("SOCIO_ACTIVO", "CLIENTE_EXTERNO");
+    private static final Set<String> ROLES_GESTIONABLES_POR_RECEPCION = Set.of("USUARIO");
 
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;

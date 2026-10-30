@@ -17,19 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClaseController {
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE', 'RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE', 'RECEPCIONISTA')")
     public ResponseEntity<Void> listarClases() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @PostMapping("/{claseId}/reservas")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE')")
+    @PreAuthorize("hasRole('GERENTE') or (hasRole('USUARIO') and @membresiaService.tieneMembresiaVigentePorEmail(authentication.name))")
     public ResponseEntity<Void> reservarClase() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @DeleteMapping("/{claseId}/reservas/{reservaId}")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE', 'RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE', 'RECEPCIONISTA')")
     public ResponseEntity<Void> cancelarReserva() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
@@ -65,19 +65,19 @@ public class ClaseController {
     }
 
     @PostMapping("/{claseId}/lista-espera")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE')")
+    @PreAuthorize("hasRole('GERENTE') or (hasRole('USUARIO') and @membresiaService.tieneMembresiaVigentePorEmail(authentication.name))")
     public ResponseEntity<Void> incorporarListaEspera() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @DeleteMapping("/{claseId}/lista-espera/me")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<Void> salirListaEspera() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @PostMapping("/{claseId}/ofertas/{ofertaId}/respuesta")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'GERENTE')")
+    @PreAuthorize("hasRole('GERENTE') or (hasRole('USUARIO') and @membresiaService.tieneMembresiaVigentePorEmail(authentication.name))")
     public ResponseEntity<Void> responderOferta() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }

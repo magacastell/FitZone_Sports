@@ -27,19 +27,19 @@ public class PagoController {
     private final ReembolsoService reembolsos;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<Void> crearPago() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<Void> listarMisPagos() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @GetMapping("/{pagoId}/comprobante")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<byte[]> consultarComprobante(Authentication auth, @PathVariable Integer pagoId) {
         var pdf = comprobantes.descargar(auth.getName(), pagoId);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
@@ -50,7 +50,7 @@ public class PagoController {
     }
 
     @GetMapping("/{pagoId}")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<Void> consultarPago() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
@@ -62,7 +62,7 @@ public class PagoController {
     }
 
     @PostMapping("/{pagoId}/reembolsos")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<ReembolsoResponse> solicitarReembolso(Authentication auth, @PathVariable Integer pagoId) {
         return ResponseEntity.ok(reembolsos.solicitar(auth.getName(), pagoId));
     }

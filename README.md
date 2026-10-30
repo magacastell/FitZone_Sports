@@ -212,8 +212,8 @@ La contratación, renovación manual/automática, consulta histórica, suspensi�
 
 | Email | Password | Rol |
 |---|---|---|
-| socio@fitzone.com | socio123 | SOCIO_ACTIVO |
-| cliente@fitzone.com | cliente123 | CLIENTE_EXTERNO |
+| socio@fitzone.com | socio123 | USUARIO |
+| cliente@fitzone.com | cliente123 | USUARIO |
 | recepcion@fitzone.com | recepcion123 | RECEPCIONISTA |
 | gerente@fitzone.com | gerente123 | GERENTE |
 
@@ -255,10 +255,10 @@ Los stubs no consultan ni modifican datos. Sus contratos de solicitud/respuesta 
 están pendientes. Las anotaciones `@PreAuthorize` usan el soporte existente de
 Spring Security (`@EnableMethodSecurity`).
 
-Roles: **S** = SOCIO_ACTIVO, **C** = CLIENTE_EXTERNO,
+Roles: **S** y **C** = USUARIO (ambos actores comerciales del TP),
 **R** = RECEPCIONISTA, **G** = GERENTE. GERENTE tiene acceso a todas las rutas.
-Se conservan los roles actuales; en los documentos, socio activo se considera
-una condición de membresía y su futura representación requiere revisión.
+Socio es condición funcional derivada de membresía vigente; la autoridad USUARIO no cambia al pagar o vencer.
+Ver [ADR de actores y membresía](docs/adr/0007-actores-y-membresia.md). Los tokens legados requieren un nuevo login tras V7.
 
 Pendiente antes de implementar operaciones reales:
 
@@ -274,7 +274,7 @@ Pendiente antes de implementar operaciones reales:
   la modificación de cancha no define todavía ese contrato global.
 
 Reglas de `usuario`: recepción solo lista, consulta y modifica usuarios de su sede, y
-solo SOCIO_ACTIVO o CLIENTE_EXTERNO. Puede activar/desactivar cuentas (`activo`) con
+solo USUARIO. Puede activar/desactivar cuentas (`activo`) con
 `PATCH /usuarios/{usuarioId}`. Nadie puede desactivar su propia cuenta, y
 `PATCH /usuarios/me` no permite cambiar `activo`. El gerente opera sobre todas las
 sedes y roles. `GET /usuarios` acepta `?sedeId=` (recepción solo con su propia sede).

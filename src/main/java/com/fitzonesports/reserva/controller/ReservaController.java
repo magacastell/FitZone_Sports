@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservaController {
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<Void> listarMisReservas() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }

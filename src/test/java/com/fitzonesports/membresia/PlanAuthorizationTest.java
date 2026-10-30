@@ -35,7 +35,7 @@ class PlanAuthorizationTest {
 
     @Test
     void customersOnlyListActivePlansAndCannotWrite() {
-        for (String role : new String[]{"SOCIO_ACTIVO", "CLIENTE_EXTERNO", "RECEPCIONISTA"}) {
+        for (String role : new String[]{"USUARIO", "RECEPCIONISTA"}) {
             authenticate(role);
             assertDoesNotThrow(() -> controller.listarPlanes(false));
             assertThrows(AccessDeniedException.class, () -> controller.crearPlan(new PlanRequest("Mensual", 1, BigDecimal.TEN)));

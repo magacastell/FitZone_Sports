@@ -65,7 +65,7 @@ class PagosIntegrationTest {
         sede = jdbc.queryForObject("INSERT INTO sede(nombre,capacidad_maxima) VALUES (?,10) RETURNING id",Integer.class,"Pagos " + sufijo);
         email="titular-"+sufijo+"@test.com"; otroEmail="otro-"+sufijo+"@test.com";
         gerente="gerente-"+sufijo+"@test.com"; recepcion="recepcion-"+sufijo+"@test.com";
-        usuario=usuario(email,"CLIENTE_EXTERNO"); otro=usuario(otroEmail,"CLIENTE_EXTERNO");
+        usuario=usuario(email,"USUARIO"); otro=usuario(otroEmail,"USUARIO");
         usuario(gerente,"GERENTE"); usuario(recepcion,"RECEPCIONISTA");
         plan=jdbc.queryForObject("INSERT INTO plan_membresia(nombre,duracion_meses,precio) VALUES (?,1,15000.50) RETURNING id",Integer.class,"Plan " + sufijo);
         mvc=MockMvcBuilders.webAppContextSetup(contexto).apply(springSecurity()).build();
@@ -184,6 +184,18 @@ class PagosIntegrationTest {
         assertNotNull(comprobantes.descargar(email,pago).contenido());
         reembolsos.solicitar(email,pago);
         assertTrue(membresias.tieneMembresiaVigente(usuario));
+    }
+
+    @Test void canchasPermiteAutoridadEstableSinPrometerReservasImplementadas() throws Exception {
+        String token=bearer(email);
+        for (boolean conMembresia : List.of(false,true)) {
+            if (conMembresia) contratar();
+            mvc.perform(get("/canchas").header("Authorization",token)).andExpect(status().isNotImplemented());
+            mvc.perform(post("/canchas/1/reservas").header("Authorization",token)).andExpect(status().isNotImplemented());
+            mvc.perform(get("/reservas/me").header("Authorization",token)).andExpect(status().isNotImplemented());
+        }
+        mvc.perform(post("/canchas/1/reservas").header("Authorization",bearer(recepcion))).andExpect(status().isForbidden());
+        mvc.perform(get("/canchas")).andExpect(status().isUnauthorized());
     }
 
     @Test void reembolsosConcurrentesNoDuplicanDevolucion() throws Exception {
