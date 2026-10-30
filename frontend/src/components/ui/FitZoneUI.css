@@ -1,0 +1,314 @@
+/* Portado de v0: src/index.css (shared.tsx). Aislado de las vistas heredadas. */
+.fitzone-ui .page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.fitzone-ui .page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 2px;
+}
+
+.fitzone-ui .page-heading__copy {
+  min-width: 0;
+}
+
+.fitzone-ui .eyebrow {
+  margin: 0 0 8px;
+  color: #6e8d72;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+}
+
+.fitzone-ui .page-heading h2 {
+  margin: 0;
+  color: #23352c;
+  font-size: clamp(25px, 2.6vw, 31px);
+  font-weight: 740;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+
+.fitzone-ui .page-heading__description {
+  margin: 9px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.fitzone-ui .page-heading__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+}
+
+.fitzone-ui .fit-button {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 670;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.fitzone-ui .fit-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.fitzone-ui .fit-button:disabled {
+  opacity: 0.62;
+}
+
+.fitzone-ui .fit-button svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  stroke-width: 2;
+}
+
+.fitzone-ui .fit-button--sm {
+  height: 34px;
+  padding: 0 11px;
+  font-size: 11px;
+}
+
+.fitzone-ui .fit-button--md {
+  height: 40px;
+  padding: 0 15px;
+}
+
+.fitzone-ui .fit-button--lg {
+  height: 46px;
+  padding: 0 19px;
+  font-size: 13px;
+}
+
+.fitzone-ui .fit-button--primary {
+  color: #fff;
+  background: var(--primary);
+}
+
+.fitzone-ui .fit-button--primary:hover:not(:disabled) {
+  background: #245d40;
+}
+
+.fitzone-ui .fit-button--secondary {
+  border-color: #dce5dd;
+  color: #344a3c;
+  background: #fff;
+}
+
+.fitzone-ui .fit-button--secondary:hover:not(:disabled) {
+  border-color: #c4d4c8;
+  background: #f8faf7;
+}
+
+.fitzone-ui .fit-button--ghost {
+  color: #60736a;
+  background: transparent;
+}
+
+.fitzone-ui .fit-button--ghost:hover:not(:disabled) {
+  color: #254c37;
+  background: #f1f5f1;
+}
+
+.fitzone-ui .fit-button--lime {
+  color: #1c382b;
+  background: var(--accent-lime);
+}
+
+.fitzone-ui .fit-button--lime:hover:not(:disabled) {
+  background: #d7ef91;
+}
+
+.fitzone-ui .fit-button--danger {
+  color: #9a3f37;
+  background: #fff2f0;
+}
+
+.fitzone-ui .fit-button--dark-outline {
+  border-color: rgba(240, 248, 242, 0.28);
+  color: #f2f8f3;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.fitzone-ui .fit-button--dark-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.fitzone-ui .panel {
+  min-width: 0;
+  border: 1px solid #e5ebe5;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 3px 14px rgba(35, 58, 44, 0.035);
+}
+
+.fitzone-ui .panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.fitzone-ui .panel-heading h3 {
+  margin: 0;
+  color: #2a3b32;
+  font-size: 14px;
+  font-weight: 710;
+  letter-spacing: -0.02em;
+}
+
+.fitzone-ui .panel-heading p {
+  margin: 5px 0 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.fitzone-ui .panel-heading__action {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.fitzone-ui .status-badge {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fitzone-ui .status-badge--success {
+  border-color: #d5e8d5;
+  color: #2d7048;
+  background: #edf7ec;
+}
+
+.fitzone-ui .status-badge--warning {
+  border-color: #f1e3be;
+  color: #946315;
+  background: #fff7e4;
+}
+
+.fitzone-ui .status-badge--danger {
+  border-color: #f1d5d1;
+  color: #a54840;
+  background: #fff0ee;
+}
+
+.fitzone-ui .status-badge--neutral {
+  border-color: #e2e7e3;
+  color: #68766d;
+  background: #f3f5f3;
+}
+
+.fitzone-ui .status-badge--info {
+  border-color: #d7e6e8;
+  color: #3b737b;
+  background: #edf7f7;
+}
+
+.fitzone-ui .avatar-circle--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 10px;
+}
+
+.fitzone-ui .avatar-circle--md {
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+}
+
+.fitzone-ui .avatar-circle--lg {
+  width: 54px;
+  height: 54px;
+  font-size: 15px;
+}
+
+.fitzone-ui .empty-state {
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  text-align: center;
+}
+
+.fitzone-ui .empty-state__icon {
+  display: grid;
+  width: 45px;
+  height: 45px;
+  place-items: center;
+  border-radius: 13px;
+  color: #64816d;
+  background: #f0f5ef;
+}
+
+.fitzone-ui .empty-state__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.fitzone-ui .empty-state h4 {
+  margin: 15px 0 0;
+  color: #2c3d33;
+  font-size: 14px;
+}
+
+.fitzone-ui .empty-state p {
+  max-width: 355px;
+  margin: 7px 0 0;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.fitzone-ui .empty-state__action {
+  margin-top: 17px;
+}
+
+
+.fitzone-ui { --primary: #2f704f; --accent-lime: #cce879; --surface: #fff; --muted-foreground: #63776a; }
+.fitzone-ui .fit-button { text-decoration: none; cursor: pointer; }
+.fitzone-ui .fit-button:disabled { cursor: not-allowed; }
+.fitzone-ui .status-badge { font-size: 11px; }
+.fitzone-ui .eyebrow { font-size: 11px; }
+.fitzone-ui .panel-heading p, .fitzone-ui .empty-state p { font-size: 12px; }
+.fitzone-ui .avatar-circle { display: grid; flex: 0 0 auto; place-items: center; border-radius: 50%; color: #254534; background: #e2edcf; font-weight: 700; text-transform: uppercase; }
+.fitzone-ui .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.fitzone-ui :where(button, a, select):focus-visible { outline: 3px solid #2f704f; outline-offset: 3px; }
+@media (max-width: 640px) {
+  .fitzone-ui .page-stack { gap: 17px; }
+  .fitzone-ui .page-heading { align-items: flex-start; flex-direction: column; gap: 13px; }
+  .fitzone-ui .page-heading h2 { font-size: 26px; }
+  .fitzone-ui .page-heading__actions { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fitzone-ui .fit-button { transition: none; }
+  .fitzone-ui .fit-button:hover:not(:disabled) { transform: none; }
+}

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useOutletCon
 import Layout from '../components/Layout';
 import FeaturePlaceholder from '../components/FeaturePlaceholder';
 import PerfilUsuario from '../modules/m1-usuarios/PerfilUsuario';
+import MembresiaUsuario from '../modules/m1-usuarios/MembresiaUsuario';
 import GestionPlanes from '../modules/m1-usuarios/GestionPlanes';
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
@@ -19,6 +20,7 @@ function InicioPorRol() {
   const { user, loading } = useAuth();
   if (loading || !user) return <p role="status">Cargando sesión de FitZone...</p>;
   if (user.rol === 'GERENTE') return <Navigate to="/gestion/planes" replace />;
+  if (user.rol === 'CLIENTE_EXTERNO' || user.rol === 'SOCIO_ACTIVO') return <Navigate to="/membresia" replace />;
   return <Navigate to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'} replace />;
 }
 
@@ -41,7 +43,7 @@ function SocioQRRoute() {
           <button type="button" onClick={refrescarMembresia}>Reintentar consulta de membresía</button>
         </>
       ) : <p>Mi QR no está disponible con el estado actual de tu membresía.</p>}
-      <Link to="/perfil">Ver perfil y membresía</Link>
+      <Link to="/membresia">Ver mi membresía</Link>
     </div>
   );
   return <SocioQRModal isOpen={true} onClose={() => navigate('/')} onAccesoDenegado={alDenegarAcceso} />;
@@ -62,6 +64,7 @@ export default function AppRoutes() {
               <Route path="clases" element={<AgendaClases />} />
               <Route path="mi-qr" element={<SocioQRRoute />} />
               <Route path="perfil" element={<PerfilUsuario />} />
+              <Route path="membresia" element={<MembresiaUsuario />} />
               <Route path="gestion/planes" element={<GestionPlanes />} />
               <Route path="comprobantes" element={<HistorialComprobante />} />
               

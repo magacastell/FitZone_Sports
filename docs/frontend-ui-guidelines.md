@@ -7,9 +7,9 @@ Reutilizar `fetchAPI`, servicios, AuthContext, rutas y contratos existentes. La 
 no sustituye autorización, titularidad, sede ni reglas de negocio del backend.
 No migrar a Next.js ni agregar otra arquitectura, store o cliente HTTP por motivos visuales.
 
-Esta primera adaptación modifica solamente el shell: Layout, sidebar, header,
-identidad y contenedor responsive. Los interiores de Perfil, Planes y Recepción
-se adaptarán en bloques separados, preservando su funcionalidad.
+La base compartida comprende Layout, sidebar, header, identidad y contenedor responsive.
+El portal Cliente/Socio y su Perfil se adaptan en un bloque separado. Los interiores
+de Planes y Recepción se adaptarán posteriormente, preservando su funcionalidad.
 
 ## Referencia inspeccionada
 
@@ -66,15 +66,16 @@ No cambiar estilos globales de login/registro o páginas individuales incidental
 ## Navegación e identidad
 
 - El rol proviene de `user.rol` del JWT real. Nunca agregar selector de rol/vista.
-- Preservar destinos: Cliente/Socio → Perfil; Recepción → Control de acceso;
+- Preservar destinos: Cliente/Socio → Mi membresía (`/membresia`); Recepción → Control de acceso;
   Gerente → Gestión de Planes. Las URLs y permisos no cambian con el estilo.
 - Usar nombres de negocio: Mi membresía, Mi QR, Comprobantes, Control de acceso,
   Planes. No mostrar M1/M2/M3/M4/M5 como etiquetas de navegación.
 - No crear enlaces a capacidades inexistentes copiando el sidebar del mock.
 - Perfil es identidad transversal: nombre, email, DNI, sede y rol. Se accede desde
   la identidad/avatar del header y sigue disponible para todos los roles.
-- Membresía es una capacidad comercial de Cliente/Socio. El acceso del sidebar
-  “Mi membresía” conserva `/perfil` por ahora; no crea una nueva pantalla ni ruta.
+- Membresía es una capacidad comercial de Cliente/Socio. El sidebar enlaza
+  “Mi membresía” a `/membresia`; `/perfil` conserva la identidad de cuenta y
+  sigue accesible desde el header. No redirigir Perfil a la experiencia comercial.
 - El nombre del header se consulta mediante `consultarMiPerfil()`. Mientras carga
   o si falla, se usa el email real de sesión. No inventar nombres, fotos ni sedes.
   El árbol se remonta al cambiar token, evitando identidad de la cuenta anterior.
@@ -84,6 +85,44 @@ No cambiar estilos globales de login/registro o páginas individuales incidental
   membresía real y validación final del backend M2.
 
 ## Datos y estados
+
+### Portal Cliente/Socio
+
+La composición mantiene dos niveles: resumen destacado + acceso rápido, y datos
+personales + comprobantes. `/membresia` reutiliza los handlers S4 de contratación
+y el componente de renovación extraído con su intención persistida; `/perfil`
+es exclusivamente identidad. No copiar la lógica simulada del MemberPage de v0.
+
+La presentación se porta del JSX de `member-page.tsx` y de los bloques concretos
+de `src/index.css`: `membership-layout`, `membership-card` y sus secciones,
+`qr-card`, `member-details-grid`, `member-identity` y `member-data-grid`.
+Se conservan proporciones 1.55/0.76, separación 18 px, card mínima de 328 px,
+padding 25/27/22 px, radio 18 px y arco decorativo mediante `::after` sin eventos.
+Los breakpoints internos de v0 son 1240/1020/820/640 px; el shell aprobado mantiene
+su propio menú móvil. Metadatos de 8–10 px se elevan a 11–12 px por legibilidad.
+
+`components/ui/FitZoneUI.jsx` porta `AppButton`, `StatusBadge`, `PageHeading`,
+`PanelHeading`, `AvatarCircle` y `EmptyState` de `shared.tsx`, sin TypeScript ni mocks.
+`AppLink` adapta el botón a React Router; `DataCard` reúne panel y encabezado.
+El CSS se aísla con `.fitzone-ui`, sin alterar las vistas de Recepción o Planes.
+Los headings se ajustan a h2/h3/h4 para respetar el h1 del Layout real.
+No se crea una tabla genérica sin consumidores: la tabla `fit-table` inspeccionada
+en Planes/Recepción se portará junto con su integración en otro bloque.
+
+El plan, precio, inicio y fin salen del snapshot `periodoVigente`; el precio es
+el importe pagado de ese período, no una tarifa mensual ni el catálogo actual.
+Los próximos períodos salen de `periodos` con estado `PROGRAMADA`. El estado
+de membresía y la autorización los determina el backend. La barra muestra la
+fracción de tiempo restante entre inicio y fin reales, acotada a 0–100%; los días
+son una aproximación en intervalos de 24 horas, redondeados hacia arriba.
+Más de cinco días usa verde, tres a cinco naranja y dos o menos rojo, siempre
+con texto. Se actualiza visualmente cada minuto y no habilita QR ni acciones.
+Sin ambas fechas válidas y ordenadas no se dibuja una barra.
+El texto visible es “N días restantes”, acompañado de las fechas exactas.
+Si el backend responde VENCIDA, ese estado se presenta explícitamente.
+El acceso rápido enlaza al modal M2 real; el icono decorativo no es un QR válido.
+Comprobantes no inventa filas: explica la integración pendiente y marca como demo
+el enlace a la pantalla heredada. Las fechas se presentan en horario argentino.
 
 Todo dato debe existir en backend o estar explícitamente marcado como demo/pendiente.
 No copiar los KPI, sede Palermo, usuarios, porcentajes, pagos o QR de v0.
@@ -95,7 +134,8 @@ El aviso actual conserva identificadas las pantallas que todavía usan demostrac
   no exponer Failed to fetch, stack traces ni interpretar todos los errores como ausencia.
 - Empty: explicar qué falta y ofrecer únicamente acciones soportadas.
 - Disabled: estado visible y atributo nativo; conservar bloqueos inmediatos de envío.
-- Activa, vencida y suspendida se toman del backend; no recalcular vigencia en CSS/React.
+- Activa, vencida y suspendida se toman del backend; no recalcular ese estado en
+  CSS/React. Las fechas solo alimentan el indicador visual del período.
 - Mantener separación entre rol, estado de cuenta y estado de membresía.
 
 ## Responsive
@@ -126,3 +166,81 @@ Antes de cerrar cambios visuales: probar las cuatro cuentas, F5, logout/cambio d
 usuario, navegación con teclado y tamaños de ventana; ejecutar build y diff --check.
 No alterar servicios, reglas de negocio, seguridad ni contratos para lograr una apariencia.
 Una captura del mock no sustituye la validación del flujo real.
+
+## Inspección puntual de roles (29/10/2026, sin cambio de modelo)
+
+1. `UsuarioService.registrarCliente` asigna siempre `CLIENTE_EXTERNO`; el registro
+   público no admite elegir rol. `AuthController` devuelve JWT con ese rol.
+2. `MembresiaService.contratar` crea cuenta/período/pago, sin actualizar `usuario.rol`.
+   Devuelve `MembresiaResponse`, no un JWT nuevo. El consumidor S4 actualiza membresía;
+   `AuthContext.user.rol` sigue derivándose del token existente.
+3. No se encontró conversión automática CLIENTE_EXTERNO → SOCIO_ACTIVO, ni inversa.
+   El seed incluye ambos. El servicio de usuarios tampoco expone cambio de rol.
+4. Los controladores usan `@PreAuthorize`, además de validar titular, usuario activo
+   y sede en los servicios donde están implementados. Resumen del contrato actual:
+
+| Capacidad/rutas | Roles admitidos y límites |
+| --- | --- |
+| GET/PATCH `/usuarios/me`, GET `/sedes`, GET `/planes` | Los cuatro roles; planes inactivos sólo Recepción/Gerencia. |
+| Listar/consultar/modificar usuarios ajenos | Recepción/Gerencia; Recepción sólo su sede y modifica sólo clientes/socios. |
+| POST/PATCH/DELETE `/planes`, POST/PATCH `/sedes` | Gerencia; DELETE de plan desactiva, PATCH admite reactivación. |
+| GET `/membresias/me`, alta, renovación, configuración automática, cancelación por período | Cliente/Socio/Gerencia en controlador; alta rechaza Gerencia en servicio, que sólo admite Cliente/Socio. Titularidad y cuenta activa se validan según operación. |
+| GET `/membresias/{id}`, PATCH `/{id}/estado` | Recepción/Gerencia; administración de Recepción limitada a su sede. |
+| GET `/accesos/qr` | Cliente/Socio/Gerencia en controlador, más usuario activo y período vigente no suspendido en servicio. |
+| Ingresos, salidas y aforo | Recepción/Gerencia; Recepción opera su sede. |
+| Clases/lista de espera/reserva de clase | Los stubs distinguen SOCIO_ACTIVO de CLIENTE_EXTERNO: este último queda excluido; devuelven 501 tras autorización. Personal tiene sus permisos específicos. |
+| Canchas/turnos/reservas | Stubs con permisos Cliente/Socio/Gerencia y, para lectura/administración, Recepción; no hay integración de negocio real. |
+| Pagos propios, PDF y reembolsos | Cliente/Socio/Gerencia; PDF/reembolsos validan titularidad. Listado general sólo Gerencia; varias rutas de listado/alta siguen stub. |
+
+5. `membresia.estado` controla el QR del frontend y los mensajes de membresía;
+   M2 confirma mediante `tieneMembresiaVigente`, que comprueba períodos reales,
+   suspensión y cuenta activa. La barra no participa. El menú Clases aún depende
+   del rol SOCIO_ACTIVO y apunta a demo: no es un beneficio funcional integrado.
+6. Al vencer un período, la respuesta/persistencia de membresía pasa a VENCIDA
+   según la consulta/job existentes; no se cambia rol ni JWT. Se impide nuevo QR
+   e ingreso; se conserva renovación manual. M2 permite registrar la salida de
+   quien ya está adentro sin exigir vigencia para esa salida.
+7. M2 permite acceso en otra sede: `consultarParaAcceso` no restringe sede del
+   titular y `registrarIngreso` resuelve la sede del operador. No es un privilegio
+   exclusivo de SOCIO_ACTIVO: también funciona para CLIENTE_EXTERNO con membresía
+   vigente. No se encontró un beneficio multisede adicional de ese rol en M3/M4;
+   sus operaciones siguen stub.
+8. `docs/membresias.md` documenta el rol legado; `docs/openapi/DECISIONES.md`,
+   P01/P02, deja el modelo futuro pendiente de validación del equipo. P03 incluye
+   una actualización de implementación sobre la separación de rol y vigencia.
+   `MembresiaIntegrationTest.contratacionCobraUnaVezYConservaMesCalendario` prueba
+   QR para CLIENTE_EXTERNO con membresía; `vencimientoExactoYRenovacionSinCobroRetroactivo`
+   comprueba VENCIDA, QR 403 y renovación posterior. Se inspeccionaron estos tests;
+   no se ejecutaron pruebas backend ni se alteraron datos para esta revisión.
+
+El JWT lleva una foto del rol para el frontend. `JwtAuthenticationFilter` carga
+las autoridades actuales de la BD para autorizar peticiones; no hay refresco de
+roles del frontend al contratar. Cualquier cambio futuro exige acordar primero
+el modelo y revisar ambas partes, sin resolverlo silenciosamente desde React.
+
+### Referencias v0 inspeccionadas para siguientes bloques
+
+- `access-page.tsx`: encabezados/paneles/badges compartidos, tabs de ingreso/salida,
+  formulario de lector, resultado, aforo y tabla de movimientos. Sus códigos,
+  ocupación y conexión simulada no se portan.
+- `plans-page.tsx`: `PlanForm`, catálogo, filtros/búsqueda, `fit-table`, estado y
+  acciones por fila. No se portan ahora sus handlers locales ni socios asociados.
+  La futura integración debe respetar baja lógica y snapshots históricos reales.
+- `manager-dashboard.tsx`: paneles, KPI, gráficos Recharts, tablas y vencimientos.
+  No se portan KPI, gráficos, reportes ni dependencias sin fuente de datos real.
+- `shared.tsx`, `member-page.tsx`, `src/index.css`, entrada `src/main.tsx` y shell
+  `fitzone-app.tsx`: presentación React portable, sin necesidad de migrar a Next.
+
+
+## Renovación anticipada: presentación y evidencia
+
+Se mantiene la renovación habilitada con períodos futuros. `docs/membresias.md`
+documenta que se agrega al último período pagado no cancelado; `agregarPeriodo`
+calcula inicio = max(ahora, máximo fin no cancelado), fin = inicio.plusMonths(duración).
+Esto soporta encadenar períodos y no establece un límite comercial de anticipación.
+El test de renovación anticipada cubre un período futuro y replay, no explícitamente
+varios futuros. Si el equipo desea un límite de compra anticipada, debe definirlo
+como nueva política de dominio; no se impone unilateralmente desde la UI.
+Se presentan todos los PROGRAMADA del DTO en una lista compacta, una sola vez.
+Los intervalos son [inicio, fin); el trigger V5 rechaza superposición no cancelada.
+En el límite compartido termina el anterior y comienza el siguiente, sin perder vigencia.

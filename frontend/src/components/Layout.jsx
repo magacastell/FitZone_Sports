@@ -30,7 +30,7 @@ const NOMBRE_ROL = {
 };
 
 const TITULO_POR_RUTA = {
-  '/perfil': 'Perfil', '/gestion/planes': 'Planes de membresía',
+  '/perfil': 'Perfil', '/membresia': 'Mi membresía', '/gestion/planes': 'Planes de membresía',
   '/recepcion/acceso': 'Control de acceso', '/mi-qr': 'Mi QR',
   '/comprobantes': 'Comprobantes', '/canchas': 'Canchas', '/clases': 'Clases',
 };
@@ -159,23 +159,22 @@ function LayoutAutenticado() {
 
         <nav className="app-nav" aria-label="Navegación principal">
           <div className="app-nav__group">
-            <p className="app-nav__heading" id="nav-usuario">Mi cuenta</p>
+            <p className="app-nav__heading" id="nav-usuario">{esCliente ? 'Mi espacio' : 'Mi cuenta'}</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
-              <NavigationLink to="/perfil" icon={UserRound}>{esCliente ? 'Mi membresía' : 'Perfil'}</NavigationLink>
-              {esCliente && <NavigationLink to="/canchas" icon={LayoutGrid}>Canchas</NavigationLink>}
-              {rolActivo === 'SOCIO' && (
-                <>
-                  <NavigationLink to="/clases" icon={CalendarDays}>Clases grupales</NavigationLink>
-                </>
-              )}
-              {esCliente && <NavigationLink to="/comprobantes" icon={ReceiptText}>Comprobantes</NavigationLink>}
+              <NavigationLink to={esCliente ? '/membresia' : '/perfil'} icon={UserRound}>{esCliente ? 'Mi membresía' : 'Perfil'}</NavigationLink>
             </ul>
           </div>
 
-          {puedeAbrirQr && (
-            <ul className="app-nav__list">
-              <NavigationLink to="/mi-qr" icon={QrCode}>Mi QR</NavigationLink>
-            </ul>
+          {esCliente && (
+            <div className="app-nav__group">
+              <p className="app-nav__heading" id="nav-servicios">Servicios</p>
+              <ul className="app-nav__list" aria-labelledby="nav-servicios">
+                {puedeAbrirQr && <NavigationLink to="/mi-qr" icon={QrCode}>Mi QR</NavigationLink>}
+                <NavigationLink to="/comprobantes" icon={ReceiptText}>Comprobantes · demo</NavigationLink>
+                <NavigationLink to="/canchas" icon={LayoutGrid}>Canchas · demo</NavigationLink>
+                {rolActivo === 'SOCIO' && <NavigationLink to="/clases" icon={CalendarDays}>Clases · demo</NavigationLink>}
+              </ul>
+            </div>
           )}
 
           {(rolActivo === 'RECEPCION' || rolActivo === 'GERENTE') && (
