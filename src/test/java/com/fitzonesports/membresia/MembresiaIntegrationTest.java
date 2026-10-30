@@ -3,6 +3,12 @@ package com.fitzonesports.membresia;
 import com.fitzonesports.membresia.dto.*;
 import com.fitzonesports.membresia.service.MembresiaService;
 import com.fitzonesports.acceso.service.AccesoService;
+import com.fitzonesports.acceso.dto.RegistrarIngresoRequest;
+import com.fitzonesports.acceso.dto.RegistrarSalidaRequest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import java.time.*;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -343,4 +349,80 @@ class MembresiaIntegrationTest {
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isForbidden());
     }
 
+
+    private MockMvc recepcionMvc() {
+        return org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
+                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity()).build();
+    }
+    private String bearerM2(String mail) { return "Bearer "+jwt.generateToken(detalles.loadUserByUsername(mail)); }
+    private String cuerpoQr(String qr) { return "{\"qrToken\":\""+qr+"\"}"; }
+
+    @Test void recepcionHttpIngresoSalidaYAforoSinDoblePresencia() throws Exception {
+        contratar(); var mvc=recepcionMvc(); String qr=accesos.generarQr(email).token();
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(qr)))
+                .andExpect(MockMvcResultMatchers.status().isCreated()).andExpect(jsonPath("$.sedeId").value(otraSede)).andExpect(jsonPath("$.titular.nombre").value("Test"));
+        mvc.perform(get("/accesos/sedes/"+otraSede+"/aforo").header("Authorization",bearerM2(recepcion)))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andExpect(jsonPath("$.ocupacionActual").value(1));
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(gerente)).contentType("application/json")
+                .content("{\"qrToken\":\""+qr+"\",\"sedeId\":"+sede+"}"))
+                .andExpect(MockMvcResultMatchers.status().isConflict());
+        mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(qr)))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andExpect(jsonPath("$.salida").isNotEmpty());
+        assertEquals(0,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
+        assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM registro_acceso WHERE sedeid=? AND fecha_hora_salida IS NOT NULL",Integer.class,otraSede));
+    }
+    @Test void recepcionSedeManipuladaNoAutorizaIngresoSalidaNiAforo() throws Exception {
+        contratar(); var mvc=recepcionMvc(); String qr=accesos.generarQr(email).token();
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(recepcion)).contentType("application/json")
+                .content("{\"qrToken\":\""+qr+"\",\"sedeId\":"+sede+"}"))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+        mvc.perform(get("/accesos/sedes/"+sede+"/aforo").header("Authorization",bearerM2(recepcion))).andExpect(MockMvcResultMatchers.status().isForbidden());
+        var ingreso=accesos.registrarIngreso(gerente,new RegistrarIngresoRequest(qr,sede));
+        for(String body:new String[]{cuerpoQr(qr),"{\"accesoId\":"+ingreso.id()+"}"})
+            mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(body)).andExpect(MockMvcResultMatchers.status().isForbidden());
+        assertEquals(1,accesos.consultarAforo(gerente,sede).ocupacionActual());
+    }
+    @Test void recepcionRolesHttpYPermisoExistenteDeGerente() throws Exception {
+        var mvc=recepcionMvc();
+        for(String ruta:new String[]{"/accesos/ingresos","/accesos/salidas"}) {
+            mvc.perform(post(ruta).contentType("application/json").content("{}")).andExpect(MockMvcResultMatchers.status().isUnauthorized());
+            mvc.perform(post(ruta).header("Authorization",bearerM2(email)).contentType("application/json").content(cuerpoQr("lectura"))).andExpect(MockMvcResultMatchers.status().isForbidden());
+        }
+        mvc.perform(get("/accesos/sedes/"+otraSede+"/aforo")).andExpect(MockMvcResultMatchers.status().isUnauthorized());
+        mvc.perform(get("/accesos/sedes/"+otraSede+"/aforo").header("Authorization",bearerM2(email))).andExpect(MockMvcResultMatchers.status().isForbidden());
+        mvc.perform(get("/accesos/qr").header("Authorization",bearerM2(recepcion))).andExpect(MockMvcResultMatchers.status().isForbidden());
+        contratar();
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(gerente)).contentType("application/json").content(cuerpoQr(accesos.generarQr(email).token()))).andExpect(MockMvcResultMatchers.status().isBadRequest());
+        mvc.perform(get("/usuarios/me").header("Authorization",bearerM2(recepcion))).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(jsonPath("$.sedeId").value(otraSede));
+        mvc.perform(get("/accesos/sedes/"+sede+"/aforo").header("Authorization",bearerM2(gerente))).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @Test void recepcionQrInvalidoVencidoReemplazadoYSuspension() throws Exception {
+        contratar(); var mvc=recepcionMvc();
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr("invalido"))).andExpect(MockMvcResultMatchers.status().isBadRequest());
+        String anterior=accesos.generarQr(email).token(); reloj.fijar("2026-01-31T15:00:02Z"); String actual=accesos.generarQr(email).token();
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(anterior))).andExpect(MockMvcResultMatchers.status().isConflict());
+        reloj.fijar("2026-01-31T15:01:04Z");
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(actual))).andExpect(MockMvcResultMatchers.status().isConflict());
+        actual=accesos.generarQr(email).token(); jdbc.update("UPDATE membresia SET suspendida=true,estado='SUSPENDIDA' WHERE usuarioid=?",usuario); entityManager.clear();
+        mvc.perform(post("/accesos/ingresos").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(actual))).andExpect(MockMvcResultMatchers.status().isForbidden());
+        assertEquals(0,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
+    }
+    @Test void recepcionAforoEsInformativoInclusoAlSuperarCapacidad() {
+        contratar(); jdbc.update("UPDATE sede SET capacidad_maxima=1 WHERE id=?",otraSede); entityManager.clear();
+        accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(accesos.generarQr(email).token(),null));
+        String segundo="segundo-"+UUID.randomUUID()+"@test.com"; crearUsuario(segundo,"USUARIO",sede);
+        service.contratar(segundo,new CrearMembresiaRequest(plan),UUID.randomUUID());
+        accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(accesos.generarQr(segundo).token(),null));
+        assertEquals(2,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
+        assertEquals(1,accesos.consultarAforo(recepcion,otraSede).capacidadMaxima());
+    }
+    @Test void recepcionSalidaExigeUnaIdentificacionYNoDuplica() throws Exception {
+        contratar(); var mvc=recepcionMvc(); String qr=accesos.generarQr(email).token();
+        var ingreso=accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(qr,null));
+        for(String body:new String[]{"{}","{\"accesoId\":"+ingreso.id()+",\"qrToken\":\""+qr+"\"}"})
+            mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(body)).andExpect(MockMvcResultMatchers.status().isBadRequest());
+        accesos.registrarSalida(recepcion,new RegistrarSalidaRequest(ingreso.id(),null));
+        mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content("{\"accesoId\":"+ingreso.id()+"}")).andExpect(MockMvcResultMatchers.status().isConflict());
+        mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(qr))).andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 }

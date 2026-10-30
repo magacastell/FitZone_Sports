@@ -77,3 +77,10 @@
   - Integró comprobantes de períodos reales con descarga autorizada, cards, importes argentinos, estados recuperables y feedback temporal. Mejoró nuevas emisiones PDF preservando documentos existentes y snapshots; explicitó límites del listado y de pagos antiguos sin PDF.
   - Ejecutó 56 tests backend (37 con PostgreSQL aislado), 77 verificaciones frontend de dominio/portal/comprobantes, 16 de Planes y 12 de transporte; builds frontend/backend correctos.
   - Repitió contratación y renovación fake por UI, descarga PDF real y revisión responsive. La auditoría previa quedó sin commit, push ni merge. El cierre fue aprobado para dos commits locales según la sección T de docs/refactor-actores-verificacion.md, con integración conjunta a la rama paraguas y sin push ni merge a main.
+
+- **Recepción — composición v0 e integración M2 (pendiente de revisión manual)**
+  - Auditó relación de usuario/sede, JWT y permisos; conservó sede única y restricciones backend, sin nueva decisión de arquitectura ni cambios a permisos.
+  - Portó scanner, Ingreso/Salida, resultado y aforo al sistema visual existente, con servicio M2, bloqueo inmediato, cleanup y refresco sin optimismo.
+  - Omitió movimientos ficticios y módulos 501; conservó Perfil, identidad real y selección existente de Gerente sin rediseñarlo.
+  - Ejecutó 62 tests backend (43 PostgreSQL), 97 verificaciones de dominio/portal/Recepción, 16 de Planes y 13 de transporte; builds correctos. Probó un ingreso/salida real y aforo 0→1→0, teclado y responsive.
+  - Documentó contrato y limitaciones en docs/m2-recepcion.md. Sin tiempo estimado, commit, push ni merge.

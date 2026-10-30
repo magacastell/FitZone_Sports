@@ -276,3 +276,18 @@ reintentar; bloqueo inmediato por ref y cleanup al desmontar. Loading/error/empt
 son distintos. Cuenta sin membresía vuelve al catálogo por URL directa; roles internos
 reciben una pantalla de no disponibilidad. La seguridad efectiva sigue en M5.
 Clases y Canchas permanecen fuera del menú; sus rutas sólo explican que no están disponibles.
+
+### Recepción: operación local (30/10/2026)
+
+Ver contrato, auditoría y pruebas en [Recepción y M2](m2-recepcion.md).
+La composición se porta de access-page.tsx de v0: heading con sede, toolbar, panel
+lector con Ingreso/Salida y resultado, card de aforo lateral. Se omiten el toggle
+fake de conexión y la tabla de movimientos (listado real 501). No mostrar códigos
+FZ o DNI como alternativas si la API sólo recibe QR. Labels de disponibilidad del
+puesto no certifican conexión física del lector. No copiar metadatos de 8 px: mínimo
+11-13 px y controles de 44 px, con foco visible. Selector por botones aria-pressed,
+input enfocable + Enter, resultado status/alert. No modales para cada escaneo.
+Aforo calculado por servidor, porcentaje neutral, capacidad informativa. Último dato
+con calculadoEn argentino/24 h y estado explícito si falla refresco. No simular aforo
+sumando/restando al aprobar. Sidebar de Recepción: Perfil + Operación/Control de acceso;
+Gerente conserva sus permisos existentes y Planes, sin ampliar capacidades.

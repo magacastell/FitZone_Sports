@@ -8,7 +8,7 @@ const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { transformSync } = require('esbuild');
 const sources = {
  layout:'src/components/Layout.jsx', perfil:'src/modules/m1-usuarios/MembresiaUsuario.jsx',contrato:'src/modules/m1-usuarios/ContratacionMembresia.jsx',cuenta:'src/modules/m1-usuarios/PerfilUsuario.jsx',renew:'src/modules/m1-usuarios/RenovacionMembresia.jsx',
- route:'src/routes/AppRoutes.jsx', qr:'src/modules/m2-acceso/SocioQRModal.jsx', login:'src/modules/auth/LoginPage.jsx', register:'src/modules/auth/RegisterPage.jsx', protected:'src/components/ProtectedRoute.jsx', receipts:'src/modules/m5-pagos/HistorialComprobante.jsx'
+ route:'src/routes/AppRoutes.jsx', qr:'src/modules/m2-acceso/SocioQRModal.jsx', login:'src/modules/auth/LoginPage.jsx', register:'src/modules/auth/RegisterPage.jsx', protected:'src/components/ProtectedRoute.jsx', receipts:'src/modules/m5-pagos/HistorialComprobante.jsx', recepcion:'src/modules/m2-acceso/ControlAccesoSede.jsx', lector:'src/modules/m2-acceso/LectorAcceso.jsx'
 };
 let current;
 const fragment = Symbol('fragment');
@@ -34,7 +34,7 @@ const react = {...hooks,Fragment:fragment,createElement:(t,p,...c)=>jsx(t,{...p,
 function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{promise,resolve,reject};}
 function storage(){const map=new Map;return{getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k)};}
 function env(){
- const e={shared:null,user:{rol:'USUARIO'},token:'sesion-A',members:[],profiles:[],plans:[],contracts:[],renewals:[],qrs:[],pdfs:[],downloads:[],revoked:[],timers:new Map(),timerId:0,nav:[],listeners:new Map(),runners:[],uuids:0,
+ const e={shared:null,user:{rol:'USUARIO'},token:'sesion-A',members:[],profiles:[],plans:[],contracts:[],renewals:[],qrs:[],pdfs:[],aforos:[],sedes:[],ingresos:[],salidas:[],downloads:[],revoked:[],timers:new Map(),timerId:0,nav:[],listeners:new Map(),runners:[],uuids:0,
  localStorage:storage(),sessionStorage:storage(),visibilityState:'visible'};
  e.localStorage.setItem('token',e.token);
  const call=(name,args)=>{const d=deferred();d.args=args;e[name].push(d);return d.promise;};
@@ -42,6 +42,7 @@ function env(){
   consultarMiMembresia:()=>call('members',[]),consultarMiPerfil:()=>call('profiles',[]),
   listarPlanes:()=>call('plans',[]),contratarMembresia:(...a)=>call('contracts',a),renovarMembresia:(...a)=>call('renewals',a)
  };
+ e.m2={consultarAforo:(...a)=>call('aforos',a),listarSedesAcceso:(...a)=>call('sedes',a),registrarIngreso:(...a)=>call('ingresos',a),registrarSalida:(...a)=>call('salidas',a)};
  e.focus=()=>{for(const f of e.listeners.get('focus')??[])f();};
  return e;
 }
@@ -54,7 +55,7 @@ async function runner(name,e,props={},target='default'){
   URL:{createObjectURL:()=> 'blob:pdf-real',revokeObjectURL:url=>e.revoked.push(url)},
   window:{addEventListener:(k,f)=>{if(!e.listeners.has(k))e.listeners.set(k,new Set);e.listeners.get(k).add(f);},removeEventListener:(k,f)=>e.listeners.get(k)?.delete(f),confirm:()=>true},
   crypto:{randomUUID:()=>{e.uuids++;return '00000000-0000-4000-8000-'+String(e.uuids).padStart(12,'0');}},
-  setTimeout:(fn,ms)=>{const id=++e.timerId;e.timers.set(id,{fn,ms});return id;},clearTimeout:id=>e.timers.delete(id),setInterval:()=>{e.intervals=(e.intervals||0)+1;return 2;},clearInterval:()=>{e.clearedIntervals=(e.clearedIntervals||0)+1;},
+  setTimeout:(fn,ms)=>{const id=++e.timerId;e.timers.set(id,{fn,ms});return id;},clearTimeout:id=>e.timers.delete(id),setInterval:(fn)=>{e.intervals=(e.intervals||0)+1;e.poll=fn;return 2;},clearInterval:()=>{e.clearedIntervals=(e.clearedIntervals||0)+1;},
   atob:s=>Buffer.from(s,'base64').toString()
  });
  vm.runInContext('globalThis = this',context);
@@ -74,10 +75,17 @@ async function runner(name,e,props={},target='default'){
   if(spec==='react-router-dom')return synthetic(router,context);
   if(spec.includes('AuthContext'))return synthetic({useAuth:()=>({token:e.token,user:e.user,loading:!!e.loading,login:e.login,register:e.register,isAuthenticated:!!e.token,logout:()=>{e.loggedOut=true;e.token=null;}})},context);
   if(spec.includes('m1Service'))return synthetic(e.services,context);
+  if(spec.includes('m2Service'))return synthetic(e.m2,context);
   if(spec.includes('pagosService'))return synthetic({descargarComprobante:id=>{const d=deferred();d.args=[id];e.pdfs.push(d);return d.promise;}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
-  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec.endsWith('LectorAcceso'))return synthetic({default:p=>{e.lectorProps=p;return jsx('lector',p);}},context);
+  if(spec.endsWith('useAforoSede')||spec.endsWith('TarjetaAforo')){
+   const file=spec.endsWith('useAforoSede')?'src/modules/m2-acceso/useAforoSede.js':'src/modules/m2-acceso/TarjetaAforo.jsx';
+   const child=new vm.SourceTextModule(transformSync(fs.readFileSync(file,'utf8'),{loader:'jsx',format:'esm',jsx:'automatic'}).code,{context});
+   await child.link(linker);await child.evaluate();return child;
+  }
   if(['PortalSocioCards','RenovacionMembresia','FitZoneUI','CatalogoPlanes','ContratacionMembresia','estadoCuenta'].some(n=>spec.endsWith(n))){
  const file=spec.endsWith('estadoCuenta')?'src/modules/m1-usuarios/estadoCuenta.js':spec.endsWith('CatalogoPlanes')?'src/modules/m1-usuarios/CatalogoPlanes.jsx':spec.endsWith('ContratacionMembresia')?'src/modules/m1-usuarios/ContratacionMembresia.jsx':spec.endsWith('FitZoneUI')?'src/components/ui/FitZoneUI.jsx':spec.endsWith('PortalSocioCards')?'src/modules/m1-usuarios/PortalSocioCards.jsx':'src/modules/m1-usuarios/RenovacionMembresia.jsx';
  const child=new vm.SourceTextModule(transformSync(fs.readFileSync(file,'utf8'),{loader:'jsx',format:'esm',jsx:'automatic'}).code,{context});
@@ -95,6 +103,7 @@ async function runner(name,e,props={},target='default'){
    if(n==null||typeof n!=='object')return n;
    if(Array.isArray(n))return n.map(expand);
    if(n.type?.name==='RenovacionMembresia'){e.renewalProps=n.props;return jsx('renewal',n.props);}
+   if(n.type==='input'&&n.props.ref)n.props.ref.current={focus:()=>{e.focos=(e.focos||0)+1;}};
    if(typeof n.type==='function')return expand(n.type(n.props));
    return{...n,props:{...n.props,children:expand(n.props.children)}};
   };
@@ -388,6 +397,85 @@ for(const status of [403,404,500,undefined])await test('PDF: error '+(status??'r
 await test('PDF: desmontaje ignora respuesta y limpia aviso temporal',async()=>{
  const e=paidEnv(),r=await runner('receipts',e);const p=button(r,'pago 42').props.onClick(),writes=r.writes;r.unmount();e.pdfs[0].resolve({});await p;assert.equal(r.writes,writes);assert.equal(e.downloads.length,0);
  const next=await runner('receipts',e);const q=button(next,'pago 42').props.onClick();e.pdfs[1].resolve({});await q;await settle(e);next.unmount();assert(![...e.timers.values()].some(t=>t.ms===4000));
+});
+
+
+for(const rol of ['USUARIO','RECEPCIONISTA','GERENTE'])await test('Recepcion URL: '+rol,async()=>{
+ const e=env();e.user.rol=rol;const r=await runner('recepcion',e);
+ if(rol==='USUARIO'){assert(nodes(r.view,n=>n.type==='navigate'&&n.props.to==='/perfil').length);assert.equal(e.profiles.length,0);}
+ else {assert.equal(r.tree.key,'sesion-A');assert.equal(e.profiles.length,1);}
+ assert.equal(e.members.length,0);
+});
+async function puesto(rol='RECEPCIONISTA'){
+ const e=env();e.user.rol=rol;const r=await runner('recepcion',e,{},'PuestoAcceso');
+ e.profiles[0].resolve({sedeId:12,sedeNombre:'Sede real'});
+ if(rol==='GERENTE')e.sedes[0].resolve([{id:12,nombre:'Sede real'},{id:13,nombre:'Otra real'}]);
+ await settle(e);return {e,r};
+}
+const aforoDto=(n=0,sedeId=12)=>({sedeId,ocupacionActual:n,capacidadMaxima:10,calculadoEn:'2026-10-30T12:00:00-03:00'});
+await test('Recepcion usa sede de perfil, no selector ni membresia ni sedes globales',async()=>{
+ const {e,r}=await puesto();assert.equal(e.sedes.length,0);assert.equal(e.members.length,0);assert.equal(e.aforos[0].args[0],12);
+ assert.equal(nodes(r.view,n=>n.type==='select').length,0);assert(text(r.view).includes('Sede real'));assert.equal(e.lectorProps.esGerente,false);
+});
+await test('Gerente conserva seleccion existente, nueva sede descarta aforo anterior',async()=>{
+ const {e,r}=await puesto('GERENTE');e.aforos[0].resolve(aforoDto(7));await settle(e);
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'13'}});r.render();
+ assert.equal(nodes(r.view,n=>n.props?.role==='progressbar').length,0,'No exponer aforo de sede anterior ni un render');await settle(e);
+ assert.equal(e.aforos[1].args[0],13);assert.equal(nodes(r.view,n=>n.props?.role==='progressbar').length,0);
+ e.aforos[1].resolve(aforoDto(2,13));await settle(e);assert.equal(e.lectorProps.sedeId,13);
+});
+await test('Recepcion error de perfil recuperable y desmontaje ignora respuesta',async()=>{
+ const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('recepcion',e,{},'PuestoAcceso');e.profiles[0].reject(err(500));await settle(e);
+ button(r,'Reintentar sede').props.onClick();await settle(e);const writes=r.writes;r.unmount();e.profiles[1].resolve({sedeId:12});await settle(e);assert.equal(r.writes,writes);assert.equal(e.aforos.length,0);
+});
+await test('Aforo real: loading, porcentaje y capacidad informativa sin umbrales inventados',async()=>{
+ const {e,r}=await puesto();assert(text(r.view).includes('Consultando aforo'));
+ e.aforos[0].resolve(aforoDto(12));await settle(e);const bar=nodes(r.view,n=>n.props.role==='progressbar')[0];
+ assert.equal(bar.props['aria-valuenow'],100);assert.equal(bar.props['aria-valuetext'],'120% de capacidad');assert(text(r.view).includes('Capacidad alcanzada'));assert(text(r.view).includes('no bloquea'));
+});
+await test('Aforo error inicial sin cero ficticio; retry muestra respuesta real',async()=>{
+ const {e,r}=await puesto();e.aforos[0].reject(err(500));await settle(e);assert.equal(nodes(r.view,n=>n.props.role==='progressbar').length,0);
+ const p=button(r,'Reintentar aforo').props.onClick();e.aforos[1].resolve(aforoDto(3));await p;await settle(e);assert.equal(nodes(r.view,n=>n.props.role==='progressbar')[0].props['aria-valuenow'],30);
+});
+await test('Aforo polling sin duplicar; POST invalida lectura vieja; error retiene dato marcado',async()=>{
+ const {e,r}=await puesto();e.aforos[0].resolve(aforoDto(0));await settle(e);e.poll();e.poll();assert.equal(e.aforos.length,2);
+ e.lectorProps.onMovimiento();assert.equal(e.aforos.length,3);e.aforos[2].resolve(aforoDto(1));await settle(e);e.aforos[1].resolve(aforoDto(0));await settle(e);
+ assert.equal(nodes(r.view,n=>n.props.role==='progressbar')[0].props['aria-valuenow'],10);
+ e.poll();e.aforos[3].reject(err(undefined));await settle(e);assert(text(r.view).includes('último dato disponible'));assert(text(r.view).includes('SIN ACTUALIZAR'));
+ r.unmount();assert.equal(e.clearedIntervals,1);
+});
+await test('Aforo desmontado no escribe, StrictMode descarta consulta previa',async()=>{
+ const {e,r}=await puesto();const writes=r.writes;r.unmount();e.aforos[0].resolve(aforoDto(5));await settle(e);assert.equal(r.writes,writes);
+ const x=env();x.user.rol='RECEPCIONISTA';const rx=await runner('recepcion',x,{},'PuestoAcceso');rx.strictEffects();assert.equal(x.profiles.length,2);
+ x.profiles[0].resolve({sedeId:99,sedeNombre:'Vieja'});x.profiles[1].resolve({sedeId:12,sedeNombre:'Actual'});await settle(x);assert.equal(x.aforos[0].args[0],12);
+});
+const accesoDto={id:88,sedeId:12,ingreso:'2026-10-30T12:00:00-03:00',salida:'2026-10-30T12:05:00-03:00',titular:{nombre:'Titular real',apellido:'Prueba'}};
+async function lector(){const e=env();e.refrescos=0;const r=await runner('lector',e,{sedeId:12,sedeNombre:'Sede real',esGerente:false,onMovimiento:()=>e.refrescos++});return{e,r};}
+function escanear(r,valor='Aa.Qr-Sensible'){nodes(r.view,n=>n.type==='input')[0].props.onChange({target:{value:valor}});r.render();return nodes(r.view,n=>n.type==='form')[0].props.onSubmit;}
+await test('Lector Enter/form preserva QR, bloqueo ref inmediato, limpia y recupera foco',async()=>{
+ const {e,r}=await lector(),submit=escanear(r,'  Aa.Qr-Sensible  '),p=submit({preventDefault(){}});submit({preventDefault(){}});
+ assert.equal(e.ingresos.length,1);assert.equal(e.ingresos[0].args[0],'Aa.Qr-Sensible');assert.equal(e.ingresos[0].args[1],undefined);
+ button(r,'Salida').props.onClick();r.render();assert.equal(button(r,'Ingreso').props['aria-pressed'],true);
+ e.ingresos[0].resolve(accesoDto);await p;await settle(e);assert.equal(e.refrescos,1);assert(text(r.view).includes('Acceso autorizado'));assert(text(r.view).includes('Titular real'));assert(e.focos>=2);
+ assert.equal(nodes(r.view,n=>n.type==='input')[0].props.value,'');
+});
+await test('Salida usa operacion real, no ingreso; cambio de modo limpia lectura y resultado',async()=>{
+ const {e,r}=await lector();escanear(r);button(r,'Salida').props.onClick();r.render();assert.equal(nodes(r.view,n=>n.type==='input')[0].props.value,'');
+ const p=escanear(r)( {preventDefault(){}});assert.equal(e.ingresos.length,0);assert.equal(e.salidas.length,1);e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).includes('Salida registrada'));assert.equal(e.refrescos,1);
+});
+for(const status of [400,403,404,409,500,undefined])await test('Lector rechazo/error '+(status??'red')+' sin exito ni optimismo',async()=>{
+ const {e,r}=await lector();const p=escanear(r)({preventDefault(){}});const error=err(status,'stack tecnico');if(status===409)error.data={detail:'El QR venció: pedí uno nuevo'};
+ e.ingresos[0].reject(error);await p;await settle(e);assert(!text(r.view).includes('stack tecnico'));assert(!text(r.view).includes('Acceso autorizado'));assert(nodes(r.view,n=>n.props.role==='alert').length);
+ assert.equal(e.refrescos,!status||status>=500?1:0);if(status===409)assert(text(r.view).includes('El QR venció'));
+ assert.equal(button(r,'Ingreso').props.disabled,false);
+});
+await test('Lector desmontado ignora resultado/callback; nueva sesion inicia limpia',async()=>{
+ const {e,r}=await lector();const p=escanear(r)({preventDefault(){}}),writes=r.writes;r.unmount();e.ingresos[0].resolve(accesoDto);await p;assert.equal(r.writes,writes);assert.equal(e.refrescos,0);
+ const next=await runner('lector',e,{sedeId:13,sedeNombre:'Otra cuenta',onMovimiento(){}});assert(!text(next.view).includes('Titular real'));assert.equal(nodes(next.view,n=>n.type==='input')[0].props.value,'');
+});
+await test('Recepcion token nuevo remonta contexto sin sede/datos previos',async()=>{
+ const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('recepcion',e);assert.equal(r.tree.key,'sesion-A');r.unmount();e.token='sesion-B';
+ const next=await runner('recepcion',e);assert.equal(next.tree.key,'sesion-B');assert.equal(e.lectorProps,undefined);assert(text(next.view).includes('Consultando tu sede'));
 });
 
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));

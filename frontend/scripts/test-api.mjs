@@ -45,4 +45,17 @@ await test('PDF binario usa el mismo transporte sin alterar JSON predeterminado'
  assert.equal(await api('/pagos/9/comprobante',{responseType:'blob',headers:{Accept:'application/pdf'}}),pdf);
  assert(!('responseType' in call[1]));assert.equal(call[1].headers.Accept,'application/pdf');
 });
+
+const m2=new vm.SourceTextModule(fs.readFileSync('src/services/m2Service.js','utf8'),{context});
+await m2.link(()=>mod);await m2.evaluate();
+await test('M2 GET aforo/sedes y POST ingreso/salida respetan contrato real',async()=>{
+ saved.set('token','jwt-real');response={ok:true,status:200,json:async()=>({id:1})};
+ await m2.namespace.consultarAforo(12);assert.equal(call[0],'/api/v1/accesos/sedes/12/aforo');assert.equal(call[1].method,undefined);
+ await m2.namespace.listarSedesAcceso();assert.equal(call[0],'/api/v1/sedes');
+ await m2.namespace.registrarIngreso('Aa.Qr');assert.equal(call[0],'/api/v1/accesos/ingresos');assert.equal(call[1].method,'POST');assert.equal(call[1].body,JSON.stringify({qrToken:'Aa.Qr'}));
+ assert.equal(call[1].headers['Idempotency-Key'],undefined);
+ await m2.namespace.registrarIngreso('Aa.Qr',12);assert.equal(call[1].body,JSON.stringify({qrToken:'Aa.Qr',sedeId:12}));
+ await m2.namespace.registrarSalida('Aa.Qr');assert.equal(call[0],'/api/v1/accesos/salidas');assert.equal(call[1].body,JSON.stringify({qrToken:'Aa.Qr'}));assert.equal(call[1].headers.Authorization,'Bearer jwt-real');
+});
+
 console.log('RESULTADO: '+passed+' aprobadas');

@@ -172,10 +172,10 @@ function LayoutAutenticado() {
 
           {(rolActivo === 'RECEPCION' || rolActivo === 'GERENTE') && (
             <div className="app-nav__group">
-              <p className="app-nav__heading" id="nav-gestion">Operación y gestión</p>
+              <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Operación' : 'Operación y gestión'}</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
                 {rolActivo === 'GERENTE' && <NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink>}
-                <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>Control de acceso y aforo</NavigationLink>
+                <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>{rolActivo === 'RECEPCION' ? 'Control de acceso' : 'Control de acceso y aforo'}</NavigationLink>
               </ul>
             </div>
           )}
