@@ -7,7 +7,7 @@ info:
     x-implementation-status: implemented = lógica funcional actual; stub = ruta existente sin caso de uso implementado. El HTTP 501 actual se registra sólo en x-implementation-note, nunca como respuesta objetivo.
     x-contract-status: stable = interfaz respaldada por código funcional o decisión técnica de contrato explícita; draft = interfaz de trabajo con reglas funcionales pendientes de validar por el equipo. Un stub puede tener contrato stable. Un implemented puede mantener propuestas de evolución sin convertirlas en requisitos.
     openapi.yaml es la fuente técnica de las partes stable. Las partes draft sirven para revisión y mocks; no obligan a otros módulos ni deben usarse como acuerdos definitivos para generar validaciones de negocio. x-contract-pending referencia temas P01–P12 de DECISIONES.md. x-propuesta-* preserva alternativas anteriores como metadata no normativa.
-    JWT/Bearer global. Login y registro públicos. GET /sedes conserva la autorización actual; su apertura pública está propuesta en P12. x-roles-actuales registra las anotaciones del controller, sin afirmar que existan validaciones funcionales de propiedad/sede en stubs. Las modificaciones de permisos se separan como propuestas.
+    JWT/Bearer global. Login y registro públicos. GET /sedes conserva la autorización actual; la elección de sede ocurre autenticada al contratar (P12). x-roles-actuales registra las anotaciones del controller, sin afirmar que existan validaciones funcionales de propiedad/sede en stubs. Las modificaciones de permisos se separan como propuestas.
     DTO implementados exactos; PATCH application/json con omitido/null = no modificar. Problem Details con code y errores de campo es objetivo técnico, no garantía del runtime actual. Paginación selectiva base 0, size 20 y máximo 100; operationId únicos en español.
     Campos/precios/estados futuros, coordinación entre módulos, métricas y políticas permanecen draft cuando falta implementación o acuerdo. Las rutas de membresías reflejan el backend con cobros fake y arrepentimiento por período; ver docs/membresias.md. La sincronización offline continúa como propuesta en DECISIONES.md.
 servers:
@@ -76,7 +76,7 @@ paths:
       - Auth
       summary: Registrar cliente
       description: Crea cliente con rol actual USUARIO. No permite elegir roles ni estado de membresía.
-        sedeId debe existir; email duplicado produce 409. DNI es único en BD, pero su conflicto todavía no se traduce
+        No recibe sede; el alta comercial queda sin sede habitual. Email duplicado produce 409. DNI es único en BD, pero su conflicto todavía no se traduce
         explícitamente en el servicio.
       operationId: registrarCliente
       x-implementation-status: implemented
@@ -89,8 +89,6 @@ paths:
                 $ref: '#/components/schemas/RegisterResponse'
         '400':
           $ref: '#/components/responses/Validacion'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
         '409':
           $ref: '#/components/responses/Conflicto'
       security: []
@@ -326,7 +324,7 @@ paths:
       - M1 · Usuarios
       summary: Listar sedes
       description: 'Lista autenticada de sedes como array del DTO actual: id, nombre, direccion y capacidadMaxima.
-        La apertura pública para el registro es una propuesta separada (P12), pendiente de validación; no se cambia
+        La elección al contratar reutiliza esta ruta autenticada (P12); no se cambia
         la autorización vigente por inferencia.'
       operationId: listarSedes
       x-implementation-status: implemented
@@ -355,7 +353,6 @@ paths:
       - USUARIO
       - RECEPCIONISTA
       - GERENTE
-      x-propuesta-security: []
       x-propuesta-pending:
       - P12
     post:
@@ -662,7 +659,10 @@ paths:
       description: |
         Contrato de la implementación con pasarela fake. Ver docs/membresias.md.
         Las operaciones personales requieren titularidad; gerente puede renovar y configurar otras cuentas.
-        Idempotency-Key es un UUID obligatorio. Reutilizarlo para reintentar la misma operación; otro plan devuelve 409.
+        Idempotency-Key es un UUID obligatorio. Reutilizarlo para reintentar la misma operación; otro plan o sede devuelve 409.
+        sedeId es obligatorio si el usuario no tiene sede habitual; si ya tiene, omitirlo conserva la actual y enviar otra produce 409.
+        Una sola membresía por usuario: posteriores períodos se agregan por renovación, que no cambia sede.
+        El alta confirma sede, membresía, período, pago y PDF en una transacción. Pago rechazado revierte todo, incluida sede.
       parameters:
       - name: Idempotency-Key
         in: header
@@ -2789,15 +2789,13 @@ components:
       x-contract-status: stable
     RegisterRequest:
       type: object
-      description: DTO actual. sedeId es obligatorio sin @Positive; el servidor comprueba existencia. El rol se
-        asigna como USUARIO.
+      description: Alta comercial sin sede habitual. El servidor asigna USUARIO y sede null; no acepta asignación de personal ni afiliación durante registro.
       required:
       - nombre
       - apellido
       - dni
       - email
       - password
-      - sedeId
       properties:
         nombre:
           type: string
@@ -2826,10 +2824,6 @@ components:
           pattern: .*\S.*
           writeOnly: true
           example: claveSegura123
-        sedeId:
-          type: integer
-          format: int32
-          example: 1
       x-contract-status: stable
     UsuarioResponse:
       type: object
@@ -2875,10 +2869,13 @@ components:
           example: USUARIO
         sedeId:
           type: integer
+          nullable: true
+          description: Sede habitual comercial, opcional antes del alta; sede operativa obligatoria del personal.
           format: int32
           example: 1
         sedeNombre:
           type: string
+          nullable: true
           example: Centro
       x-contract-status: stable
     ActualizarPerfilRequest:
@@ -3216,7 +3213,7 @@ components:
           type: integer
         sedeId:
           type: integer
-          description: Sede administrativa; no limita el acceso multi-sede.
+          description: Origen histórico del alta de la membresía, obligatorio e inmutable en este flujo. No limita acceso multisede ni sigue futuros cambios de sede habitual.
         planId:
           type: integer
           description: Plan del último período contratado no cancelado, usado para renovación automática.
@@ -3241,6 +3238,11 @@ components:
         planId:
           type: integer
           minimum: 1
+        sedeId:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Obligatoria si no existe sede habitual; si existe, sólo la misma u omitida. Integra la intención idempotente junto al plan.
     RenovarMembresiaRequest:
       type: object
       properties:

@@ -25,7 +25,7 @@ public record UsuarioResponse(
                 usuario.getFoto(),
                 usuario.isActivo(),
                 usuario.getRol().getNombre(),
-                usuario.getSede().getId(),
-                usuario.getSede().getNombre());
+                usuario.getSede() == null ? null : usuario.getSede().getId(),
+                usuario.getSede() == null ? null : usuario.getSede().getNombre());
     }
 }

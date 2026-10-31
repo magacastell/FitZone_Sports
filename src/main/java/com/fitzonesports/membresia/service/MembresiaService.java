@@ -20,6 +20,7 @@ public class MembresiaService {
     private final PeriodoMembresiaRepository periodos;
     private final PlanMembresiaRepository planes;
     private final UsuarioService usuarios;
+    private final com.fitzonesports.sede.service.SedeService sedes;
     private final CobroMembresiaService cobros;
     private final JdbcTemplate jdbc;
     private final Clock clock;
@@ -28,12 +29,13 @@ public class MembresiaService {
     private jakarta.persistence.EntityManager entityManager;
 
     public MembresiaService(MembresiaRepository membresias, PeriodoMembresiaRepository periodos,
-            PlanMembresiaRepository planes, UsuarioService usuarios, CobroMembresiaService cobros,
+            PlanMembresiaRepository planes, UsuarioService usuarios, com.fitzonesports.sede.service.SedeService sedes, CobroMembresiaService cobros,
             JdbcTemplate jdbc, Clock clock, com.fitzonesports.pago.service.ComprobanteService comprobantes) {
         this.membresias = membresias;
         this.periodos = periodos;
         this.planes = planes;
         this.usuarios = usuarios;
+        this.sedes = sedes;
         this.cobros = cobros;
         this.jdbc = jdbc;
         this.clock = clock;
@@ -67,22 +69,31 @@ public class MembresiaService {
         var repetido = periodos.findByClaveOperacion(operacion);
         if (repetido.isPresent()) {
             validarReintento(repetido.get(), request.planId());
-            return respuesta(cargar(repetido.get().getMembresiaId()));
+            var anterior = cargar(repetido.get().getMembresiaId());
+            if (request.sedeId() != null && !request.sedeId().equals(anterior.getSedeId()))
+                throw error(409,"La clave ya se uso con otra sede");
+            return respuesta(anterior);
         }
         if (membresias.findByUsuarioId(usuario.id()).isPresent()) {
             throw error(409,"Ya tenes una membresia; usa renovaciones para contratar otro periodo");
         }
         var plan = planActivo(request.planId());
+        Integer sedeId = request.sedeId() == null ? usuario.sedeId() : request.sedeId();
+        if (sedeId == null) throw error(400,"Elegi tu sede habitual para contratar");
+        if (usuario.sedeId() != null && !usuario.sedeId().equals(sedeId))
+            throw error(409,"La contratacion no permite cambiar tu sede habitual");
+        sedes.consultarSede(sedeId);
         var ahora = LocalDateTime.now(clock);
         var membresia = new Membresia();
         membresia.setUsuarioId(usuario.id());
-        membresia.setSedeId(usuario.sedeId());
+        membresia.setSedeId(sedeId);
         membresia.setPlanId(plan.getId());
         membresia.setFechaInicio(ahora);
         membresia.setFechaFin(ahora.plusMonths(plan.getDuracionMeses()));
         membresia.setEstado("ACTIVA");
         membresias.saveAndFlush(membresia);
         agregarPeriodo(membresia, plan, operacion);
+        usuarios.asignarSedeHabitualEnAlta(usuario.id(), sedeId);
         return respuesta(membresia);
     }
 

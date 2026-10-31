@@ -219,7 +219,7 @@ La contratación, renovación manual/automática, consulta histórica, suspensi�
 
 Login: `POST /api/v1/auth/login` con `{ "email": "...", "password": "..." }`, devuelve un JWT para usar como `Authorization: Bearer <token>` en el resto de los endpoints.
 
-Registro: `POST /api/v1/auth/register` con `{ "nombre": "...", "apellido": "...", "dni": "...", "email": "...", "password": "...", "sedeId": 1 }`. La sede indicada debe existir.
+Registro: `POST /api/v1/auth/register` con `{ "nombre": "...", "apellido": "...", "dni": "...", "email": "...", "password": "..." }`. El alta comercial queda sin sede habitual. Se elige al contratar con sesión iniciada; GET /sedes sigue autenticado.
 
 ## Estructura del backend
 

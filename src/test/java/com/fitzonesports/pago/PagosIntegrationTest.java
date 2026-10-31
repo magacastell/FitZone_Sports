@@ -75,7 +75,7 @@ class PagosIntegrationTest {
                 + "VALUES (?,?,(SELECT id FROM rol WHERE nombre=?),?,'María','Muñoz','test') RETURNING id",Integer.class,mail,mail,rol,sede);
     }
     private com.fitzonesports.membresia.dto.MembresiaResponse contratar() {
-        return membresias.contratar(email,new CrearMembresiaRequest(plan),UUID.randomUUID());
+        return membresias.contratar(email,new CrearMembresiaRequest(plan,null),UUID.randomUUID());
     }
     private String bearer(String mail) { return "Bearer " + jwt.generateToken(detalles.loadUserByUsername(mail)); }
     private void assertEstado(int esperado, org.junit.jupiter.api.function.Executable operacion) {

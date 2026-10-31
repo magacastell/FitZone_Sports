@@ -74,15 +74,15 @@ class MembresiaIntegrationTest {
         return jdbc.queryForObject("INSERT INTO usuario(dni,email,rolid,sedeid,nombre,apellido,contrasenia) "
                 + "VALUES (?,?,(SELECT id FROM rol WHERE nombre=?),?,'Test','Test','test') RETURNING id",Integer.class,mail,mail,rol,sedeId);
     }
-    private MembresiaResponse contratar() { return service.contratar(email,new CrearMembresiaRequest(plan),UUID.randomUUID()); }
+    private MembresiaResponse contratar() { return service.contratar(email,new CrearMembresiaRequest(plan,null),UUID.randomUUID()); }
     private void status(int esperado,org.junit.jupiter.api.function.Executable operacion) {
         assertEquals(esperado,assertThrows(ResponseStatusException.class,operacion).getStatusCode().value());
     }
 
     @Test void contratacionCobraUnaVezYConservaMesCalendario() {
         UUID clave=UUID.randomUUID();
-        var m=service.contratar(email,new CrearMembresiaRequest(plan),clave);
-        var replay=service.contratar(email,new CrearMembresiaRequest(plan),clave);
+        var m=service.contratar(email,new CrearMembresiaRequest(plan,null),clave);
+        var replay=service.contratar(email,new CrearMembresiaRequest(plan,null),clave);
         assertEquals(m.id(),replay.id());
         assertEquals(1,replay.periodos().size());
         assertEquals(LocalDate.of(2026,2,28),m.periodoVigente().fin().toLocalDate());
@@ -116,6 +116,76 @@ class MembresiaIntegrationTest {
         reloj.fijar("2026-03-05T15:00:00Z");
         var nueva=service.renovar(email,m.id(),new RenovarMembresiaRequest(null),UUID.randomUUID());
         assertEquals(LocalDate.of(2026,3,5),nueva.periodoVigente().inicio().toLocalDate());
+    }
+
+    @Test void vencimientoDerivadoRechazaQrPrevioYConservaSedeHistorialYPdf() {
+        var m=contratar();
+        var original=comprobarPdf(m.periodoVigente().pagoId());
+        reloj.fijar("2026-02-28T14:59:59Z");
+        var qr=accesos.generarQr(email);
+        reloj.fijar("2026-02-28T15:00:00Z");
+        var vencida=service.consultarPropia(email);
+        assertEquals("ACTIVA",jdbc.queryForObject("SELECT estado FROM membresia WHERE id=?",String.class,m.id()));
+        assertEquals("VENCIDA",vencida.estado());
+        assertNull(vencida.periodoVigente());
+        assertEquals(1,vencida.periodos().size());
+        assertEquals("VENCIDA",vencida.periodos().get(0).estado());
+        assertEquals(sede,jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+        assertEquals(sede,vencida.sedeId());
+        status(403,()->accesos.generarQr(email));
+        status(403,()->accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(qr.token(),null)));
+        assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM registro_acceso WHERE usuarioid=?",Integer.class,usuario));
+        assertArrayEquals(original,comprobarPdf(m.periodoVigente().pagoId()));
+    }
+
+    private byte[] comprobarPdf(Integer pago) {
+        return contexto.getBean(com.fitzonesports.pago.service.ComprobanteService.class).descargar(email,pago).contenido();
+    }
+
+    @Test void renovacionVencidaReplayNoDuplicaPagoPeriodoNiComprobanteNiReasignaSede() {
+        var m=contratar();
+        reloj.fijar("2026-03-15T15:00:00Z");
+        var clave=UUID.randomUUID();
+        var renovada=service.renovar(email,m.id(),new RenovarMembresiaRequest(plan),clave);
+        assertEquals("ACTIVA",renovada.estado());
+        assertEquals(LocalDateTime.of(2026,3,15,12,0),renovada.periodoVigente().inicio().toLocalDateTime());
+        assertEquals(LocalDateTime.of(2026,4,15,12,0),renovada.periodoVigente().fin().toLocalDateTime());
+        assertTrue(renovada.periodos().get(0).fin().isBefore(renovada.periodoVigente().inicio()));
+        assertEquals(2,service.renovar(email,m.id(),new RenovarMembresiaRequest(plan),clave).periodos().size());
+        status(409,()->service.renovar(email,m.id(),new RenovarMembresiaRequest(Integer.MAX_VALUE),clave));
+        assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
+        assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM comprobante c JOIN pago p ON p.id=c.pagoid WHERE p.usuarioid=?",Integer.class,usuario));
+        assertEquals(sede,jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+        assertEquals(m.sedeId(),renovada.sedeId());
+        assertNotNull(accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(accesos.generarQr(email).token(),null)));
+    }
+
+    @Test void periodoProgramadoMantieneContinuidadExactamenteAlFinalizarElAnterior() {
+        var m=contratar();
+        var renovada=service.renovar(email,m.id(),new RenovarMembresiaRequest(null),UUID.randomUUID());
+        assertEquals("PROGRAMADA",renovada.periodos().get(1).estado());
+        reloj.fijar(m.periodoVigente().fin().toInstant().toString());
+        var siguiente=service.consultarPropia(email);
+        assertEquals("ACTIVA",siguiente.estado());
+        assertEquals(renovada.periodos().get(1).id(),siguiente.periodoVigente().id());
+        assertEquals("VENCIDA",siguiente.periodos().get(0).estado());
+        assertTrue(service.tieneMembresiaVigente(usuario));
+        assertNotNull(accesos.generarQr(email));
+    }
+
+    @Test void reactivarDespuesDelVencimientoNoRegalaDiasNiBorraLaSede() {
+        var m=contratar();
+        service.actualizarEstado(gerente,m.id(),new ActualizarEstadoMembresiaRequest(ActualizarEstadoMembresiaRequest.Accion.SUSPENDER,"Control de prueba"));
+        assertNotNull(service.consultarPropia(email).periodoVigente());
+        reloj.fijar("2026-03-15T15:00:00Z");
+        assertEquals("SUSPENDIDA",service.consultarPropia(email).estado());
+        status(409,()->service.renovar(email,m.id(),new RenovarMembresiaRequest(null),UUID.randomUUID()));
+        var reactivada=service.actualizarEstado(gerente,m.id(),new ActualizarEstadoMembresiaRequest(ActualizarEstadoMembresiaRequest.Accion.REACTIVAR,"Control finalizado"));
+        assertEquals("VENCIDA",reactivada.estado());
+        assertNull(reactivada.periodoVigente());
+        assertEquals(m.periodoVigente().fin(),reactivada.periodos().get(0).fin());
+        assertEquals(sede,jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+        status(403,()->accesos.generarQr(email));
     }
 
     @Test void jobActualizaEstadosPersistidosYNoSóloLaRespuesta() {
@@ -258,7 +328,7 @@ class MembresiaIntegrationTest {
         try (var pool=java.util.concurrent.Executors.newFixedThreadPool(2)) {
             java.util.concurrent.Callable<MembresiaResponse> tarea=()->{
                 if (!inicio.await(10,java.util.concurrent.TimeUnit.SECONDS)) throw new IllegalStateException("Timeout");
-                return service.contratar(email,new CrearMembresiaRequest(plan),clave);
+                return service.contratar(email,new CrearMembresiaRequest(plan,null),clave);
             };
             var a=pool.submit(tarea); var b=pool.submit(tarea); inicio.countDown();
             assertEquals(a.get(20,java.util.concurrent.TimeUnit.SECONDS).id(),b.get(20,java.util.concurrent.TimeUnit.SECONDS).id());
@@ -333,7 +403,7 @@ class MembresiaIntegrationTest {
     @Test void registroLoginNoPermitenElegirPrivilegios() throws Exception {
         var usuarios=contexto.getBean(com.fitzonesports.usuario.service.UsuarioService.class);
         String nuevo="registro-"+UUID.randomUUID()+"@test.com";
-        var registrado=usuarios.registrarCliente(new com.fitzonesports.usuario.dto.RegisterRequest("Nuevo","Cliente",nuevo,nuevo,"password123",sede));
+        var registrado=usuarios.registrarCliente(new com.fitzonesports.usuario.dto.RegisterRequest("Nuevo","Cliente",nuevo,nuevo,"password123"));
         assertEquals("USUARIO",registrado.getRol().getNombre());
         assertFalse(service.tieneMembresiaVigente(registrado.getId()));
         var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
@@ -411,7 +481,7 @@ class MembresiaIntegrationTest {
         contratar(); jdbc.update("UPDATE sede SET capacidad_maxima=1 WHERE id=?",otraSede); entityManager.clear();
         accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(accesos.generarQr(email).token(),null));
         String segundo="segundo-"+UUID.randomUUID()+"@test.com"; crearUsuario(segundo,"USUARIO",sede);
-        service.contratar(segundo,new CrearMembresiaRequest(plan),UUID.randomUUID());
+        service.contratar(segundo,new CrearMembresiaRequest(plan,null),UUID.randomUUID());
         accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(accesos.generarQr(segundo).token(),null));
         assertEquals(2,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
         assertEquals(1,accesos.consultarAforo(recepcion,otraSede).capacidadMaxima());
@@ -425,4 +495,84 @@ class MembresiaIntegrationTest {
         mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content("{\"accesoId\":"+ingreso.id()+"}")).andExpect(MockMvcResultMatchers.status().isConflict());
         mvc.perform(post("/accesos/salidas").header("Authorization",bearerM2(recepcion)).contentType("application/json").content(cuerpoQr(qr))).andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+    @Test void sedeRegistroHttpSinAsignacionInclusoConCampoLegado() throws Exception {
+        var mvc=recepcionMvc();
+        for (String extra : new String[]{"", ",\"sedeId\":"+sede}) {
+            String mail="sin-sede-"+UUID.randomUUID()+"@test.com";
+            var registro=mvc.perform(post("/auth/register").contentType("application/json").content(
+                "{\"nombre\":\"Nuevo\",\"apellido\":\"Cliente\",\"dni\":\""+mail+"\",\"email\":\""+mail+"\",\"password\":\"password123\""+extra+"}"))
+                .andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
+            String token=new com.fasterxml.jackson.databind.ObjectMapper().readTree(registro.getResponse().getContentAsString()).get("token").asText();
+            mvc.perform(get("/usuarios/me").header("Authorization","Bearer "+token))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andExpect(jsonPath("$.rol").value("USUARIO"))
+                .andExpect(jsonPath("$.sedeId").value(org.hamcrest.Matchers.nullValue()))
+                .andExpect(jsonPath("$.sedeNombre").value(org.hamcrest.Matchers.nullValue()));
+            mvc.perform(get("/sedes")).andExpect(MockMvcResultMatchers.status().isUnauthorized());
+        }
+    }
+    @Test void sedeAltaSinAsignacionExigeEleccionYNoOtorgaPrivilegios() {
+        jdbc.update("UPDATE usuario SET sedeid=NULL WHERE id=?",usuario); entityManager.clear();
+        status(400,()->service.contratar(email,new CrearMembresiaRequest(plan,null),UUID.randomUUID()));
+        status(404,()->service.contratar(email,new CrearMembresiaRequest(plan,Integer.MAX_VALUE),UUID.randomUUID()));
+        assertFalse(service.tieneMembresiaVigente(usuario));
+        status(403,()->accesos.generarQr(email));
+        assertNull(jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+    }
+    @Test void sedeElegidaSePersisteConPagoOrigenYReplayInmutable() {
+        jdbc.update("UPDATE usuario SET sedeid=NULL WHERE id=?",usuario); entityManager.clear();
+        UUID clave=UUID.randomUUID(); var pedido=new CrearMembresiaRequest(plan,otraSede);
+        var alta=service.contratar(email,pedido,clave); entityManager.flush();
+        assertEquals(otraSede,alta.sedeId());
+        assertEquals(otraSede,jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+        assertEquals(alta.id(),service.contratar(email,pedido,clave).id());
+        status(409,()->service.contratar(email,new CrearMembresiaRequest(plan,sede),clave));
+        status(409,()->service.contratar(email,new CrearMembresiaRequest(Integer.MAX_VALUE,otraSede),clave));
+        assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
+        assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM comprobante c JOIN pago p ON p.id=c.pagoid WHERE p.usuarioid=?",Integer.class,usuario));
+        // Renovar no cambia sede ni origen. El QR puede usarse fuera de la habitual.
+        service.renovar(email,alta.id(),new RenovarMembresiaRequest(null),UUID.randomUUID());
+        var ingreso=accesos.registrarIngreso(gerente,new RegistrarIngresoRequest(accesos.generarQr(email).token(),sede));
+        assertEquals(sede,ingreso.sedeId());
+        assertEquals(otraSede,service.consultarPropia(email).sedeId());
+    }
+    @Test void sedeExistenteNoSeCambiaMedianteContratacion() {
+        status(409,()->service.contratar(email,new CrearMembresiaRequest(plan,otraSede),UUID.randomUUID()));
+        assertEquals(sede,jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+        assertEquals(sede,service.contratar(email,new CrearMembresiaRequest(plan,sede),UUID.randomUUID()).sedeId());
+        status(409,()->service.contratar(email,new CrearMembresiaRequest(plan,sede),UUID.randomUUID()));
+    }
+    @Test @Transactional(propagation=Propagation.NOT_SUPPORTED)
+    void sedeRechazoRevierteTodaElAlta() {
+        jdbc.update("UPDATE usuario SET sedeid=NULL WHERE id=?",usuario);
+        org.mockito.Mockito.doReturn(new com.fitzonesports.pago.pasarela.ResultadoCobro(
+            com.fitzonesports.pago.pasarela.ResultadoCobro.Estado.RECHAZADO,"rechazo","TEST"))
+            .when(pasarela).cobrar(org.mockito.ArgumentMatchers.any());
+        status(402,()->service.contratar(email,new CrearMembresiaRequest(plan,sede),UUID.randomUUID()));
+        assertNull(jdbc.queryForObject("SELECT sedeid FROM usuario WHERE id=?",Integer.class,usuario));
+        assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM membresia WHERE usuarioid=?",Integer.class,usuario));
+        assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
+    }
+    @Test @Transactional(propagation=Propagation.NOT_SUPPORTED)
+    void sedePersonalObligatoriaEnBaseAunqueUsuarioSeaNullable() {
+        for(String mail:new String[]{recepcion,gerente})
+            assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update("UPDATE usuario SET sedeid=NULL WHERE email=?",mail));
+        jdbc.update("UPDATE usuario SET sedeid=NULL WHERE id=?",usuario);
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update(
+            "UPDATE usuario SET rolid=(SELECT id FROM rol WHERE nombre='RECEPCIONISTA') WHERE id=?",usuario));
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update("UPDATE rol SET nombre='INTERNO' WHERE nombre='USUARIO'"));
+    }
+    @Test @Transactional(propagation=Propagation.NOT_SUPPORTED)
+    void sedeMigracionV7AV8ConservaAsignacionYFkYOrigen() {
+        String esquema="sede_upgrade_"+UUID.randomUUID().toString().replace("-","");
+        String url=System.getenv("PLAN_TEST_DB_URL");
+        org.flywaydb.core.Flyway.configure().dataSource(url,"postgres","").schemas(esquema).target("7").load().migrate();
+        jdbc.update("INSERT INTO "+esquema+".sede(id,nombre,capacidad_maxima) VALUES (5,'Existente',10)");
+        jdbc.update("INSERT INTO "+esquema+".usuario(dni,email,rolid,sedeid,nombre,apellido,contrasenia) VALUES ('x','x',(SELECT id FROM "+esquema+".rol WHERE nombre='USUARIO'),5,'x','x','x')");
+        org.flywaydb.core.Flyway.configure().dataSource(url,"postgres","").schemas(esquema).load().migrate();
+        assertEquals(5,jdbc.queryForObject("SELECT sedeid FROM "+esquema+".usuario WHERE email='x'",Integer.class));
+        assertEquals("YES",jdbc.queryForObject("SELECT is_nullable FROM information_schema.columns WHERE table_schema=? AND table_name='usuario' AND column_name='sedeid'",String.class,esquema));
+        assertEquals("NO",jdbc.queryForObject("SELECT is_nullable FROM information_schema.columns WHERE table_schema=? AND table_name='membresia' AND column_name='sedeid'",String.class,esquema));
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update("UPDATE "+esquema+".usuario SET sedeid=99999"));
+    }
+
 }

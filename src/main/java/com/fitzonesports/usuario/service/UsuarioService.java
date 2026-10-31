@@ -2,7 +2,6 @@ package com.fitzonesports.usuario.service;
 
 import com.fitzonesports.usuario.dto.RegisterRequest;
 import com.fitzonesports.auth.model.Rol;
-import com.fitzonesports.sede.model.Sede;
 import com.fitzonesports.auth.repository.RolRepository;
 import com.fitzonesports.sede.repository.SedeRepository;
 import com.fitzonesports.usuario.dto.ActualizarPerfilRequest;
@@ -44,8 +43,6 @@ public class UsuarioService {
 
         Rol rol = rolRepository.findByNombre(ROL_REGISTRO_PUBLICO)
                 .orElseThrow(() -> new IllegalStateException("Falta seedear el rol " + ROL_REGISTRO_PUBLICO));
-        Sede sede = sedeRepository.findById(request.sedeId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe"));
 
         Usuario usuario = Usuario.builder()
                 .nombre(request.nombre())
@@ -54,7 +51,6 @@ public class UsuarioService {
                 .email(request.email())
                 .contrasenia(passwordEncoder.encode(request.password()))
                 .rol(rol)
-                .sede(sede)
                 .build();
         return usuarioRepository.save(usuario);
     }
@@ -62,6 +58,20 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public UsuarioResponse consultarPerfil(String email) {
         return UsuarioResponse.from(cargarPorEmail(email));
+    }
+
+    /** Uso interno del alta M1, bajo bloqueo del titular y en la misma transaccion. */
+    @Transactional
+    public void asignarSedeHabitualEnAlta(Integer usuarioId, Integer sedeId) {
+        Usuario usuario = cargarPorId(usuarioId);
+        if (!"USUARIO".equals(usuario.getRol().getNombre())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un usuario comercial puede contratar");
+        }
+        if (usuario.getSede() != null && !usuario.getSede().getId().equals(sedeId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La contratacion no permite cambiar tu sede habitual");
+        }
+        usuario.setSede(sedeRepository.findById(sedeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe")));
     }
 
     /** Consulta interna de M2 (acceso): sin restriccion de sede, porque el QR de un socio vale en todas (RF-03). */
@@ -139,7 +149,7 @@ public class UsuarioService {
 
     private void validarSede(Usuario solicitante, Usuario objetivo) {
         if (esRecepcionista(solicitante)
-                && !solicitante.getSede().getId().equals(objetivo.getSede().getId())) {
+                && (objetivo.getSede() == null || !solicitante.getSede().getId().equals(objetivo.getSede().getId()))) {
             throw sedeAjena();
         }
     }
