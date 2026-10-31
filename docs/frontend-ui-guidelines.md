@@ -297,7 +297,9 @@ el navegador decide dónde guardar. Errores comprensibles, botón PDF habilitado
 reintentar; bloqueo inmediato por ref y cleanup al desmontar. Loading/error/empty
 son distintos. Cuenta sin membresía vuelve al catálogo por URL directa; roles internos
 reciben una pantalla de no disponibilidad. La seguridad efectiva sigue en M5.
-Clases y Canchas permanecen fuera del menú; sus rutas sólo explican que no están disponibles.
+En ese corte Clases y Canchas permanecían fuera del menú. La preparación posterior
+descrita en «Actividades y administración de sede» habilita sus vistas por actor;
+los servicios siguen pendientes y nunca se presentan reservas ficticias.
 
 ### Recepción: operación local (30/10/2026)
 
@@ -311,5 +313,6 @@ puesto no certifican conexión física del lector. No copiar metadatos de 8 px: 
 input enfocable + Enter, resultado status/alert. No modales para cada escaneo.
 Aforo calculado por servidor, porcentaje neutral, capacidad informativa. Último dato
 con calculadoEn argentino/24 h y estado explícito si falla refresco. No simular aforo
-sumando/restando al aprobar. Sidebar de Recepción: Perfil + Operación/Control de acceso;
-Gerente conserva sus permisos existentes y Planes, sin ampliar capacidades.
+sumando/restando al aprobar. Sidebar actual de Recepción: Perfil, Control de acceso,
+Aforo, Clases y Canchas. Gerente Central tiene navegación global separada, como se
+describe al inicio de esta guía; conserva permisos backend, sin operación local en UI.

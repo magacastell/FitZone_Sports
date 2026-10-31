@@ -1,7 +1,9 @@
 # Recepción, Clases y Canchas: preparación frontend
 
 Base: feature/integracion-final-frontend, 47e131cea679197641ca783a4f513ac3b8d9f4fa,
-limpia al iniciar. Sin commit, push ni merge. Cliente/Socio cerrado y backend intacto.
+limpia al iniciar. Bloque cerrado en `65e0eff`; las evidencias describen la revisión
+previa al commit. Cliente/Socio cerrado y backend intacto. Estado consolidado en
+[la entrega de integración](integracion-final-frontend.md).
 
 ## Fuentes y auditoría
 

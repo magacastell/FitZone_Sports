@@ -1,11 +1,16 @@
 # Recepción — control de acceso y aforo
 
-Estado: implementación en refactor/recepcion-ui, pendiente de revisión manual y commit.
+Estado: bloque aprobado e integrado en `b68e998`; el informe conserva el corte original
+de `refactor/recepcion-ui`. Sus menciones a revisión pendiente o contenedor retenido
+son históricas. Ver [estado final de la rama](integracion-final-frontend.md).
 Base: b2b3a11e4ec99d56891c604e845259ab5caf2224. Fecha: 30/10/2026.
 
 > Evolución posterior (sede habitual): V8/V9 permiten sede null sólo para USUARIO comercial.
 > El personal mantiene sede obligatoria; contexto y autorización de Recepción no cambian.
 > Ver [verificación](sede-habitual-verificacion.md). La auditoría debajo describe el corte original de este bloque.
+> Evolución posterior de UI: Admin de Sede conserva ingreso/salida, aforo y accesos a
+> Clases/Canchas preparados; Gerente Central consulta aforo global desde Panel y no
+> entra al puesto de Recepción. Los permisos backend M2 existentes no se revocaron.
 
 ## Auditoría del modelo actual
 

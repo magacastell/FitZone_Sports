@@ -104,3 +104,13 @@
 - **Cierre Cliente/Socio aprobado**
   - Revisión funcional y visual aprobada por el responsable. Separación autorizada en backend/DB y experiencia frontend/documentación, con integración conjunta a la rama paraguas.
   - Las entradas previas conservan los resultados y el estado histórico anterior al cierre. No se agregan funciones ni cambios cosméticos; sin push ni integración a main.
+
+- **Cierre definitivo de la rama de integración frontend**
+  - Partió de `65e0eff7da819f68d7c0c0eb5b4ca8830be86070` en `feature/integracion-final-frontend`, con índice vacío y doce archivos de Gerencia pendientes. Cerró ese bloque en `d5bb461`: Panel actual, Sedes, Usuarios/Membresías, Reportes preparados y separación del puesto de Recepción, sin backend nuevo.
+  - Contrastó el aporte completo con la base de creación verificable `3ee92e88b2e66e4e25b43b5e5f6c597af175e201`. Preparó `docs/integracion-final-frontend.md` con decisiones, alcance por actor, trazabilidad y pendientes M3/M4/reportes, sin atribuirlos como terminados.
+  - La limpieza se limitó a documentación: README actualizado, estados de cierre y evolución posterior de navegación aclarados en informes/guía/ADR. No cambió la decisión ADR-007 ni su conciliación histórica pendiente. No encontró una necesidad objetiva de borrar código o refactorizar componentes.
+  - Ejecutó las cinco suites frontend existentes: 140 dominio/UI, 16 Planes, 14 transporte, 18 M3/M4 y 7 Gerencia; 195 aprobadas. Build frontend correcto; sin nuevos tests, dependencias o runners en este cierre.
+  - Backend `mvnw.cmd verify`: 73 tests, cero fallos/errores/omitidos; 54 PostgreSQL reales (35 membresías/M2, 8 persistencia/migraciones, 11 pagos). Empaquetado/repackage correcto. Usó JDK 22.0.1 local con target 21 y zona America/Argentina/Buenos_Aires.
+  - El primer empaquetado falló por el JAR abierto en Windows, después de pasar los tests. Detuvo únicamente el backend local, repitió verify completo y lo reinició con la misma zona horaria y seed desactivado. No hubo cambios funcionales para resolverlo.
+  - Eliminó únicamente fitzone-cierre-test y su volumen anónimo, previa comprobación de exclusividad. Identidad/montaje de fitzone-postgres y fitzone_sports_fitzone_pgdata intactos; BD normal en V9 aceptando conexiones. No ejecutó fixtures ni pruebas contra la BD normal.
+  - `git diff --check` correcto. Capturas, logs y respaldos locales permanecen ignorados; no se incluyen en Git. No agregó tiempo, PR ni hashes aún inexistentes. El pedido autoriza publicar sólo esta rama sin force push; no autoriza integrar a main.

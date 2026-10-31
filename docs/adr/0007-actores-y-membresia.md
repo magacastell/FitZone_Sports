@@ -108,7 +108,10 @@ activa y beneficio de socio con ella, según la intención de dominio confirmada
 usuario. El importe, porcentaje y fórmula de M4 no están implementados ni acordados en
 el contrato draft. USUARIO habilita la operación futura; no concede una tarifa reducida.
 Los controllers siguen 501 y las pantallas directas informan no disponibilidad.
-Clases/Canchas quedan fuera del menú operativo para ambos actores hasta integración real.
+En el corte de esta decisión Clases/Canchas quedaron fuera del menú operativo.
+La preparación frontend posterior ofrece vistas de consulta por actor con mensajes
+de servicio pendiente; no habilita reservas ni cambia esta decisión de dominio.
+Ver [preparación M3/M4](../m3-m4-frontend.md).
 
 La lista de comprobantes reutiliza períodos con pagoId, incluso vencidos/cancelados:
 no equivale al listado financiero general de M5. Ordena por inicio del período, sin

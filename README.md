@@ -7,8 +7,10 @@ Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas 
 ## Stack
 
 - **Backend:** Java 21 + Spring Boot 4.1.1 (Maven), PostgreSQL, Flyway, Spring Data JPA, Spring Security + JWT
-- **Frontend:** React + Vite + React Router; login y registro conectados a la API, pantallas de negocio con datos de ejemplo.
-- **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, y a futuro `membresia`, `clase`, `reserva`, `pago`)
+- **Frontend:** React + Vite + React Router; Cliente/Socio, Recepción y Gerencia integrados según el soporte real de la API. Clases, Canchas y Reportes tienen frontend preparado y backend pendiente, con estados explícitos de no disponibilidad.
+- **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, `usuario`, `sede`, `membresia`, `acceso`, `clase`, `reserva`, `pago`, `reporte`). La presencia de un módulo no implica que su backend esté terminado.
+
+Entrega de la rama `feature/integracion-final-frontend`: [alcance, decisiones, pruebas y pendientes](docs/integracion-final-frontend.md).
 
 ## Requisitos
 
@@ -80,6 +82,7 @@ Con PostgreSQL local, conservá los valores del paso anterior. Luego, para ambas
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE = "dev"
+$env:JAVA_TOOL_OPTIONS = "-Duser.timezone=America/Argentina/Buenos_Aires"
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -340,7 +343,8 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 | reporte | GET | `/reportes/ingresos` | G | consultarIngresos |
 
 La autenticación existente (`POST /auth/login` y `POST /auth/register`) sigue
-implementada y pública. Los stubs no están conectados todavía al frontend.
+implementada y pública. El frontend de Clases, Canchas y Reportes consulta las rutas
+preparadas y presenta `501` como servicio pendiente; no ofrece operaciones ficticias.
 
 ### Planes de membresía
 
@@ -381,7 +385,7 @@ No prueban la validación de JWT.
 
 Para activar las pruebas de persistencia, definir `PLAN_TEST_DB_URL` con una URL
 JDBC hacia una base PostgreSQL **vacía y descartable**, usuario `postgres` y sin
-contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V6 y Hibernate valida
+contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V9 y Hibernate valida
 el mapeo. Estas pruebas verifican decimales, restricciones, orden y conservación
 de referencias de membresía al desactivar, concurrencia y actualización desde V2.
 Sin la variable se omiten.
