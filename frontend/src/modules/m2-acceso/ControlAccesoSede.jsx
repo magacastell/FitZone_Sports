@@ -13,7 +13,8 @@ import './ControlAccesoSede.css';
 export default function ControlAccesoSede() {
   const { user, token, loading } = useAuth();
   if (loading || !user) return <p role="status">Cargando sesión...</p>;
-  if (!['RECEPCIONISTA', 'GERENTE'].includes(user.rol)) return <Navigate to="/perfil" replace />;
+  if (user.rol === 'GERENTE') return <Navigate to="/gestion/panel" replace />;
+  if (user.rol !== 'RECEPCIONISTA') return <Navigate to="/perfil" replace />;
   return <PuestoAcceso key={token} />;
 }
 

@@ -170,8 +170,8 @@ for(const rol of ['USUARIO','RECEPCIONISTA'])await test('URL directa y menu rest
  const e=gestionEnv();e.user={rol};const r=await runner('gestion',e);assert(text(r.view).includes('No tenés permisos'));assert.equal(e.planGets.length,0);
  const l=await layout(e);assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/gestion/planes').length,0);
 });
-await test('gerente ve Planes e inicia alli; otros destinos conservados',async()=>{
- for(const [rol,destino]of [['GERENTE','/gestion/planes'],['RECEPCIONISTA','/recepcion/acceso'],['USUARIO','/membresia'],['USUARIO','/membresia']]){
+await test('gerente ve Planes e inicia Panel general; otros destinos conservados',async()=>{
+ for(const [rol,destino]of [['GERENTE','/gestion/panel'],['RECEPCIONISTA','/recepcion/acceso'],['USUARIO','/membresia'],['USUARIO','/membresia']]){
  const e=gestionEnv();e.user={rol};const l=await layout(e);assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/gestion/planes').length,rol==='GERENTE'?1:0);
  const r=await runner('route',e,{},'InicioPorRol');assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,destino);
  }

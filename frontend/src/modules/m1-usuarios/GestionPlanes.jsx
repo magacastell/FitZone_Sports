@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { listarPlanes, crearPlan, actualizarPlan, desactivarPlan } from '../../services/planesService';
+import '../gerencia/Gerencia.css';
 
 const FORMULARIO_INICIAL = { nombre: '', duracionMeses: '1', precio: '', activo: true };
 
@@ -119,7 +120,7 @@ function GestionPlanesContenido() {
 
   const bloqueado = ocupado || listado.estado === 'cargando';
   return (
-    <section style={{ maxWidth: '900px', background: '#fff', padding: '1.5rem', borderRadius: '8px' }}>
+    <section className="gerencia-planes">
       <h2>Planes de membresía</h2>
       {exito && <p role="status">{exito}</p>}
       {error && <p role="alert">{error}</p>}

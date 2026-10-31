@@ -25,6 +25,7 @@ const VISTA_POR_ROL = {
 };
 
 const TITULO_POR_RUTA = {
+  '/gestion/panel': 'Panel general', '/gestion/sedes': 'Sedes', '/gestion/usuarios': 'Usuarios y membresías', '/gestion/reportes': 'Reportes',
   '/recepcion/aforo': 'Aforo',
   '/perfil': 'Perfil', '/membresia': 'Mi membresía', '/gestion/planes': 'Planes de membresía',
   '/recepcion/acceso': 'Control de acceso', '/mi-qr': 'Mi QR',
@@ -151,7 +152,7 @@ function LayoutAutenticado() {
 
         <div className="app-sidebar__context">
           <span>Espacio de trabajo</span>
-          <strong>{clienteSinMembresia ? 'Cliente · Elegí tu plan' : nombreActor(user?.rol, membresia)}</strong>
+          <strong>{rolActivo === 'GERENTE' ? 'Gerente Central' : clienteSinMembresia ? 'Cliente · Elegí tu plan' : nombreActor(user?.rol, membresia)}</strong>
         </div>
 
         <nav className="app-nav" aria-label="Navegación principal">
@@ -178,10 +179,10 @@ function LayoutAutenticado() {
 
           {(rolActivo === 'RECEPCION' || rolActivo === 'GERENTE') && (
             <div className="app-nav__group">
-              <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Admin de Sede' : 'Operación y gestión'}</p>
+              <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Admin de Sede' : 'Administración global'}</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
-                {rolActivo === 'GERENTE' && <NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink>}
-                <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>{rolActivo === 'RECEPCION' ? 'Control de acceso' : 'Control de acceso y aforo'}</NavigationLink>
+                {rolActivo === 'GERENTE' && <><NavigationLink to="/gestion/panel" icon={LayoutGrid}>Panel general</NavigationLink><NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink><NavigationLink to="/gestion/sedes" icon={MapPin}>Sedes</NavigationLink><NavigationLink to="/gestion/usuarios" icon={UserRound}>Usuarios / Membresías</NavigationLink><NavigationLink to="/gestion/reportes" icon={ReceiptText}>Reportes</NavigationLink></>}
+                {rolActivo === 'RECEPCION' && <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>Control de acceso</NavigationLink>}
                 {rolActivo === 'RECEPCION' && <><NavigationLink to="/recepcion/aforo" icon={LayoutGrid}>Aforo</NavigationLink><NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink><NavigationLink to="/canchas" icon={List}>Canchas</NavigationLink></>}
               </ul>
             </div>
@@ -208,7 +209,7 @@ function LayoutAutenticado() {
           </div>
           <Link to="/perfil" className="app-user" aria-label={`Ver perfil de ${nombreCuenta}`}>
             <span className="app-user__avatar" aria-hidden="true">{iniciales}</span>
-            <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{nombreActor(user?.rol, membresia)}</span></span>
+            <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{rolActivo === 'GERENTE' ? 'Gerente Central' : nombreActor(user?.rol, membresia)}</span></span>
           </Link>
         </header>
         <main id="contenido" className="app-main" tabIndex={-1}>

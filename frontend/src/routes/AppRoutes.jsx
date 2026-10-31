@@ -5,6 +5,7 @@ import FeaturePlaceholder from '../components/FeaturePlaceholder';
 import PerfilUsuario from '../modules/m1-usuarios/PerfilUsuario';
 import MembresiaUsuario from '../modules/m1-usuarios/MembresiaUsuario';
 import GestionPlanes from '../modules/m1-usuarios/GestionPlanes';
+import Gerencia from '../modules/gerencia/Gerencia';
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
 import AforoSede from '../modules/m2-acceso/AforoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
@@ -20,7 +21,7 @@ import { useAuth } from '../context/AuthContext';
 function InicioPorRol() {
   const { user, loading } = useAuth();
   if (loading || !user) return <p role="status">Cargando sesión de FitZone...</p>;
-  if (user.rol === 'GERENTE') return <Navigate to="/gestion/planes" replace />;
+  if (user.rol === 'GERENTE') return <Navigate to="/gestion/panel" replace />;
   if (user.rol === 'USUARIO') return <Navigate to="/membresia" replace />;
   return <Navigate to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'} replace />;
 }
@@ -67,6 +68,10 @@ export default function AppRoutes() {
               <Route path="perfil" element={<PerfilUsuario />} />
               <Route path="membresia" element={<MembresiaUsuario />} />
               <Route path="gestion/planes" element={<GestionPlanes />} />
+              <Route path="gestion/panel" element={<Gerencia />} />
+              <Route path="gestion/sedes" element={<Gerencia vista="sedes" />} />
+              <Route path="gestion/usuarios" element={<Gerencia vista="usuarios" />} />
+              <Route path="gestion/reportes" element={<Gerencia vista="reportes" />} />
               <Route path="comprobantes" element={<HistorialComprobante />} />
               
               <Route path="recepcion/acceso" element={<ControlAccesoSede />} />

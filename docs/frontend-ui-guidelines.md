@@ -1,5 +1,18 @@
 # Guía visual del frontend de FitZone
 
+## Gerente Central
+
+El actor GERENTE usa alcance global, independiente de la sede de su perfil.
+Panel general resume estado actual con datos reales; Reportes es análisis histórico
+sujeto al backend disponible. No portar las series DEMO de v0. Sedes reutiliza el
+contrato real de nombre/dirección/capacidad y no inventa estados operativos.
+Usuarios y Membresías se consultan sin confundir sus IDs ni inferir vigencia en React.
+Ver [auditoría y verificación](gerencia-central-frontend.md).
+Reportes conserva la estructura futura de resumen/evolución/comparación con estados
+textuales de datos no disponibles; nunca mostrar gráficos ni KPIs de relleno.
+Gerente consulta aforo global desde Panel; el flujo de ingreso/salida queda en Admin
+de Sede. Esta separación visual no altera autorizaciones backend.
+
 ## Actividades y administración de sede
 
 Clases/Canchas reutilizan composición de las páginas de actividades v0: filtros por

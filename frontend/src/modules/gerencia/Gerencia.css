@@ -1,0 +1,30 @@
+.gerencia .panel { padding: 24px; }
+.gerencia .gerencia-kpis,.gerencia .gerencia-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,270px),1fr)); gap: 20px; }
+.gerencia .gerencia-grid { margin-top: 20px; }
+.gerencia .gerencia-numero { display: block; margin: 16px 0; font-size: 40px; color: #234a36; }
+.gerencia .gerencia-sede { min-width: 0; padding: 20px; border: 1px solid #dce5de; border-radius: 12px; overflow-wrap: anywhere; }
+.gerencia p { line-height: 1.6; }
+.gerencia .gerencia-form { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,210px),1fr)); gap: 18px; margin-bottom: 18px; }
+.gerencia label { display: grid; gap: 7px; margin-bottom: 14px; font-size: 14px; font-weight: 600; }
+.gerencia input,.gerencia select { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid #bbcdbf; border-radius: 8px; font: inherit; color: #1e2d26; background: white; }
+.gerencia fieldset { min-width: 0; padding: 0; border: 0; }
+.gerencia .gerencia-tabla { max-width: 100%; overflow-x: auto; margin-top: 20px; }
+.gerencia table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.gerencia th,.gerencia td { padding: 14px 12px; border-bottom: 1px solid #e2e9e3; }
+.gerencia th { background: #edf3ec; }
+.gerencia .fit-button { margin: 4px 8px 4px 0; }
+.gerencia .gerencia-reportes-resumen { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.gerencia .gerencia-reportes-series { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.gerencia .gerencia-datos-pendientes { padding-top: 14px; color: #52665a; font-size: 14px; }
+.gerencia .gerencia-reporte-vacio { display: flex; min-height: 170px; flex-direction: column; justify-content: center; align-items: center; padding: 20px; border: 1px dashed #c9d7cc; border-radius: 12px; background: #f6f8f5; text-align: center; }
+.gerencia .gerencia-reporte-vacio p { color: #344f3f; font-weight: 600; }
+.gerencia .gerencia-reporte-vacio span { color: #52665a; font-size: 13px; line-height: 1.6; }
+@media(max-width:1024px) { .gerencia .gerencia-reportes-resumen { grid-template-columns: minmax(0,1fr); } }
+@media(max-width:768px) { .gerencia .gerencia-reportes-series { grid-template-columns: minmax(0,1fr); } }
+.gerencia-planes { min-width: 0; padding: 24px; background: white; border: 1px solid #e2e9e3; border-radius: 14px; }
+.gerencia-planes h2 { margin-top: 0; font-size: 28px; color: #1e2d26; }
+.gerencia-planes :where(input,select) { max-width: 100%; min-height: 44px; padding: 8px; border: 1px solid #bbcdbf; border-radius: 8px; box-sizing: border-box; font: inherit; }
+.gerencia-planes th,.gerencia-planes td { padding: 14px 10px; border-bottom: 1px solid #e2e9e3; }
+.gerencia-planes th { background: #edf3ec; }
+.gerencia-planes .table-scroll { max-width: 100%; overflow-x: auto; }
+.gerencia-planes td button { min-height: 44px; padding: 8px; margin: 4px; border: 1px solid #bbcdbf; border-radius: 8px; background: white; color: #234a36; cursor: pointer; }

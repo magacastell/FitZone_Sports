@@ -9,6 +9,7 @@ const { transformSync } = require('esbuild');
 const sources = {
  servicios:'src/components/ServiciosSede.jsx',
  aforoLocal:'src/modules/m2-acceso/AforoSede.jsx',
+ gerente:'src/modules/gerencia/Gerencia.jsx',
  layout:'src/components/Layout.jsx', perfil:'src/modules/m1-usuarios/MembresiaUsuario.jsx',contrato:'src/modules/m1-usuarios/ContratacionMembresia.jsx',cuenta:'src/modules/m1-usuarios/PerfilUsuario.jsx',renew:'src/modules/m1-usuarios/RenovacionMembresia.jsx',
  route:'src/routes/AppRoutes.jsx', qr:'src/modules/m2-acceso/SocioQRModal.jsx', login:'src/modules/auth/LoginPage.jsx', register:'src/modules/auth/RegisterPage.jsx', protected:'src/components/ProtectedRoute.jsx', receipts:'src/modules/m5-pagos/HistorialComprobante.jsx', recepcion:'src/modules/m2-acceso/ControlAccesoSede.jsx', lector:'src/modules/m2-acceso/LectorAcceso.jsx'
 };
@@ -78,6 +79,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('AuthContext'))return synthetic({useAuth:()=>({token:e.token,user:e.user,loading:!!e.loading,login:e.login,register:e.register,isAuthenticated:!!e.token,logout:()=>{e.loggedOut=true;e.token=null;}})},context);
   if(spec.includes('m1Service'))return synthetic(e.services,context);
   if(spec.includes('sedesService'))return synthetic({listarSedes:e.services.listarSedes},context);
+  if(spec.includes('gerenciaService'))return synthetic(Object.fromEntries(['listarSedes','listarUsuarios','consultarAforo','crearSede','actualizarSede','consultarMembresia','consultarReporte'].map(nombre=>[nombre,(...args)=>{const d=deferred();d.args=args;(e.gerencia??={})[nombre]??=[];e.gerencia[nombre].push(d);return d.promise;}])),context);
   if(spec.includes('m3Service')||spec.includes('m4Service'))return synthetic({listarClases:id=>{const d=deferred();d.args=[id];(e.actividades??=[]).push(d);return d.promise;},listarCanchas:id=>{const d=deferred();d.args=[id];(e.actividades??=[]).push(d);return d.promise;}},context);
   if(spec.includes('m2Service'))return synthetic(e.m2,context);
   if(spec.includes('pagosService'))return synthetic({descargarComprobante:id=>{const d=deferred();d.args=[id];e.pdfs.push(d);return d.promise;}},context);
@@ -261,7 +263,7 @@ for(const rol of ['GERENTE','RECEPCIONISTA'])await test('perfil interno separado
  assert(text(r.view).includes('Cuenta interna'));assert(!text(r.view).includes('Mi membresía'));assert.equal(e.plans.length,0);assert.equal(e.members.length,0);
  const portal=await runner('perfil',e);assert.equal(nodes(portal.view,n=>n.type==='navigate')[0].props.to,'/perfil');
 });
-for(const [rol,ruta] of [['USUARIO','/membresia'],['RECEPCIONISTA','/recepcion/acceso'],['GERENTE','/gestion/planes']])await test('destino real '+rol,async()=>{
+for(const [rol,ruta] of [['USUARIO','/membresia'],['RECEPCIONISTA','/recepcion/acceso'],['GERENTE','/gestion/panel']])await test('destino real '+rol,async()=>{
  const e=env();e.user={rol};const r=await runner('route',e,{},'InicioPorRol');assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,ruta);
 });
 for(const status of [400,402,403,404,500,undefined])await test('contratacion conserva recuperacion '+(status??'red'),async()=>{
@@ -409,6 +411,7 @@ await test('PDF: desmontaje ignora respuesta y limpia aviso temporal',async()=>{
 for(const rol of ['USUARIO','RECEPCIONISTA','GERENTE'])await test('Recepcion URL: '+rol,async()=>{
  const e=env();e.user.rol=rol;const r=await runner('recepcion',e);
  if(rol==='USUARIO'){assert(nodes(r.view,n=>n.type==='navigate'&&n.props.to==='/perfil').length);assert.equal(e.profiles.length,0);}
+ else if(rol==='GERENTE'){assert(nodes(r.view,n=>n.type==='navigate'&&n.props.to==='/gestion/panel').length);assert.equal(e.profiles.length,0);}
  else {assert.equal(r.tree.key,'sesion-A');assert.equal(e.profiles.length,1);}
  assert.equal(e.members.length,0);
 });
@@ -650,5 +653,44 @@ await test('Aforo separado conserva sede real y transporte M2 existente',async()
 });
 await test('Aforo separado no se ofrece por URL a usuario comercial',async()=>{
  const e=env();const r=await runner('aforoLocal',e);assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,'/perfil');assert.equal(e.profiles.length,0);
+});
+for(const rol of ['USUARIO','RECEPCIONISTA'])await test('Gerencia guard rechaza '+rol,async()=>{
+ const e=env();e.user.rol=rol;const r=await runner('gerente',e);assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,'/perfil');assert.equal(e.gerencia,undefined);
+});
+await test('Gerente Central navega global sin capacidades comerciales ni dependencia de sede',async()=>{
+ const e=env();e.user.rol='GERENTE';const r=await layout(e);for(const ruta of ['panel','planes','sedes','usuarios','reportes'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href==='/gestion/'+ruta).length,1);assert(text(r.view).includes('Gerente Central'));assert.equal(e.members.length,0);
+});
+await test('Panel muestra cifras reales parciales y no fabrica recaudacion',async()=>{
+ const e=env();const r=await runner('gerente',e,{},'PanelGeneral');assert(text(r.view).includes('Consultando datos'));e.gerencia.listarSedes[0].resolve([]);e.gerencia.listarUsuarios[0].reject(err(500));await settle(e);assert(text(r.view).includes('No hay sedes'));assert(text(r.view).includes('No pudimos'));assert(!text(r.view).includes('$'));assert.equal(e.gerencia.consultarMembresia,undefined);
+});
+await test('Sedes guarda payload real con bloqueo inmediato y actualiza tras confirmacion',async()=>{
+ const e=env();const r=await runner('gerente',e,{},'Sedes');e.gerencia.listarSedes[0].resolve([]);await settle(e);for(const [i,value] of ['Nueva real','Dirección real','50'].entries()){nodes(r.view,n=>n.type==='input')[i].props.onChange({target:{value}});r.render();}
+ const submit=nodes(r.view,n=>n.type==='form')[0].props.onSubmit;const p=submit({preventDefault(){}});submit({preventDefault(){}});assert.equal(e.gerencia.crearSede.length,1);assert.deepEqual(JSON.parse(JSON.stringify(e.gerencia.crearSede[0].args[0])),{nombre:'Nueva real',direccion:'Dirección real',capacidadMaxima:50});e.gerencia.crearSede[0].resolve({id:7});await p;await settle(e);assert(text(r.view).includes('Sede guardada'));assert.equal(e.gerencia.listarSedes.length,2);
+});
+await test('Reporte 501 es pendiente y no muestra graficas ni numeros inventados',async()=>{
+ const e=env();const r=await runner('gerente',e,{filtros:{tipo:'ocupacion',desde:'2026-10-01',hasta:'2026-11-01',sedeId:''}},'ResultadoReporte');e.gerencia.consultarReporte[0].reject(err(501));await settle(e);assert(text(r.view).includes('aún no está disponible'));assert.equal(nodes(r.view,n=>n.type==='svg').length,0);
+});
+await test('Membresia administrativa consulta ID propio y desmontaje ignora resultado tardio',async()=>{
+ const e=env();const r=await runner('gerente',e,{id:77},'DetalleMembresia');assert.deepEqual(e.gerencia.consultarMembresia[0].args,[77]);r.unmount();const writes=r.writes;e.gerencia.consultarMembresia[0].resolve(dto());await settle(e);assert.equal(r.writes,writes);
+});
+await test('Sedes conflicto conserva formulario y no anuncia exito',async()=>{
+ const e=env();const r=await runner('gerente',e,{},'Sedes');e.gerencia.listarSedes[0].resolve([]);await settle(e);for(const [i,value] of ['Repetida','Dirección','30'].entries()){nodes(r.view,n=>n.type==='input')[i].props.onChange({target:{value}});r.render();}
+ const p=nodes(r.view,n=>n.type==='form')[0].props.onSubmit({preventDefault(){}});e.gerencia.crearSede[0].reject(err(409));await p;await settle(e);assert(text(r.view).includes('conflicto'));assert(!text(r.view).includes('Sede guardada'));assert.equal(nodes(r.view,n=>n.type==='input')[0].props.value,'Repetida');assert.equal(e.gerencia.listarSedes.length,1);
+});
+await test('Usuarios globales conserva autoridad y no inventa membresia por ID de usuario',async()=>{
+ const e=env();const r=await runner('gerente',e,{},'Usuarios');e.gerencia.listarUsuarios[0].resolve([{id:7,nombre:'Persona',apellido:'Real',email:'real@test',dni:'123',rol:'USUARIO',sedeNombre:null,activo:true}]);await settle(e);assert(text(r.view).includes('real@test'));assert(text(r.view).includes('Sin asignar'));assert.equal(e.gerencia.consultarMembresia,undefined);
+ nodes(r.view,n=>n.type==='input'&&n.props.type==='search')[0].props.onChange({target:{value:'inexistente'}});r.render();assert(text(r.view).includes('No hay usuarios para esta búsqueda'));
+});
+await test('Membresia administrativa vencida mantiene plan historico; 404 es error recuperable',async()=>{
+ const e=env();const r=await runner('gerente',e,{id:77},'DetalleMembresia');e.gerencia.consultarMembresia[0].resolve(dto('VENCIDA',{id:77,periodos:[{nombrePlan:'Plan histórico real',estado:'VENCIDA',inicio:'2020-01-01',fin:'2020-02-01'}]}));await settle(e);assert(text(r.view).includes('Plan histórico real'));assert(text(r.view).includes('Último período contratado'));button(r,'Actualizar membresía').props.onClick();await settle(e);e.gerencia.consultarMembresia[1].reject(err(404));await settle(e);assert(text(r.view).includes('No se encontró'));assert(!text(r.view).includes('Plan histórico real'));
+});
+await test('Reportes prepara resumen evolucion y comparacion sin KPIs ni graficos ficticios',async()=>{
+ const e=env();const r=await runner('gerente',e,{},'Reportes');e.gerencia.listarSedes[0].resolve([{id:1,nombre:'Sede real'}]);await settle(e);
+ for(const titulo of ['Resumen del período','Membresías','Accesos','Financiero / recaudación','Evolución','Accesos por período','Recaudación por período','Comparación por sede'])assert(text(r.view).includes(titulo));
+ assert(text(r.view).includes('Datos no disponibles: pendiente servicio de reportes'));assert.equal(e.gerencia.consultarReporte,undefined);assert.equal(nodes(r.view,n=>n.props.className==='gerencia-numero'||n.type==='svg'||n.props.role==='progressbar').length,0);
+ assert.equal(nodes(r.view,n=>n.type==='form').length,1);assert(text(r.view).includes('Consultar reporte'));
+});
+await test('Gerente sin operacion de acceso; Recepcion conserva navegacion operativa',async()=>{
+ for(const rol of ['GERENTE','RECEPCIONISTA']){const e=env();e.user.rol=rol;const r=await layout(e);for(const ruta of ['/recepcion/acceso','/recepcion/aforo'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===ruta).length,rol==='GERENTE'?0:1);if(rol==='RECEPCIONISTA')for(const ruta of ['/clases','/canchas'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===ruta).length,1);}
 });
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));
