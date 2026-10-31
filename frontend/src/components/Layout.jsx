@@ -25,6 +25,7 @@ const VISTA_POR_ROL = {
 };
 
 const TITULO_POR_RUTA = {
+  '/recepcion/aforo': 'Aforo',
   '/perfil': 'Perfil', '/membresia': 'Mi membresía', '/gestion/planes': 'Planes de membresía',
   '/recepcion/acceso': 'Control de acceso', '/mi-qr': 'Mi QR',
   '/comprobantes': 'Comprobantes', '/canchas': 'Canchas', '/clases': 'Clases',
@@ -154,6 +155,10 @@ function LayoutAutenticado() {
         </div>
 
         <nav className="app-nav" aria-label="Navegación principal">
+          {esCliente && <div className="app-nav__group"><p className="app-nav__heading">Actividades</p><ul className="app-nav__list">
+            {puedeAbrirQr && <NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink>}
+            <NavigationLink to="/canchas" icon={LayoutGrid}>Canchas</NavigationLink>
+          </ul></div>}
           <div className="app-nav__group">
             <p className="app-nav__heading" id="nav-usuario">{clienteSinMembresia ? 'Planes' : esCliente ? 'Mi espacio' : 'Mi cuenta'}</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
@@ -173,10 +178,11 @@ function LayoutAutenticado() {
 
           {(rolActivo === 'RECEPCION' || rolActivo === 'GERENTE') && (
             <div className="app-nav__group">
-              <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Operación' : 'Operación y gestión'}</p>
+              <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Admin de Sede' : 'Operación y gestión'}</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
                 {rolActivo === 'GERENTE' && <NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink>}
                 <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>{rolActivo === 'RECEPCION' ? 'Control de acceso' : 'Control de acceso y aforo'}</NavigationLink>
+                {rolActivo === 'RECEPCION' && <><NavigationLink to="/recepcion/aforo" icon={LayoutGrid}>Aforo</NavigationLink><NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink><NavigationLink to="/canchas" icon={List}>Canchas</NavigationLink></>}
               </ul>
             </div>
           )}

@@ -1,5 +1,14 @@
 # Guía visual del frontend de FitZone
 
+## Actividades y administración de sede
+
+Clases/Canchas reutilizan composición de las páginas de actividades v0: filtros por
+sede, paneles, pasos y estados vacíos. Datos demo, precios, disponibilidad y handlers
+locales de reserva no se trasladan. Los servicios reales responden 501; la UI lo
+expresa sin fingir catálogo vacío ni éxito. Ver [contratos y límites](m3-m4-frontend.md).
+Las ilustraciones SVG de public/canchas son recursos visuales locales por tipo,
+no fotos de una cancha real, ni fuente de estado/disponibilidad/precio.
+
 ## Alcance y arquitectura
 
 FitZone real utiliza React 18, Vite, React Router y backend Spring Boot/PostgreSQL.

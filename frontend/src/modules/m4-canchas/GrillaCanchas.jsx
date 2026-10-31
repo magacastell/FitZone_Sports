@@ -1,5 +1,5 @@
-import FeaturePlaceholder from '../../components/FeaturePlaceholder';
+import ServiciosSede from '../../components/ServiciosSede';
 
 export default function GrillaCanchas() {
-  return <FeaturePlaceholder title="Canchas" description="Las reservas de canchas todavía no están disponibles." />;
+  return <ServiciosSede />;
 }

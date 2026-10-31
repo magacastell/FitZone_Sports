@@ -6,6 +6,7 @@ import PerfilUsuario from '../modules/m1-usuarios/PerfilUsuario';
 import MembresiaUsuario from '../modules/m1-usuarios/MembresiaUsuario';
 import GestionPlanes from '../modules/m1-usuarios/GestionPlanes';
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
+import AforoSede from '../modules/m2-acceso/AforoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
 import AgendaClases from '../modules/m3-clases/AgendaClases';
 import GrillaCanchas from '../modules/m4-canchas/GrillaCanchas';
@@ -69,6 +70,7 @@ export default function AppRoutes() {
               <Route path="comprobantes" element={<HistorialComprobante />} />
               
               <Route path="recepcion/acceso" element={<ControlAccesoSede />} />
+              <Route path="recepcion/aforo" element={<AforoSede />} />
               <Route path="admin/canchas/mantenimiento" element={
                 <FeaturePlaceholder
                   title="Mantenimiento de canchas (M4)"

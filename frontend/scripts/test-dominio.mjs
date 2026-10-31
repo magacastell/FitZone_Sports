@@ -7,6 +7,8 @@ import { createRequire } from 'node:module';
 const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { transformSync } = require('esbuild');
 const sources = {
+ servicios:'src/components/ServiciosSede.jsx',
+ aforoLocal:'src/modules/m2-acceso/AforoSede.jsx',
  layout:'src/components/Layout.jsx', perfil:'src/modules/m1-usuarios/MembresiaUsuario.jsx',contrato:'src/modules/m1-usuarios/ContratacionMembresia.jsx',cuenta:'src/modules/m1-usuarios/PerfilUsuario.jsx',renew:'src/modules/m1-usuarios/RenovacionMembresia.jsx',
  route:'src/routes/AppRoutes.jsx', qr:'src/modules/m2-acceso/SocioQRModal.jsx', login:'src/modules/auth/LoginPage.jsx', register:'src/modules/auth/RegisterPage.jsx', protected:'src/components/ProtectedRoute.jsx', receipts:'src/modules/m5-pagos/HistorialComprobante.jsx', recepcion:'src/modules/m2-acceso/ControlAccesoSede.jsx', lector:'src/modules/m2-acceso/LectorAcceso.jsx'
 };
@@ -75,6 +77,8 @@ async function runner(name,e,props={},target='default'){
   if(spec==='react-router-dom')return synthetic(router,context);
   if(spec.includes('AuthContext'))return synthetic({useAuth:()=>({token:e.token,user:e.user,loading:!!e.loading,login:e.login,register:e.register,isAuthenticated:!!e.token,logout:()=>{e.loggedOut=true;e.token=null;}})},context);
   if(spec.includes('m1Service'))return synthetic(e.services,context);
+  if(spec.includes('sedesService'))return synthetic({listarSedes:e.services.listarSedes},context);
+  if(spec.includes('m3Service')||spec.includes('m4Service'))return synthetic({listarClases:id=>{const d=deferred();d.args=[id];(e.actividades??=[]).push(d);return d.promise;},listarCanchas:id=>{const d=deferred();d.args=[id];(e.actividades??=[]).push(d);return d.promise;}},context);
   if(spec.includes('m2Service'))return synthetic(e.m2,context);
   if(spec.includes('pagosService'))return synthetic({descargarComprobante:id=>{const d=deferred();d.args=[id];e.pdfs.push(d);return d.promise;}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
@@ -141,7 +145,8 @@ await test('USUARIO ACTIVA: QR por membresia, sin servicios demo',async()=>{
  const e=env(),l=await layout(e);
  assert.equal(e.shared.membresia.estado,'cargando');assert.equal(hasQr(l),false);assert.equal(e.members.length,1);
  await setMember(e,dto());assert.equal(hasQr(l),true);assert.equal(e.shared.rolActivo,'USUARIO');
- assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/canchas').length,0);
+ assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/canchas').length,1);
+ assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/clases').length,1);
 });
 for(const state of ['VENCIDA','SUSPENDIDA'])await test('USUARIO '+state+' sin QR ni selector',async()=>{
  const e=env();e.user.rol='USUARIO';const l=await layout(e);await setMember(e,dto(state));
@@ -586,7 +591,8 @@ await test('Cliente visual: plan antes de sede, cambio sin POST y seleccion text
 await test('Sidebar Cliente: experiencia real sin membresia y sin servicios ficticios',async()=>{
  const e=env(),r=await layout(e);assert(!text(r.view).includes('Cliente · Elegí tu plan'));await initialError(e,err(404));
  assert(text(r.view).includes('Cliente · Elegí tu plan'));assert(text(r.view).includes('EXPERIENCIA'));assert(text(r.view).includes('Sin membresía'));
- for(const href of ['/mi-qr','/comprobantes','/clases','/canchas','/gestion/planes'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===href).length,0);
+ for(const href of ['/mi-qr','/comprobantes','/clases','/gestion/planes'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===href).length,0);
+ assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href==='/canchas').length,1);
 });
 await test('aviso a siete dias: continuidad confirmada evita falsa urgencia',async()=>{
  const periodo={inicio:new Date(now-20*86400000).toISOString(),fin:new Date(now+5*86400000).toISOString()};
@@ -615,5 +621,34 @@ await test('suspendida muestra bloqueo sin QR ni una nueva renovacion',async()=>
 await test('reload consulta estado real y conserva historial sin convertir vencida a cliente nuevo',async()=>{
  const e=env(),primero=await layout(e);await setMember(e,dto());primero.unmount();const recargado=await layout(e);await setMember(e,dto('VENCIDA',{periodos:[{id:1,pagoId:44,estado:'VENCIDA'}]}));
  assert.equal(hasQr(recargado),false);assert.equal(e.shared.membresia.estado,'cargada');assert(nodes(recargado.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!text(recargado.view).includes('Elegí tu plan'));
+});
+for(const clases of [true,false])await test('Actividades '+clases+': habitual inicial, multisede y 501 honesto',async()=>{
+ const e=env();e.shared={puedeAbrirQr:true,membresia:{estado:'cargada',datos:dto()}};
+ const r=await runner('servicios',e,{clases},'VistaServicios');e.profiles[0].resolve({sedeId:12});e.sedes[0].resolve([{id:12,nombre:'Central real'},{id:28,nombre:'Otra real'}]);await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='select')[0].props.value,'12');assert.equal(e.actividades[0].args[0],'12');
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'28'}});await settle(e);e.actividades[0].resolve(clases?{items:[]}:[]);e.actividades[1].reject(err(501));await settle(e);
+ assert(text(r.view).includes('aún no están disponibles')||text(r.view).includes('aún no está disponible'));assert(!text(r.view).includes('Sin resultados'));
+ const count=e.profiles.length;button(r,'Actualizar consulta').props.onClick();await settle(e);assert.equal(e.profiles.length,count);assert.equal(e.actividades[2].args[0],'28');
+ r.unmount();const writes=r.writes;e.actividades[2].resolve(clases?{items:[]}:[]);await settle(e);assert.equal(r.writes,writes);
+});
+await test('Clases sin membresia activa no consulta servicios de socio',async()=>{
+ const e=env();e.shared={puedeAbrirQr:false,membresia:{estado:'cargada',datos:dto('VENCIDA')}};const r=await runner('servicios',e,{clases:true},'VistaServicios');assert.equal(e.profiles.length,0);assert.equal(e.actividades,undefined);assert(text(r.view).includes('membresía activa'));
+});
+await test('Recepcion actividades fija sede operativa y no consulta otras sedes',async()=>{
+ const e=env();e.user.rol='RECEPCIONISTA';e.shared={puedeAbrirQr:false,membresia:{estado:'no-aplica'}};const r=await runner('servicios',e,{clases:false},'VistaServicios');e.profiles[0].resolve({sedeId:28,sedeNombre:'Local'});await settle(e);assert.equal(e.sedes.length,0);assert(nodes(r.view,n=>n.type==='select')[0].props.disabled);assert.equal(e.actividades[0].args[0],'28');
+ e.actividades[0].reject(err(403));await settle(e);assert(text(r.view).includes('No tenés autorización'));assert(!text(r.view).includes('Sin resultados'));
+});
+await test('Cliente Canchas elige sede explicitamente sin fabricar recursos ni precio',async()=>{
+ const e=env();e.shared={puedeAbrirQr:false,membresia:{estado:'sin-membresia'}};const r=await runner('servicios',e,{clases:false},'VistaServicios');e.profiles[0].resolve({sedeId:null});e.sedes[0].resolve([{id:12,nombre:'Central'}]);await settle(e);assert.equal(e.actividades,undefined);assert.equal(nodes(r.view,n=>n.type==='select')[0].props.value,'');assert(!text(r.view).includes('$'));
+});
+for(const clases of [true,false])await test('Catalogo '+clases+' vacio real y respuesta ajena no se confunden con 501',async()=>{
+ const e=env();e.shared={puedeAbrirQr:true,membresia:{estado:'cargada',datos:dto()}};const r=await runner('servicios',e,{clases},'VistaServicios');e.profiles[0].resolve({sedeId:12});e.sedes[0].resolve([{id:12,nombre:'Real'}]);await settle(e);e.actividades[0].resolve(clases?{items:[]}:[]);await settle(e);assert(text(r.view).includes('Sin resultados'));
+ button(r,'Actualizar consulta').props.onClick();await settle(e);e.actividades[1].resolve(clases?{items:[{id:1,sedeId:99}]}:[{id:1,sedeId:99}]);await settle(e);assert(text(r.view).includes('no corresponde'));assert(!text(r.view).includes('Sin resultados'));
+});
+await test('Aforo separado conserva sede real y transporte M2 existente',async()=>{
+ const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('aforoLocal',e,{},'AforoLocal');e.profiles[0].resolve({sedeId:28,sedeNombre:'Sede operativa'});await settle(e);assert.equal(e.aforos[0].args[0],28);e.aforos[0].resolve({sedeId:28,ocupacionActual:2,capacidadMaxima:20,calculadoEn:'2026-10-30T12:00:00-03:00'});await settle(e);assert(text(r.view).includes('Sede operativa'));assert(text(r.view).includes('2'));r.unmount();
+});
+await test('Aforo separado no se ofrece por URL a usuario comercial',async()=>{
+ const e=env();const r=await runner('aforoLocal',e);assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,'/perfil');assert.equal(e.profiles.length,0);
 });
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));

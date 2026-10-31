@@ -1,5 +1,5 @@
-import FeaturePlaceholder from '../../components/FeaturePlaceholder';
+import ServiciosSede from '../../components/ServiciosSede';
 
 export default function AgendaClases() {
-  return <FeaturePlaceholder title="Clases" description="Las reservas de clases todavía no están disponibles." />;
+  return <ServiciosSede clases />;
 }
