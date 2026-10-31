@@ -1,7 +1,7 @@
 import { fetchAPI } from './api';
 
 export const consultarAforo = (sedeId) => fetchAPI(`/accesos/sedes/${sedeId}/aforo`);
-export const listarSedesAcceso = () => fetchAPI('/sedes');
+export { listarSedes as listarSedesAcceso } from './sedesService';
 
 export function registrarIngreso(qrToken, sedeId) {
   return fetchAPI('/accesos/ingresos', {

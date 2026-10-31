@@ -19,47 +19,56 @@ const moneda = (valor) => Number(valor).toLocaleString('es-AR', { style: 'curren
 
 
 // Solo presentación. Nunca determina el estado de membresía ni autoriza acceso.
-export function presentacionVigencia(periodo, ahora = Date.now()) {
+export function presentacionVigencia(periodo, ahora = Date.now(), periodos = []) {
   if (!periodo?.inicio || !periodo?.fin) return null;
   const inicio = Date.parse(periodo.inicio);
   const fin = Date.parse(periodo.fin);
   if (!Number.isFinite(inicio) || !Number.isFinite(fin) || fin <= inicio) return null;
   const dias = Math.max(0, Math.ceil((fin - ahora) / 86400000));
+  const continuidad = periodos.some((p) => p.estado === 'PROGRAMADA'
+    && Date.parse(p.inicio) <= fin && Date.parse(p.fin) > fin);
   return {
     porcentaje: Math.max(0, Math.min(100, (fin - ahora) / (fin - inicio) * 100)),
-    tono: dias > 5 ? 'normal' : dias >= 3 ? 'advertencia' : 'critico',
-    texto: ahora < inicio ? 'El período aún no comenzó' : dias === 0 ? 'Período finalizado' : `${dias} ${dias === 1 ? 'día restante' : 'días restantes'}`,
+    tono: continuidad || dias > 7 ? 'normal' : dias >= 3 ? 'advertencia' : 'critico',
+    texto: ahora < inicio ? 'El período aún no comenzó' : dias === 0 ? 'Período finalizado' : continuidad ? 'Próximo período confirmado' : `${dias} ${dias === 1 ? 'día restante' : 'días restantes'}`,
+    aviso: !continuidad && ahora >= inicio && dias > 0 && dias <= 7
+      ? `Tu membresía vence en ${dias} ${dias === 1 ? 'día' : 'días'}.` : null,
   };
 }
 
-function VigenciaPeriodo({ periodo, estado }) {
+function VigenciaPeriodo({ periodo, estado, periodos }) {
   const [ahora, setAhora] = useState(Date.now);
   useEffect(() => {
     const timer = setInterval(() => setAhora(Date.now()), 60000);
     return () => clearInterval(timer);
   }, []);
-  const vista = presentacionVigencia(periodo, ahora);
-  const texto = estado === 'VENCIDA' ? 'Membresía vencida' : vista?.texto;
+  const vista = presentacionVigencia(periodo, ahora, periodos);
+  const texto = estado === 'SUSPENDIDA' ? 'Acceso suspendido' : estado === 'VENCIDA' ? 'Membresía vencida' : vista?.texto;
   return <div className={`membership-period membership-period--${estado === 'VENCIDA' ? 'vencida' : vista?.tono || 'normal'}`}>
-    <div className="membership-period__heading"><span>Vigencia del período actual</span>{texto && <strong>{texto}</strong>}</div>
+    <div className="membership-period__heading"><span>{estado === 'SUSPENDIDA' ? 'Fechas del período contratado' : 'Vigencia del período actual'}</span>{texto && <strong>{texto}</strong>}</div>
     {vista && <div className="membership-progress" role="progressbar" aria-label="Tiempo restante del período" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(vista.porcentaje)} aria-valuetext={texto}>
       <span style={{ width: `${vista.porcentaje}%` }} />
     </div>}
     <div className="membership-period__dates"><span><span className="sr-only">Inicio: </span>{fecha(periodo.inicio)}</span><span><span className="sr-only">Fin: </span>{fecha(periodo.fin)}</span></div>
+    {estado === 'ACTIVA' && vista?.aviso && <p className="membership-expiry-notice" role="status">{vista.aviso} <a href="#renovacion-titulo">Renovar membresía</a></p>}
   </div>;
 }
 
 // JSX de MemberPage de v0; las props proceden del estado compartido S4.
-export function ResumenMembresia({ membresia, puedeAbrirQr, children }) {
+export function ResumenMembresia({ membresia, puedeAbrirQr, perfil, children }) {
   const datos = membresia.estado === 'cargada' ? membresia.datos : null;
   const periodo = datos?.periodoVigente;
+  const ultimo = datos?.periodos?.filter((p) => p.estado === 'VENCIDA')
+    .sort((a, b) => Date.parse(b.fin) - Date.parse(a.fin))[0];
+  const mostrado = periodo || ultimo;
+  const vencida = datos?.estado === 'VENCIDA';
   const programados = datos?.periodos?.filter((p) => p.estado === 'PROGRAMADA') || [];
   const etiquetas = { ACTIVA: 'Activa', VENCIDA: 'Vencida', SUSPENDIDA: 'Suspendida' };
   const tonos = { ACTIVA: 'success', VENCIDA: 'warning', SUSPENDIDA: 'danger' };
   const qrDisponible = puedeAbrirQr && datos?.estado === 'ACTIVA';
   return <article className="membership-card" aria-label="Resumen de membresía" aria-busy={membresia.estado === 'cargando'}>
     <div className="membership-card__top">
-      <span className="membership-card__eyebrow"><ShieldCheck aria-hidden="true" /> MEMBRESÍA ACTUAL</span>
+      <span className="membership-card__eyebrow"><ShieldCheck aria-hidden="true" /> {vencida ? 'ÚLTIMO PLAN CONTRATADO' : 'MEMBRESÍA ACTUAL'}</span>
       {datos && <StatusBadge tone={tonos[datos.estado] || 'neutral'}>{etiquetas[datos.estado] || datos.estado}</StatusBadge>}
     </div>
     {membresia.estado === 'cargando' && <p role="status">Cargando membresía...</p>}
@@ -67,10 +76,12 @@ export function ResumenMembresia({ membresia, puedeAbrirQr, children }) {
     {membresia.estado === 'error' && <div className="membership-card__main"><div><h3>No pudimos consultar tu membresía</h3><p>Volvé a consultar desde la opción de recuperación.</p></div></div>}
     {datos && <>
       <div className="membership-card__main">
-        <div><h3>{periodo?.nombrePlan || 'Sin período vigente'}</h3><p>{datos.estado === 'ACTIVA' ? 'Tu plan y las fechas de tu período contratado.' : datos.estado === 'SUSPENDIDA' ? 'Tu membresía está suspendida. Consultá con administración.' : 'Tu membresía está vencida. Podés renovar el último plan contratado.'}</p></div>
-        {periodo?.precio != null && <div className="membership-price"><strong>{moneda(periodo.precio)}</strong><span>por período de {periodo.duracionMeses} {periodo.duracionMeses === 1 ? 'mes' : 'meses'}</span></div>}
+        <div><h3>{mostrado?.nombrePlan || 'Sin período vigente'}</h3><p>{datos.estado === 'ACTIVA' ? 'Tu plan y las fechas de tu período contratado.' : datos.estado === 'SUSPENDIDA' ? 'Tu membresía está suspendida. Consultá con administración. La suspensión no extiende los períodos contratados.' : 'Renová tu membresía para recuperar el acceso al gimnasio y los beneficios de Socio. Conservás tu cuenta e historial.'}</p></div>
+        {mostrado?.precio != null && <div className="membership-price"><strong>{moneda(mostrado.precio)}</strong><span>por período de {mostrado.duracionMeses} {mostrado.duracionMeses === 1 ? 'mes' : 'meses'}</span></div>}
       </div>
-      {periodo ? <VigenciaPeriodo periodo={periodo} estado={datos.estado} /> : <p>No hay un período vigente.</p>}
+      {vencida && ultimo && <div className="membership-history" role="status"><p>Tu último período venció el <strong>{fecha(ultimo.fin)}</strong> (hora argentina).</p><p>Última vigencia: {fecha(ultimo.inicio)} → {fecha(ultimo.fin)}.</p></div>}
+      {perfil?.estado === 'cargado' && <p className="membership-home">Sede habitual: <strong>{perfil.datos.sedeNombre || 'Sin asignar'}</strong></p>}
+      {periodo ? <VigenciaPeriodo periodo={periodo} estado={datos.estado} periodos={datos.periodos} /> : <p>No hay un período vigente.</p>}
     </>}
     <div className="membership-card__footer">
       {datos && <div className="membership-next-period"><span className="membership-next-period__icon" aria-hidden="true"><CalendarDays /></span><span><small>{programados.length > 1 ? 'Períodos programados' : 'Próximo período'}</small>
@@ -84,7 +95,7 @@ export function ResumenMembresia({ membresia, puedeAbrirQr, children }) {
 
 export function DatosPersonales({ perfil, mostrarEnlace = true, rol, membresia }) {
   const datos = perfil.estado === 'cargado' ? perfil.datos : null;
-  const campos = datos ? [{ label: 'Correo electrónico', valor: datos.email, Icon: Mail }, { label: 'DNI', valor: datos.dni, Icon: Fingerprint }, { label: 'Sede', valor: datos.sedeNombre, Icon: MapPin }] : [];
+  const campos = datos ? [{ label: 'Correo electrónico', valor: datos.email, Icon: Mail }, { label: 'DNI', valor: datos.dni, Icon: Fingerprint }, { label: (rol || datos.rol) === 'USUARIO' ? 'Sede habitual' : 'Sede', valor: datos.sedeNombre || ((rol || datos.rol) === 'USUARIO' ? 'Sin asignar' : null), Icon: MapPin }] : [];
   return <DataCard className="member-profile-panel" title="Datos personales" description="Información asociada a tu cuenta FitZone." action={mostrarEnlace && <Link className="text-link" to="/perfil">Ver perfil <ArrowRight aria-hidden="true" /></Link>} aria-busy={perfil.estado === 'cargando'}>
     {perfil.estado === 'cargando' && <p role="status">Cargando perfil...</p>}
     {perfil.estado === 'error' && <p role="alert">No pudimos cargar tu perfil. {mensajePortal(perfil.mensaje)}</p>}

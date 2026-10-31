@@ -84,3 +84,23 @@
   - Omitió movimientos ficticios y módulos 501; conservó Perfil, identidad real y selección existente de Gerente sin rediseñarlo.
   - Ejecutó 62 tests backend (43 PostgreSQL), 97 verificaciones de dominio/portal/Recepción, 16 de Planes y 13 de transporte; builds correctos. Probó un ingreso/salida real y aforo 0→1→0, teclado y responsive.
   - Documentó contrato y limitaciones en docs/m2-recepcion.md. Sin tiempo estimado, commit, push ni merge.
+
+
+- **Sede habitual durante primera contratación — pendiente de revisión manual**
+  - Eliminó sede hardcodeada del registro; perfil nullable, elección real al contratar y origen histórico de membresía, sin restringir multisede.
+  - Agregó V8/V9 preservando datos/FK y sede obligatoria del personal; documentó corrección forward-only por aplicación automática inicial de DevTools, sin repair ni downgrade.
+  - Conservó transacción M1/M5, rollback de pago, idempotencia plan+sede, recuperación por sesión y renovación sin reasignación; reutilizó lectura autenticada de sedes.
+  - Verificó 69 tests backend (50 PostgreSQL), 111 de dominio/portal/Recepción, 16 de Planes y 14 de transporte; builds correctos. E2E con nueva cuenta, contratación fake, QR, PDF y F5; segunda cuenta Cliente para revisión.
+  - Actualizó P12, OpenAPI, membresías e informe de integración. Sin tiempo/hash/PR inventados; sin commit, push ni merge.
+
+- **Ciclo Cliente/Socio — pendiente de revisión final**
+  - Auditó vencimiento derivado, sincronización existente, suspensión administrativa y renovación max(último fin, ahora); conservó backend, V1–V9, sede, multisede e idempotencia.
+  - Diferenció Cliente nuevo, ACTIVA, VENCIDA y SUSPENDIDA; recuperó plan/vigencia histórica y agregó aviso visual <=7 días sin falsa urgencia cuando hay continuidad programada.
+  - Ejecutó 73 tests backend (54 PostgreSQL aislado), 119 frontend de dominio/portal/Recepción, 16 Planes y 14 transporte; builds correctos y diff sin errores de whitespace.
+  - Probó contratación, renovación anticipada/vencida, QR real, perfil, comprobantes y F5 por UI/HTTP; replay sin duplicados. Revisó responsive 390/768/1024/1280/1440.
+  - Conservó cuentas locales de fixture identificadas para revisión; respaldo previo, sin alterar datos anteriores. Eliminó sólo PostgreSQL temporal de tests y su volumen exclusivo. Documentó preparación y límites en docs/ciclo-vida-membresia-verificacion.md.
+  - Sin commit, push ni merge; sin tiempo, hash o PR nuevos inventados.
+
+- **Cierre Cliente/Socio aprobado**
+  - Revisión funcional y visual aprobada por el responsable. Separación autorizada en backend/DB y experiencia frontend/documentación, con integración conjunta a la rama paraguas.
+  - Las entradas previas conservan los resultados y el estado histórico anterior al cierre. No se agregan funciones ni cambios cosméticos; sin push ni integración a main.

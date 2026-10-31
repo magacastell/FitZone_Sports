@@ -37,7 +37,7 @@ Se considera confirmado lo verificable en estas fuentes locales, con su alcance 
 |---|---|---|
 | Controladores de Auth, usuario, sede, membresía, acceso, clase, reserva, pago y reporte en `src/main/java/com/fitzonesports/` | Rutas y anotaciones de autorización; membresías cuenta con implementación y pruebas PostgreSQL/HTTP. | Una anotación de rol por sí sola no implementa propiedad, sede, vigencia, precios ni cupos. |
 | `auth/controller/AuthController.java`, `auth/dto/`, `usuario/dto/RegisterRequest.java`, `auth/security/SecurityConfig.java` | Login/registro públicos con JWT; campos de sus DTO; registro devuelve token con 201. Las demás rutas requieren autenticación en la configuración actual. | No confirma apertura pública de sedes ni una separación nueva de actores/roles. |
-| `usuario/service/UsuarioService.java`, `usuario/dto/` | Registro asigna CLIENTE_EXTERNO; email duplicado produce 409; sede inexistente 404. Perfil propio deriva del JWT. Recepción lista/consulta usuarios de su sede, incluidos miembros del personal; sólo puede modificar SOCIO_ACTIVO/CLIENTE_EXTERNO. Gerente opera todas las sedes/roles. Nadie desactiva su propia cuenta. PATCH omitido/null no modifica. | Reglas de sede verificadas en usuarios no se generalizan automáticamente a los stubs de otros módulos. DNI único no tiene traducción explícita de excepción a 409. |
+| `usuario/service/UsuarioService.java`, `usuario/dto/` | Registro asigna USUARIO sin sede; email duplicado produce 409. Perfil propio deriva del JWT. Recepción lista/consulta usuarios de su sede, incluidos miembros del personal; sólo puede modificar USUARIO. Gerente opera todas las sedes/roles. Nadie desactiva su propia cuenta. PATCH omitido/null no modifica. | Reglas de sede verificadas en usuarios no se generalizan automáticamente a los stubs de otros módulos. DNI único no tiene traducción explícita de excepción a 409. |
 | `sede/service/SedeService.java`, `sede/dto/` | DTO de sede, nombre único sin distinguir mayúsculas, capacidad positiva y creación/modificación sólo Gerente. Lectura hoy autenticada. | No confirma una regla de rechazo de acceso por capacidad ni que capacidad sea pública. |
 | `membresia/controller/PlanController.java`, `membresia/service/PlanService.java`, DTO de planes, V3 y pruebas de planes | GET/POST/PATCH/DELETE funcionales. Plan global con precio decimal en ARS, duración 1/3/12, nombre único sin distinguir mayúsculas y baja/reactivación lógica. Lectura activa por defecto; incluir inactivos sólo Recepción/Gerente; escrituras sólo Gerente. | No implementa contratación, renovación, beneficios, restricciones por sede ni conservación de condiciones contratadas. |
 | V1/V2 en `src/main/resources/db/migration/` | Hay registros de usuario/sede, roles actuales, tablas iniciales de membresía/plan, acceso, clase, espera, penalización, cancha/turno, reservas, pago y comprobante; unicidad de DNI/email y de comienzo de turno por cancha. `duracion_meses` está en el esquema inicial. | Las tablas no prueban un workflow completo, reglas temporales, períodos históricos separados, fórmula de tarifa, compensación ni estado funcional definitivo. No equivalen a servicios implementados. |
@@ -55,7 +55,7 @@ Las restantes 37 operaciones mantienen sus schemas útiles como draft. Su ruta y
 Estas decisiones estructuran la interfaz y **no adjudican al equipo reglas comerciales**:
 
 - OpenAPI 3.0.3, único punto de entrada `openapi.yaml`, servidor local `http://localhost:3000/api/v1`, paths relativos al prefijo, textos en español y operationId camelCase únicos.
-- JWT/Bearer global, login/registro públicos. La seguridad de `GET /sedes` queda como en el código actual; apertura pública sólo como `x-propuesta-security: []` y P12. `x-roles-actuales` no se usa para inferir nuevos permisos. `x-propuesta-permisos` contiene alternativas futuras, sin ampliar autorización por sí mismo.
+- JWT/Bearer global, login/registro públicos. La seguridad de `GET /sedes` queda como en el código actual; elección autenticada al contratar según P12, sin apertura pública. `x-roles-actuales` no se usa para inferir nuevos permisos. `x-propuesta-permisos` contiene alternativas futuras, sin ampliar autorización por sí mismo.
 - Reutilización de schemas, responses, parameters, headers y securitySchemes. Los trece DTO implementados conservan campos/tipos/restricciones. Los DTO de planes usan precio numérico en ARS, no el objeto monetario draft de otros módulos. Se mantiene `application/json` en PATCH con omitido/null = no modificar; no es JSON Merge Patch.
 - Errores objetivo Problem Details con `code` y errores de campo: 400 formato/validación, 401 autenticación, 403 autorización, 404 inexistente, 409 conflicto, 412 sólo precondición de versión vieja. Backend actual aún no garantiza esa representación uniforme.
 - 201 al crear, 200 con representación, 204 sin cuerpo. 501 no es respuesta del caso de uso objetivo; sólo información del estado actual del stub.
@@ -88,7 +88,7 @@ Validación técnica: Redocly sin agregar dependencias al proyecto, sintaxis YAM
 - **Tema:** aislamiento por sede fuera de los usuarios ya implementados.
 - **Qué está confirmado:** usuarios y recursos del esquema están asociados a sedes; UsuarioService restringe Recepción y permite Gerente global. Los stubs tienen roles autorizados, sin validación de sede.
 - **Qué falta decidir:** alcance exacto de cada operación de personal, cuándo derivar sede de sesión o aceptar sedeId, qué servicios puede usar un cliente en otras sedes y si Recepción accederá a reembolsos/pagos asistidos.
-- **Propuesta actual:** Recepción sólo su sede operativa, Gerente global; sede de registro no limita por sí sola servicios de cliente. Recepción procesa devoluciones normales; Gerente autoriza excepciones financieras.
+- **Propuesta actual:** Recepción sólo su sede operativa, Gerente global; sede habitual no limita por sí sola servicios de cliente (P12). Recepción procesa devoluciones normales; Gerente autoriza excepciones financieras.
 - **Motivo de la propuesta:** aislamiento operativo con administración global y permisos financieros explícitos.
 - **Módulos afectados:** M1–M5 y reportes.
 - **Impacto si cambia:** filtros, sedeId en entradas, autorización, visibilidad de recursos y frontend de personal. No cambia silenciosamente las reglas de usuarios ya implementadas.
@@ -195,16 +195,16 @@ Validación técnica: Redocly sin agregar dependencias al proyecto, sintaxis YAM
 - **Impacto si cambia:** campos/filtros, consultas agregadas, interpretación de ingresos y comparación por período/sede.
 - **Estado:** PENDIENTE DE VALIDACIÓN DEL EQUIPO.
 
-### P12 — Sedes públicas para registro (D5)
+### P12 — Sede habitual en la primera contratación
 
-- **Tema:** elección de sede sin sesión.
-- **Qué está confirmado:** el registro exige sedeId existente; GET /sedes devuelve DTO y requiere autenticación actualmente, también en @PreAuthorize.
-- **Qué falta decidir:** abrir esa misma ruta, crear una proyección pública mínima u otra forma de elegir sede; campos visibles antes de autenticación, incluida capacidad.
-- **Propuesta actual:** abrir GET /sedes para registro y evitar una sede hardcodeada. No se cambia su seguridad normativa mientras se valida; `x-propuesta-security: []` conserva la alternativa sin falsear el backend.
-- **Motivo de la propuesta:** permitir selección de sede en registro sin exigir una sesión previa.
-- **Módulos afectados:** Auth, M1/sede y frontend.
-- **Impacto si cambia:** seguridad, proyección pública y formulario de registro.
-- **Estado:** PENDIENTE DE VALIDACIÓN DEL EQUIPO.
+- **Decisión tomada e implementada (30/10/2026):** registro comercial sin sede; selección autenticada al contratar la primera membresía. Sustituye la propuesta anterior de abrir GET /sedes para el registro.
+- **Motivo:** Cliente puede existir sin afiliación, incluso para futuros servicios externos. La sede habitual es referencia, no restricción de beneficios multisede.
+- **Contrato:** registro no recibe sede. POST /membresias recibe planId y sedeId; esta última es necesaria sin habitual previa. Con habitual, sólo se conserva la misma. Idempotency-Key permanece en header; plan+sede son inmutables en replay. Renovación no reasigna sede.
+- **Persistencia:** V8 admite usuario.sedeid null sólo para USUARIO; conserva FK y asignaciones existentes. Personal conserva sede obligatoria mediante triggers, también al cambiar autoridad. Membresía conserva sedeid obligatorio como origen histórico del alta. La sede se confirma en la transacción de contratación; un rechazo de pago revierte todo.
+- **Multisede:** no se comparan sede habitual y sede del recurso para conceder beneficios; M1 sigue determinando vigencia. Recepción conserva aislamiento por sede operativa.
+- **M3/M4 futuros (no implementados):** Socio puede iniciar en su habitual y elegir otra sede para clases/canchas, conservando beneficios según TP. Cliente elige sede de cancha y paga tarifa externa; Socio vencido puede usar tarifa externa. La reserva pertenece a la sede del recurso. No confundir con el origen histórico de membresía.
+- **Pendientes:** cambio posterior de habitual, autorizaciones, responsables y eventual gestión administrativa. Sin endpoint de traslado, historial ni múltiples habituales. Los datos anteriores no permiten distinguir elección explícita del antiguo default.
+- **Estado:** IMPLEMENTADO, revisión funcional y visual aprobada para cierre. Ver ../sede-habitual-verificacion.md y ../membresias.md.
 
 ### Trazabilidad de los antecedentes D1–D20
 
@@ -221,3 +221,13 @@ Validación técnica: Redocly sin agregar dependencias al proyecto, sintaxis YAM
 | D17 | Convención técnica de clave conservada; alcance/retención/integración P08–P10. |
 | D18/D19 | P09/P10; nueva cancelación de membresía fuera de paths. |
 | D20 | PDF como representación técnica stable; emisión P09/P10 y métricas P11. |
+
+### Verificación del ciclo personal (30/10/2026)
+
+Sin cambio contractual: ACTIVA deriva de período no cancelado vigente y ausencia
+de suspensión; VENCIDA conserva cuenta/historial/sede; SUSPENDIDA es bloqueo
+administrativo auditado. Renovar usa max(último fin no cancelado, ahora), sin cobro
+retroactivo. No hay gracia. El umbral visual <=7 días y su supresión por continuidad
+PROGRAMADA no son reglas comerciales ni autorizan QR/M2. Se conservan HTTP, DTOs,
+headers e idempotencia: no se modifica openapi.yaml en este corte ni se crea ADR.
+Ver ../ciclo-vida-membresia-verificacion.md para escenarios, pruebas y límites.

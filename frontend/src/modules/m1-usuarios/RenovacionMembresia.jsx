@@ -179,7 +179,7 @@ export default function RenovacionMembresia({ perfil, membresia, onRenovada }) {
       {renovacion.estado === 'cargando' && <p role="status">Buscando una renovación pendiente...</p>}
       {renovacion.estado === 'lista' && (membresia.estado === 'SUSPENDIDA'
         ? <p>La membresía está suspendida. No se puede iniciar una nueva renovación.</p>
-        : <AppButton variant="lime" type="button" onClick={prepararRenovacion}>Renovar plan <ArrowRight aria-hidden="true" /></AppButton>)}
+        : <AppButton variant="lime" type="button" onClick={prepararRenovacion}>{membresia.estado === 'VENCIDA' ? 'Renovar membresía' : 'Renovar plan'} <ArrowRight aria-hidden="true" /></AppButton>)}
       {renovacion.estado === 'preparando' && <p role="status">Consultando el último plan contratado...</p>}
       {renovacion.estado === 'confirmar' && (
         <>

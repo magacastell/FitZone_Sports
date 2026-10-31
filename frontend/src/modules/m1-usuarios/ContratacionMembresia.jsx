@@ -1,27 +1,66 @@
 import { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { listarPlanes, contratarMembresia } from '../../services/m1Service';
-import { AppButton } from '../../components/ui/FitZoneUI';
+import { listarPlanes, listarSedes, contratarMembresia } from '../../services/m1Service';
+import { AppButton, StatusBadge } from '../../components/ui/FitZoneUI';
 import { mensajePortal } from './PortalSocioCards';
 import CatalogoPlanes from './CatalogoPlanes';
 
-export default function ContratacionMembresia() {
-  const { user } = useAuth();
+export default function ContratacionMembresia({ perfil, onContratada }) {
+  const { user, token } = useAuth();
   const esCliente = user?.rol === 'USUARIO';
   const { membresia, actualizarMembresia: setMembresia, refrescarMembresia } = useOutletContext();
   const [consultaPlanes, setConsultaPlanes] = useState(0);
   const [planes, setPlanes] = useState({ estado: 'inicial' });
   const [planSeleccionado, setPlanSeleccionado] = useState('');
+  const [sedes, setSedes] = useState({ estado: 'inicial' });
+  const [sedeSeleccionada, setSedeSeleccionada] = useState('');
   const [contratacion, setContratacion] = useState({ estado: 'inicial' });
   const intento = useRef(null);
   const enviando = useRef(false);
   const montado = useRef(false);
+  const claveStorage = `fitzone:m1:contratacion:${user.email}`;
+  const sesion = useRef(token);
+  const mismaSesion = () => {
+    try { return localStorage.getItem('token') === sesion.current; } catch { return false; }
+  };
+
+  const descartarIntento = () => {
+    try {
+      sessionStorage.removeItem(claveStorage);
+      intento.current = null;
+      return true;
+    } catch {
+      setContratacion({ estado: 'error-local', mensaje: 'No pudimos limpiar la contratación guardada. Recargá antes de continuar.' });
+      return false;
+    }
+  };
 
   useEffect(() => {
     montado.current = true;
+    try {
+      const texto = sessionStorage.getItem(claveStorage);
+      if (texto !== null) {
+        const registro = JSON.parse(texto);
+        if (registro.version !== 1 || registro.email !== user.email
+          || !Number.isInteger(registro.planId) || registro.planId <= 0
+          || !Number.isInteger(registro.sedeId) || registro.sedeId <= 0
+          || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(registro.clave)) throw new Error();
+        intento.current = registro;
+        setPlanSeleccionado(String(registro.planId)); setSedeSeleccionada(String(registro.sedeId));
+        setContratacion({ estado: 'error', mensaje: 'Hay una contratación pendiente. Podés reintentar la misma operación.' });
+      }
+    } catch {
+      setContratacion({ estado: 'error-local', mensaje: 'No pudimos recuperar la contratación guardada. No enviaremos una nueva operación.' });
+    }
     return () => { montado.current = false; };
   }, []);
+  useEffect(() => {
+    if (membresia.estado === 'cargada' && intento.current && mismaSesion() && descartarIntento()) {
+      setContratacion({ estado: 'actualizada' });
+      onContratada?.();
+    }
+  }, [membresia.estado]);
   useEffect(() => {
     if (!esCliente || membresia.estado !== 'sin-membresia') return;
     let activo = true;
@@ -34,8 +73,18 @@ export default function ContratacionMembresia() {
         if (activo) setPlanes({ estado: 'error', mensaje: error.message });
       },
     );
+    setSedes({ estado: 'cargando' });
+    listarSedes().then(
+      (datos) => { if (activo) setSedes({ estado: 'cargadas', datos }); },
+      (error) => { if (activo) setSedes({ estado: 'error', mensaje: error.message }); },
+    );
     return () => { activo = false; };
   }, [membresia.estado, esCliente, consultaPlanes]);
+
+  const sedeActual = perfil?.estado === 'cargado' ? perfil.datos.sedeId : null;
+  const sedeElegida = sedeActual ?? (sedeSeleccionada ? Number(sedeSeleccionada) : null);
+  const sedeVisible = sedes.datos?.find((sede) => sede.id === sedeElegida);
+  const planVisible = planes.datos?.find((plan) => String(plan.id) === planSeleccionado);
 
   const uuidDisponible = typeof globalThis.crypto?.randomUUID === 'function';
   const puedeCambiarPlan = contratacion.estado === 'error' && contratacion.status === 402;
@@ -51,7 +100,8 @@ export default function ContratacionMembresia() {
     if (!montado.current) return;
     if (estado.estado === 'cargada') {
       setContratacion({ estado: 'actualizada' });
-      intento.current = null;
+      descartarIntento();
+      onContratada?.();
     } else if (estado.estado === 'sin-membresia') {
       setContratacion({ estado: 'error', status: 409, mensaje: mensajeConflicto, reconciliada: true });
     } else {
@@ -72,23 +122,28 @@ export default function ContratacionMembresia() {
 
   const contratar = async (event) => {
     event.preventDefault();
-    if (!esCliente || enviando.current || membresia.estado !== 'sin-membresia' || envioBloqueado) return;
+    if (!esCliente || enviando.current || !mismaSesion() || membresia.estado !== 'sin-membresia' || envioBloqueado) return;
     if (!intento.current) {
       const plan = planes.estado === 'cargados'
         ? planes.datos.find((p) => String(p.id) === planSeleccionado) : null;
-      if (!plan || !uuidDisponible) return;
-      intento.current = { planId: plan.id, clave: globalThis.crypto.randomUUID() };
+      if (!plan || !uuidDisponible || perfil?.estado !== 'cargado' || !sedeVisible) return;
+      const nueva = { version: 1, email: user.email, planId: plan.id, sedeId: sedeVisible.id, clave: globalThis.crypto.randomUUID() };
+      try { sessionStorage.setItem(claveStorage, JSON.stringify(nueva)); } catch {
+        setContratacion({ estado: 'error-local', mensaje: 'No pudimos guardar la contratación. No se envió el pago.' });
+        return;
+      }
+      intento.current = nueva;
     }
     enviando.current = true;
     setContratacion({ estado: 'enviando' });
     try {
-      const datos = await contratarMembresia(intento.current.planId, intento.current.clave);
-      if (!montado.current) return;
+      const datos = await contratarMembresia(intento.current.planId, intento.current.clave, intento.current.sedeId);
+      if (!montado.current || !mismaSesion()) return;
       setMembresia({ estado: 'cargada', datos });
-      setContratacion({ estado: 'exito' });
-      intento.current = null;
+      if (descartarIntento()) setContratacion({ estado: 'exito' });
+      onContratada?.();
     } catch (error) {
-      if (!montado.current) return;
+      if (!montado.current || !mismaSesion()) return;
       if (error.status === 409) {
         await reconciliarMembresia(error.message);
       } else {
@@ -101,8 +156,9 @@ export default function ContratacionMembresia() {
 
   const cambiarPlan = () => {
     if (enviando.current || !puedeCambiarPlan) return;
-    intento.current = null;
+    if (!descartarIntento()) return;
     setPlanSeleccionado('');
+    setSedeSeleccionada('');
     setContratacion({ estado: 'inicial' });
   };
 
@@ -112,11 +168,13 @@ export default function ContratacionMembresia() {
     setContratacion({ estado: 'actualizando-planes' });
     setPlanes({ estado: 'cargando' });
     try {
-      const datos = await listarPlanes();
+      const [datos, opciones] = await Promise.all([listarPlanes(), listarSedes()]);
       if (!montado.current) return;
       setPlanes({ estado: 'cargados', datos });
-      intento.current = null;
+      setSedes({ estado: 'cargadas', datos: opciones });
+      if (!descartarIntento()) return;
       setPlanSeleccionado('');
+      setSedeSeleccionada('');
       setContratacion({ estado: 'inicial' });
     } catch (error) {
       if (montado.current) {
@@ -132,26 +190,50 @@ export default function ContratacionMembresia() {
   if (contratacion.estado === 'exito') return <p role="status">Contratación confirmada. Tu membresía ya está disponible.</p>;
   if (contratacion.estado === 'actualizada') return <p role="status">Se actualizó el estado de tu membresía.</p>;
   return (
-    <section className="panel portal-contratacion" aria-labelledby="contratacion-titulo">
-      <h3 id="contratacion-titulo">Planes disponibles</h3><p>Elegí duración e importe. Al confirmar se procesa el pago simulado, sin cargos reales.</p>
+    <section className="portal-contratacion" aria-labelledby="contratacion-titulo">
+      <h3 id="contratacion-titulo" className="sr-only">Planes disponibles</h3>
       {contratacion.estado === 'reconciliando' && <p role="status">Verificando el estado actual de tu membresía...</p>}
       {esCliente && membresia.estado === 'sin-membresia' && (
         <>
           {planes.estado === 'cargando' && <p role="status">Cargando planes...</p>}
           {planes.estado === 'error' && <><p role="alert">No pudimos cargar los planes. {mensajePortal(planes.mensaje)}</p>{contratacion.estado === 'inicial' && <AppButton type="button" onClick={() => setConsultaPlanes((actual) => actual + 1)}>Reintentar catálogo</AppButton>}</>}
+          {perfil?.estado === 'error' && <p role="alert">No pudimos consultar tu cuenta. Recargá para continuar.</p>}
           {planes.estado === 'cargados' && (planes.datos.length === 0 ? (
             <p>No hay planes disponibles para contratar.</p>
           ) : (
             <form onSubmit={contratar} aria-busy={contratacion.estado === 'enviando'}>
               <CatalogoPlanes planes={planes.datos} seleccionado={planSeleccionado} bloqueado={contratacion.estado === 'enviando' || intento.current !== null} onSeleccionar={setPlanSeleccionado} />
-              <AppButton type="submit" disabled={!planSeleccionado || !uuidDisponible || envioBloqueado}>
-                {contratacion.estado === 'enviando' ? 'Contratando...' : intento.current ? 'Reintentar contratación' : 'Confirmar contratación'}
-              </AppButton>
+              {(planSeleccionado || intento.current) && <section className="panel contratacion-confirmacion" aria-labelledby="plan-seleccionado-titulo">
+                <div className="contratacion-plan">
+                  <div>
+                    <p className="eyebrow">PLAN SELECCIONADO</p>
+                    <h4 id="plan-seleccionado-titulo">{planVisible?.nombre || 'Tu contratación pendiente'}</h4>
+                    {planVisible && <p>{planVisible.duracionMeses} {planVisible.duracionMeses === 1 ? 'mes' : 'meses'}</p>}
+                  </div>
+                  <div className="contratacion-plan__precio">
+                    {planVisible && <strong>{Number(planVisible.precio).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}</strong>}
+                    <StatusBadge tone="success">Seleccionado</StatusBadge>
+                  </div>
+                </div>
+                {sedes.estado === 'cargando' && <p role="status">Cargando sedes...</p>}
+                {sedes.estado === 'error' && <><p role="alert">No pudimos cargar las sedes. {mensajePortal(sedes.mensaje)}</p>{contratacion.estado === 'inicial' && <AppButton type="button" onClick={() => setConsultaPlanes((actual) => actual + 1)}>Reintentar sedes</AppButton>}</>}
+                {sedes.estado === 'cargadas' && <div className="contratacion-sede"><label htmlFor="sede-habitual">{sedeActual ? 'Tu sede habitual' : 'Elegí tu sede habitual'}</label>
+                <p id="sede-habitual-ayuda">Será tu sede principal. Tu membresía seguirá permitiéndote acceder a las demás sedes.</p>
+                {sedes.datos.length ? <select id="sede-habitual" aria-describedby="sede-habitual-ayuda" value={intento.current ? String(intento.current.sedeId) : sedeElegida == null ? '' : String(sedeElegida)} disabled={!!sedeActual || intento.current !== null || contratacion.estado === 'enviando'} onChange={(event) => setSedeSeleccionada(event.target.value)}>
+                  <option value="">Seleccioná una sede</option>{sedes.datos.map((sede) => <option key={sede.id} value={sede.id}>{sede.nombre}{sede.direccion ? ` — ${sede.direccion}` : ''}</option>)}
+                </select> : <p>No hay sedes disponibles para contratar.</p>}
+                {sedeActual && <p>Se conserva la sede habitual de tu cuenta.</p>}
+                </div>}
+                {(!intento.current || contratacion.estado === 'enviando') && <div className="contratacion-confirmacion__footer"><p>Al confirmar se procesa el pago simulado, sin cargos reales.</p><AppButton type="submit" disabled={!planSeleccionado || !sedeVisible || perfil?.estado !== 'cargado' || !uuidDisponible || envioBloqueado}>{contratacion.estado === 'enviando' ? 'Contratando...' : 'Confirmar contratación'}</AppButton></div>}
+              </section>}
+              {!planSeleccionado && !intento.current && <div className="contratacion-siguiente"><p>Elegí un plan para continuar con tu sede habitual.</p><AppButton type="submit" disabled>Confirmar contratación</AppButton></div>}
               {!uuidDisponible && <p role="alert">No se puede iniciar la contratación en este navegador o conexión.</p>}
             </form>
           ))}
         </>
       )}
+      {contratacion.estado === 'error-local' && <p role="alert">{contratacion.mensaje}</p>}
+      {intento.current && puedeReintentar && <AppButton type="button" onClick={contratar}>Reintentar contratación</AppButton>}
       {contratacion.estado === 'error' && (
         <>
           <p role="alert">No pudimos completar la contratación. {mensajePortal(contratacion.mensaje)}</p>
@@ -168,7 +250,7 @@ export default function ContratacionMembresia() {
             </>
           )}
           {puedeActualizarPlanes && <AppButton type="button" onClick={actualizarPlanes}>Actualizar planes para elegir nuevamente</AppButton>}
-          {puedeReintentar && contratacion.status !== 402 && <p>No se pudo confirmar el resultado. Reintentá con el mismo plan, sin cerrar esta pantalla.</p>}
+          {puedeReintentar && contratacion.status !== 402 && <p>No se pudo confirmar el resultado. El reintento conserva el mismo plan y sede.</p>}
         </>
       )}
       {membresia.estado === 'error' && contratacion.estado !== 'reconciliando' && (

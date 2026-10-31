@@ -76,7 +76,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('planesService'))return synthetic(e.planServices,context);if(spec.includes('m1Service'))return synthetic(e.services,context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
-  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','CreditCard','MapPin'].map(k=>[k,()=>jsx('svg',{})])),context);
   if(spec.endsWith('SocioQRModal'))return synthetic({default:p=>{e.modal=p;return jsx('qr-modal',p);}},context);
   return synthetic({default:()=>null},context);
  });
@@ -185,6 +185,7 @@ await test('servicio transporte y reexport S4 mantienen rutas y errores',async()
  assert.equal(calls[0][0],'/planes');assert.equal(calls[0].length,1);assert.equal(calls[1][0],'/planes?incluirInactivos=true');
  assert.equal(calls[2][1].method,'POST');assert.equal(JSON.parse(calls[2][1].body).precio,'1.20');assert.equal(calls[3][1].method,'PATCH');assert.equal(calls[4][1].method,'DELETE');
  fallo=new Error('original');try{await p.listarPlanes();assert.fail();}catch(e){assert.equal(e,fallo);}
- const m1=new vm.SourceTextModule(fs.readFileSync('src/services/m1Service.js','utf8'),{context});await m1.link(spec=>spec.includes('planesService')?mod:stub);await m1.evaluate();assert.equal(m1.namespace.listarPlanes,p.listarPlanes);
+ const sedes=new vm.SourceTextModule(fs.readFileSync('src/services/sedesService.js','utf8'),{context});await sedes.link(()=>stub);await sedes.evaluate();
+ const m1=new vm.SourceTextModule(fs.readFileSync('src/services/m1Service.js','utf8'),{context});await m1.link(spec=>spec.includes('planesService')?mod:spec.includes('sedesService')?sedes:stub);await m1.evaluate();assert.equal(m1.namespace.listarPlanes,p.listarPlanes);
 });
 console.log('RESULTADO: '+passed+' aprobadas');

@@ -40,7 +40,7 @@ function env(){
  const call=(name,args)=>{const d=deferred();d.args=args;e[name].push(d);return d.promise;};
  e.services={
   consultarMiMembresia:()=>call('members',[]),consultarMiPerfil:()=>call('profiles',[]),
-  listarPlanes:()=>call('plans',[]),contratarMembresia:(...a)=>call('contracts',a),renovarMembresia:(...a)=>call('renewals',a)
+  listarPlanes:()=>call('plans',[]),listarSedes:()=>call('sedes',[]),contratarMembresia:(...a)=>call('contracts',a),renovarMembresia:(...a)=>call('renewals',a)
  };
  e.m2={consultarAforo:(...a)=>call('aforos',a),listarSedesAcceso:(...a)=>call('sedes',a),registrarIngreso:(...a)=>call('ingresos',a),registrarSalida:(...a)=>call('salidas',a)};
  e.focus=()=>{for(const f of e.listeners.get('focus')??[])f();};
@@ -79,7 +79,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('pagosService'))return synthetic({descargarComprobante:id=>{const d=deferred();d.args=[id];e.pdfs.push(d);return d.promise;}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
-  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check'].map(k=>[k,()=>jsx('svg',{})])),context);
   if(spec.endsWith('LectorAcceso'))return synthetic({default:p=>{e.lectorProps=p;return jsx('lector',p);}},context);
   if(spec.endsWith('useAforoSede')||spec.endsWith('TarjetaAforo')){
    const file=spec.endsWith('useAforoSede')?'src/modules/m2-acceso/useAforoSede.js':'src/modules/m2-acceso/TarjetaAforo.jsx';
@@ -128,9 +128,10 @@ async function setMember(e,data){e.members.at(-1).resolve(data);await settle(e);
 async function initialError(e,error){e.members.at(-1).reject(error);await settle(e);}
 async function startContract(e){
  const p=await runner('perfil',e);
- e.profiles.at(-1).resolve({id:7,nombre:'Ana',apellido:'Perez',email:'real@fitzone',dni:'123',sedeNombre:'Central'});
+ e.profiles.at(-1).resolve({id:7,nombre:'Ana',apellido:'Perez',email:'real@fitzone',dni:'123',sedeId:12,sedeNombre:'Central'});
+ e.sedes.at(-1).resolve([{id:12,nombre:'Central',direccion:'Calle real'}]);
  e.plans.at(-1).resolve([{id:3,nombre:'Plan real',duracionMeses:1,precio:100}]);await settle(e);
- button(p,'Elegir plan').props.onClick();p.render();
+ button(p,'Elegir este plan').props.onClick();p.render();
  const submit=nodes(p.view,n=>n.type==='form')[0].props.onSubmit;
  const pending=submit({preventDefault(){}});return{p,submit,pending};
 }
@@ -192,7 +193,7 @@ for(const state of ['cargando','sin-membresia','error','ACTIVA','VENCIDA','SUSPE
 await test('perfil comparte GET; contratacion/doble click actualiza menu sin nuevo GET',async()=>{
  const e=env(),l=await layout(e);await initialError(e,err(404));const {p,submit,pending}=await startContract(e);
  assert.equal(e.members.length,1);assert(!text(p.view).includes('Datos personales'));await submit({preventDefault(){}});
- assert.equal(e.contracts.length,1);assert.equal(e.uuids,1);e.contracts[0].resolve(dto());await pending;await settle(e);
+ assert.equal(e.contracts.length,1);assert.equal(e.uuids,1);e.contracts[0].resolve(dto());await pending;await settle(e);e.profiles.at(-1).resolve({id:7,nombre:'Ana',apellido:'Perez',sedeId:12,sedeNombre:'Central'});await settle(e);
  assert.equal(hasQr(l),true);assert(text(p.view).includes('Ana'));assert(text(p.view).includes('Contratación confirmada'));assert.equal(e.members.length,1);
  e.renewalProps.onRenovada(dto('VENCIDA'));await settle(e);assert.equal(hasQr(l),false);
 });
@@ -269,8 +270,8 @@ for(const status of [400,402,403,404,500,undefined])await test('contratacion con
  }
  if(status===404){
   const refresh=button(p,'Actualizar planes').props.onClick();assert.equal(e.uuids,1);
-  e.plans[1].resolve([{id:3,nombre:'Actualizado',precio:100,duracionMeses:1}]);await refresh;await settle(e);
-  button(p,'Elegir plan').props.onClick();p.render();
+  e.plans[1].resolve([{id:3,nombre:'Actualizado',precio:100,duracionMeses:1}]);e.sedes[1].resolve([{id:12,nombre:'Central'}]);await refresh;await settle(e);
+  button(p,'Elegir este plan').props.onClick();p.render();
   const next=nodes(p.view,n=>n.type==='form')[0].props.onSubmit({preventDefault(){}});assert.equal(e.uuids,2);
   e.contracts[1].resolve(dto());await next;await settle(e);
  }
@@ -283,7 +284,7 @@ await test('Perfil de cliente no incluye capacidades comerciales ni planes',asyn
 const cardSource=fs.readFileSync('src/modules/m1-usuarios/PortalSocioCards.jsx','utf8');
 const visual=vm.runInNewContext('('+cardSource.slice(cardSource.indexOf('export function presentacionVigencia'),cardSource.indexOf('function VigenciaPeriodo')).replace('export ','').trim()+')');
 const now=Date.parse('2026-10-29T12:00:00-03:00');
-for(const [days,tone] of [[6,'normal'],[5,'advertencia'],[3,'advertencia'],[2,'critico'],[1,'critico'],[0,'critico'],[-2,'critico']])await test('barra visual: dias '+days+' / '+tone,async()=>{
+for(const [days,tone] of [[8,'normal'],[7,'advertencia'],[6,'advertencia'],[5,'advertencia'],[3,'advertencia'],[2,'critico'],[1,'critico'],[0,'critico'],[-2,'critico']])await test('barra visual: dias '+days+' / '+tone,async()=>{
  const start=now-10*86400000, end=now+days*86400000;
  const view=visual({inicio:new Date(start).toISOString(),fin:new Date(end).toISOString()},now);
  assert.equal(view.tono,tone);assert.equal(view.porcentaje,Math.max(0,days/(10+days)*100));
@@ -478,4 +479,141 @@ await test('Recepcion token nuevo remonta contexto sin sede/datos previos',async
  const next=await runner('recepcion',e);assert.equal(next.tree.key,'sesion-B');assert.equal(e.lectorProps,undefined);assert(text(next.view).includes('Consultando tu sede'));
 });
 
+
+await test('Registro comercial no envia sede ni selecciona una por defecto',async()=>{
+ const e=env();let enviado;e.register=async datos=>{enviado=datos;return{success:true};};
+ const r=await runner('register',e);
+ for(const [id,value] of Object.entries({'register-nombre':'Ana','register-apellido':'Real','register-dni':'9988','register-email':'nueva@test.com','register-password':'password123','register-confirmacion':'password123'})){
+  nodes(r.view,n=>n.type==='input'&&n.props.id===id)[0].props.onChange({target:{value}});r.render();
+ }
+ await nodes(r.view,n=>n.type==='form')[0].props.onSubmit({preventDefault(){}});
+ assert.equal(enviado.email,'nueva@test.com');assert(!('sedeId' in enviado));assert.equal(e.nav[0],'/');
+});
+await test('Perfil comercial sin sede muestra Sin asignar, sin error ni Central inventada',async()=>{
+ const e=env();e.shared={membresia:{estado:'sin-membresia'}};const r=await runner('cuenta',e);
+ e.profiles[0].resolve({id:7,rol:'USUARIO',nombre:'Cuenta',apellido:'Nueva',sedeId:null,sedeNombre:null});await settle(e);
+ assert(text(r.view).includes('Sede habitual'));assert(text(r.view).includes('Sin asignar'));assert(!text(r.view).includes('Central'));
+});
+const sedesReales=[{id:12,nombre:'Central real',direccion:'Calle 12'},{id:28,nombre:'Norte real',direccion:null}];
+async function altaSinSede(opciones=sedesReales,planes=[{id:3,nombre:'Plan real',duracionMeses:1,precio:100}]){
+ const e=env();e.user.email='nueva@test.com';e.actualizaciones=0;
+ e.shared={membresia:{estado:'sin-membresia'},actualizarMembresia:estado=>{e.shared.membresia=estado;},refrescarMembresia:()=>{const d=deferred();e.members.push(d);return d.promise;}};
+ const props={perfil:{estado:'cargado',datos:{id:7,email:e.user.email,sedeId:null}},onContratada:()=>e.actualizaciones++};
+ const r=await runner('contrato',e,props);
+ e.plans[0].resolve(planes);
+ if(opciones!==null)e.sedes[0].resolve(opciones);
+ await settle(e);return{e,r,props};
+}
+function elegirSede(r,id){nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:String(id)}});r.render();}
+function enviarAlta(r){return nodes(r.view,n=>n.type==='form')[0].props.onSubmit({preventDefault(){}});}
+await test('Alta exige seleccion explicita y usa direccion real, sin fallback a primera sede',async()=>{
+ const {e,r}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();
+ assert(button(r,'Confirmar contratación').props.disabled);await enviarAlta(r);assert.equal(e.contracts.length,0);
+ assert.equal(nodes(r.view,n=>n.type==='select')[0].props.value,'');assert(text(r.view).includes('Calle 12'));
+ elegirSede(r,28);assert(!button(r,'Confirmar contratación').props.disabled);assert(text(r.view).includes('Norte real'));
+ const p=enviarAlta(r);enviarAlta(r);assert.equal(e.contracts.length,1);assert.equal(e.contracts[0].args[2],28);
+ const guardado=JSON.parse(e.sessionStorage.getItem('fitzone:m1:contratacion:nueva@test.com'));assert.equal(guardado.sedeId,28);assert.equal(guardado.planId,3);
+ e.contracts[0].resolve(dto('ACTIVA',{sedeId:28}));await p;await settle(e);
+ assert.equal(e.shared.membresia.datos.sedeId,28);assert.equal(e.actualizaciones,1);assert.equal(e.sessionStorage.getItem('fitzone:m1:contratacion:nueva@test.com'),null);
+});
+for(const status of [402,500,undefined])await test('Alta '+(status??'red')+' conserva plan+sede+clave; F5 recupera sin POST automatico',async()=>{
+ const {e,r,props}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,28);
+ const p=enviarAlta(r),args=e.contracts[0].args;e.contracts[0].reject(err(status));await p;await settle(e);
+ assert(nodes(r.view,n=>n.type==='select')[0].props.disabled);
+ r.unmount();const next=await runner('contrato',e,props);await settle(e);assert.equal(e.contracts.length,1);
+ const retry=button(next,'Reintentar contratación').props.onClick({preventDefault(){}});assert.deepEqual(e.contracts[1].args,args);assert.equal(e.uuids,1);
+ e.contracts[1].resolve(dto('ACTIVA',{sedeId:28}));await retry;await settle(e);assert.equal(e.shared.membresia.datos.sedeId,28);
+});
+await test('Pago 402 permite otra intencion solo explicitamente y requiere elegir otra vez',async()=>{
+ const {e,r}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,28);
+ const p=enviarAlta(r);e.contracts[0].reject(err(402));await p;await settle(e);
+ button(r,'Iniciar nueva contratación').props.onClick();await settle(e);assert.equal(e.uuids,1);
+ assert.equal(nodes(r.view,n=>n.type==='select').length,0);assert(button(r,'Confirmar contratación').props.disabled);
+ button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,12);const q=enviarAlta(r);assert.equal(e.uuids,2);assert.equal(e.contracts[1].args[2],12);
+ e.contracts[1].resolve(dto());await q;
+});
+await test('Sedes loading, error recuperable y vacio no habilitan pagos',async()=>{
+ const {e,r}=await altaSinSede(null);assert(!text(r.view).includes('Cargando sedes'));button(r,'Elegir este plan').props.onClick();r.render();assert(text(r.view).includes('Cargando sedes'));e.sedes[0].reject(err(500));await settle(e);
+ assert(text(r.view).includes('No pudimos cargar las sedes'));button(r,'Reintentar sedes').props.onClick();await settle(e);
+ e.sedes[1].resolve([]);e.plans[1].resolve([{id:3,nombre:'Plan',precio:100}]);await settle(e);assert(text(r.view).includes('No hay sedes'));
+ assert.equal(e.contracts.length,0);assert(button(r,'Confirmar contratación').props.disabled);
+});
+await test('Cuenta con sede conserva seleccion y no usa alta para cambiarla',async()=>{
+ const {e,r}=await altaSinSede();r.props={...r.props,perfil:{estado:'cargado',datos:{id:7,sedeId:12}}};r.render();button(r,'Elegir este plan').props.onClick();r.render();
+ assert.equal(nodes(r.view,n=>n.type==='select')[0].props.value,'12');assert(nodes(r.view,n=>n.type==='select')[0].props.disabled);
+ const p=enviarAlta(r);assert.equal(e.contracts[0].args[2],12);e.contracts[0].resolve(dto());await p;
+});
+await test('Storage invalido bloquea nueva clave y no borra pendiente',async()=>{
+ const {e,r,props}=await altaSinSede();r.unmount();e.sessionStorage.setItem('fitzone:m1:contratacion:nueva@test.com','invalido');
+ const next=await runner('contrato',e,props);await settle(e);assert(text(next.view).includes('No pudimos recuperar'));assert.equal(e.contracts.length,0);assert.equal(e.uuids,0);
+ assert.equal(e.sessionStorage.getItem('fitzone:m1:contratacion:nueva@test.com'),'invalido');
+});
+await test('Resultado tardio no cambia cuenta; token distinto no reenvia intento anterior',async()=>{
+ const {e,r}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,28);
+ const p=enviarAlta(r);r.unmount();e.contracts[0].resolve(dto());await p;assert.equal(e.actualizaciones,0);assert.equal(e.shared.membresia.estado,'sin-membresia');
+ const x=await altaSinSede();button(x.r,'Elegir este plan').props.onClick();x.r.render();elegirSede(x.r,28);x.e.localStorage.setItem('token','otra');await enviarAlta(x.r);assert.equal(x.e.contracts.length,0);
+});
+await test('F5 con membresia ya confirmada reconcilia sin segundo pago y actualiza perfil',async()=>{
+ const {e,r,props}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,28);const p=enviarAlta(r);
+ e.contracts[0].reject(err());await p;r.unmount();e.shared.membresia={estado:'cargada',datos:dto('ACTIVA',{sedeId:28})};
+ const next=await runner('contrato',e,props);await settle(e);assert.equal(e.contracts.length,1);assert.equal(e.sessionStorage.getItem('fitzone:m1:contratacion:nueva@test.com'),null);assert(text(next.view).includes('Se actualizó'));
+});
+
+
+await test('Sin storage escribible no se envia pago ni se deja un intento nuevo en memoria',async()=>{
+ const {e,r}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,28);
+ e.sessionStorage.setItem=()=>{throw new Error('QuotaExceeded');};await enviarAlta(r);await settle(e);
+ assert.equal(e.contracts.length,0);assert(text(r.view).includes('No se envió el pago'));assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Reintentar contratación')).length,0);
+});
+await test('Retry pendiente sigue visible aunque fallen planes y sedes tras F5',async()=>{
+ const {e,r,props}=await altaSinSede();button(r,'Elegir este plan').props.onClick();r.render();elegirSede(r,28);const p=enviarAlta(r),args=e.contracts[0].args;
+ e.contracts[0].reject(err());await p;r.unmount();const next=await runner('contrato',e,props);
+ e.plans.at(-1).reject(err(500));e.sedes.at(-1).reject(err(500));await settle(e);
+ const q=button(next,'Reintentar contratación').props.onClick({preventDefault(){}});assert.deepEqual(e.contracts[1].args,args);e.contracts[1].resolve(dto());await q;
+});
+
+await test('Cliente visual: plan antes de sede, cambio sin POST y seleccion textual accesible',async()=>{
+ const {e,r}=await altaSinSede(sedesReales,[{id:3,nombre:'Mensual real',duracionMeses:1,precio:100},{id:77,nombre:'Otro real',duracionMeses:3,precio:255.50}]);
+ assert.equal(nodes(r.view,n=>n.type==='select').length,0);assert(button(r,'Confirmar contratación').props.disabled);assert.equal(e.contracts.length,0);
+ button(r,'Mensual real').props.onClick();r.render();assert.equal(nodes(r.view,n=>n.type==='select').length,1);
+ assert(button(r,'Plan seleccionado').props['aria-pressed']);assert(text(r.view).includes('PLAN SELECCIONADO'));assert(button(r,'Confirmar contratación').props.disabled);
+ button(r,'Otro real').props.onClick();r.render();assert.equal(e.uuids,0);assert.equal(e.contracts.length,0);
+ elegirSede(r,28);assert(!button(r,'Confirmar contratación').props.disabled);
+ const p=enviarAlta(r);r.render();assert.equal(e.contracts[0].args[0],77);assert.equal(e.contracts[0].args[2],28);assert(button(r,'Contratando').props.disabled);
+ assert.equal(nodes(r.view,n=>n.props['aria-pressed']!==undefined&&!n.props.disabled).length,0);
+ e.contracts[0].resolve(dto());await p;
+});
+await test('Sidebar Cliente: experiencia real sin membresia y sin servicios ficticios',async()=>{
+ const e=env(),r=await layout(e);assert(!text(r.view).includes('Cliente · Elegí tu plan'));await initialError(e,err(404));
+ assert(text(r.view).includes('Cliente · Elegí tu plan'));assert(text(r.view).includes('EXPERIENCIA'));assert(text(r.view).includes('Sin membresía'));
+ for(const href of ['/mi-qr','/comprobantes','/clases','/canchas','/gestion/planes'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===href).length,0);
+});
+await test('aviso a siete dias: continuidad confirmada evita falsa urgencia',async()=>{
+ const periodo={inicio:new Date(now-20*86400000).toISOString(),fin:new Date(now+5*86400000).toISOString()};
+ assert(visual(periodo,now).aviso.includes('5 días'));
+ for(const estado of ['CANCELADA','VENCIDA','SUSPENDIDA'])assert(visual(periodo,now,[{estado,inicio:periodo.fin,fin:new Date(now+35*86400000).toISOString()}]).aviso);
+ const cubierto=visual(periodo,now,[{estado:'PROGRAMADA',inicio:periodo.fin,fin:new Date(now+35*86400000).toISOString()}]);
+ assert.equal(cubierto.aviso,null);assert.equal(cubierto.tono,'normal');assert(cubierto.texto.includes('confirmado'));
+ assert(visual(periodo,now,[{estado:'PROGRAMADA',inicio:new Date(now+6*86400000).toISOString(),fin:new Date(now+36*86400000).toISOString()}]).aviso);
+ assert.equal(visual({...periodo,fin:new Date(now+8*86400000).toISOString()},now).aviso,null);
+ assert.equal(visual({...periodo,fin:new Date(now).toISOString()},now).aviso,null);
+});
+await test('vencida conserva plan historico sede comprobantes y renovacion sin onboarding',async()=>{
+ const e=env(),l=await layout(e);const data=dto('VENCIDA',{periodos:[{id:1,estado:'VENCIDA',nombrePlan:'Plan histórico',precio:12345.67,duracionMeses:1,inicio:'2020-01-01T12:00:00-03:00',fin:'2020-02-01T12:00:00-03:00',pagoId:44}]});
+ await setMember(e,data);const r=await runner('perfil',e);e.profiles.at(-1).resolve({id:7,nombre:'Titular',apellido:'Real',sedeId:12,sedeNombre:'Sede conservada'});await settle(e);
+ const t=text(r.view);for(const esperado of ['Membresía vencida','Plan histórico','Sede conservada','12.345,67','2020','Comprobantes'])assert(t.includes(esperado));
+ assert.equal(e.plans.length,0);assert.equal(e.contracts.length,0);assert.equal(hasQr(l),false);assert(text(l.view).includes('Membresía vencida'));
+ const ren=await runner('renew',e,e.renewalProps);await settle(e);button(ren,'Renovar membresía').props.onClick();e.plans[0].resolve([{id:3,nombre:'Plan vigente',duracionMeses:1,precio:15000}]);await settle(e);
+ const envio=button(ren,'Confirmar renovación').props.onClick();assert.deepEqual(e.renewals[0].args.slice(0,2),[22,3]);const key=e.renewals[0].args[2];e.renewals[0].reject(err(500));await envio;await settle(e);
+ const replay=button(ren,'Reintentar renovación pendiente').props.onClick();assert.equal(e.renewals[1].args[2],key);assert.equal(e.uuids,1);e.renewals[1].resolve(dto());await replay;await settle(e);assert.equal(hasQr(l),true);
+});
+await test('suspendida muestra bloqueo sin QR ni una nueva renovacion',async()=>{
+ const e=env(),l=await layout(e);await setMember(e,dto('SUSPENDIDA'));const r=await runner('perfil',e);e.profiles.at(-1).resolve({id:7,nombre:'Titular',sedeNombre:'Central'});await settle(e);
+ assert(text(r.view).includes('Membresía suspendida'));assert(text(r.view).includes('administración'));assert.equal(hasQr(l),false);
+ const ren=await runner('renew',e,e.renewalProps);await settle(e);assert(text(ren.view).includes('No se puede iniciar'));assert.equal(nodes(ren.view,n=>n.type==='button').length,0);assert.equal(e.plans.length,0);
+});
+await test('reload consulta estado real y conserva historial sin convertir vencida a cliente nuevo',async()=>{
+ const e=env(),primero=await layout(e);await setMember(e,dto());primero.unmount();const recargado=await layout(e);await setMember(e,dto('VENCIDA',{periodos:[{id:1,pagoId:44,estado:'VENCIDA'}]}));
+ assert.equal(hasQr(recargado),false);assert.equal(e.shared.membresia.estado,'cargada');assert(nodes(recargado.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!text(recargado.view).includes('Elegí tu plan'));
+});
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));

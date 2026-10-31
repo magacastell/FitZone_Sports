@@ -142,8 +142,7 @@ DECISIONES conserva antecedentes históricos con aviso de sustitución por ADR-0
 No se implementan reservas/descuentos/política financiera M3/M4 ni reportes.
 No se define máximo de anticipación. No se agrega pasarela remota ni su reconciliación.
 No se integra listado financiero general; los PDFs son de membresías con pagoId real.
-El registro frontend conserva su sede inicial preexistente; selección de sede es otro
-alcance. Los períodos migrados sin pago identificado no anuncian comprobante inexistente.
+Evolución posterior: el bloque de sede habitual elimina la asignación silenciosa del registro y elige sede al contratar; ver [verificación](sede-habitual-verificacion.md). El resto de este informe describe su corte original. Los períodos migrados sin pago identificado no anuncian comprobante inexistente.
 
 ## P. Diff
 

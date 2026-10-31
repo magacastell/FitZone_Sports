@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
-import { CalendarDays, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, List, Menu, X } from 'lucide-react';
+import { CalendarDays, CreditCard, DoorOpen, Dumbbell, LayoutGrid, LogOut, MapPin, QrCode, ReceiptText, UserRound, List, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { consultarMiMembresia, consultarMiPerfil } from '../services/m1Service';
 import { nombreActor, periodosConPago } from '../modules/m1-usuarios/estadoCuenta';
@@ -128,11 +128,12 @@ function LayoutAutenticado() {
     navigate('/login');
   };
 
+  const clienteSinMembresia = esCliente && membresia.estado === 'sin-membresia';
   return (
     <div className="app-layout">
       <a className="skip-link" href="#contenido">Ir al contenido</a>
 
-      <aside id="menu-principal" ref={menuRef} className={`app-sidebar${menuAbierto ? ' app-sidebar--open' : ''}`} aria-label="Menú de FitZone Sports"
+      <aside id="menu-principal" ref={menuRef} className={`app-sidebar${menuAbierto ? ' app-sidebar--open' : ''}${clienteSinMembresia ? ' app-sidebar--cliente' : ''}`} aria-label="Menú de FitZone Sports"
         onKeyDown={(event) => {
           if (event.key === 'Escape') { setMenuAbierto(false); botonMenuRef.current?.focus(); }
         }}
@@ -149,14 +150,14 @@ function LayoutAutenticado() {
 
         <div className="app-sidebar__context">
           <span>Espacio de trabajo</span>
-          <strong>{nombreActor(user?.rol, membresia)}</strong>
+          <strong>{clienteSinMembresia ? 'Cliente · Elegí tu plan' : nombreActor(user?.rol, membresia)}</strong>
         </div>
 
         <nav className="app-nav" aria-label="Navegación principal">
           <div className="app-nav__group">
-            <p className="app-nav__heading" id="nav-usuario">{esCliente ? 'Mi espacio' : 'Mi cuenta'}</p>
+            <p className="app-nav__heading" id="nav-usuario">{clienteSinMembresia ? 'Planes' : esCliente ? 'Mi espacio' : 'Mi cuenta'}</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
-              <NavigationLink to={esCliente ? '/membresia' : '/perfil'} icon={UserRound}>{esCliente ? (membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : 'Mi membresía') : 'Perfil'}</NavigationLink>
+              <NavigationLink to={esCliente ? '/membresia' : '/perfil'} icon={clienteSinMembresia ? CreditCard : UserRound}>{esCliente ? (membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : 'Mi membresía') : 'Perfil'}</NavigationLink>
             </ul>
           </div>
 
@@ -181,6 +182,7 @@ function LayoutAutenticado() {
           )}
         </nav>
 
+        {clienteSinMembresia && <div className="app-sidebar__experience"><MapPin aria-hidden="true" /><span><small>EXPERIENCIA</small><strong>Sin membresía</strong></span></div>}
         {isAuthenticated && (
           <button type="button" className="button button--secondary app-sidebar__logout" onClick={handleLogout}>
             <LogOut size={18} strokeWidth={1.75} aria-hidden="true" />

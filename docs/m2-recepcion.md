@@ -3,6 +3,10 @@
 Estado: implementación en refactor/recepcion-ui, pendiente de revisión manual y commit.
 Base: b2b3a11e4ec99d56891c604e845259ab5caf2224. Fecha: 30/10/2026.
 
+> Evolución posterior (sede habitual): V8/V9 permiten sede null sólo para USUARIO comercial.
+> El personal mantiene sede obligatoria; contexto y autorización de Recepción no cambian.
+> Ver [verificación](sede-habitual-verificacion.md). La auditoría debajo describe el corte original de este bloque.
+
 ## Auditoría del modelo actual
 
 Usuario tiene una única relación ManyToOne no nula con Sede, almacenada en

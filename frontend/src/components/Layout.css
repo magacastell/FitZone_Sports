@@ -68,6 +68,12 @@
 .app-sidebar .app-sidebar__logout { width: 100%; margin-top: auto; color: #eff7ef; border-color: #577567; background: transparent; }
 .app-sidebar .app-sidebar__logout:hover { color: #fff; background: #284a3e; }
 .app-sidebar :where(a, button):focus-visible { outline-color: var(--color-accent); }
+.app-sidebar__experience { display: flex; align-items: center; gap: 12px; margin-top: auto; padding: 16px 12px; border: 1px solid #3c5a4e; border-radius: 12px; background: #214337; }
+.app-sidebar__experience > svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--color-accent); }
+.app-sidebar__experience > span { display: grid; gap: 5px; }
+.app-sidebar__experience small { color: #bbcec1; font-size: 11px; letter-spacing: .08em; }
+.app-sidebar__experience strong { color: #fff; font-size: 14px; }
+.app-sidebar--cliente .app-sidebar__logout { margin-top: 0; }
 
 .app-workspace { display: flex; flex-direction: column; min-width: 0; }
 .app-topbar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 5rem; padding: 0.875rem 2rem; border-bottom: 1px solid var(--color-border); background: #fff; }

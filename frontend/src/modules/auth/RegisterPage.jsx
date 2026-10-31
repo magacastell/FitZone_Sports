@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-// GET /sedes exige sesión, así que el formulario público todavía no puede listar sedes.
-// Mientras tanto se usa la sede sembrada en dev ("Sede Central").
-const SEDE_ID_POR_DEFECTO = 1;
-
 const inputStyle = { width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' };
 const labelStyle = { display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155' };
 
@@ -39,7 +35,7 @@ export default function RegisterPage() {
 
     setEnviando(true);
     const { confirmacion, ...datos } = form;
-    const result = await register({ ...datos, sedeId: SEDE_ID_POR_DEFECTO });
+    const result = await register(datos);
     setEnviando(false);
 
     if (result.success) {
