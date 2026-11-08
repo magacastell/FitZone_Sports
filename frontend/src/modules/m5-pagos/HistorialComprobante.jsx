@@ -47,8 +47,8 @@ export default function HistorialComprobantes() {
   if (user?.rol !== 'USUARIO') return <div className="fitzone-ui"><PageHeading title="Comprobantes personales no disponibles" description="Esta sección corresponde a pagos de membresía de tu cuenta." /><Link to="/perfil">Volver a mi perfil</Link></div>;
   if (membresia.estado === 'sin-membresia') return <Navigate to="/membresia" replace />;
 
-  return <div className="fitzone-ui"><div className="page-stack">
-    <PageHeading eyebrow="MI CUENTA" title="Comprobantes" description="Tus pagos de membresía, con el detalle del período y su comprobante original." />
+  return <div className="fitzone-ui receipts-page"><div className="page-stack">
+    <PageHeading eyebrow="MI CUENTA" title="Comprobantes" description="Tus períodos pagados y sus comprobantes originales." />
     {membresia.estado === 'cargando' && <DataCard title="Consultando tus comprobantes"><p role="status">Estamos cargando los períodos con pago registrado...</p></DataCard>}
     {membresia.estado === 'error' && <DataCard title="No pudimos cargar tus comprobantes"><p role="alert">No pudimos consultar tu membresía. Podés volver a intentarlo.</p><AppButton onClick={refrescarMembresia}>Reintentar consulta</AppButton></DataCard>}
     <div role="status" aria-live="polite" className="receipts-feedback">{descarga.estado === 'exito' ? 'Descarga iniciada. Revisá las descargas de tu navegador.' : descarga.estado === 'cargando' ? 'Preparando tu PDF...' : ''}</div>
@@ -57,10 +57,10 @@ export default function HistorialComprobantes() {
       <div className="receipts-summary"><span>{periodos.length} {periodos.length === 1 ? 'período' : 'períodos'} con pago registrado</span><span>Períodos más recientes primero</span></div>
       <div className="receipts-grid">{periodos.map((p) => <DataCard key={p.id} className="receipt-card" title={p.nombrePlan} description={`Referencia de pago #${p.pagoId}`} action={<FileText size={24} aria-hidden="true" />}>
         {p.estado === 'CANCELADA' && <StatusBadge tone="neutral">Período cancelado</StatusBadge>}
-        <dl className="receipt-card__details"><div><dt>Período contratado</dt><dd>{fecha(p.inicio)} → {fecha(p.fin)}</dd></div><div><dt>Importe del período · ARS</dt><dd className="receipt-card__amount">{Number(p.precio).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}</dd></div></dl>
+        <div className="receipt-card__body"><dl className="receipt-card__details"><div><dt>Período contratado</dt><dd><time dateTime={p.inicio}>{fecha(p.inicio)}</time> → <time dateTime={p.fin}>{fecha(p.fin)}</time></dd></div><div><dt>Importe original · ARS</dt><dd className="receipt-card__amount">{Number(p.precio).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}</dd></div></dl>
         <AppButton variant="secondary" disabled={descarga.estado === 'cargando'} onClick={() => descargar(p.pagoId)}>{descarga.estado === 'cargando' && descarga.pagoId === p.pagoId ? 'Descargando...' : 'Descargar PDF'}<span className="sr-only"> de {p.nombrePlan}, {fecha(p.inicio)}, pago {p.pagoId}</span></AppButton>
-      </DataCard>)}</div>
-      <p className="receipts-note">El PDF conserva los datos del cobro original, incluso si después hubo un reembolso. Su número y fecha de emisión están dentro del documento. Un período cancelado no informa por sí solo el estado del pago.</p>
+        </div></DataCard>)}</div>
+      <p className="receipts-note">El PDF conserva el cobro original, incluso tras un reembolso; su número y emisión figuran en el documento. Un período cancelado no confirma por sí solo el estado del pago.</p>
     </> : <DataCard title="Tu historial"><EmptyState icon={FileText} title="Todavía no tenés comprobantes." description="Acá aparecerán los períodos de membresía con pago registrado." /></DataCard>)}
     <Link to="/membresia">Volver a mi cuenta</Link>
   </div></div>;

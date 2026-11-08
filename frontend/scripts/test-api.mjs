@@ -10,6 +10,7 @@ const context = vm.createContext({
   window: { location },
   fetch: async (...args) => { call = args; if (failure) throw failure; return response; },
   Error,
+  FormData, Blob,
 });
 const mod = new vm.SourceTextModule(fs.readFileSync('src/services/api.js','utf8'), {
   context, initializeImportMeta(meta) { meta.env = {}; },
@@ -71,5 +72,26 @@ await test('Alta M1 transporta plan+sede con clave en header; renovacion no envi
  assert.equal(call[1].body,JSON.stringify({planId:3,sedeId:28}));assert(!JSON.parse(call[1].body).idempotencyKey);
  await m1.namespace.renovarMembresia(22,null,'otra-clave');assert.equal(call[1].body,'{}');assert.equal(call[0],'/api/v1/membresias/22/renovaciones');
  await m1.namespace.listarSedes();assert.equal(call[0],'/api/v1/sedes');assert.equal(call[1].method,undefined);
+});
+await test('M1 PATCH perfil limita payload a nombre/apellido, sin campos protegidos ni foto',async()=>{
+ response={ok:true,status:200,json:async()=>({id:7,nombre:'Ana'})};
+ await m1.namespace.actualizarMiPerfil({nombre:'Ana',apellido:'Pérez',rol:'GERENTE',email:'otro',dni:'0',sedeId:99,foto:'no-cambiar'});
+ assert.equal(call[0],'/api/v1/usuarios/me');assert.equal(call[1].method,'PATCH');
+ assert.deepEqual(JSON.parse(call[1].body),{nombre:'Ana',apellido:'Pérez'});
+});
+await test('M1 automática PUT explícito booleano y renovación POST con plan/clave conservados',async()=>{
+ for(const habilitada of [true,false]){
+  await m1.namespace.configurarRenovacionAutomatica(22,habilitada);
+  assert.equal(call[0],'/api/v1/membresias/22/renovacion-automatica');assert.equal(call[1].method,'PUT');assert.deepEqual(JSON.parse(call[1].body),{habilitada});
+ }
+ await m1.namespace.renovarMembresia(22,9,'clave-original');
+ assert.equal(call[0],'/api/v1/membresias/22/renovaciones');assert.equal(call[1].method,'POST');assert.equal(call[1].headers['Idempotency-Key'],'clave-original');assert.deepEqual(JSON.parse(call[1].body),{planId:9});
+});
+await test('multipart foto conserva JWT y delega boundary al navegador',async()=>{
+ response={ok:true,status:200,json:async()=>({foto:'/usuarios/me/foto?version=x'})};
+ const archivo=new Blob(['imagen'],{type:'image/png'});await m1.namespace.actualizarMiFoto(archivo);
+ assert.equal(call[0],'/api/v1/usuarios/me/foto');assert.equal(call[1].method,'PUT');
+ assert.equal(call[1].headers['Content-Type'],undefined);assert.equal(call[1].headers.Authorization,'Bearer jwt-real');
+ assert.equal(call[1].multipart,undefined);assert.equal(call[1].body.get('foto').type,'image/png');
 });
 console.log('RESULTADO: '+passed+' aprobadas');

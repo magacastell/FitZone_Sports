@@ -4,6 +4,7 @@ import { CalendarDays, CreditCard, DoorOpen, Dumbbell, LayoutGrid, LogOut, MapPi
 import { useAuth } from '../context/AuthContext';
 import { consultarMiMembresia, consultarMiPerfil } from '../services/m1Service';
 import { nombreActor, periodosConPago } from '../modules/m1-usuarios/estadoCuenta';
+import { AvatarCircle } from './ui/FitZoneUI';
 import './Layout.css';
 
 function NavigationLink({ to, icon: Icon, children }) {
@@ -41,19 +42,26 @@ function LayoutAutenticado() {
   const { user, logout, isAuthenticated } = useAuth();
   const { pathname } = useLocation();
   const [perfilCuenta, setPerfilCuenta] = useState(null);
+  const revisionPerfil = useRef(0);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const menuRef = useRef(null);
   const botonMenuRef = useRef(null);
 
   useEffect(() => {
     let activo = true;
+    const revision = ++revisionPerfil.current;
     setPerfilCuenta(null);
     if (user?.email) consultarMiPerfil().then(
-      (datos) => { if (activo) setPerfilCuenta(datos); },
+      (datos) => { if (activo && revision === revisionPerfil.current) setPerfilCuenta(datos); },
       () => { /* El enlace a Perfil conserva el email real de la sesión como alternativa. */ },
     );
     return () => { activo = false; };
   }, [user?.email]);
+
+  const actualizarPerfil = (datos) => {
+    revisionPerfil.current++;
+    setPerfilCuenta(datos);
+  };
 
   useEffect(() => { setMenuAbierto(false); }, [pathname]);
   useEffect(() => {
@@ -208,13 +216,13 @@ function LayoutAutenticado() {
             <div><span className="app-topbar__brand">FitZone Sports</span><h1>{pathname === '/membresia' && membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : TITULO_POR_RUTA[pathname] || 'Mi espacio'}</h1></div>
           </div>
           <Link to="/perfil" className="app-user" aria-label={`Ver perfil de ${nombreCuenta}`}>
-            <span className="app-user__avatar" aria-hidden="true">{iniciales}</span>
+            <AvatarCircle className="app-user__avatar" initials={iniciales} foto={perfilCuenta?.foto} />
             <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{rolActivo === 'GERENTE' ? 'Gerente Central' : nombreActor(user?.rol, membresia)}</span></span>
           </Link>
         </header>
         <main id="contenido" className="app-main" tabIndex={-1}>
           <div className="app-content">
-            <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr }} />
+            <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr, actualizarPerfil }} />
           </div>
         </main>
       </div>

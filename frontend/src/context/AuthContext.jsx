@@ -61,9 +61,14 @@ export const AuthProvider = ({ children }) => {
   // El registro público devuelve un JWT: el usuario queda con sesión iniciada
   const register = async (datos) => {
     try {
+      const { foto, ...perfil } = datos;
+      const cuerpo = new FormData();
+      cuerpo.append('datos', new Blob([JSON.stringify(perfil)], { type: 'application/json' }));
+      cuerpo.append('foto', foto);
       const data = await fetchAPI('/auth/register', {
         method: 'POST',
-        body: JSON.stringify(datos),
+        multipart: true,
+        body: cuerpo,
       });
       localStorage.setItem('token', data.token);
       setToken(data.token);

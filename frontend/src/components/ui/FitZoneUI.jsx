@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { fetchAPI } from '../../services/api';
 import './FitZoneUI.css';
 
 // Presentación portada de components/fitzone/shared.tsx de v0. Sin estado de dominio.
@@ -37,8 +40,23 @@ export function DataCard({ className = '', title, description, action, children,
   </section>;
 }
 
-export function AvatarCircle({ initials, size = 'md' }) {
-  return <span className={`avatar-circle avatar-circle--${size}`} aria-hidden="true">{initials}</span>;
+export function AvatarCircle({ initials, foto, size = 'md', className }) {
+  const { token } = useAuth();
+  const [imagen, setImagen] = useState(null);
+  useEffect(() => {
+    let activo = true, url;
+    setImagen(null);
+    // Sólo referencias propias generadas por el servidor; no cargar URLs externas.
+    if (token && /^\/usuarios\/me\/foto\?version=[0-9a-f-]{36}$/.test(foto || '')) {
+      fetchAPI(foto, { responseType: 'blob' }).then((blob) => {
+        if (activo && localStorage.getItem('token') === token) {
+          url = URL.createObjectURL(blob); setImagen(url);
+        }
+      }).catch(() => { /* Mantener iniciales si no hay imagen disponible. */ });
+    }
+    return () => { activo = false; if (url) URL.revokeObjectURL(url); };
+  }, [foto, token]);
+  return <span className={className || `avatar-circle avatar-circle--${size}`} aria-hidden="true">{imagen ? <img src={imagen} alt="" onError={() => setImagen(null)} /> : initials}</span>;
 }
 
 export function EmptyState({ title, description, icon: Icon, action }) {

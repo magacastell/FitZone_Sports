@@ -34,9 +34,11 @@ public class UsuarioService {
     private final RolRepository rolRepository;
     private final SedeRepository sedeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FotoPerfilService fotos;
 
     @Transactional
-    public Usuario registrarCliente(RegisterRequest request) {
+    public Usuario registrarCliente(RegisterRequest request, org.springframework.web.multipart.MultipartFile foto) {
+        var imagen = fotos.validar(foto);
         if (usuarioRepository.existsByEmail(request.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya esta registrado");
         }
@@ -52,7 +54,9 @@ public class UsuarioService {
                 .contrasenia(passwordEncoder.encode(request.password()))
                 .rol(rol)
                 .build();
-        return usuarioRepository.save(usuario);
+        usuarioRepository.saveAndFlush(usuario);
+        fotos.guardar(usuario, imagen);
+        return usuario;
     }
 
     @Transactional(readOnly = true)

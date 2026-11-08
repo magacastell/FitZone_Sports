@@ -19,6 +19,15 @@ const moneda = (valor) => Number(valor).toLocaleString('es-AR', { style: 'curren
 
 
 // Solo presentación. Nunca determina el estado de membresía ni autoriza acceso.
+export function disponibilidadRenovacion(datos, ahora = Date.now()) {
+  if (datos.estado === 'SUSPENDIDA') return 'suspendida';
+  if (datos.renovacionAutomatica) return 'automatica';
+  if (datos.periodos?.some((p) => p.estado === 'PROGRAMADA' && Date.parse(p.fin) > ahora)) return 'programada';
+  if (datos.estado === 'VENCIDA') return 'disponible';
+  return datos.estado === 'ACTIVA' && presentacionVigencia(datos.periodoVigente, ahora, datos.periodos)?.aviso
+    ? 'disponible' : 'vigente';
+}
+
 export function presentacionVigencia(periodo, ahora = Date.now(), periodos = []) {
   if (!periodo?.inicio || !periodo?.fin) return null;
   const inicio = Date.parse(periodo.inicio);
@@ -36,7 +45,7 @@ export function presentacionVigencia(periodo, ahora = Date.now(), periodos = [])
   };
 }
 
-function VigenciaPeriodo({ periodo, estado, periodos }) {
+function VigenciaPeriodo({ periodo, estado, periodos, automatica }) {
   const [ahora, setAhora] = useState(Date.now);
   useEffect(() => {
     const timer = setInterval(() => setAhora(Date.now()), 60000);
@@ -50,7 +59,7 @@ function VigenciaPeriodo({ periodo, estado, periodos }) {
       <span style={{ width: `${vista.porcentaje}%` }} />
     </div>}
     <div className="membership-period__dates"><span><span className="sr-only">Inicio: </span>{fecha(periodo.inicio)}</span><span><span className="sr-only">Fin: </span>{fecha(periodo.fin)}</span></div>
-    {estado === 'ACTIVA' && vista?.aviso && <p className="membership-expiry-notice" role="status">{vista.aviso} <a href="#renovacion-titulo">Renovar membresía</a></p>}
+    {estado === 'ACTIVA' && vista?.aviso && !automatica && <p className="membership-expiry-notice" role="status">{vista.aviso} {disponibilidadRenovacion({ estado, periodoVigente: periodo, periodos }, ahora) === 'disponible' && <a href="#renovacion-titulo">Renovar membresía</a>}</p>}
   </div>;
 }
 
@@ -81,7 +90,7 @@ export function ResumenMembresia({ membresia, puedeAbrirQr, perfil, children }) 
       </div>
       {vencida && ultimo && <div className="membership-history" role="status"><p>Tu último período venció el <strong>{fecha(ultimo.fin)}</strong> (hora argentina).</p><p>Última vigencia: {fecha(ultimo.inicio)} → {fecha(ultimo.fin)}.</p></div>}
       {perfil?.estado === 'cargado' && <p className="membership-home">Sede habitual: <strong>{perfil.datos.sedeNombre || 'Sin asignar'}</strong></p>}
-      {periodo ? <VigenciaPeriodo periodo={periodo} estado={datos.estado} periodos={datos.periodos} /> : <p>No hay un período vigente.</p>}
+      {periodo ? <VigenciaPeriodo periodo={periodo} estado={datos.estado} periodos={datos.periodos} automatica={datos.renovacionAutomatica} /> : <p>No hay un período vigente.</p>}
     </>}
     <div className="membership-card__footer">
       {datos && <div className="membership-next-period"><span className="membership-next-period__icon" aria-hidden="true"><CalendarDays /></span><span><small>{programados.length > 1 ? 'Períodos programados' : 'Próximo período'}</small>
@@ -101,7 +110,7 @@ export function DatosPersonales({ perfil, mostrarEnlace = true, rol, membresia }
     {perfil.estado === 'error' && <p role="alert">No pudimos cargar tu perfil. {mensajePortal(perfil.mensaje)}</p>}
     {datos && <>
       <div className="member-identity">
-        <AvatarCircle initials={`${datos.nombre?.[0] || ''}${datos.apellido?.[0] || ''}`} size="lg" />
+        <AvatarCircle initials={`${datos.nombre?.[0] || ''}${datos.apellido?.[0] || ''}`} foto={datos.foto} size="lg" />
         <div><h4>{datos.nombre} {datos.apellido}</h4><p><UserRound aria-hidden="true" />{nombreActor(rol || datos.rol, membresia)}</p></div>
         {typeof datos.activo === 'boolean' && <StatusBadge tone={datos.activo ? 'success' : 'neutral'}>Cuenta {datos.activo ? 'activa' : 'inactiva'}</StatusBadge>}
       </div>

@@ -6,6 +6,26 @@ export function consultarMiPerfil() {
   return fetchAPI('/usuarios/me');
 }
 
+export function actualizarMiPerfil({ nombre, apellido }) {
+  return fetchAPI('/usuarios/me', {
+    method: 'PATCH',
+    body: JSON.stringify({ nombre, apellido }),
+  });
+}
+
+export function actualizarMiFoto(archivo) {
+  const cuerpo = new FormData();
+  cuerpo.append('foto', archivo);
+  return fetchAPI('/usuarios/me/foto', { method: 'PUT', multipart: true, body: cuerpo });
+}
+
+export function configurarRenovacionAutomatica(membresiaId, habilitada) {
+  return fetchAPI(`/membresias/${membresiaId}/renovacion-automatica`, {
+    method: 'PUT',
+    body: JSON.stringify({ habilitada }),
+  });
+}
+
 export function consultarMiMembresia() {
   return fetchAPI('/membresias/me');
 }

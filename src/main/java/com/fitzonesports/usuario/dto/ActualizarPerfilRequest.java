@@ -7,5 +7,5 @@ import jakarta.validation.constraints.Size;
 public record ActualizarPerfilRequest(
         @Pattern(regexp = ".*\\S.*", message = "no puede estar vacio") @Size(max = 255) String nombre,
         @Pattern(regexp = ".*\\S.*", message = "no puede estar vacio") @Size(max = 255) String apellido,
-        @Size(max = 255) String foto) {
+        @jakarta.validation.constraints.Null(message = "Para reemplazar la foto usá la carga de archivo") String foto) {
 }

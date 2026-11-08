@@ -24,6 +24,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final com.fitzonesports.usuario.service.FotoPerfilService fotos;
+
+    @GetMapping("/me/foto")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
+    public ResponseEntity<byte[]> consultarFoto(Authentication authentication) {
+        var foto = fotos.consultar(authentication.getName());
+        return ResponseEntity.ok().contentType(org.springframework.http.MediaType.parseMediaType(foto.tipo()))
+                .header("X-Content-Type-Options", "nosniff").header("Cache-Control", "no-store")
+                .body(foto.contenido());
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping(value = "/me/foto", consumes = "multipart/form-data")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
+    public ResponseEntity<UsuarioResponse> reemplazarFoto(Authentication authentication,
+            @org.springframework.web.bind.annotation.RequestPart("foto") org.springframework.web.multipart.MultipartFile foto) {
+        return ResponseEntity.ok(fotos.reemplazar(authentication.getName(), foto));
+    }
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")

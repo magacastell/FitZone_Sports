@@ -77,7 +77,8 @@ paths:
       summary: Registrar cliente
       description: Crea cliente con rol actual USUARIO. No permite elegir roles ni estado de membresía.
         No recibe sede; el alta comercial queda sin sede habitual. Email duplicado produce 409. DNI es único en BD, pero su conflicto todavía no se traduce
-        explícitamente en el servicio.
+        explícitamente en el servicio. Requiere multipart con datos JSON y foto PNG/JPEG de hasta 2 MB;
+        dimensión máxima 4096 px por lado y 8 megapíxeles. No acepta alta JSON sin foto.
       operationId: registrarCliente
       x-implementation-status: implemented
       responses:
@@ -91,16 +92,32 @@ paths:
           $ref: '#/components/responses/Validacion'
         '409':
           $ref: '#/components/responses/Conflicto'
+        '413':
+          description: Archivo o petición demasiado grande.
+        '415':
+          description: El registro requiere multipart/form-data con parte datos application/json.
       security: []
       x-divergencias-backend:
       - Conflicto DNI depende actualmente de BD y no tiene traducción explícita a 409.
       requestBody:
         required: true
-        description: Datos de la operación.
+        description: Datos JSON y archivo obligatorio; el alta y la foto se confirman juntos.
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              type: object
+              required: [datos, foto]
+              properties:
+                datos:
+                  $ref: '#/components/schemas/RegisterRequest'
+                foto:
+                  type: string
+                  format: binary
+            encoding:
+              datos:
+                contentType: application/json
+              foto:
+                contentType: image/png, image/jpeg
       x-roles-actuales:
       - PUBLICO
       x-contract-source:
@@ -109,6 +126,55 @@ paths:
       x-contract-basis: DTO/comportamiento funcional existente y convenciones técnicas del contrato.
       x-permisos-objetivo:
       - PUBLICO
+  /usuarios/me/foto:
+    get:
+      tags: [M1 · Usuarios]
+      summary: Consultar foto propia
+      operationId: consultarFotoPropia
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: JWT del titular; foto persistida en PostgreSQL. No hay URLs públicas ni acceso por ID ajeno. Cache-Control no-store y X-Content-Type-Options nosniff.
+      responses:
+        '200':
+          description: Imagen propia.
+          content:
+            image/png:
+              schema: {type: string, format: binary}
+            image/jpeg:
+              schema: {type: string, format: binary}
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+    put:
+      tags: [M1 · Usuarios]
+      summary: Reemplazar foto propia
+      operationId: reemplazarFotoPropia
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: PNG/JPEG hasta 2 MB, 4096 px por lado y 8 megapíxeles; se valida contenido y se reescriben píxeles sin metadatos. No requiere membresía.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [foto]
+              properties:
+                foto: {type: string, format: binary}
+      responses:
+        '200':
+          description: Perfil con referencia versionada de la foto.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '400':
+          $ref: '#/components/responses/Validacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '413':
+          description: Archivo o petición excede el tamaño admitido.
   /usuarios/me:
     get:
       tags:
@@ -2800,22 +2866,26 @@ components:
         nombre:
           type: string
           minLength: 1
+          maxLength: 255
           pattern: .*\S.*
           example: Ana
         apellido:
           type: string
           minLength: 1
+          maxLength: 255
           pattern: .*\S.*
           example: Pérez
         dni:
           type: string
           minLength: 1
+          maxLength: 255
           pattern: .*\S.*
           example: '30123456'
         email:
           type: string
           format: email
           minLength: 1
+          maxLength: 255
           pattern: .*\S.*
           example: ana@ejemplo.com
         password:
@@ -2880,7 +2950,7 @@ components:
       x-contract-status: stable
     ActualizarPerfilRequest:
       type: object
-      description: 'DTO actual: campo omitido o null significa no modificar. foto es String, no exige URL. No cambia
+      description: 'DTO actual: campo omitido o null significa no modificar. foto sólo admite null; se reemplaza mediante PUT multipart /usuarios/me/foto. No cambia
         email, DNI, rol, sede ni activo; no es JSON Merge Patch.'
       properties:
         nombre:
@@ -2898,8 +2968,7 @@ components:
         foto:
           type: string
           nullable: true
-          maxLength: 255
-          example: perfil-ana.jpg
+          enum: [null]
       x-contract-status: stable
     ActualizarUsuarioRequest:
       type: object

@@ -40,12 +40,11 @@ function MembresiaContenido() {
     <ContratacionMembresia perfil={perfil} onContratada={() => setConsultaPerfil((valor) => valor + 1)} />
     {membresia.estado === 'cargada' && <>
       <div className={`membership-layout${puedeAbrirQr ? '' : ' membership-layout--sin-acceso'}`}><div className="portal-membership-column">
-        <ResumenMembresia membresia={membresia} puedeAbrirQr={puedeAbrirQr} perfil={perfil}>
-          {perfil.estado === 'cargado' && (perfil.datos.id === membresia.datos.usuarioId
+        <ResumenMembresia membresia={membresia} puedeAbrirQr={puedeAbrirQr} perfil={perfil} />
+      </div>{puedeAbrirQr && <AccesoRapido puedeAbrirQr={puedeAbrirQr} membresia={membresia} />}</div>
+      {perfil.estado === 'cargado' && (perfil.datos.id === membresia.datos.usuarioId
             ? <RenovacionMembresia key={`${perfil.datos.id}:${membresia.datos.id}`} perfil={perfil.datos} membresia={membresia.datos} onRenovada={(datos) => actualizarMembresia({ estado: 'cargada', datos })} />
             : <p role="alert">El perfil y la membresía no corresponden a la misma cuenta.</p>)}
-        </ResumenMembresia>
-      </div>{puedeAbrirQr && <AccesoRapido puedeAbrirQr={puedeAbrirQr} membresia={membresia} />}</div>
       <div className="member-details-grid"><DatosPersonales perfil={perfil} rol={user.rol} membresia={membresia} /><ResumenComprobantes membresia={membresia} /></div>
     </>}
   </div></div>;

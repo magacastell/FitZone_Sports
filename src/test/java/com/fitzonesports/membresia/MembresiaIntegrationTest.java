@@ -403,7 +403,7 @@ class MembresiaIntegrationTest {
     @Test void registroLoginNoPermitenElegirPrivilegios() throws Exception {
         var usuarios=contexto.getBean(com.fitzonesports.usuario.service.UsuarioService.class);
         String nuevo="registro-"+UUID.randomUUID()+"@test.com";
-        var registrado=usuarios.registrarCliente(new com.fitzonesports.usuario.dto.RegisterRequest("Nuevo","Cliente",nuevo,nuevo,"password123"));
+        var registrado=usuarios.registrarCliente(new com.fitzonesports.usuario.dto.RegisterRequest("Nuevo","Cliente",nuevo,nuevo,"password123"), fotoRegistro());
         assertEquals("USUARIO",registrado.getRol().getNombre());
         assertFalse(service.tieneMembresiaVigente(registrado.getId()));
         var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
@@ -499,8 +499,9 @@ class MembresiaIntegrationTest {
         var mvc=recepcionMvc();
         for (String extra : new String[]{"", ",\"sedeId\":"+sede}) {
             String mail="sin-sede-"+UUID.randomUUID()+"@test.com";
-            var registro=mvc.perform(post("/auth/register").contentType("application/json").content(
-                "{\"nombre\":\"Nuevo\",\"apellido\":\"Cliente\",\"dni\":\""+mail+"\",\"email\":\""+mail+"\",\"password\":\"password123\""+extra+"}"))
+            var datos=new org.springframework.mock.web.MockMultipartFile("datos", "", "application/json",
+                ("{\"nombre\":\"Nuevo\",\"apellido\":\"Cliente\",\"dni\":\""+mail+"\",\"email\":\""+mail+"\",\"password\":\"password123\""+extra+"}").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            var registro=mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/auth/register").file(datos).file(fotoRegistro()))
                 .andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
             String token=new com.fasterxml.jackson.databind.ObjectMapper().readTree(registro.getResponse().getContentAsString()).get("token").asText();
             mvc.perform(get("/usuarios/me").header("Authorization","Bearer "+token))
@@ -509,6 +510,11 @@ class MembresiaIntegrationTest {
                 .andExpect(jsonPath("$.sedeNombre").value(org.hamcrest.Matchers.nullValue()));
             mvc.perform(get("/sedes")).andExpect(MockMvcResultMatchers.status().isUnauthorized());
         }
+    }
+    private org.springframework.mock.web.MockMultipartFile fotoRegistro() throws Exception {
+        var salida=new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB),"png",salida);
+        return new org.springframework.mock.web.MockMultipartFile("foto","foto.png","image/png",salida.toByteArray());
     }
     @Test void sedeAltaSinAsignacionExigeEleccionYNoOtorgaPrivilegios() {
         jdbc.update("UPDATE usuario SET sedeid=NULL WHERE id=?",usuario); entityManager.clear();
