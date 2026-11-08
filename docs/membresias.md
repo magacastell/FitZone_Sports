@@ -137,11 +137,11 @@ ACTIVA requiere usuario habilitado, ausencia de suspensión y algún período no
 cancelado con `inicio <= ahora < fin`. No hay gracia. `/membresias/me` deriva el
 estado usando Clock aunque la columna `membresia.estado` todavía no se haya
 sincronizado. El job existente la actualiza cada minuto y procesa las automáticas;
-este bloque no agrega jobs ni habilita renovación automática desde la UI.
+la UI configura la preferencia automática mediante el PUT existente, sin agregar jobs.
 
 VENCIDA conserva identidad, sede habitual, origen del alta, períodos y comprobantes.
-La UI muestra último período vencido y plan histórico si existen, y renovación del
-último plan contratado usando su precio actual. No inventa una fecha si no hay un
+La UI muestra último período vencido y plan histórico si existen, y permite elegir
+un plan activo para renovar usando su precio actual. No inventa una fecha si no hay un
 período vencido identificable (por ejemplo, todos cancelados). Renovar no pide sede.
 QR y M2 rechazan vigencia ausente incluso si el QR fue emitido antes del vencimiento.
 La salida de un ingreso ya abierto sigue permitida.
@@ -162,3 +162,52 @@ duración futura. La UI reconsulta al cargar/F5 y recuperar foco; la autorizaci�
 efectiva de QR e ingreso siempre se vuelve a comprobar en backend.
 
 Ver [auditoría, escenarios y verificación del ciclo](ciclo-vida-membresia-verificacion.md).
+
+## Experiencia personal RF-01/RF-02 (07/11/2026, cambios locales para revisión)
+
+Perfil permite editar nombre y apellido mediante PATCH /usuarios/me. Se validan
+texto no vacío y máximo 255 caracteres, según ActualizarPerfilRequest; la respuesta
+confirmada actualiza la pantalla y la identidad del encabezado. No se envían DNI,
+email, rol, sede ni foto en ese PATCH. El alta pública ahora requiere multipart:
+parte `datos` JSON y archivo `foto`. GET/PUT `/usuarios/me/foto` permiten consultar
+y reemplazar la imagen propia con JWT, sin necesidad de membresía. PNG/JPEG hasta
+2 MB, 4096 px por lado y 8 megapíxeles; el servidor valida contenido y reescribe
+píxeles sin metadatos. V10 agrega `usuario_foto` con bytes en PostgreSQL; el String
+`usuario.foto` conserva sólo una referencia versionada. No hay archivos en el repo,
+URL pública, servicio externo ni volumen adicional. Históricas sin foto mantienen
+iniciales. Contratos exactos en OpenAPI y resultados en el informe RF-01/RF-02.
+
+La renovación manual nueva se ofrece para VENCIDA y para ACTIVA dentro del aviso
+visual existente de siete días, sin automática habilitada ni períodos PROGRAMADA.
+Lejos del vencimiento no hay botón, enlace ni formulario de renovación anticipada.
+SUSPENDIDA no inicia nuevas renovaciones. Los intentos ya guardados conservan su
+recuperación incluso si cambió el estado; backend decide si admite el replay.
+
+Se reutiliza CatalogoPlanes: nombre, duración y precio reales; el usuario confirma
+el plan del siguiente período. Antes de cargar planes y de crear una intención se
+reconsulta /membresias/me. El POST sigue siendo /{id}/renovaciones, nunca un alta;
+planId y UUID se conservan ante red/5xx/F5 y conflictos. Cambiar de plan no convierte
+el período vigente, no prorratea y no toca snapshots ni comprobantes anteriores.
+Con períodos PROGRAMADA no se ofrece acumular otro. Si hay un hueco entre períodos,
+la UI lo deriva a administración: no decide cómo rellenarlo o reordenar pagos.
+
+La automática se consulta en el DTO y se cambia con PUT de habilitada true/false.
+Se informa que el cobro es simulado y ocurre al agotarse el último período pagado,
+con el último plan contratado, que puede ser futuro y distinto al vigente. Si el
+último período terminó, habilitar puede causar un cobro en la próxima ejecución
+del job (aproximadamente un minuto). No se prometen cargos mientras está suspendida.
+
+Para iniciar otra renovación manual se debe desactivar antes la automática y
+reconsultar la cuenta. La selección/pago manual y el cambio de preferencia se
+bloquean entre sí en esta pantalla; una intención monetaria pendiente impide cambiar
+la automática. Ante error del PUT se conserva el valor confirmado y se ofrece
+reenviar exactamente la misma preferencia, sin invertirla ni iniciar un pago manual.
+No se cambia el plan de la automática por fuera de una renovación consentida.
+
+Estas medidas UX no son autorización ni exclusión entre clientes: otras pestañas
+o llamadas directas siguen sujetas al bloqueo por titular, idempotencia y transacción
+existentes. No se amplía la garantía a intenciones distintas de otros clientes.
+La renovación conserva sus contratos, roles y reglas de precio. RF-01 agrega el
+upload, su contrato multipart y la migración V10 descritos arriba.
+
+Ver [alcance, validación y límites](rf01-rf02-experiencia-verificacion.md).

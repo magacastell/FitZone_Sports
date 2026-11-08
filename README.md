@@ -222,7 +222,7 @@ La contratación, renovación manual/automática, consulta histórica, suspensi�
 
 Login: `POST /api/v1/auth/login` con `{ "email": "...", "password": "..." }`, devuelve un JWT para usar como `Authorization: Bearer <token>` en el resto de los endpoints.
 
-Registro: `POST /api/v1/auth/register` con `{ "nombre": "...", "apellido": "...", "dni": "...", "email": "...", "password": "..." }`. El alta comercial queda sin sede habitual. Se elige al contratar con sesión iniciada; GET /sedes sigue autenticado.
+Registro: `POST /api/v1/auth/register` multipart, con parte `datos` JSON (`nombre`, `apellido`, `dni`, `email`, `password`) y archivo obligatorio `foto` PNG/JPEG hasta 2 MB. La foto se guarda en PostgreSQL mediante V10, sin carpeta de uploads ni servicio externo; reemplazo y consulta autenticada en `/usuarios/me/foto`. El alta comercial queda sin sede habitual. Se elige al contratar con sesión iniciada; GET /sedes sigue autenticado. Detalle en [verificación RF-01/RF-02](docs/rf01-rf02-experiencia-verificacion.md).
 
 ## Estructura del backend
 

@@ -3,6 +3,10 @@
 Rama para revisión: `feature/integracion-final-frontend`. Corte: 30/10/2026.
 No implica adopción ni merge a `main`.
 
+Evolución local del 07/11/2026: los cambios RF-01/RF-02 para revisión se documentan
+en [su informe](rf01-rf02-experiencia-verificacion.md), en una rama derivada de este
+corte. El inventario y las pruebas del 30/10 que siguen son históricos.
+
 ## 1. Objetivo
 
 El trabajo comenzó para integrar y unificar el frontend existente con la composición
