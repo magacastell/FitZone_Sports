@@ -939,6 +939,44 @@ paths:
           description: Recurso inexistente.
         '409':
           description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /accesos/offline/conexion:
+    get:
+      tags: [M2 · Accesos]
+      summary: Comprobar comunicación autenticada con el servidor
+      responses:
+        '204': {description: Comunicación disponible; no-store}
+        '401': {$ref: '#/components/responses/NoAutenticado'}
+  /accesos/offline/preparacion:
+    post:
+      tags: [M2 · Accesos]
+      summary: Autorizar el terminal principal de Recepción y obtener su copia
+      description: Sólo RECEPCIONISTA habilitado de la sede. Un terminal y operador por sede; otro UUID devuelve 403. Incluye exclusivamente socios con lotes offline preparados para esa sede, hasta 1000; sin fotos, DNI, email de socios ni contraseñas. Evidencia RS256 tipo m2-copia, válida dos horas, con períodos y presencia conocida. No-store. No se debe reemplazar una copia con pendientes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [terminalId]
+              properties:
+                terminalId: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Copia firmada y clave pública
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [evidencia, jwk, servidorAhora, sedeNombre]
+                properties:
+                  evidencia: {type: string, description: JWS con revision, terminalId, operadorId, sedeId, capacidad, miembros y presencias}
+                  jwk: {type: object}
+                  servidorAhora: {type: integer, format: int64}
+                  sedeNombre: {type: string}
+        '400': {$ref: '#/components/responses/Validacion'}
+        '401': {$ref: '#/components/responses/NoAutenticado'}
+        '403': {$ref: '#/components/responses/SinPermiso'}
+        '409': {$ref: '#/components/responses/Conflicto'}
   /accesos/offline/credenciales:
     post:
       tags: [M2 · Accesos]

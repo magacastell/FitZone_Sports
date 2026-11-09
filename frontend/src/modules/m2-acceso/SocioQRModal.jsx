@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { fetchAPI } from '../../services/api';
 import './SocioQRModal.css';
+import PrepararQrOffline from './PrepararQrOffline';
+import { qrPreparado } from '../../services/offline/db';
 
 // RF-04: el QR cambia cada minuto. Se pide uno nuevo un poco antes de que venza el actual.
 const MARGEN_RENOVACION_MS = 5000;
@@ -24,6 +26,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
   const [vence, setVence] = useState(0);
   const [segundos, setSegundos] = useState(0);
   const [error, setError] = useState('');
+  const [revisionOffline,setRevisionOffline]=useState(0);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -42,17 +45,19 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
 
     const renovar = async () => {
       try {
-        const data = await fetchAPI('/accesos/qr');
+        let data;
+        try { data=await qrPreparado(); }
+        catch { data=await fetchAPI('/accesos/qr'); }
         if (!activo) return;
-        const duracion = vigenciaMs(data.token);
+        const duracion = data.duracion ?? vigenciaMs(data.token);
         setToken(data.token);
         setVence(Date.now() + duracion);
         setError('');
-        timer = setTimeout(renovar, Math.max(duracion - MARGEN_RENOVACION_MS, 1000));
+        timer = setTimeout(renovar, Math.max(data.duracion ? duracion + 30 : duracion - MARGEN_RENOVACION_MS, 1000));
       } catch (err) {
         if (!activo) return;
         setToken(null);
-        setError(err.message || 'No pudimos generar tu QR.');
+        setError(err.status ? err.message : `${err.message || ''} Sin conexión y sin credenciales offline vigentes preparadas. Conectate para generar una autorización.`);
         if (err.status === 403) onAccesoDenegado?.(err);
       }
     };
@@ -62,7 +67,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
       activo = false;
       clearTimeout(timer);
     };
-  }, [isOpen, onAccesoDenegado]);
+  }, [isOpen, onAccesoDenegado,revisionOffline]);
 
   useEffect(() => {
     if (!token) return;
@@ -93,6 +98,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
     >
       <h2 id="socio-qr-title">Acceso a Sede - Credencial Digital</h2>
       <p id="socio-qr-description">Mostrá este código en recepción. Se renueva solo cada minuto.</p>
+      <PrepararQrOffline onPreparado={()=>setRevisionOffline(v=>v+1)} />
 
       <div style={qrContainerStyle}>
         {token ? (

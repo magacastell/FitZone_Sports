@@ -89,6 +89,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('m3Service')||spec.includes('m4Service'))return synthetic({listarClases:id=>{const d=deferred();d.args=[id];(e.actividades??=[]).push(d);return d.promise;},listarCanchas:id=>{const d=deferred();d.args=[id];(e.actividades??=[]).push(d);return d.promise;}},context);
   if(spec.includes('m2Service'))return synthetic(e.m2,context);
   if(spec.includes('pagosService'))return synthetic({descargarComprobante:id=>{const d=deferred();d.args=[id];e.pdfs.push(d);return d.promise;}},context);
+  if(spec.includes('services/offline/db'))return synthetic({qrPreparado:async()=>{throw Error('Sin lote en este test online');}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
   if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check'].map(k=>[k,()=>jsx('svg',{})])),context);
@@ -225,7 +226,7 @@ for(const status of [200,404,403,500])await test('contratacion 409 reconciliacio
 });
 for(const status of [403,500,undefined])await test('M2 '+(status??'red')+': mensaje real y revalidacion solo 403',async()=>{
  const e=env(),l=await layout(e);await setMember(e,dto());const route=await runner('route',e,{},'SocioQRRoute');
- const modal=await runner('qr',e,e.modal);assert.equal(e.qrs[0].args[0],'/accesos/qr');
+ const modal=await runner('qr',e,e.modal);await settle(e);assert.equal(e.qrs[0].args[0],'/accesos/qr');
  e.qrs[0].reject(err(status,'Denegacion real M2'));await settle(e);assert(text(modal.view).includes('Denegacion real M2'));
  assert.equal(e.members.length,status===403?2:1);
  if(status===403){
@@ -234,11 +235,11 @@ for(const status of [403,500,undefined])await test('M2 '+(status??'red')+': mens
  }
 });
 await test('QR real usa token del backend; cierre/unmount impide notificacion tardia',async()=>{
- const e=env();let denied=0;const r=await runner('qr',e,{isOpen:true,onClose(){},onAccesoDenegado(){denied++;}});
+ const e=env();let denied=0;const r=await runner('qr',e,{isOpen:true,onClose(){},onAccesoDenegado(){denied++;}});await settle(e);
  e.qrs[0].resolve({token:'header.'+Buffer.from(JSON.stringify({iat:100,exp:160})).toString('base64')+'.sig'});await settle(e);
  assert.equal(nodes(r.view,n=>n.type==='qr-svg').length,1);assert.equal(denied,0);
  const e2=env(),r2=await runner('qr',e2,{isOpen:true,onClose(){},onAccesoDenegado(){denied++;}});
- r2.unmount();e2.qrs[0].reject(err(403));await settle(e2);assert.equal(denied,0);
+ await settle(e2);r2.unmount();e2.qrs[0].reject(err(403));await settle(e2);assert.equal(denied,0);
 });
 await test('renovacion: sessionStorage, red, remount/replay misma clave y DTO compartido',async()=>{
  const e=env(),l=await layout(e);await setMember(e,cercana());consultaRenovacion(e);

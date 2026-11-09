@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-pwa.mjs",
     "preview": "vite preview",
     "test": "npm run test:api && npm run test:dominio && npm run test:planes && npm run test:actividades && npm run test:gerencia",
     "test:api": "node --experimental-vm-modules scripts/test-api.mjs",
+    "test:offline": "node scripts/test-offline.mjs",
     "test:dominio": "node --experimental-vm-modules scripts/test-dominio.mjs",
     "test:planes": "node --experimental-vm-modules scripts/test-planes.mjs",
     "test:actividades": "node --experimental-vm-modules scripts/test-servicios-actividades.mjs",
