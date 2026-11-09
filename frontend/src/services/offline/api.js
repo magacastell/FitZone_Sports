@@ -1,11 +1,16 @@
 import { fetchAPI } from '../api';
-import { guardarCopia, guardarLote, idTerminal,cuentaActual } from './db';
+import { guardarCopia, guardarLote, idTerminal,cuentaActual,db } from './db';
 
 export async function prepararTerminal() {
   const cuenta=cuentaActual(),token=localStorage.getItem('token');
   const respuesta=await fetchAPI('/accesos/offline/preparacion',{method:'POST',body:JSON.stringify({terminalId:await idTerminal()})});
   if(cuentaActual()!==cuenta || localStorage.getItem('token')!==token)throw Error('Cambió la sesión durante la preparación.');
-  return guardarCopia(respuesta);
+  const copia=await guardarCopia(respuesta);
+  if(globalThis.navigator?.storage?.persist) {
+    const persistente=await navigator.storage.persist().catch(()=>false);
+    await db.meta.update('copia',{persistente});
+  }
+  return copia;
 }
 export async function prepararCredenciales(sedeId) {
   const cuenta=cuentaActual(),token=localStorage.getItem('token');

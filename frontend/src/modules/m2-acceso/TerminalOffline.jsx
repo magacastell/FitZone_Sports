@@ -4,6 +4,7 @@ import { prepararTerminal,hayConexion } from '../../services/offline/api';
 import { db,copiaActual } from '../../services/offline/db';
 import { registrarLocal } from '../../services/offline/movimientos';
 import { sincronizar } from '../../services/offline/sync';
+import './OfflineAcceso.css';
 
 export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
   const [vista,setVista]=useState({}),[mensaje,setMensaje]=useState(''),[conexion,setConexion]=useState('consultando');
@@ -40,6 +41,12 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
   async function operar(e) {
     e.preventDefault();await ejecutar(async()=>{
       if(conexion==='sesión requerida')throw Error('Volvé a iniciar sesión antes de operar con el servidor disponible.');
+      if(conexion==='disponible') {
+        await sincronizar();
+        if(await db.movimientos.where('estado').anyOf('PENDIENTE','CONFLICTO','RECHAZADO').count())throw Error('Revisá los pendientes y conflictos antes de preparar una nueva operación con conexión.');
+        // Con central disponible se renueva la copia: no autorizar con una suspensión vieja.
+        await prepararTerminal();
+      }
       const movimiento=await registrarLocal(tipo,codigo.trim(),porId,autonomo);
       if(vivo.current){setCodigo('');setMensaje(`${tipo==='INGRESO'?'Ingreso':'Egreso'} provisional guardado. Visita ${movimiento.visitaId}. Pendiente de confirmación central.`);}
       if(conexion==='disponible') {
@@ -51,7 +58,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
       onMovimiento();
     });
   }
-  return <section className="panel" aria-label="Terminal offline"><h2>Terminal preparado · acceso de contingencia</h2>
+  return <section className="panel offline-terminal" aria-label="Terminal offline"><h2>Terminal preparado · acceso de contingencia</h2>
     <p>Servidor: <strong>{conexion}</strong>. {vista.copia?'Terminal preparado':'Terminal no preparado o caducado'}.</p>
     {vista.error&&<p role="alert">{vista.error}</p>}
     <AppButton disabled={ocupado||conexion!=='disponible'||vista.pendientes>0} onClick={()=>ejecutar(async()=>{await prepararTerminal();setMensaje('Copia autorizada guardada por hasta dos horas.');})}>Preparar / actualizar terminal</AppButton>
@@ -61,6 +68,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
     <p><a href="/terminal-offline">Abrir terminal sin conexión</a> · <a href="/recepcion/acceso">Volver a Recepción</a></p>
     {vista.copia&&<><p>Sede: {vista.copia.sedeNombre}. Copia del {new Date(vista.copia.servidorAhora).toLocaleString()} · vence {new Date(vista.copia.datos.exp*1000).toLocaleString()}.</p>
       <p>Última respuesta de sincronización: {vista.copia.ultimaSincronizacion?new Date(vista.copia.ultimaSincronizacion).toLocaleString():'Sin confirmación todavía'}.</p>
+      {!vista.copia.persistente&&<p>El navegador no concedió persistencia protegida: no borres sus datos ni uses modo privado. Los pendientes se conservan al cerrar normalmente.</p>}
       <p>Aforo local provisional: <strong data-testid="aforo-local">{vista.aforo}</strong> / {vista.copia.datos.capacidad}. Incluye presencia conocida y movimientos locales; puede diferir del central.</p>
       <form onSubmit={operar}><label>Movimiento<select aria-label="Movimiento offline" value={tipo} disabled={ocupado} onChange={e=>{setTipo(e.target.value);setPorId(false);}}><option value="INGRESO">Ingreso</option><option value="SALIDA">Egreso</option></select></label>
         {tipo==='SALIDA'&&<label><input type="checkbox" checked={porId} onChange={e=>setPorId(e.target.checked)}/>Usar ID de visita o número de ingreso central</label>}

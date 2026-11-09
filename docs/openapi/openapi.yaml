@@ -988,6 +988,7 @@ paths:
         '400': {$ref: '#/components/responses/Validacion'}
         '401': {$ref: '#/components/responses/NoAutenticado'}
         '403': {$ref: '#/components/responses/SinPermiso'}
+        '503': {description: Configuración de firma offline no disponible; conservar pendientes para reintentar}
   /accesos/offline/conexion:
     get:
       tags: [M2 · Accesos]
@@ -1026,6 +1027,7 @@ paths:
         '401': {$ref: '#/components/responses/NoAutenticado'}
         '403': {$ref: '#/components/responses/SinPermiso'}
         '409': {$ref: '#/components/responses/Conflicto'}
+        '503': {description: Se requiere clave RSA privada persistente exclusiva de M2 en el servidor}
   /accesos/offline/credenciales:
     post:
       tags: [M2 · Accesos]
@@ -1059,6 +1061,7 @@ paths:
         '400': {$ref: '#/components/responses/Validacion'}
         '401': {$ref: '#/components/responses/NoAutenticado'}
         '403': {$ref: '#/components/responses/SinPermiso'}
+        '503': {description: Se requiere clave RSA privada persistente exclusiva de M2 en el servidor}
   /accesos/qr:
     get:
       tags:

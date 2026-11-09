@@ -40,7 +40,7 @@ export async function copiaActual(autonoma = false) {
 }
 export async function guardarLote(respuesta) {
   const relojLocal=Date.now();
-  await db.meta.put({id:'qr:'+cuentaActual(),...respuesta,relojLocal,ultimoReloj:relojLocal,desfase:respuesta.servidorAhora-relojLocal});
+  await db.meta.put({...respuesta,id:'qr:'+cuentaActual(),relojLocal,ultimoReloj:relojLocal,desfase:respuesta.servidorAhora-relojLocal});
   localStorage.setItem('fitzone:offline:socio',cuentaActual());
 }
 export async function qrPreparado(autonomo=false) {

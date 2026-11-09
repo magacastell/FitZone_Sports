@@ -114,7 +114,7 @@ public class AccesoService {
         }
 
         acceso.setFechaHoraSalida(LocalDateTime.now(clock));
-        RegistroAcceso cerrado = registroAccesoRepository.save(acceso);
+        RegistroAcceso cerrado = registroAccesoRepository.saveAndFlush(acceso);
         UsuarioResponse titular = usuarioService.consultarParaAcceso(cerrado.getUsuarioId());
         return AccesoResponse.from(cerrado,
                 titularValidado(titular), clock.getZone());

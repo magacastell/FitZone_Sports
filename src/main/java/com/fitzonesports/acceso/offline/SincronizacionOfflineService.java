@@ -52,7 +52,8 @@ public class SincronizacionOfflineService {
         var validos=new ArrayList<Evento>();
         for(var e:pendientes) {
             try { validar(e,terminal,operador.id(),operador.sedeId());validos.add(e); }
-            catch(ResponseStatusException | IllegalArgumentException ex) { marcar(e,"RECHAZADO","Evidencia, datos o autorización de captura inválidos",null); }
+            catch(ResponseStatusException ex) { if(ex.getStatusCode().is5xxServerError())throw ex;marcar(e,"RECHAZADO","Evidencia, datos o autorización de captura inválidos",null); }
+            catch(IllegalArgumentException ex) { marcar(e,"RECHAZADO","Formato de captura inválido",null); }
         }
         var visitas=new LinkedHashMap<String,List<Evento>>();
         for(var e:validos)visitas.computeIfAbsent(e.visitaId(),k->new ArrayList<>()).add(e);

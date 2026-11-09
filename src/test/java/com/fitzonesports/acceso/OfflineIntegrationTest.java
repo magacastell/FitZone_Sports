@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(properties={"spring.profiles.active=staging","spring.datasource.url=${PLAN_TEST_DB_URL}","spring.datasource.username=postgres","spring.datasource.password=","jwt.secret=clave-solo-pruebas-offline-no-productiva-1234567890"})
 @Transactional
 class OfflineIntegrationTest {
+    @org.springframework.test.context.DynamicPropertySource
+    static void clave(org.springframework.test.context.DynamicPropertyRegistry propiedades){String valor=FirmaOfflineTest.clavePruebas();propiedades.add("fitzone.offline.private-key",()->valor);}
     @Autowired JdbcTemplate jdbc;
     @Autowired CredencialOfflineService credenciales;
     @Autowired TerminalOfflineService terminales;

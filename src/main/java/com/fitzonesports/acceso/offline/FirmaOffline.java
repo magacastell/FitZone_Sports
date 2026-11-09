@@ -24,8 +24,8 @@ public class FirmaOffline {
         this.clock=clock;
         try {
             if (configurada.isBlank()) {
-                var generador=KeyPairGenerator.getInstance("RSA");generador.initialize(2048);
-                var par=generador.generateKeyPair();privada=par.getPrivate();publica=par.getPublic();
+                // Sin clave persistente no se preparan credenciales que morirían al reiniciar Spring.
+                privada=null;publica=null;
             } else {
                 var fabrica=KeyFactory.getInstance("RSA");
                 privada=fabrica.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(configurada)));
@@ -36,11 +36,13 @@ public class FirmaOffline {
         } catch (GeneralSecurityException | IllegalArgumentException e) { throw new IllegalStateException("Clave exclusiva de M2 inválida",e); }
     }
     public String firmar(String tipo, Map<String,?> datos, Instant desde, Instant hasta) {
+        comprobarConfiguracion();
         return Jwts.builder().issuer(EMISOR).claim("tipo",tipo).claims(datos)
                 .issuedAt(Date.from(clock.instant())).notBefore(Date.from(desde)).expiration(Date.from(hasta))
                 .signWith(privada,Jwts.SIG.RS256).compact();
     }
     public Claims verificar(String token,String tipo,Instant instante) {
+        comprobarConfiguracion();
         try {
             var jws=Jwts.parser().verifyWith(publica).requireIssuer(EMISOR)
                     .clock(()->Date.from(instante)).build().parseSignedClaims(token);
@@ -52,10 +54,14 @@ public class FirmaOffline {
         }
     }
     public Map<String,String> jwk() {
+        comprobarConfiguracion();
         var rsa=(RSAPublicKey)publica;
         return Map.of("kty","RSA","alg","RS256","use","sig","n",sinSigno(rsa.getModulus().toByteArray()),"e",sinSigno(rsa.getPublicExponent().toByteArray()));
     }
     private String sinSigno(byte[] bytes) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes[0]==0?Arrays.copyOfRange(bytes,1,bytes.length):bytes);
+    }
+    private void comprobarConfiguracion() {
+        if(privada==null)throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"Configurar fitzone.offline.private-key con una clave RSA persistente del servidor antes de preparar M2 offline");
     }
 }
