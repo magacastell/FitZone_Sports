@@ -17,7 +17,7 @@ export async function fetchAPI(endpoint, options = {}) {
 
   // Token vencido o inválido: se limpia la sesión y se vuelve al login
   // (solo si había token; un 401 en /auth/login es "credenciales incorrectas")
-  if (response.status === 401 && token) {
+  if (response.status === 401 && token && localStorage.getItem('token') === token) {
     localStorage.removeItem('token');
     window.location.href = '/login';
   }

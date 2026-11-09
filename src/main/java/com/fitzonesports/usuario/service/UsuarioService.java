@@ -54,7 +54,21 @@ public class UsuarioService {
                 .contrasenia(passwordEncoder.encode(request.password()))
                 .rol(rol)
                 .build();
-        usuarioRepository.saveAndFlush(usuario);
+        try {
+            usuarioRepository.saveAndFlush(usuario);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // La restricción SQL sigue siendo el árbitro, incluso entre altas concurrentes.
+            for (Throwable causa = e; causa != null; causa = causa.getCause()) {
+                if (causa instanceof org.hibernate.exception.ConstraintViolationException restriccion
+                        && "23505".equals(restriccion.getSQLState())) {
+                    if ("usuario_dni_key".equals(restriccion.getConstraintName()))
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "El DNI ya esta registrado");
+                    if ("usuario_email_key".equals(restriccion.getConstraintName()))
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya esta registrado");
+                }
+            }
+            throw e;
+        }
         fotos.guardar(usuario, imagen);
         return usuario;
     }

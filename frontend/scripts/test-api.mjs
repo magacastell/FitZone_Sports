@@ -2,13 +2,13 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 
-let response, failure, call;
+let response, failure, call, pendingFetch;
 const saved = new Map([['token','jwt-prueba']]);
 const location = { href: '' };
 const context = vm.createContext({
   localStorage: { getItem: (key) => saved.get(key), removeItem: (key) => saved.delete(key) },
   window: { location },
-  fetch: async (...args) => { call = args; if (failure) throw failure; return response; },
+  fetch: async (...args) => { call = args; if (pendingFetch) return pendingFetch; if (failure) throw failure; return response; },
   Error,
   FormData, Blob,
 });
@@ -37,6 +37,17 @@ await test('error no JSON',async()=>{
 await test('401 conserva redireccion y error',async()=>{
  response={ok:false,status:401,json:async()=>({message:'Sesión inválida'})};
  await assert.rejects(api('/x'),e=>e.status===401);assert.equal(saved.has('token'),false);assert.equal(location.href,'/login');
+});
+await test('401 tardío de A no cierra sesión B ni redirige',async()=>{
+ let resolver; pendingFetch=new Promise(resolve=>{resolver=resolve;});
+ saved.set('token','sesion-A');location.href='';
+ const solicitud=api('/usuarios/me');
+ assert.equal(call[1].headers.Authorization,'Bearer sesion-A');
+ saved.set('token','sesion-B');
+ resolver({ok:false,status:401,json:async()=>({message:'A vencida'})});
+ await assert.rejects(solicitud,e=>e.status===401);
+ assert.equal(saved.get('token'),'sesion-B');assert.equal(location.href,'');
+ pendingFetch=null;
 });
 await test('red propaga la misma excepcion',async()=>{
  failure=new Error('Red');await assert.rejects(api('/x'),e=>e===failure);failure=null;

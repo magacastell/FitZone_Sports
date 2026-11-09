@@ -76,8 +76,8 @@ paths:
       - Auth
       summary: Registrar cliente
       description: Crea cliente con rol actual USUARIO. No permite elegir roles ni estado de membresía.
-        No recibe sede; el alta comercial queda sin sede habitual. Email duplicado produce 409. DNI es único en BD, pero su conflicto todavía no se traduce
-        explícitamente en el servicio. Requiere multipart con datos JSON y foto PNG/JPEG de hasta 2 MB;
+        No recibe sede; el alta comercial queda sin sede habitual. Email o DNI duplicado produce 409, conservando la unicidad en BD.
+        Requiere multipart con datos JSON y foto PNG/JPEG de hasta 2 MB;
         dimensión máxima 4096 px por lado y 8 megapíxeles. No acepta alta JSON sin foto.
       operationId: registrarCliente
       x-implementation-status: implemented
@@ -97,8 +97,6 @@ paths:
         '415':
           description: El registro requiere multipart/form-data con parte datos application/json.
       security: []
-      x-divergencias-backend:
-      - Conflicto DNI depende actualmente de BD y no tiene traducción explícita a 409.
       requestBody:
         required: true
         description: Datos JSON y archivo obligatorio; el alta y la foto se confirman juntos.
