@@ -9,5 +9,5 @@ export default function PrepararQrOffline({onPreparado}) {
     try{await prepararCredenciales(sede);setMensaje('QR preparados por hasta dos horas. Pedí a Recepción que actualice su copia.');onPreparado();}
     catch(e){setMensaje(e.message);}finally{setOcupado(false);}
   }
-  return <div><label>Sede para acceso sin conexión<select aria-label="Sede offline" value={sede} onChange={e=>setSede(e.target.value)}><option value="">Elegí una sede</option>{sedes.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}</select></label><button type="button" onClick={preparar} disabled={!sede||ocupado}>Preparar QR offline</button><p role="status">{mensaje}</p></div>;
+  return <div><label>Sede para acceso sin conexión<select aria-label="Sede offline" value={sede} onChange={e=>setSede(e.target.value)}><option value="">Elegí una sede</option>{sedes.map(s=><option key={s.id} value={s.id}>{s.nombre}</option>)}</select></label><button type="button" onClick={preparar} disabled={!sede||ocupado}>Preparar QR offline</button><p role="status">{mensaje}</p><a href="/qr-offline">Abrir QR sin conexión</a></div>;
 }

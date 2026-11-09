@@ -9,6 +9,8 @@ import Gerencia from '../modules/gerencia/Gerencia';
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
 import AforoSede from '../modules/m2-acceso/AforoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
+import TerminalOffline from '../modules/m2-acceso/TerminalOffline';
+import QrOffline from '../modules/m2-acceso/QrOffline';
 import AgendaClases from '../modules/m3-clases/AgendaClases';
 import GrillaCanchas from '../modules/m4-canchas/GrillaCanchas';
 import HistorialComprobante from '../modules/m5-pagos/HistorialComprobante';
@@ -57,6 +59,9 @@ export default function AppRoutes() {
       <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
+          {/* Permiso offline firmado y acotado, verificado dentro del terminal; no usa el Layout remoto. */}
+          <Route path="/terminal-offline" element={<main className="fitzone-ui"><TerminalOffline autonomo /></main>} />
+          <Route path="/qr-offline" element={<QrOffline />} />
 
           {/* Todas las rutas del Layout ahora están protegidas */}
           <Route element={<ProtectedRoute />}>

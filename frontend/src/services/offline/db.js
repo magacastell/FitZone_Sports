@@ -27,9 +27,11 @@ export async function guardarCopia(respuesta) {
   });
   return copia;
 }
-export async function copiaActual() {
+export async function copiaActual(autonoma = false) {
   const copia=await db.meta.get('copia');
-  if(!copia || copia.cuenta!==cuentaActual())throw Error('Este operador no tiene un terminal preparado.');
+  let cuenta;
+  try { cuenta=cuentaActual(); } catch { if(autonoma)cuenta=copia?.cuenta; }
+  if(!copia || copia.cuenta!==cuenta)throw Error('Este operador no tiene un terminal preparado.');
   const ahora=ahoraAutorizado(copia);
   copia.datos=await verificar(copia.evidencia,copia.jwk,'m2-copia',ahora);
   return {copia,ahora};
@@ -37,9 +39,12 @@ export async function copiaActual() {
 export async function guardarLote(respuesta) {
   const relojLocal=Date.now();
   await db.meta.put({id:'qr:'+cuentaActual(),...respuesta,relojLocal,ultimoReloj:relojLocal,desfase:respuesta.servidorAhora-relojLocal});
+  localStorage.setItem('fitzone:offline:socio',cuentaActual());
 }
-export async function qrPreparado() {
-  const lote=await db.meta.get('qr:'+cuentaActual());
+export async function qrPreparado(autonomo=false) {
+  let cuenta;
+  try { cuenta=cuentaActual(); } catch { if(autonomo)cuenta=localStorage.getItem('fitzone:offline:socio'); }
+  const lote=await db.meta.get('qr:'+cuenta);
   if(!lote)throw Error('No preparaste credenciales offline. Conectate para generar una autorización.');
   const ahora=ahoraAutorizado(lote);
   const token=tokenActual(lote.tokens,ahora);

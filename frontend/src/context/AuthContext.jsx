@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    localStorage.removeItem('fitzone:offline:socio');
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');

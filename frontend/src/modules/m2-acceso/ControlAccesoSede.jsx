@@ -9,6 +9,7 @@ import useAforoSede from './useAforoSede';
 import LectorAcceso from './LectorAcceso';
 import TarjetaAforo from './TarjetaAforo';
 import './ControlAccesoSede.css';
+import TerminalOffline from './TerminalOffline';
 
 export default function ControlAccesoSede() {
   const { user, token, loading } = useAuth();
@@ -48,6 +49,7 @@ function PuestoAcceso() {
     {sede && <>
       <div className="access-toolbar"><span><ScanLine aria-hidden="true" />Puesto de recepción</span>{esGerente && <label className="access-site-select">Sede<select value={sedeId} onChange={(event) => setSedeId(Number(event.target.value))}>{contexto.sedes.map((item) => <option key={item.id} value={item.id}>{item.nombre}</option>)}</select></label>}</div>
       <div className="access-overview-grid"><LectorAcceso key={sedeId} sedeId={sedeId} sedeNombre={sede.nombre} esGerente={esGerente} onMovimiento={() => refrescar(true)} /><TarjetaAforo aforo={aforo} refrescar={() => refrescar(true)} sedeNombre={sede.nombre} /></div>
+      <TerminalOffline onMovimiento={()=>refrescar(true)} />
     </>}
   </div></div>;
 }

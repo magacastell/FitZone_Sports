@@ -35,3 +35,26 @@ const evidenciaNueva=await firmarCopia();
 await assert.rejects(()=>guardarCopia({evidencia:evidenciaNueva,jwk,servidorAhora:Date.now()}),/Sincronizá/);
 await db.movimientos.clear();
 console.log('OK offline: terminal estable, preparación firmada y persistencia tras reapertura de IndexedDB');
+
+const {registrarLocal}=await import('../src/services/offline/movimientos.js');
+const miembro={id:7,nombre:'Socio',habilitado:true,suspendido:false,lotes:['lote'],periodos:[{inicio:(now-60)*1000,fin:(now+3600)*1000}]};
+await guardarCopia({evidencia:await firmarCopia({miembros:[miembro]}),jwk,servidorAhora:Date.now()});
+const qr=await new SignJWT({tipo:'m2-qr',uid:7,sid:1,bid:'lote',jti:'lote:1'}).setProtectedHeader({alg:'RS256'})
+ .setIssuer('fitzone-m2').setNotBefore(now).setExpirationTime(now+60).sign(privateKey);
+const entradas=await Promise.allSettled([registrarLocal('INGRESO',qr),registrarLocal('INGRESO',qr)]);
+assert.equal(entradas.filter(r=>r.status==='fulfilled').length,1);assert.equal(await db.movimientos.count(),1);assert.equal(await db.presencias.count(),1);
+db.close();await db.open();assert.equal(await db.movimientos.count(),1);
+await registrarLocal('SALIDA',qr);assert.equal(await db.presencias.count(),0);assert.equal(await db.movimientos.count(),2);
+await assert.rejects(()=>registrarLocal('INGRESO',qr),/ya se utilizó/);
+await db.movimientos.clear();await db.usos.clear();
+await guardarCopia({evidencia:await firmarCopia({miembros:[{...miembro,suspendido:true}]}),jwk,servidorAhora:Date.now()});
+await assert.rejects(()=>registrarLocal('INGRESO',qr),/no autoriza/);
+await guardarCopia({evidencia:await firmarCopia({miembros:[{...miembro,periodos:[{inicio:0,fin:1}]}]}),jwk,servidorAhora:Date.now()});
+await assert.rejects(()=>registrarLocal('INGRESO',qr),/no autoriza/);
+await guardarCopia({evidencia:await firmarCopia({miembros:[miembro]}),jwk,servidorAhora:Date.now()});
+const fallo=()=>{throw new DOMException('Sin espacio','QuotaExceededError');};db.movimientos.hook('creating',fallo);
+await assert.rejects(()=>registrarLocal('INGRESO',qr),/Sin espacio/);assert.equal(await db.presencias.count(),0);assert.equal(await db.usos.count(),0);
+db.movimientos.hook('creating').unsubscribe(fallo);
+await db.meta.update('copia',{desfase:7201000});await assert.rejects(()=>registrarLocal('INGRESO',qr));
+console.log('OK offline: concurrencia local, reapertura, egreso, replay, suspensión, vigencia, caducidad y rollback ante falta de espacio');
+await db.delete();
