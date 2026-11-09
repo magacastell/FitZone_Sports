@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+const BASE_URL = import.meta.env?.VITE_API_URL || '/api/v1';
 
 export async function fetchAPI(endpoint, options = {}) {
   const { responseType = 'json', multipart = false, ...fetchOptions } = options;

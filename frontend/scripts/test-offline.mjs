@@ -24,7 +24,7 @@ const {db,idTerminal,guardarCopia,copiaActual}=await import('../src/services/off
 assert.equal(await idTerminal(),await idTerminal());
 const dos=await Promise.all([idTerminal(),idTerminal()]);assert.equal(dos[0],dos[1]);
 async function firmarCopia(datos={}) {
- return new SignJWT({tipo:'m2-copia',revision:'revision-test',terminalId:dos[0],operadorId:1,sedeId:1,capacidad:20,miembros:[],presencias:[],...datos})
+ return new SignJWT({tipo:'m2-copia',cuenta:'operador@test.invalid',revision:'revision-test',terminalId:dos[0],operadorId:1,sedeId:1,capacidad:20,miembros:[],presencias:[],...datos})
  .setProtectedHeader({alg:'RS256'}).setIssuer('fitzone-m2').setNotBefore(now).setExpirationTime(now+7200).sign(privateKey);
 }
 await guardarCopia({evidencia:await firmarCopia(),jwk,servidorAhora:Date.now(),sedeNombre:'Prueba'});
@@ -57,4 +57,22 @@ await assert.rejects(()=>registrarLocal('INGRESO',qr),/Sin espacio/);assert.equa
 db.movimientos.hook('creating').unsubscribe(fallo);
 await db.meta.update('copia',{desfase:7201000});await assert.rejects(()=>registrarLocal('INGRESO',qr));
 console.log('OK offline: concurrencia local, reapertura, egreso, replay, suspensión, vigencia, caducidad y rollback ante falta de espacio');
+await guardarCopia({evidencia:await firmarCopia({miembros:[miembro]}),jwk,servidorAhora:Date.now()});
+const ingreso=await registrarLocal('INGRESO',qr);
+const {sincronizar}=await import('../src/services/offline/sync.js');
+const procesados=new Map();let perder=true,llamadas=0;
+globalThis.fetch=async(url,opciones)=>{
+ llamadas++;const pedido=JSON.parse(opciones.body);assert.equal(pedido.eventos[0].id,ingreso.id);
+ const resultados=pedido.eventos.map(e=>{if(!procesados.has(e.id))procesados.set(e.id,{id:e.id,estado:'CONFIRMADO',detalle:'Prueba de transporte',accesoId:88});return procesados.get(e.id);});
+ if(perder){perder=false;throw new TypeError('Respuesta perdida después del commit simulado');}
+ return Response.json(resultados);
+};
+await assert.rejects(()=>sincronizar(),/Respuesta perdida/);
+assert.equal((await db.movimientos.get(ingreso.id)).estado,'PENDIENTE');
+const simultaneas=await Promise.all([sincronizar(),sincronizar()]);assert.equal(simultaneas[0][0].id,ingreso.id);
+assert.equal(llamadas,2);assert.equal(procesados.size,1);assert.equal((await db.movimientos.get(ingreso.id)).estado,'CONFIRMADO');
+const salida=await registrarLocal('SALIDA',qr);
+globalThis.fetch=async()=>{localStorage.setItem('token','sesion-distinta');return Response.json([{id:salida.id,estado:'CONFIRMADO',detalle:'Respuesta tardía',accesoId:88}]);};
+await assert.rejects(()=>sincronizar(),/Cambió la sesión/);assert.equal((await db.movimientos.get(salida.id)).estado,'PENDIENTE');
+console.log('OK offline: transporte con respuesta incierta conserva ID, ACK explícito, doble envío y cambio de sesión');
 await db.delete();

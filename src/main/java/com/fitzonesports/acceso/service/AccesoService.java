@@ -37,6 +37,9 @@ public class AccesoService {
     private final Clock clock;
     private final MembresiaService membresiaService;
     private final com.fitzonesports.usuario.service.FotoPerfilService fotos;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager entityManager;
 
     /** Emite el QR del usuario autenticado; reemplaza al anterior, que deja de ser valido. */
     @Transactional
@@ -56,6 +59,8 @@ public class AccesoService {
         Integer sedeId = resolverSede(operador, request.sedeId());
 
         Integer usuarioId = qrTokenService.validar(request.qrToken());
+        // Comparte exclusión por titular con la reconciliación offline, sin sustituir V4.
+        jdbc.queryForObject("SELECT id FROM usuario WHERE id=? FOR UPDATE",Integer.class,usuarioId);
         codigoQrRepository.findByUsuarioId(usuarioId)
                 .filter(emitido -> emitido.getToken().equals(request.qrToken()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
@@ -96,6 +101,10 @@ public class AccesoService {
                 ? registroAccesoRepository.findById(request.accesoId())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El acceso no existe"))
                 : accesoAbiertoDelQr(request.qrToken());
+        jdbc.queryForObject("SELECT id FROM usuario WHERE id=? FOR UPDATE",Integer.class,acceso.getUsuarioId());
+        // Una reconciliación pudo cerrar la visita mientras esperábamos el bloqueo.
+        jdbc.queryForObject("SELECT id FROM registro_acceso WHERE id=? FOR UPDATE",Integer.class,acceso.getId());
+        entityManager.refresh(acceso);
 
         if (esRecepcionista(operador) && !acceso.getSedeId().equals(operador.sedeId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El acceso pertenece a otra sede");

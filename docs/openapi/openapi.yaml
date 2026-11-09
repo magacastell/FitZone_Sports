@@ -939,6 +939,55 @@ paths:
           description: Recurso inexistente.
         '409':
           description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /accesos/offline/sincronizacion:
+    post:
+      tags: [M2 · Accesos]
+      summary: Reconciliar eventos del terminal sin duplicarlos
+      description: Sólo el operador autorizado del terminal y sede. Hasta 100 eventos por batch; inbox y accesos en una transacción. Reintentar los mismos IDs tras respuesta incierta. Verifica la copia y el QR al instante de captura, no al recibir; copias de hasta dos horas y futuro limitado a 30 segundos. Admisiones provisionales; conflictos de presencia y solapamiento histórico conservan evidencia sin sobrescribir accesos. EN_ESPERA conserva el pendiente por dependencia faltante. ID reutilizado con otro payload registra intento incompatible. QR offline sólo es admisible mediante este protocolo; los endpoints online conservan su QR anterior y la regla de último emitido.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [terminalId, eventos]
+              properties:
+                terminalId: {type: string, format: uuid}
+                eventos:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    type: object
+                    required: [id, visitaId, usuarioId, tipo, instante, revision, secuencia]
+                    properties:
+                      id: {type: string, format: uuid}
+                      visitaId: {type: string, maxLength: 64, description: UUID local o central seguido de dos puntos e ID para egreso conocido}
+                      usuarioId: {type: integer, minimum: 1}
+                      tipo: {type: string, enum: [INGRESO, SALIDA]}
+                      instante: {type: integer, format: int64, minimum: 1, description: Epoch milisegundos corregido al reloj central al preparar}
+                      qrToken: {type: string, maxLength: 4096, nullable: true}
+                      revision: {type: string, format: uuid}
+                      secuencia: {type: integer, format: int64, minimum: 1}
+      responses:
+        '200':
+          description: Resultados individuales confirmados en PostgreSQL; no-store
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [id, estado, detalle, accesoId, repetido]
+                  properties:
+                    id: {type: string, format: uuid}
+                    estado: {type: string, enum: [CONFIRMADO, CONFLICTO, RECHAZADO, EN_ESPERA]}
+                    detalle: {type: string}
+                    accesoId: {type: integer, nullable: true}
+                    repetido: {type: boolean}
+        '400': {$ref: '#/components/responses/Validacion'}
+        '401': {$ref: '#/components/responses/NoAutenticado'}
+        '403': {$ref: '#/components/responses/SinPermiso'}
   /accesos/offline/conexion:
     get:
       tags: [M2 · Accesos]

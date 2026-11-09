@@ -18,6 +18,7 @@ export async function idTerminal() {
 export async function guardarCopia(respuesta) {
   const datos=await verificar(respuesta.evidencia,respuesta.jwk,'m2-copia',respuesta.servidorAhora);
   const cuenta=cuentaActual();const relojLocal=Date.now();
+  if(datos.cuenta!==cuenta)throw Error('La copia corresponde a otro operador.');
   const copia={id:'copia',...respuesta,datos,cuenta,relojLocal,ultimoReloj:relojLocal,desfase:respuesta.servidorAhora-relojLocal};
   await db.transaction('rw',db.meta,db.movimientos,db.presencias,async()=>{
     if(await db.movimientos.where('estado').equals('PENDIENTE').count())throw Error('Sincronizá los pendientes antes de reemplazar la copia.');
@@ -34,6 +35,7 @@ export async function copiaActual(autonoma = false) {
   if(!copia || copia.cuenta!==cuenta)throw Error('Este operador no tiene un terminal preparado.');
   const ahora=ahoraAutorizado(copia);
   copia.datos=await verificar(copia.evidencia,copia.jwk,'m2-copia',ahora);
+  if(copia.datos.cuenta!==cuenta)throw Error('La autorización corresponde a otro operador.');
   return {copia,ahora};
 }
 export async function guardarLote(respuesta) {

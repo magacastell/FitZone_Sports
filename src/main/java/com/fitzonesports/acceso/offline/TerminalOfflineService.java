@@ -53,6 +53,7 @@ public class TerminalOfflineService {
                 (r,n)->Map.of("visitaId","central:"+r.getInt(1),"usuarioId",r.getInt(2),"sedeId",r.getInt(3),"ingreso",fecha(r.getTimestamp(4))),u.sedeId(),u.sedeId(),java.sql.Timestamp.from(ahora));
         var datos=new LinkedHashMap<String,Object>();
         datos.put("revision",revision.toString());datos.put("terminalId",terminal.toString());datos.put("operadorId",u.id());datos.put("sedeId",u.sedeId());
+        datos.put("cuenta",u.email());
         datos.put("miembros",miembros);datos.put("presencias",presencia);
         datos.put("capacidad",jdbc.queryForObject("SELECT capacidad_maxima FROM sede WHERE id=?",Integer.class,u.sedeId()));
         String evidencia=firma.firmar("m2-copia",datos,ahora,hasta);

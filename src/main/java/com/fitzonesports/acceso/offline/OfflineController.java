@@ -2,6 +2,7 @@ package com.fitzonesports.acceso.offline;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import com.fitzonesports.acceso.offline.SincronizacionOfflineService.Evento;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,12 @@ import org.springframework.web.bind.annotation.*;
 public class OfflineController {
     private final CredencialOfflineService credenciales;
     private final TerminalOfflineService terminales;
+    private final SincronizacionOfflineService sincronizacion;
+    public record Batch(@NotNull java.util.UUID terminalId,@jakarta.validation.constraints.NotEmpty @jakarta.validation.constraints.Size(max=100) java.util.List<@Valid Evento> eventos) {}
+    @PostMapping("/sincronizacion") @PreAuthorize("hasRole('RECEPCIONISTA')")
+    public ResponseEntity<java.util.List<SincronizacionOfflineService.Resultado>> sincronizar(Authentication auth,@Valid @RequestBody Batch batch) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(sincronizacion.sincronizar(auth.getName(),batch.terminalId(),batch.eventos()));
+    }
     public record PrepararCredencial(@NotNull Integer sedeId) {}
     public record PrepararTerminal(@NotNull java.util.UUID terminalId) {}
     @PostMapping("/preparacion") @PreAuthorize("hasRole('RECEPCIONISTA')")
