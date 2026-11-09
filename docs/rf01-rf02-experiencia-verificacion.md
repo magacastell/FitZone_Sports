@@ -1,5 +1,9 @@
 # RF-01/RF-02 — cierre local para revisión
 
+> Los cortes del 07/11 y el seguimiento B/C son históricos. A/D quedan resueltos por
+> el cierre autorizado del 09/11 documentado al final; sus propuestas anteriores no
+> son el contrato vigente.
+
 Fecha: 07/11/2026. Rama `feat/m1-experiencia-membresias`, base `03f904e`.
 Commit funcional local: `cc8b5aa` — `feat(m1): completar perfil con foto y experiencia de membresías`.
 El presente commit documental completa el cierre autorizado. Sin push, merge ni
@@ -186,3 +190,37 @@ Cierre de esta verificación: git diff --check correcto; YAML OpenAPI validado c
 SnakeYAML en Java 21 (sin instalar paquetes). La base temporal quedó detenida; el
 contenedor de tests está detenido y conserva sus XML. Las tres referencias base
 permanecen en sus hashes originales y el índice está vacío.
+
+## Cierre definitivo de M1 y M2 online — 09/11/2026
+
+Base `f8c6c7f`, rama `fix/cierre-definitivo-m1-m2-online`. Sin reimplementar RF-01/02:
+se completó A con la foto canónica del socio en el resultado de ingreso/egreso
+autorizado, y D con rechazo 400 de foto administrativa textual no nula. Omitido/null
+mantiene compatibilidad. La alternativa anterior de endpoint independiente no se
+implementó: se reutilizó `titular.foto` con PNG/JPEG inline y no-store. Ver contratos
+actualizados en [Recepción](m2-recepcion.md) y [membresías](membresias.md).
+
+Se expuso la salida por número de ingreso que ya admitía el backend, porque la UI
+sólo aceptaba QR y no permitía usar esa alternativa tras su vencimiento. No agrega
+historial/búsqueda, cambia permisos ni modifica reglas de membresía.
+
+Verificación nueva: npm test (18 transporte, 185 callbacks dominio/UI, 16 Planes,
+18 contratos Actividades y 7 Gerencia), build Vite y backend completo: 85 tests,
+sin fallos, errores ni omitidos. Java 21 y PostgreSQL 18 descartable, con migraciones
+y contrato YAML incluidos. JaCoCo: 774/892 líneas (86,77 %) y 287/376 ramas (76,33 %).
+La foto se verificó con HttpClient y servidor Spring en puerto aleatorio; D con
+MockMvc/Spring/PG. La concurrencia RN-01 usa dos transacciones sobre la misma PG.
+Las suites frontend siguen siendo VM/mocks, no navegador ni React DOM.
+
+Las cuatro nuevas regresiones backend pasaron focalizadas y luego en la suite
+completa. El primer intento focalizado falló por limpieza incompleta de fixtures
+con accesos confirmados fuera de transacción; se corrigió sólo ese cleanup. La
+prueba frontend del número de ingreso se ajustó por el espaciado del harness al
+extraer texto JSX, manteniendo la comprobación del ID y del body enviados.
+
+Resultados completos y ubicaciones de reportes: [pruebas.md](pruebas.md). No hubo
+nueva revisión visual ni repetición del proxy/persistencia tras reiniciar Spring;
+esas evidencias anteriores siguen identificadas como históricas. No se amplía la
+garantía de idempotencia a intenciones diferentes ni se define cómo rellenar huecos
+entre períodos. Offline y sincronización permanecen fuera de este cierre, al igual
+que el conflicto grupal de numeración de ADR-007, que no se renumeró.

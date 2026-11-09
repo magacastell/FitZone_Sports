@@ -11,6 +11,9 @@ Base: b2b3a11e4ec99d56891c604e845259ab5caf2224. Fecha: 30/10/2026.
 > Evolución posterior de UI: Admin de Sede conserva ingreso/salida, aforo y accesos a
 > Clases/Canchas preparados; Gerente Central consulta aforo global desde Panel y no
 > entra al puesto de Recepción. Los permisos backend M2 existentes no se revocaron.
+> Cierre online 09/11/2026: foto canónica del titular en la respuesta autorizada y
+> salida por número de ingreso disponibles; ver actualización al final. El informe
+> original debajo conserva su evidencia histórica.
 
 ## Auditoría del modelo actual
 
@@ -42,7 +45,7 @@ Idempotency-Key. No existe pago ni QR de reserva en este flujo.
 | GET /usuarios/me | Sin body | 200 UsuarioResponse, incluye rol y sede | Usuario autenticado; 401/403/404 según cuenta |
 | GET /accesos/qr | Sin body | 200 {token,venceEn,usuarioId}, no-store | USUARIO/GERENTE, cuenta activa y membresía vigente; 401/403 |
 | POST /accesos/ingresos | {qrToken,sedeId?}; Recepción omite sedeId, Gerente lo indica | 201 AccesoResponse | RECEPCIONISTA/GERENTE; 400 QR inválido/body/sede faltante Gerente; 403 cuenta/membresía/sede; 404 recurso; 409 QR vencido/reemplazado o ingreso abierto |
-| POST /accesos/salidas | Exactamente {qrToken} o {accesoId}; UI usa QR | 200 AccesoResponse | RECEPCIONISTA/GERENTE; 400 ninguno/ambos/QR inválido; 403 otra sede; 404 sin acceso; 409 QR vencido/reemplazado o acceso cerrado |
+| POST /accesos/salidas | Exactamente {qrToken} o {accesoId}; UI permite elegir ambos modos | 200 AccesoResponse | RECEPCIONISTA/GERENTE; 400 ninguno/ambos/QR inválido; 403 otra sede; 404 sin acceso; 409 QR vencido/reemplazado o acceso cerrado |
 | GET /accesos/sedes/{id}/aforo | Sin body | 200 {sedeId,ocupacionActual,capacidadMaxima,calculadoEn} | RECEPCIONISTA propia sede/GERENTE cualquiera; 401/403/404 |
 | GET /sedes | Sin body; sólo para selector existente de Gerente en esta UI | 200 lista real | Lectura autenticada; no CRUD en este bloque |
 | GET /accesos y PATCH /accesos/{id} | Stub | 501 | Listado y corrección pendientes |
@@ -65,8 +68,9 @@ final de concurrencia. registro_acceso persiste fecha de ingreso/salida y sede.
 Aforo cuenta ingresos sin salida en esa sede. Alcanzar/superar capacidad NO bloquea:
 es informativo en el contrato real. Cierre diario existente a las 23:59 argentinas.
 Salida por ID no exige membresía vigente; por QR exige QR auténtico/vigente/último.
-Si no se puede obtener un QR nuevo al vencer una membresía, existe salida backend por
-accesoId. La UI actual no agrega búsqueda/historial ni un modo administrativo por ID.
+Si no se puede obtener un QR nuevo al vencer una membresía, existe salida por
+accesoId. Desde el cierre del 09/11 la UI permite introducir el número mostrado en
+la confirmación de ingreso; no agrega búsqueda ni historial.
 No hay fallo nuevo de seguridad que requiera cambiar backend o migraciones.
 
 ## Composición y código
@@ -166,3 +170,32 @@ y corrección manual backend siguen 501; no se crean endpoints para copiar una t
 Asignación/gestión de empleados multisede no está definida aquí; queda para otro bloque.
 Sin cambios a backend productivo, Auth/JWT, contratos, migraciones, M1 ni lógica QR.
 Sin commit/push/merge; rama queda pendiente de revisión manual.
+
+## Cierre online — 09/11/2026
+
+Se resolvió el pendiente A autorizado: `AccesoService.titularValidado` consulta
+`usuario_foto` sólo después de autorizar y registrar ingreso/egreso. Devuelve la
+imagen canónica del socio en `titular.foto` como Data URI PNG/JPEG, o null si no hay
+archivo. No usa `/usuarios/me/foto` del operador ni URLs históricas. Los consumidores
+que interpretaban foto como una ruta deben admitir este formato inline.
+
+Se conserva la sede operativa del recepcionista y el ingreso de socios de cualquier
+sede habitual. Las respuestas tienen `Cache-Control: no-store`; no se agregó una
+ruta pública ni una consulta por usuario arbitrario. Se eligió reutilizar la
+respuesta del movimiento en vez de un endpoint adicional con nuevas reglas de
+lectura temporal. Trade-off: hasta aproximadamente 2,8 MB de JSON base64 por foto de
+2 MB. El límite/validación de imágenes existente se conserva.
+
+`LectorAcceso` muestra sólo PNG/JPEG inline y descarta la imagen ante fallo de carga,
+nuevo intento, rechazo o cambio de modo. La salida permite elegir QR o número de
+ingreso, mediante el endpoint ya existente, con validación de entero positivo.
+La confirmación muestra ese número; permite egresar con QR/membresía vencidos sin
+ampliar permisos ni agregar listado de accesos.
+
+Se probó por HTTP real que el socio multisede recibe su imagen y no la del operador,
+que anónimo/usuario común/sede manipulada/QR inválido no autorizan el ingreso y que
+la salida por ID conserva la foto y deja aforo cero tras vencer QR/membresía.
+La regresión concurrente ejecuta dos ingresos en sedes distintas: uno confirma y
+otro obtiene 409, con una sola fila abierta. Evidencia completa y límites en
+[pruebas.md](pruebas.md); recorrido de código en [la guía de defensa](defensa-m1-m2-online.md).
+El listado/corrección 501 y el funcionamiento offline conservan su alcance pendiente.

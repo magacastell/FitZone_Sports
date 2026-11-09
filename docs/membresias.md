@@ -211,3 +211,18 @@ La renovación conserva sus contratos, roles y reglas de precio. RF-01 agrega el
 upload, su contrato multipart y la migración V10 descritos arriba.
 
 Ver [alcance, validación y límites](rf01-rf02-experiencia-verificacion.md).
+
+## Foto administrativa — cierre del 09/11/2026
+
+Se resolvió el pendiente D: `PATCH /usuarios/{id}` conserva `foto` omitida/null sin
+modificar la imagen, pero rechaza cualquier referencia textual no nula con 400.
+Es un cambio incompatible para consumidores anteriores que escribían ese campo;
+OpenAPI lo marca deprecated y documenta la restricción. Nombre, apellido y activo
+mantienen las reglas y permisos existentes, incluida la sede administrativa.
+
+Sólo el flujo de archivo del titular escribe la foto mediante `FotoPerfilService`:
+bytes canónicos en `usuario_foto` y referencia derivada/versionada en `usuario.foto`.
+No se eliminan cuentas o referencias históricas ni se modifican V1–V10. Los valores
+antiguos que no tienen archivo siguen sin imagen; no se descargan desde Internet.
+M2 entrega la imagen del socio exclusivamente junto al movimiento autorizado, según
+[el contrato de Recepción](m2-recepcion.md#cierre-online--09112026).

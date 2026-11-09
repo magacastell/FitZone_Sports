@@ -2,6 +2,8 @@
 
 Corte: 09/11/2026. Base auditada e4fe538, rama chore/auditoria-pruebas-cierre.
 Corrección focalizada de Planes/PDF: eb85ed2.
+El inventario y las métricas de esa auditoría son históricos. El cierre posterior
+de M1/M2 online (85 tests y foto en Recepción) se registra al final de este documento.
 No es ADR-008 ni una declaración de cumplimiento de todos los RF. No hay un umbral
 de cobertura aprobado: el equipo debe definirlo con la evidencia de abajo.
 
@@ -52,7 +54,8 @@ Con JDK 21 y Maven Wrapper disponibles también se puede usar ./mvnw clean verif
 descartable, usuario postgres sin password como fijan los tests; JAVA_TOOL_OPTIONS
 debe incluir -Duser.timezone=America/Argentina/Buenos_Aires. No apuntar a una BD de
 trabajo: las suites crean fixtures y esquemas y prueban migraciones. Sin esa variable
-se omiten las 57 pruebas PG; ese resultado NO acredita suite completa.
+se omiten las pruebas PG (57 en el corte original, 61 tras el cierre online);
+ese resultado NO acredita suite completa.
 
 Selección backend nativa: ./mvnw '-Dtest=PlanServiceTest,PlanControllerTest' test.
 La exportación visual opcional del PDF se obtiene con
@@ -208,3 +211,42 @@ No se inventa el umbral de ADR-008 a partir de un resultado favorable.
 No se implementó pipeline ni se finalizó ADR-008. Sus insumos son esta clasificación,
 los resultados medidos, las brechas y los comandos reproducibles. Sin push ni merge
 a main en esta subrama; A/D, offline y desarrollo de M3/M4/M5 conservan sus responsables.
+
+## Verificación posterior: cierre de M1/M2 online — 09/11/2026
+
+Base `f8c6c7f`, rama `fix/cierre-definitivo-m1-m2-online`. A/D aprobados e implementados.
+Se conservan los inventarios anteriores como corte histórico; los resultados nuevos
+son:
+
+- `npm test`: API 18, dominio/UI 185, Planes 16, Actividades 18 y Gerencia 7, todos
+  aprobados. Dominio agrega cuatro callbacks: foto correcta/fallo/limpieza, rechazo
+  de referencias antiguas/externas, rechazo sin conservar foto anterior y salida
+  por ID. API amplía un callback con el body de salida por ID. No se volvió a medir
+  el número dinámico de assertions ni se instrumentó cobertura frontend.
+- `npm run build`: Vite correcto. No existe script lint en este proyecto.
+- Backend completo `clean verify`: **85 tests, 0 fallos, 0 errores, 0 omitidos**.
+  Trece clases, `MembresiaIntegrationTest` pasa de 35 a 39 métodos; 61 tests PG y
+  24 sin PG. Primero pasaron las cuatro regresiones focalizadas y luego la suite.
+- JaCoCo: **774/892 líneas (86,77 %), 287/376 ramas (76,33 %)** e instrucciones
+  4669/5381 (86,77 %). Sin nuevas exclusiones ni umbrales. Estos datos sustituyen
+  como resultado actual a 84,42 % / 74,34 %; no acreditan todos los RF del proyecto.
+
+Reportes locales de esta suite completa:
+`target/test-runs/884ecc50d9d74ab0b8d263c0ee37e28e/{surefire-reports,jacoco}`.
+Java 21 en imagen existente y PG 18 nueva/tmpfs, mediante el runner documentado;
+sin instalar JDK global ni tocar bases de desarrollo. Los reportes no se versionan.
+
+Nueva evidencia de integración: servidor Spring con puerto aleatorio y HttpClient
+real para foto del socio multisede, permisos, no-store e ingreso/egreso con imagen.
+Salida por ID después de vencer QR/membresía; aforo vuelve a cero. MockMvc sobre PG
+para foto administrativa: texto 400, null conserva bytes, edición legítima 200 y
+sede ajena 403. Referencia histórica sin archivo devuelve foto null. RN-01 ahora
+tiene dos ingresos concurrentes en sedes distintas y una sola confirmación/fila.
+
+Brechas que cambian respecto a la tabla histórica: RF-01 resuelve A/D y RN-01
+dispone de prueba concurrente online. Siguen pendientes offline/reconciliación,
+E2E automatizado de navegador, mediciones de frescura/rendimiento y dataset final.
+No se repitió el ensayo anterior de scheduler por HTTP ni de respuesta monetaria
+perdida con proxy. El servicio automático y la idempotencia se ejecutan en la suite
+backend; no se confunden con una nueva prueba del temporizador o del navegador.
+Las brechas de otros módulos no fueron implementadas por esta tarea.
