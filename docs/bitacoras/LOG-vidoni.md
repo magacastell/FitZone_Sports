@@ -143,3 +143,17 @@ Conservé las entradas históricas anteriores tal como estaban; no completé has
 | Pruebas | Pasaron 18 de transporte, 181 dominio/UI, build Vite y 22 tests Java seleccionados sin fallos, errores ni omitidos. Spring/MockMvc contra PG 18 nueva en tmpfs y Java 21 en Docker. Ver detalle y límites en docs/rf01-rf02-experiencia-verificacion.md. Sin suite completa ni nuevo ensayo navegador/proxy de respuesta perdida. |
 | Commits | `975a827` — `fix(m1): preservar la sesión y traducir conflictos de registro`. El cierre documental se registra en el segundo commit local autorizado. Verifiqué la agrupación antes de cada commit; sin push, PR, merge ni rebase. |
 | Horas efectivas | Pendientes de confirmación; no reutilicé las aproximadamente 3 horas de la sesión anterior. |
+
+
+### 09/11/2026 — auditoría y depuración de pruebas automatizadas
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Numeración de sprint pendiente de confirmar; testing e integración, sin asignar una unidad numérica no cotejada con la planificación. |
+| Actividad | Audité las cinco suites frontend y las trece clases backend desde e4fe538. Reparé el doble AvatarCircle de Planes, retiré cinco helpers y un import sin usos y una variante de datos idéntica. Conservé todos los callbacks y los 81 métodos JUnit. Dejé opcional la exportación visual PDF/PNG, manteniendo las aserciones de contenido y paginación. |
+| Decisiones | Agregué npm test con propagación de fallos, runner Java 21/PG 18 aislado y JaCoCo sin exclusiones artificiales ni umbral inventado. Conservé el test largo de PDF y pospuse la reescritura de los harness VM. Documenté inventario, matriz RF/RN/RNF y selección de suites en docs/pruebas.md, sin cerrar ADR-008. |
+| Problemas y soluciones | Planes tenía 13 casos aprobados y tres fallidos porque el mock no exportaba AvatarCircle. Tras repararlo pasaron los 16. El fallo anterior de comillas entre PowerShell, Docker y sh no era un defecto backend: lo evité enviando el cuerpo del runner por stdin. La suite backend inicial y final pasó completa. |
+| Pruebas y evidencia | Backend: 81 tests, cero fallos, errores u omitidos, con PG descartable y Java 21. Comparé los nombres de los casos antes/después: se conservaron los 81. Frontend: 18 transporte, 181 callbacks de dominio/UI, 16 Planes, 18 contratos M3/M4 y 7 verificaciones Gerencia, todos correctos; no los equiparé a assertions ni E2E. Build correcto. JaCoCo: 748/886 líneas (84,42 %) y 281/378 ramas (74,34 %). Reportes generados bajo target, sin versionarlos. No había porcentaje anterior comparable ni medí cobertura JS. |
+| Cierre | Revisé la cadena de integración y reutilicé los resultados aplicables. La publicación a main está autorizada por el responsable, con verificación del HEAD remoto como condición. No se implementaron A/D, offline, M3/M4 ni funciones nuevas; A/D siguen sujetos a coordinación. |
+| Commits | eb85ed2 — test: corregir el mock de Planes y separar la exportación visual; 1e4afc5 — test: unificar ejecución y generar cobertura reproducible. Esta entrada completa el registro documental de la tarea. |
+| Horas efectivas | Pendientes de confirmación. No imputé horas estimadas ni reutilicé las tres horas del trabajo anterior. |
