@@ -25,6 +25,8 @@ export default function LectorAcceso({ sedeId, sedeNombre, esGerente, onMovimien
   const [codigo, setCodigo] = useState('');
   const [procesando, setProcesando] = useState(false);
   const [resultado, setResultado] = useState(null);
+  const [fotoFallida, setFotoFallida] = useState(false);
+  const [identificacionSalida, setIdentificacionSalida] = useState('qr');
   const enviando = useRef(false);
   const montado = useRef(false);
   const input = useRef(null);
@@ -33,17 +35,22 @@ export default function LectorAcceso({ sedeId, sedeNombre, esGerente, onMovimien
 
   const cambiarModo = (nuevo) => {
     if (enviando.current) return;
-    setModo(nuevo); setCodigo(''); setResultado(null);
+    setModo(nuevo); setIdentificacionSalida('qr'); setCodigo(''); setResultado(null); setFotoFallida(false);
   };
   const enviar = async (event) => {
     event.preventDefault();
     if (enviando.current || !codigo.trim()) return;
+    const porId = modo === 'salida' && identificacionSalida === 'id';
+    if (porId && (!/^[1-9]\d*$/.test(codigo.trim()) || Number(codigo) > 2147483647)) {
+      setResultado({ estado: 'rechazo', titulo: 'Salida no registrada', mensaje: 'Indicá un número de ingreso válido.' });
+      return;
+    }
     enviando.current = true;
-    setProcesando(true); setResultado(null);
+    setProcesando(true); setResultado(null); setFotoFallida(false);
     try {
       const acceso = modo === 'ingreso'
         ? await registrarIngreso(codigo.trim(), esGerente ? sedeId : undefined)
-        : await registrarSalida(codigo.trim());
+        : porId ? await registrarSalida(null, Number(codigo)) : await registrarSalida(codigo.trim());
       if (!montado.current) return;
       setResultado({ estado: 'exito', titulo: modo === 'ingreso' ? 'Acceso autorizado' : 'Salida registrada', acceso, modo });
       onMovimiento();
@@ -58,6 +65,8 @@ export default function LectorAcceso({ sedeId, sedeNombre, esGerente, onMovimien
     }
   };
   const hora = resultado?.acceso?.[resultado.modo === 'ingreso' ? 'ingreso' : 'salida'];
+  const foto = resultado?.acceso?.titular?.foto;
+  const fotoValida = typeof foto === 'string' && /^data:image\/(png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(foto);
   return <section className="panel reader-panel" aria-label="Validar movimiento">
     <PanelHeading title="Validar movimiento" description="Escaneá el QR de la credencial digital." action={<span className="reader-ready"><ScanLine size={16} aria-hidden="true" />{procesando ? 'Procesando' : 'Esperando QR'}</span>} />
     <div className="reader-tabs" role="group" aria-label="Tipo de movimiento">
@@ -65,16 +74,21 @@ export default function LectorAcceso({ sedeId, sedeNombre, esGerente, onMovimien
       <button type="button" aria-pressed={modo === 'salida'} className={`reader-tab${modo === 'salida' ? ' reader-tab--active' : ''}`} disabled={procesando} onClick={() => cambiarModo('salida')}><ArrowUpFromLine aria-hidden="true" />Salida</button>
     </div>
     <form className="reader-form" onSubmit={enviar} aria-busy={procesando}>
-      <label htmlFor="access-code">Contenido del código QR</label>
+      {modo === 'salida' && <label>Identificar salida mediante<select value={identificacionSalida} disabled={procesando}
+        onChange={(event) => { setIdentificacionSalida(event.target.value); setCodigo(''); setResultado(null); setFotoFallida(false); }}>
+        <option value="qr">Código QR vigente</option><option value="id">Número de ingreso</option>
+      </select></label>}
+      <label htmlFor="access-code">{modo === 'salida' && identificacionSalida === 'id' ? 'Número de ingreso' : 'Contenido del código QR'}</label>
       <div className="reader-input-row"><QrCode aria-hidden="true" /><input ref={input} id="access-code" value={codigo} onChange={(e) => setCodigo(e.target.value)} disabled={procesando} required autoComplete="off" spellCheck={false} autoCapitalize="none" aria-describedby="access-code-help" placeholder="Escaneá o pegá el contenido del QR" /><AppButton type="submit" disabled={procesando || !codigo.trim()}><ScanLine aria-hidden="true" />{procesando ? 'Procesando...' : modo === 'ingreso' ? 'Validar ingreso' : 'Registrar salida'}</AppButton></div>
-      <p className="reader-helper" id="access-code-help">Usá el lector 2D o pegá el contenido completo del QR y presioná Enter.</p>
+      <p className="reader-helper" id="access-code-help">{modo === 'salida' && identificacionSalida === 'id' ? 'Ingresá el número de la confirmación de ingreso. Permite registrar la salida aunque el QR o la membresía hayan vencido.' : 'Usá el lector 2D o pegá el contenido completo del QR y presioná Enter.'}</p>
     </form>
     <div className={`access-result access-result--${resultado?.estado || 'inicial'}`} role={resultado && resultado.estado !== 'exito' ? 'alert' : 'status'} aria-live={resultado && resultado.estado !== 'exito' ? 'assertive' : 'polite'}>
       <span className="access-result__icon" aria-hidden="true">{resultado?.estado === 'exito' ? <CheckCircle2 /> : resultado ? <XCircle /> : <Clock3 />}</span>
       <div className="access-result__copy"><strong>{procesando ? 'Validando movimiento...' : resultado?.titulo || 'Esperando lectura'}</strong>
+        {resultado?.acceso && <span>Ingreso #{resultado.acceso.id}</span>}
         {resultado?.acceso ? <><span>{resultado.acceso.titular?.nombre} {resultado.acceso.titular?.apellido}</span><span>{sedeNombre}{hora && ` · ${new Date(hora).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false })}`}</span></> : <span>{resultado?.mensaje || 'El resultado aparecerá acá. Podés procesar una persona por vez.'}</span>}
       </div>
-      {resultado?.acceso?.titular?.foto && <img className="access-result__photo" src={resultado.acceso.titular.foto} alt="Foto del titular" width="48" height="48" />}
+      {fotoValida && !fotoFallida && <img className="access-result__photo" src={foto} onError={() => setFotoFallida(true)} alt="Foto del titular" width="48" height="48" />}
     </div>
   </section>;
 }

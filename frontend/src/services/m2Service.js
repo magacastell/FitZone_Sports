@@ -10,6 +10,6 @@ export function registrarIngreso(qrToken, sedeId) {
   });
 }
 
-export function registrarSalida(qrToken) {
-  return fetchAPI('/accesos/salidas', { method: 'POST', body: JSON.stringify({ qrToken }) });
+export function registrarSalida(qrToken, accesoId) {
+  return fetchAPI('/accesos/salidas', { method: 'POST', body: JSON.stringify(accesoId != null ? { accesoId } : { qrToken }) });
 }

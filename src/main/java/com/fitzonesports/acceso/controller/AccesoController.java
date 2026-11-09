@@ -42,6 +42,7 @@ public class AccesoController {
     public ResponseEntity<AccesoResponse> registrarIngreso(Authentication authentication,
             @Valid @RequestBody RegistrarIngresoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
+                .cacheControl(CacheControl.noStore())
                 .body(accesoService.registrarIngreso(authentication.getName(), request));
     }
 
@@ -49,7 +50,8 @@ public class AccesoController {
     @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<AccesoResponse> registrarSalida(Authentication authentication,
             @RequestBody RegistrarSalidaRequest request) {
-        return ResponseEntity.ok(accesoService.registrarSalida(authentication.getName(), request));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(accesoService.registrarSalida(authentication.getName(), request));
     }
 
     @GetMapping("/sedes/{sedeId}/aforo")

@@ -69,6 +69,7 @@ await test('M2 GET aforo/sedes y POST ingreso/salida respetan contrato real',asy
  await m2.namespace.registrarIngreso('Aa.Qr');assert.equal(call[0],'/api/v1/accesos/ingresos');assert.equal(call[1].method,'POST');assert.equal(call[1].body,JSON.stringify({qrToken:'Aa.Qr'}));
  assert.equal(call[1].headers['Idempotency-Key'],undefined);
  await m2.namespace.registrarIngreso('Aa.Qr',12);assert.equal(call[1].body,JSON.stringify({qrToken:'Aa.Qr',sedeId:12}));
+ await m2.namespace.registrarSalida(null,88);assert.equal(call[1].body,JSON.stringify({accesoId:88}));
  await m2.namespace.registrarSalida('Aa.Qr');assert.equal(call[0],'/api/v1/accesos/salidas');assert.equal(call[1].body,JSON.stringify({qrToken:'Aa.Qr'}));assert.equal(call[1].headers.Authorization,'Bearer jwt-real');
 });
 

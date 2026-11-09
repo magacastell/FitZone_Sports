@@ -101,7 +101,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse actualizarPerfil(String email, ActualizarPerfilRequest request) {
         Usuario usuario = cargarPorEmail(email);
-        aplicarDatos(usuario, request.nombre(), request.apellido(), request.foto());
+        aplicarDatos(usuario, request.nombre(), request.apellido());
         return UsuarioResponse.from(usuario);
     }
 
@@ -146,22 +146,19 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No podes desactivar tu propia cuenta");
         }
 
-        aplicarDatos(usuario, request.nombre(), request.apellido(), request.foto());
+        aplicarDatos(usuario, request.nombre(), request.apellido());
         if (request.activo() != null) {
             usuario.setActivo(request.activo());
         }
         return UsuarioResponse.from(usuario);
     }
 
-    private void aplicarDatos(Usuario usuario, String nombre, String apellido, String foto) {
+    private void aplicarDatos(Usuario usuario, String nombre, String apellido) {
         if (nombre != null) {
             usuario.setNombre(nombre.trim());
         }
         if (apellido != null) {
             usuario.setApellido(apellido.trim());
-        }
-        if (foto != null) {
-            usuario.setFoto(foto);
         }
     }
 

@@ -12,7 +12,7 @@ public record AccesoResponse(
         OffsetDateTime salida,
         Titular titular) {
 
-    /** Datos que recepcion necesita para el control visual al ingreso (nombre y foto). */
+    /** Foto opcional PNG/JPEG en data URI, sólo en la respuesta del movimiento autorizado. */
     public record Titular(String nombre, String apellido, String foto) {
     }
 

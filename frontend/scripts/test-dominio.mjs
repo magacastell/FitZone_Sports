@@ -856,4 +856,30 @@ await test('avatar usa blob autenticado, revoca recurso y no carga URLs externas
  assert.equal(nodes(r.view,n=>n.type==='img').length,1);r.unmount();assert.equal(e.revoked.length,1);
  const externo=env();const rr=await runner('avatar',externo,{initials:'AP',foto:'https://externo/imagen'},'AvatarCircle');await settle(externo);assert.equal(externo.qrs.length,0);assert.equal(text(rr.view),'AP');
 });
+
+await test('Foto del titular proviene del movimiento; error de imagen y nuevo escaneo limpian el resultado',async()=>{
+ const {e,r}=await lector();const foto='data:image/png;base64,AQID';let p=escanear(r)({preventDefault(){}});
+ e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto}});await p;await settle(e);
+ let imagen=nodes(r.view,n=>n.type==='img')[0];assert.equal(imagen.props.src,foto);assert(text(r.view).includes('Titular real'));
+ imagen.props.onError();await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
+ p=escanear(r)({preventDefault(){}});e.ingresos[1].resolve({...accesoDto,titular:{...accesoDto.titular,foto:'data:image/jpeg;base64,AQID'}});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='img').length,1);button(r,'Salida').props.onClick();await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
+});
+await test('Lector no carga rutas propias ni imágenes externas de referencias históricas',async()=>{
+ for(const foto of [null,'/usuarios/me/foto?version=anterior','https://foto.example.test/a.png','data:image/svg+xml;base64,AQID']){
+ const {e,r}=await lector();const p=escanear(r)({preventDefault(){}});e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto}});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='img').length,0);assert(text(r.view).includes('Titular real'));
+ }
+});
+await test('Rechazo después de foto válida no conserva la imagen de la persona anterior',async()=>{
+ const {e,r}=await lector();let p=escanear(r)({preventDefault(){}});e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto:'data:image/png;base64,AQID'}});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='img').length,1);p=escanear(r)({preventDefault(){}});e.ingresos[1].reject(err(403));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
+});
+
+await test('Salida por número de ingreso usa contrato existente y valida el identificador',async()=>{
+ const {e,r}=await lector();button(r,'Salida').props.onClick();await settle(e);
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'id'}});await settle(e);
+ for(const codigo of ['abc','0','2147483648']){const p=escanear(r,codigo)({preventDefault(){}});await p;await settle(e);assert.equal(e.salidas.length,0);assert(text(r.view).includes('número de ingreso válido'));}
+ const p=escanear(r,'88')({preventDefault(){}});assert.deepEqual(e.salidas[0].args,[null,88]);e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).replace(/\s/g,'').includes('Ingreso#88'));assert(text(r.view).includes('Salida registrada'));
+});
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));

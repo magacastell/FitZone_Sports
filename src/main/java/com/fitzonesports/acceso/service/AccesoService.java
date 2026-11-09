@@ -36,6 +36,7 @@ public class AccesoService {
     private final QrTokenService qrTokenService;
     private final Clock clock;
     private final MembresiaService membresiaService;
+    private final com.fitzonesports.usuario.service.FotoPerfilService fotos;
 
     /** Emite el QR del usuario autenticado; reemplaza al anterior, que deja de ser valido. */
     @Transactional
@@ -78,7 +79,7 @@ public class AccesoService {
             throw ingresoAbierto();
         }
         return AccesoResponse.from(registro,
-                new AccesoResponse.Titular(titular.nombre(), titular.apellido(), titular.foto()), clock.getZone());
+                titularValidado(titular), clock.getZone());
     }
 
     /** Cierra el acceso abierto: por id, o volviendo a escanear el QR del titular. Quien esta adentro siempre puede salir. */
@@ -107,7 +108,7 @@ public class AccesoService {
         RegistroAcceso cerrado = registroAccesoRepository.save(acceso);
         UsuarioResponse titular = usuarioService.consultarParaAcceso(cerrado.getUsuarioId());
         return AccesoResponse.from(cerrado,
-                new AccesoResponse.Titular(titular.nombre(), titular.apellido(), titular.foto()), clock.getZone());
+                titularValidado(titular), clock.getZone());
     }
 
     /** Aforo informativo de la sede (RF-05): personas con ingreso abierto y capacidad maxima. */
@@ -131,6 +132,15 @@ public class AccesoService {
         return registroAccesoRepository.findByUsuarioIdAndFechaHoraSalidaIsNull(usuarioId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "El usuario no tiene un ingreso abierto"));
+    }
+
+    private AccesoResponse.Titular titularValidado(UsuarioResponse usuario) {
+        // Sólo se invoca después de validar y registrar ingreso/salida. Sin endpoint de fotos arbitrarias.
+        String foto = fotos.consultarParaMovimiento(usuario.id())
+                .map(imagen -> "data:" + imagen.tipo() + ";base64,"
+                        + java.util.Base64.getEncoder().encodeToString(imagen.contenido()))
+                .orElse(null);
+        return new AccesoResponse.Titular(usuario.nombre(), usuario.apellido(), foto);
     }
 
     private boolean esRecepcionista(UsuarioResponse usuario) {

@@ -25,11 +25,13 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @EnabledIfEnvironmentVariable(named="PLAN_TEST_DB_URL",matches=".+")
-@SpringBootTest(properties={"spring.profiles.active=staging", "spring.datasource.url=${PLAN_TEST_DB_URL}",
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"spring.profiles.active=staging", "spring.datasource.url=${PLAN_TEST_DB_URL}",
         "spring.datasource.username=postgres", "spring.datasource.password=",
         "jwt.secret=clave-exclusiva-de-pruebas-de-membresias-1234567890", "membresias.renovacion.inicio-ms=3600000"})
 @Transactional
 class MembresiaIntegrationTest {
+    @org.springframework.boot.test.web.server.LocalServerPort int puerto;
+    @Autowired com.fitzonesports.usuario.service.FotoPerfilService fotos;
     @Autowired MembresiaService service;
     @Autowired AccesoService accesos;
     @Autowired JdbcTemplate jdbc;
@@ -298,6 +300,8 @@ class MembresiaIntegrationTest {
 
     @AfterEach void limpiarFixturesFueraDeTransaccion() {
         if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) return;
+        jdbc.update("DELETE FROM registro_acceso WHERE usuarioid=?",usuario);
+        jdbc.update("DELETE FROM codigo_qr WHERE usuarioid=?",usuario);
         jdbc.update("DELETE FROM auditoria_membresia WHERE membresia_id IN (SELECT id FROM membresia WHERE usuarioid=?)",usuario);
         jdbc.update("DELETE FROM periodo_membresia WHERE membresia_id IN (SELECT id FROM membresia WHERE usuarioid=?)",usuario);
         jdbc.update("DELETE FROM detalle_facturacion WHERE comprobanteid IN (SELECT c.id FROM comprobante c JOIN pago p ON p.id=c.pagoid WHERE p.usuarioid=?)",usuario);
@@ -581,4 +585,80 @@ class MembresiaIntegrationTest {
         assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update("UPDATE "+esquema+".usuario SET sedeid=99999"));
     }
 
+
+    private org.springframework.mock.web.MockMultipartFile imagenAcceso(String formato) throws Exception {
+        var bytes = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB), formato, bytes);
+        return new org.springframework.mock.web.MockMultipartFile("foto","foto", "image/"+formato, bytes.toByteArray());
+    }
+
+    private java.net.http.HttpResponse<String> movimientoHttp(String ruta, String operador, String cuerpo) throws Exception {
+        var builder = java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://127.0.0.1:"+puerto+"/api/v1"+ruta))
+                .timeout(java.time.Duration.ofSeconds(15)).header("Content-Type","application/json");
+        if (operador != null) builder.header("Authorization",bearerM2(operador));
+        return java.net.http.HttpClient.newHttpClient().send(builder.POST(java.net.http.HttpRequest.BodyPublishers.ofString(cuerpo)).build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+    }
+
+    @Test @Transactional(propagation=Propagation.NOT_SUPPORTED)
+    void fotoDelTitularEnIngresoYEgresoHttpRealSinConsultaArbitraria() throws Exception {
+        contratar(); fotos.reemplazar(email,imagenAcceso("png")); fotos.reemplazar(recepcion,imagenAcceso("jpeg"));
+        String esperada="data:image/png;base64,"+Base64.getEncoder().encodeToString(fotos.consultar(email).contenido());
+        String qr=accesos.generarQr(email).token();
+        assertEquals(401,movimientoHttp("/accesos/ingresos",null,cuerpoQr(qr)).statusCode());
+        assertEquals(403,movimientoHttp("/accesos/ingresos",email,cuerpoQr(qr)).statusCode());
+        var invalido=movimientoHttp("/accesos/ingresos",recepcion,cuerpoQr("qr-invalido"));
+        assertEquals(400,invalido.statusCode()); assertFalse(invalido.body().contains("data:image"));
+        var ajena=movimientoHttp("/accesos/ingresos",recepcion,"{\"qrToken\":\""+qr+"\",\"sedeId\":"+sede+"}");
+        assertEquals(403,ajena.statusCode()); assertFalse(ajena.body().contains("data:image"));
+        var ingreso=movimientoHttp("/accesos/ingresos",recepcion,cuerpoQr(qr));
+        assertEquals(201,ingreso.statusCode()); assertEquals("no-store",ingreso.headers().firstValue("Cache-Control").orElseThrow());
+        Map<String,Object> datos=new org.yaml.snakeyaml.Yaml().load(ingreso.body());
+        assertEquals(usuario,datos.get("usuarioId")); assertEquals(otraSede,datos.get("sedeId"));
+        assertEquals(esperada,((Map<?,?>)datos.get("titular")).get("foto"));
+        assertEquals("image/jpeg",fotos.consultar(recepcion).tipo());
+        reloj.fijar("2026-03-01T15:00:00Z"); // Membresía y QR vencidos: la salida por ID sigue autorizada.
+        var salida=movimientoHttp("/accesos/salidas",recepcion,"{\"accesoId\":"+datos.get("id")+"}");
+        assertEquals(200,salida.statusCode());
+        Map<String,Object> egreso=new org.yaml.snakeyaml.Yaml().load(salida.body());
+        assertEquals(esperada,((Map<?,?>)egreso.get("titular")).get("foto"));
+        assertEquals(0,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
+    }
+
+    @Test void fotoHistoricaTextualNoSeUsaEnElMovimiento() {
+        contratar(); jdbc.update("UPDATE usuario SET foto='https://foto-inexistente.example.test' WHERE id=?",usuario);entityManager.clear();
+        var ingreso=accesos.registrarIngreso(recepcion,new RegistrarIngresoRequest(accesos.generarQr(email).token(),null));
+        assertNull(ingreso.titular().foto());
+        assertNull(accesos.registrarSalida(recepcion,new RegistrarSalidaRequest(ingreso.id(),null)).titular().foto());
+    }
+
+    @Test void administracionRechazaFotoTextualYConservaOperacionesLegitimas() throws Exception {
+        fotos.reemplazar(email,imagenAcceso("png")); var antes=fotos.consultar(email).contenido();
+        var mvc=recepcionMvc();
+        mvc.perform(patch("/usuarios/"+usuario).header("Authorization",bearerM2(gerente)).contentType("application/json")
+                .content("{\"foto\":\"https://foto-ajena.example.test\"}")).andExpect(MockMvcResultMatchers.status().isBadRequest());
+        mvc.perform(patch("/usuarios/"+usuario).header("Authorization",bearerM2(gerente)).contentType("application/json")
+                .content("{\"nombre\":\"Nombre válido\",\"foto\":null,\"activo\":true}"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andExpect(jsonPath("$.nombre").value("Nombre válido"));
+        assertArrayEquals(antes,fotos.consultar(email).contenido());
+        mvc.perform(patch("/usuarios/"+usuario).header("Authorization",bearerM2(recepcion)).contentType("application/json")
+                .content("{\"nombre\":\"No autorizado\"}")).andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test @Transactional(propagation=Propagation.NOT_SUPPORTED)
+    void ingresosSimultaneosEnSedesDistintasConfirmanUnoSolo() throws Exception {
+        contratar(); String qr=accesos.generarQr(email).token(); var inicio=new java.util.concurrent.CountDownLatch(1);
+        try(var pool=java.util.concurrent.Executors.newFixedThreadPool(2)) {
+            var a=pool.submit(()->ingresoConcurrente(inicio,recepcion,qr,null));
+            var b=pool.submit(()->ingresoConcurrente(inicio,gerente,qr,sede)); inicio.countDown();
+            var resultados=new ArrayList<>(List.of(a.get(20,java.util.concurrent.TimeUnit.SECONDS),b.get(20,java.util.concurrent.TimeUnit.SECONDS)));
+            Collections.sort(resultados); assertEquals(List.of(201,409),resultados);
+            assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM registro_acceso WHERE usuarioid=? AND fecha_hora_salida IS NULL",Integer.class,usuario));
+        }
+    }
+    private int ingresoConcurrente(java.util.concurrent.CountDownLatch inicio,String operador,String qr,Integer sedeId) throws Exception {
+        if(!inicio.await(10,java.util.concurrent.TimeUnit.SECONDS))throw new IllegalStateException("Timeout");
+        try { accesos.registrarIngreso(operador,new RegistrarIngresoRequest(qr,sedeId));return 201; }
+        catch(ResponseStatusException e) { return e.getStatusCode().value(); }
+    }
 }

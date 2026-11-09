@@ -333,6 +333,7 @@ paths:
       - M1 · Usuarios
       summary: Actualizar usuario
       description: Recepción modifica sólo USUARIO de su sede. Gerente todos los roles/sedes.
+        Foto textual no nula se rechaza con 400; el reemplazo binario corresponde al titular.
         Nadie puede desactivar su propia cuenta (409). Omitido/null no modifica. If-Match objetivo protege la versión
         leída; no sustituye integridad BD.
       operationId: actualizarUsuario
@@ -2988,8 +2989,9 @@ components:
         foto:
           type: string
           nullable: true
-          maxLength: 255
-          example: perfil-ana.jpg
+          enum: [null]
+          deprecated: true
+          description: Sólo omitido o null. Cambio incompatible para consumidores que escribían referencias textuales (400). El titular reemplaza la imagen mediante PUT /usuarios/me/foto.
         activo:
           type: boolean
           example: true
@@ -3460,6 +3462,7 @@ components:
             foto:
               type: string
               nullable: true
+              description: Data URI PNG/JPEG de la imagen persistida del titular, sólo tras el movimiento autorizado, o null si no hay archivo. Nunca es una URL de /usuarios/me/foto ni externa. Imagen original limitada a 2 MB (aprox. 2,8 MB en base64). Respuestas de ingreso/egreso con Cache-Control no-store. No existe endpoint público ni de consulta arbitraria de fotos.
               example: null
         origen:
           type: string

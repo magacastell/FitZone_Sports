@@ -80,6 +80,12 @@ public class FotoPerfilService {
         return new Imagen(foto.getContenido(), foto.getTipo());
     }
 
+    /** Uso interno de M2 tras autorizar el movimiento, nunca una consulta HTTP por ID. */
+    @Transactional(readOnly = true)
+    public java.util.Optional<Imagen> consultarParaMovimiento(Integer usuarioId) {
+        return fotos.findById(usuarioId).map(foto -> new Imagen(foto.getContenido(), foto.getTipo()));
+    }
+
     private Usuario titular(String email) {
         return usuarios.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no existe"));
     }
