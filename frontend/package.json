@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "npm run test:api && npm run test:dominio && npm run test:planes && npm run test:actividades && npm run test:gerencia",
+    "test:api": "node --experimental-vm-modules scripts/test-api.mjs",
+    "test:dominio": "node --experimental-vm-modules scripts/test-dominio.mjs",
+    "test:planes": "node --experimental-vm-modules scripts/test-planes.mjs",
+    "test:actividades": "node --experimental-vm-modules scripts/test-servicios-actividades.mjs",
+    "test:gerencia": "node --experimental-vm-modules scripts/test-gerencia-service.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.49.0",

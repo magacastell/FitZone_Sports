@@ -433,6 +433,7 @@ local de pruebas descartable, con las mismas condiciones indicadas arriba.
 
 ## Documentación
 
+- Pruebas, cobertura y ejecución aislada: [guía de testing](docs/pruebas.md).
 
 - Contrato objetivo API v1: [OpenAPI](docs/openapi/openapi.yaml)
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
