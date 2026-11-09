@@ -3,7 +3,6 @@ import path from 'node:path';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { execFileSync } from 'node:child_process';
 const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { transformSync } = require('esbuild');
 const sources = {
@@ -72,6 +71,8 @@ async function runner(name,e,props={},target='default'){
   if(spec==='react')return synthetic({...react,default:react},context);
   if(spec==='react/jsx-runtime')return synthetic({jsx,jsxs:jsx,Fragment:fragment},context);
   if(spec==='react-router-dom')return synthetic(router,context);
+  // Layout usa el avatar compartido; su carga autenticada se prueba en test-dominio.
+  if(spec.endsWith('/ui/FitZoneUI'))return synthetic({AvatarCircle:p=>jsx('span',{...p,children:p.initials})},context);
   if(spec.includes('AuthContext'))return synthetic({useAuth:()=>({token:e.token,user:e.user,loading:!!e.loading,login:e.login,register:e.register,isAuthenticated:!!e.token,logout:()=>{e.loggedOut=true;e.token=null;}})},context);
   if(spec.includes('planesService'))return synthetic(e.planServices,context);if(spec.includes('m1Service'))return synthetic(e.services,context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
@@ -104,20 +105,8 @@ async function settle(e){for(let i=0;i<12;i++){await Promise.resolve();for(const
 function nodes(n,filter,out=[]){if(!n||typeof n!=='object')return out;if(Array.isArray(n)){for(const c of n)nodes(c,filter,out);return out;}if(filter(n))out.push(n);nodes(n.props?.children,filter,out);return out;}
 function text(n){if(n==null||typeof n==='boolean')return '';if(Array.isArray(n))return n.map(text).join(' ');if(typeof n!=='object')return String(n);return text(n.props?.children);}
 function button(r,label){const found=nodes(r.view,n=>n.type==='button'&&text(n).includes(label));assert.equal(found.length,1,'Boton '+label);return found[0];}
-function hasQr(r){return nodes(r.view,n=>n.type==='a'&&n.props.href==='/mi-qr').length>0;}
 function err(status,message='Fallo real'){return Object.assign(new Error(message),status?{status}:{});}
-function dto(estado='ACTIVA',extra={}){return{id:22,usuarioId:7,estado,planId:3,periodoVigente:null,periodos:[],...extra};}
 async function layout(e){return runner('layout',e,{},'LayoutAutenticado');}
-async function setMember(e,data){e.members.at(-1).resolve(data);await settle(e);}
-async function initialError(e,error){e.members.at(-1).reject(error);await settle(e);}
-async function startContract(e){
- const p=await runner('perfil',e);
- e.profiles.at(-1).resolve({id:7,nombre:'Ana',apellido:'Perez',email:'real@fitzone',dni:'123',sedeNombre:'Central'});
- e.plans.at(-1).resolve([{id:3,nombre:'Plan real',duracionMeses:1,precio:100}]);await settle(e);
- nodes(p.view,n=>n.type==='select')[0].props.onChange({target:{value:'3'}});p.render();
- const submit=nodes(p.view,n=>n.type==='form')[0].props.onSubmit;
- const pending=submit({preventDefault(){}});return{p,submit,pending};
-}
 let passed=0;
 async function test(name,fn){try{await fn();passed++;console.log('OK '+name);}catch(e){console.error('FAIL '+name+': '+e.message);process.exitCode=1;}}
 const gestionEnv=()=>{const e=env();e.user={rol:'GERENTE'};e.planGets=[];e.planPosts=[];e.planPatches=[];e.planDeletes=[];
@@ -171,7 +160,7 @@ for(const rol of ['USUARIO','RECEPCIONISTA'])await test('URL directa y menu rest
  const l=await layout(e);assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/gestion/planes').length,0);
 });
 await test('gerente ve Planes e inicia Panel general; otros destinos conservados',async()=>{
- for(const [rol,destino]of [['GERENTE','/gestion/panel'],['RECEPCIONISTA','/recepcion/acceso'],['USUARIO','/membresia'],['USUARIO','/membresia']]){
+ for(const [rol,destino]of [['GERENTE','/gestion/panel'],['RECEPCIONISTA','/recepcion/acceso'],['USUARIO','/membresia']]){
  const e=gestionEnv();e.user={rol};const l=await layout(e);assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/gestion/planes').length,rol==='GERENTE'?1:0);
  const r=await runner('route',e,{},'InicioPorRol');assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,destino);
  }

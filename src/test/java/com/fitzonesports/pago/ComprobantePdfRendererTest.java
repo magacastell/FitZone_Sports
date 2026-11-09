@@ -26,10 +26,13 @@ class ComprobantePdfRendererTest {
             for (String dato : new String[]{"María Muñoz", "16.000,75", "FZ-P-123", "30/10/2026", "30/11/2026",
                     "Cantidad: 1", "PAGO APROBADO", "Sin validez fiscal", "simulación académica"})
                 assertTrue(texto.contains(dato), dato);
-            Files.createDirectories(Path.of("target"));
-            Files.write(Path.of("target/comprobante-ejemplo.pdf"), pdf);
-            javax.imageio.ImageIO.write(new org.apache.pdfbox.rendering.PDFRenderer(documento).renderImageWithDPI(0, 120),
-                    "png", Path.of("target/comprobante-ejemplo.png").toFile());
+            // Exportación para revisión visual manual, no una aserción automatizada.
+            if (Boolean.getBoolean("fitzone.tests.exportar-ejemplos")) {
+                Files.createDirectories(Path.of("target"));
+                Files.write(Path.of("target/comprobante-ejemplo.pdf"), pdf);
+                javax.imageio.ImageIO.write(new org.apache.pdfbox.rendering.PDFRenderer(documento).renderImageWithDPI(0, 120),
+                        "png", Path.of("target/comprobante-ejemplo.png").toFile());
+            }
         }
     }
 
