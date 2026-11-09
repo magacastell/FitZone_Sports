@@ -108,8 +108,8 @@ mantener compilación y contrato, pero esa suite completa no se ejecutó.
   desde Internet. La cuenta conserva iniciales hasta cargar un archivo válido.
 - No se definió cómo rellenar huecos entre períodos pagados ni exclusión global de
   intenciones distintas entre múltiples clientes. Se conserva el contrato existente.
-- El conflicto de DNI duplicado sigue dependiendo de la restricción SQL, como ya
-  indicaba OpenAPI; no se agregó una nueva política de identidad.
+- En el corte del 07/11 el conflicto de DNI no tenía traducción específica. La
+  corrección local del 09/11 conserva la restricción SQL y responde 409; ver seguimiento debajo.
 - Sprint/unidad numéricos de la entrada de cierre requieren cotejar planificación;
   no se inventaron. Horas: aproximadamente 3, confirmadas por el responsable.
 
@@ -126,3 +126,63 @@ mantener compilación y contrato, pero esa suite completa no se ejecutó.
    pago y comprobante. La respuesta perdida se probó contra ese backend real.
 5. cambiarAutomatica configura la preferencia; procesarAutomatica cobra al agotarse
    el último período pagado. Se probó el job existente, sin crear otro ni cobrar en React.
+
+## Seguimiento focalizado — 09/11/2026
+
+Rama fix/cierre-m1-m2-online, base 08ecb29; fetch sin novedades ni superposiciones.
+Los resultados anteriores siguen siendo históricos. No se repitió una auditoría general.
+
+- A, foto en Recepción: confirmado por código, sin reproducción nueva de navegador.
+  Pendiente de aprobación porque requiere contrato de lectura del titular validado;
+  la ruta /usuarios/me/foto no puede utilizarse como foto del socio desde otra sesión.
+- B, 401 tardío: reproducido mediante respuesta diferida y corregido. Sólo se cierra
+  sesión si el token actual coincide con el utilizado por la petición que recibió 401.
+- C, DNI: reproducido con Spring/MockMvc y PostgreSQL 18 descartable; antes escapaba
+  DataIntegrityViolationException por usuario_dni_key. Ahora devuelve 409 sin detalles SQL.
+  Se conservan email 409 y errores de restricciones desconocidas. No cambian V1–V10.
+- D, foto administrativa: el frontend actual no la escribe, pero PATCH /usuarios/{id}
+  y ActualizarUsuarioRequest la conservan como contrato stable. No es código muerto.
+  Pendiente de aprobación: rechazar nuevas referencias textuales manteniendo campos
+  omitidos/null; actualizar DTO/OpenAPI y probar permisos y demás campos administrativos.
+
+Verificación nueva: 18 transporte frontend, 181 dominio/UI y build Vite correctos.
+Java 21 en imagen preexistente: 22 tests, 0 fallos, 0 errores y 0 omitidos:
+RegistroIdentidadIntegrationTest (3), RegistroConflictosTest (1), FotoPerfilServiceTest (4),
+MembresiaControllerTest (2), nueve métodos seleccionados de MembresiaIntegrationTest
+(multisede, permisos, QR, doble presencia, aforo, replay, automática, continuidad,
+renovación histórica y concurrencia de alta) y tres de PagosIntegrationTest (PDF,
+autorización y comprobante de renovación). No es la suite completa.
+Registro usa requests multipart reales de MockMvc sobre Spring y PG; no son llamadas
+HTTP por socket. Se comprobaron alta normal, DNI/email duplicados, foto privada PNG,
+reemplazo JPEG, perfil con DNI/email inmutables y cuenta sin foto; se limpian sólo las
+cuentas generadas por ese test. La reproducción inicial falló por DNI antes de corregir.
+La prueba frontend nueva también falló antes de corregir el interceptor.
+
+Entorno exclusivo: fitzone-cierre-m1-pg, almacenamiento tmpfs, sin puertos publicados
+ni volúmenes preexistentes; fitzone-cierre-m1-tests conserva los reportes de la última
+corrida. Se reutilizó fitzone-notebook-tests:local (JDK 21) con src montado sólo lectura.
+No se instalaron dependencias ni JDK global. No se iniciaron los contenedores previos.
+La pérdida de respuesta monetaria y la persistencia tras reiniciar Spring conservan
+la evidencia histórica del 07/11: no se volvieron a ensayar mediante navegador/proxy.
+
+Propuesta A para revisión conjunta: GET /accesos/{accesoId}/foto-titular autenticado,
+resolviendo usuario desde el registro, no desde un usuarioId enviado por React.
+Recepción sólo su sede operativa; Gerencia según permiso acordado. Limitar inicialmente
+la lectura a accesos abiertos; sin foto 404 e iniciales, sin ampliar acceso a URLs
+históricas externas. LectorAcceso usaría transporte autenticado y blob con cleanup,
+sin modificar AccesoResponse. Esto no cubre foto después del egreso: habilitarla requiere
+acordar explícitamente el alcance temporal. Alternativa compatible inmediata: iniciales,
+pero no satisface visualizar la fotografía. Ninguna alternativa se aplicó.
+Pruebas propuestas: titular distinto del operador y sede habitual distinta de visitada;
+operador de sede ajena, usuario común y anónimo denegados; QR inválido/vencido sin
+nuevo acceso; histórico sin foto; cierre del acceso y cleanup del blob.
+
+No se modificaron M2, políticas compartidas ni DTO administrativos. A/D no se declaran
+resueltos. OpenAPI sólo refleja la corrección de DNI/email 409 del contrato de registro.
+Cierre local autorizado: commit funcional `975a827`; documentación en el segundo commit local.
+Sin publicación, PR, merge ni rebase. Sprint/unidad y horas nuevas pendientes de confirmar.
+
+Cierre de esta verificación: git diff --check correcto; YAML OpenAPI validado con
+SnakeYAML en Java 21 (sin instalar paquetes). La base temporal quedó detenida; el
+contenedor de tests está detenido y conserva sus XML. Las tres referencias base
+permanecen en sus hashes originales y el índice está vacío.

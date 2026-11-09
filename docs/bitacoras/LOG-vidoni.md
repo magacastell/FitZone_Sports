@@ -130,3 +130,16 @@
 | Horas | Aproximadamente 3 horas efectivas, confirmadas por mí como responsable al responder en esta sesión; no reconstruí horarios ni modifiqué fechas históricas. |
 
 Conservé las entradas históricas anteriores tal como estaban; no completé hashes, horas ni decisiones que no pudiera verificar. La ubicación canónica pasa a docs/bitacoras/LOG-vidoni.md; la ruta anterior sólo redirige a ella.
+
+
+### 09/11/2026 — cierre focalizado M1 y compatibilidad M2 online
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Numeración pendiente de confirmar con la planificación. Corrección y pruebas de integración M1/M2 online. |
+| Actividad | Verifiqué repositorio, fetch y ausencia de cambios superpuestos. Creé fix/cierre-m1-m2-online desde 08ecb29. Corregí el 401 tardío y la traducción de DNI duplicado; actualicé sólo OpenAPI y el informe existente. |
+| Decisión | Conservé la restricción única SQL y traduje sólo unicidad conocida de DNI/email. Dejé foto del titular en Recepción y campo administrativo pendientes de aprobación porque afectan contratos compartidos. No modifiqué M2 ni su política de sede. |
+| Problema y solución | Una respuesta 401 antigua borraba el token nuevo: agregué comparación con la sesión actual. DNI duplicado escapaba como excepción de integridad: lo reproduje antes de corregir contra PG aislada. Ambos tests de regresión fallaron antes de las correcciones. |
+| Pruebas | Pasaron 18 de transporte, 181 dominio/UI, build Vite y 22 tests Java seleccionados sin fallos, errores ni omitidos. Spring/MockMvc contra PG 18 nueva en tmpfs y Java 21 en Docker. Ver detalle y límites en docs/rf01-rf02-experiencia-verificacion.md. Sin suite completa ni nuevo ensayo navegador/proxy de respuesta perdida. |
+| Commits | `975a827` — `fix(m1): preservar la sesión y traducir conflictos de registro`. El cierre documental se registra en el segundo commit local autorizado. Verifiqué la agrupación antes de cada commit; sin push, PR, merge ni rebase. |
+| Horas efectivas | Pendientes de confirmación; no reutilicé las aproximadamente 3 horas de la sesión anterior. |
