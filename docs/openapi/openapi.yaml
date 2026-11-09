@@ -939,6 +939,39 @@ paths:
           description: Recurso inexistente.
         '409':
           description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /accesos/offline/credenciales:
+    post:
+      tags: [M2 · Accesos]
+      summary: Preparar QR rotativos offline para una sede
+      description: Cuenta y membresía vigentes. Lote RS256 exclusivo de M2 de hasta dos horas, ventanas estrictas de 60 segundos. No reemplaza el último QR online. Preparar habilita incluir los datos mínimos del titular en la copia de esa sede. Sin fotos, contraseñas ni secretos de login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sedeId]
+              properties:
+                sedeId: {type: integer, minimum: 1}
+      responses:
+        '200':
+          description: Lote firmado, Cache-Control no-store
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, usuarioId, sedeId, servidorAhora, hasta, jwk, tokens]
+                properties:
+                  id: {type: string, format: uuid}
+                  usuarioId: {type: integer}
+                  sedeId: {type: integer}
+                  servidorAhora: {type: integer, format: int64, description: Epoch milisegundos}
+                  hasta: {type: integer, format: int64}
+                  jwk: {type: object, description: Clave pública RSA de verificación; nunca incluye parámetros privados}
+                  tokens: {type: array, maxItems: 120, items: {type: string}}
+        '400': {$ref: '#/components/responses/Validacion'}
+        '401': {$ref: '#/components/responses/NoAutenticado'}
+        '403': {$ref: '#/components/responses/SinPermiso'}
   /accesos/qr:
     get:
       tags:

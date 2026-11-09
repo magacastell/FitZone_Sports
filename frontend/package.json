@@ -15,6 +15,8 @@
     "test:gerencia": "node --experimental-vm-modules scripts/test-gerencia-service.mjs"
   },
   "dependencies": {
+    "dexie": "4.4.7",
+    "jose": "6.2.17",
     "lucide-react": "^1.49.0",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
@@ -22,9 +24,12 @@
     "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.3.4"
+    "fake-indexeddb": "6.2.8",
+    "vite": "^5.3.4",
+    "workbox-precaching": "7.4.1"
   }
 }
