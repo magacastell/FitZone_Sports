@@ -3,7 +3,11 @@ import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useOutletCon
 import Layout from '../components/Layout';
 import FeaturePlaceholder from '../components/FeaturePlaceholder';
 import PerfilUsuario from '../modules/m1-usuarios/PerfilUsuario';
+import MembresiaUsuario from '../modules/m1-usuarios/MembresiaUsuario';
+import GestionPlanes from '../modules/m1-usuarios/GestionPlanes';
+import Gerencia from '../modules/gerencia/Gerencia';
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
+import AforoSede from '../modules/m2-acceso/AforoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
 import AgendaClases from '../modules/m3-clases/AgendaClases';
 import GrillaCanchas from '../modules/m4-canchas/GrillaCanchas';
@@ -12,6 +16,15 @@ import HistorialComprobante from '../modules/m5-pagos/HistorialComprobante';
 import LoginPage from '../modules/auth/LoginPage';
 import RegisterPage from '../modules/auth/RegisterPage';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { useAuth } from '../context/AuthContext';
+
+function InicioPorRol() {
+  const { user, loading } = useAuth();
+  if (loading || !user) return <p role="status">Cargando sesión de FitZone...</p>;
+  if (user.rol === 'GERENTE') return <Navigate to="/gestion/panel" replace />;
+  if (user.rol === 'USUARIO') return <Navigate to="/membresia" replace />;
+  return <Navigate to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'} replace />;
+}
 
 function SocioQRRoute() {
   const navigate = useNavigate();
@@ -32,10 +45,10 @@ function SocioQRRoute() {
           <button type="button" onClick={refrescarMembresia}>Reintentar consulta de membresía</button>
         </>
       ) : <p>Mi QR no está disponible con el estado actual de tu membresía.</p>}
-      <Link to="/perfil">Ver perfil y membresía</Link>
+      <Link to="/membresia">Ver mi membresía</Link>
     </div>
   );
-  return <SocioQRModal isOpen={true} onClose={() => navigate('/canchas')} onAccesoDenegado={alDenegarAcceso} />;
+  return <SocioQRModal isOpen={true} onClose={() => navigate('/')} onAccesoDenegado={alDenegarAcceso} />;
 }
 
 export default function AppRoutes() {
@@ -48,14 +61,21 @@ export default function AppRoutes() {
           {/* Todas las rutas del Layout ahora están protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Layout />}>
-              <Route index element={<Navigate to="/canchas" replace />} />
+              <Route index element={<InicioPorRol />} />
               <Route path="canchas" element={<GrillaCanchas />} />
               <Route path="clases" element={<AgendaClases />} />
               <Route path="mi-qr" element={<SocioQRRoute />} />
               <Route path="perfil" element={<PerfilUsuario />} />
+              <Route path="membresia" element={<MembresiaUsuario />} />
+              <Route path="gestion/planes" element={<GestionPlanes />} />
+              <Route path="gestion/panel" element={<Gerencia />} />
+              <Route path="gestion/sedes" element={<Gerencia vista="sedes" />} />
+              <Route path="gestion/usuarios" element={<Gerencia vista="usuarios" />} />
+              <Route path="gestion/reportes" element={<Gerencia vista="reportes" />} />
               <Route path="comprobantes" element={<HistorialComprobante />} />
               
               <Route path="recepcion/acceso" element={<ControlAccesoSede />} />
+              <Route path="recepcion/aforo" element={<AforoSede />} />
               <Route path="admin/canchas/mantenimiento" element={
                 <FeaturePlaceholder
                   title="Mantenimiento de canchas (M4)"
@@ -71,7 +91,7 @@ export default function AppRoutes() {
             </Route>
           </Route>
           
-          <Route path="*" element={<Navigate to="/canchas" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

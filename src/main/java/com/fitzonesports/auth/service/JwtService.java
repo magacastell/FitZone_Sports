@@ -43,7 +43,8 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         Claims claims = parseClaims(token);
-        return userDetails.isEnabled() && claims.getSubject().equals(userDetails.getUsername())
+        return java.util.Objects.equals(claims.get("roles"), userDetails.getAuthorities().stream().map(Object::toString).toList())
+                && userDetails.isEnabled() && claims.getSubject().equals(userDetails.getUsername())
                 && !claims.getExpiration().before(new Date());
     }
 

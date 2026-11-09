@@ -16,25 +16,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class CanchaController {
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<Void> listarCanchas() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @GetMapping("/{canchaId}/turnos")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<Void> listarTurnos() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @PostMapping("/{canchaId}/reservas")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'GERENTE')")
     public ResponseEntity<Void> reservarTurno() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     @DeleteMapping("/{canchaId}/reservas/{reservaId}")
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<Void> cancelarReserva() {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }

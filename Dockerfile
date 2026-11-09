@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends unzip && rm -rf
 
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 RUN ./mvnw dependency:go-offline -B
 
 COPY src ./src

@@ -4,15 +4,15 @@ Los seis endpoints iniciales tienen persistencia y se agrega arrepentimiento por
 
 ## Reglas implementadas
 
-- Una cuenta por usuario, con períodos históricos separados. Sólo clientes (`CLIENTE_EXTERNO` o rol legado `SOCIO_ACTIVO`) contratan su primera membresía. Titular y sede administrativa se obtienen del usuario autenticado.
+- Una cuenta por usuario, con períodos históricos separados. Sólo clientes con autoridad `USUARIO` contratan su primera membresía. El titular se obtiene de la sesión. La sede habitual se elige en el alta si está sin asignar; una habitual previa se conserva. La sede de la membresía es el origen histórico del alta, no una limitación multisede.
 - Cada período aprobado conserva nombre, duración y precio del plan en ARS. Los cambios posteriores al plan no alteran lo contratado. Contratar y renovar requieren un plan activo.
 - Se usan meses calendario e intervalos `[inicio, fin)`: el 31 de enero más un mes termina el 28/29 de febrero; al llegar exactamente a `fin` deja de haber vigencia.
-- Renovar anticipadamente agrega el período al final del último período pagado no cancelado. Si ya venció, comienza al aprobarse el nuevo cobro, sin cobrar meses retroactivos.
+- Renovar agrega el período en `max(fin del último período no cancelado, ahora)`, con meses calendario. `ahora` es el instante capturado por Clock al procesar la operación; sólo se confirma si el pago fue aprobado. Así la anticipada conserva días y la vencida sin períodos futuros no cobra días retroactivos.
 - `/me` devuelve la cuenta con su historial aunque esté vencida; `404` sólo si no existe cuenta. `periodoVigente` puede ser nulo.
 - Suspender impide beneficios y renovaciones. Reactivar levanta la suspensión sin mover fechas: puede quedar vencida y requerir renovación manual. Las acciones y sus motivos se auditan.
 - Recepción consulta y modifica estados sólo para titulares de su sede actual. Gerente administra todas las sedes y puede renovar/configurar cuentas ajenas. Los clientes sólo operan su propia cuenta.
 - La vigencia es multi-sede. La sede administrativa no restringe dónde se usan los beneficios.
-- El rol legado `SOCIO_ACTIVO` se conserva por compatibilidad; no se asigna ni se quita por comprar o vencer una membresía. M2/M3/M4 pueden consultar `MembresiaService.tieneMembresiaVigente(usuarioId)`.
+- V7 reemplaza los dos roles comerciales legados por `USUARIO`; no cambia al comprar, vencer o suspender. Socio es condición derivada de ACTIVA. M2/M3/M4 pueden consultar `MembresiaService.tieneMembresiaVigente(usuarioId)`.
 - Acceso valida vigencia al emitir y escanear QR: un cliente con membresía activa puede usarlo; el rol sin membresía no habilita acceso. Las salidas siguen disponibles sin exigir vigencia.
 - Un JWT de un usuario desactivado deja de autorizar solicitudes aunque no haya expirado.
 
@@ -23,14 +23,14 @@ Prefijo `/api/v1`, autenticación `Authorization: Bearer <JWT>`.
 | Método | Ruta | Cuerpo | Resultado |
 |---|---|---|---|
 | GET | `/membresias/me` | — | `200`, cuenta e historial propios |
-| POST | `/membresias` | `{"planId":1}` | `201`, contratación pagada |
+| POST | `/membresias` | `{"planId":1,"sedeId":2}` | `201`, contratación pagada y sede confirmada |
 | POST | `/membresias/{id}/renovaciones` | `{"planId":1}` o `{}` para conservar plan | `201`, cuenta con nuevo período |
 | GET | `/membresias/{id}` | — | `200`, consulta de recepción o gerente |
 | PATCH | `/membresias/{id}/estado` | `{"accion":"SUSPENDER","motivo":"Revisión"}` o acción `REACTIVAR` | `200`, acción auditada |
 | PUT | `/membresias/{id}/renovacion-automatica` | `{"habilitada":true}` o `false` | `200`, preferencia actualizada |
 | POST | `/membresias/{id}/periodos/{periodoId}/cancelacion` | — | `200`, arrepentimiento con reembolso completo |
 
-Contratación y renovación requieren `Idempotency-Key: <UUID>`. Reutilizá el UUID para reintentar la misma operación; una nueva renovación requiere otra clave. Las claves quedan en la base, acotadas al titular y tipo de operación. Reutilizar una clave con otro plan explícito devuelve `409`. El reintento devuelve el estado actual de la cuenta sin crear otro cobro o período.
+Contratación y renovación requieren `Idempotency-Key: <UUID>`. Reutilizá el UUID para reintentar la misma operación; una nueva renovación requiere otra clave. Las claves quedan en la base, acotadas al titular y tipo de operación. En alta, reutilizar una clave con otro plan o sede devuelve `409`; renovación conserva la comparación de plan. El reintento devuelve el estado actual de la cuenta sin crear otro cobro o período. Una sola cuenta por usuario: otro POST de alta sin replay devuelve 409 incluso vencida; se utiliza renovación.
 
 No se aceptan importes ni fechas del cliente. Los períodos devuelven el precio decimal en ARS, fechas con zona y `pagoId`; los importados de V4 sin un pago identificado tienen `pagoId=null`.
 
@@ -59,7 +59,7 @@ Iniciá el backend en perfil `dev`. Primero creá un plan activo como gerente si
 ```powershell
 $login = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/v1/auth/login" -ContentType "application/json" -Body '{"email":"cliente@fitzone.com","password":"cliente123"}'
 $headers = @{ Authorization = "Bearer $($login.token)"; "Idempotency-Key" = [guid]::NewGuid().ToString() }
-$membresia = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/v1/membresias" -Headers $headers -ContentType "application/json" -Body '{"planId":1}'
+$membresia = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/v1/membresias" -Headers $headers -ContentType "application/json" -Body '{"planId":1,"sedeId":1}'
 $membresia
 Invoke-RestMethod -Uri "http://localhost:3000/api/v1/membresias/me" -Headers $headers
 ```
@@ -78,4 +78,136 @@ Los usuarios de desarrollo deben contratar un plan para generar QR; no se les re
 
 `./mvnw test` ejecuta las pruebas sin base. Con `PLAN_TEST_DB_URL` hacia una base PostgreSQL vacía y descartable, usuario `postgres` sin contraseña, se habilitan las pruebas de integración de planes y membresías: calendario, vencimientos, HTTP/JWT, permisos, acceso, idempotencia concurrente, automática, rollback de rechazos, arrepentimiento y migración desde V4.
 
-El adaptador mínimo de M5 persiste cobros aprobados y reembolsos de membresías. Los endpoints generales de pagos y PDF siguen en el alcance de M5. Una pasarela real asincrónica requerirá registro durable de intentos, estados pendientes, notificaciones y reconciliación, además de reemplazar el adaptador fake. M1 sólo otorga períodos si el cobro fue aprobado.
+El adaptador mínimo de M5 persiste cobros aprobados y reembolsos de membresías. El PDF persistido está disponible en GET /pagos/{id}/comprobante con titularidad; el listado general sigue pendiente. Una pasarela real asincrónica requerirá registro durable de intentos, estados pendientes, notificaciones y reconciliación, además de reemplazar el adaptador fake. M1 sólo otorga períodos si el cobro fue aprobado.
+
+Ver ADR-007 para migración de autoridades, tokens, matriz de permisos y limitaciones de la pasarela externa futura.
+
+## Comprobantes personales y PDF
+
+La UI lista períodos con pagoId de `/membresias/me`: plan/precio históricos, período
+y referencia de pago. No consume `/pagos/me`, que sigue 501, ni inventa emisión,
+estado financiero o reembolso. Orden: inicio de período descendente, no fecha de cobro.
+`GET /pagos/{id}/comprobante` devuelve bytes originales, con JWT, titularidad o gerente,
+Content-Type PDF, attachment y no-store; no requiere membresía actualmente vigente.
+`POST /pagos/{id}/reembolsos` conserva su respuesta real: pagoId, estado, monto, moneda,
+fechaReembolso y referencia. No se invoca para consultar estado: es una mutación.
+La UI muestra CANCELADA como estado del período, sin afirmar REEMBOLSADO.
+
+La nueva emisión PDF usa DatosComprobante interno para presentación con márgenes,
+jerarquía, total ARS en formato argentino y aclaración académica/sin validez fiscal.
+Plan, precio y período salen del snapshot contratado. Identidad se captura al emitir
+y se conserva en bytes; cambios posteriores de titular o plan y el reembolso no alteran
+el documento. Los PDF existentes mantienen su diseño anterior. Para pagos antiguos sin
+PDF, el mecanismo previo recupera la identidad actual: no hay snapshot previo de titular
+para reconstruirlo. No se prometen datos históricos inexistentes ni se reescribe el PDF.
+
+## Sede habitual y origen del alta (V8)
+
+Registro comercial sin sede y sin consulta pública de sedes. UsuarioResponse devuelve
+sedeId/sedeNombre null hasta contratar. Si no hay habitual, POST /membresias exige
+sedeId positivo y existente (400 si falta, 404 inexistente). Con sede anterior,
+omitir conserva la actual y enviar otra devuelve 409. GET /sedes sigue autenticado;
+no hay flag activo/inactivo de Sede: se listan las sedes reales del backend.
+Usuario.sedeId es habitual comercial u operativa del personal. Membresia.sedeId
+es el origen histórico del alta; futuras transferencias no deben actualizarlo.
+
+M1 conserva su bloqueo por titular y transacción con M5 fake: se validan plan/sede,
+se registra el alta y se cobra/emite comprobante con la estrategia actual, y se asigna
+la habitual tras aprobar. Nada se confirma hasta commit. El rechazo revierte sede,
+cuenta, período y pago. No se introduce una transacción distribuida; una pasarela
+remota futura mantiene pendientes sus necesidades de conciliación.
+
+La UI guarda planId+sedeId+UUID por cuenta en sessionStorage antes del envío.
+Red/5xx/F5 no crean una nueva intención; se puede reintentar la misma aunque falle
+el catálogo. Un GET que confirma la membresía permite reconciliar sin otro pago.
+402 permite retry o una nueva intención explícita; 404/409 confirmado sin cuenta
+requieren actualizar catálogo antes de descartar. Un registro local inválido bloquea
+envíos, no se borra silenciosamente. Tras éxito se recarga perfil sin relogin.
+Renovación no recibe sede ni modifica origen/habitual.
+
+Cambio posterior, responsable y autorización quedan pendientes (P12). Las sedes
+anteriores se conservan: no se puede inferir cuáles provienen del viejo default.
+Ver [verificación de este bloque](sede-habitual-verificacion.md).
+
+## Ciclo de vida y presentación personal
+
+La autoridad comercial sigue siendo USUARIO en todos los estados. Cliente nuevo
+significa ausencia de cuenta de membresía (404), no una membresía VENCIDA.
+ACTIVA requiere usuario habilitado, ausencia de suspensión y algún período no
+cancelado con `inicio <= ahora < fin`. No hay gracia. `/membresias/me` deriva el
+estado usando Clock aunque la columna `membresia.estado` todavía no se haya
+sincronizado. El job existente la actualiza cada minuto y procesa las automáticas;
+la UI configura la preferencia automática mediante el PUT existente, sin agregar jobs.
+
+VENCIDA conserva identidad, sede habitual, origen del alta, períodos y comprobantes.
+La UI muestra último período vencido y plan histórico si existen, y permite elegir
+un plan activo para renovar usando su precio actual. No inventa una fecha si no hay un
+período vencido identificable (por ejemplo, todos cancelados). Renovar no pide sede.
+QR y M2 rechazan vigencia ausente incluso si el QR fue emitido antes del vencimiento.
+La salida de un ingreso ya abierto sigue permitida.
+
+SUSPENDIDA es el flag administrativo persistido, con acción/motivo auditados.
+Gerencia puede suspender/reactivar; Recepción sólo para titulares de su sede actual.
+Puede coexistir con un período temporalmente vigente: impide beneficios y nuevas
+renovaciones; reactivar no extiende fechas y puede dejar VENCIDA. Lectura personal e
+historial/PDF continúan disponibles para una cuenta habilitada. El replay confirmado
+se verifica antes del bloqueo de nuevas renovaciones, sin crear otro período/pago.
+No se implementa una UI administrativa ni una causa/duración de suspensión nueva.
+
+El aviso a siete días es sólo UX, calculado desde las fechas con aproximación de
+24 horas y redondeo hacia arriba. No cambia estado ni permisos. Se omite si un
+período PROGRAMADA cubre inmediatamente el fin del actual; un período cancelado o
+con un hueco no suprime el aviso. La barra indica el período actual, no toda la
+duración futura. La UI reconsulta al cargar/F5 y recuperar foco; la autorización
+efectiva de QR e ingreso siempre se vuelve a comprobar en backend.
+
+Ver [auditoría, escenarios y verificación del ciclo](ciclo-vida-membresia-verificacion.md).
+
+## Experiencia personal RF-01/RF-02 (07/11/2026, cambios locales para revisión)
+
+Perfil permite editar nombre y apellido mediante PATCH /usuarios/me. Se validan
+texto no vacío y máximo 255 caracteres, según ActualizarPerfilRequest; la respuesta
+confirmada actualiza la pantalla y la identidad del encabezado. No se envían DNI,
+email, rol, sede ni foto en ese PATCH. El alta pública ahora requiere multipart:
+parte `datos` JSON y archivo `foto`. GET/PUT `/usuarios/me/foto` permiten consultar
+y reemplazar la imagen propia con JWT, sin necesidad de membresía. PNG/JPEG hasta
+2 MB, 4096 px por lado y 8 megapíxeles; el servidor valida contenido y reescribe
+píxeles sin metadatos. V10 agrega `usuario_foto` con bytes en PostgreSQL; el String
+`usuario.foto` conserva sólo una referencia versionada. No hay archivos en el repo,
+URL pública, servicio externo ni volumen adicional. Históricas sin foto mantienen
+iniciales. Contratos exactos en OpenAPI y resultados en el informe RF-01/RF-02.
+
+La renovación manual nueva se ofrece para VENCIDA y para ACTIVA dentro del aviso
+visual existente de siete días, sin automática habilitada ni períodos PROGRAMADA.
+Lejos del vencimiento no hay botón, enlace ni formulario de renovación anticipada.
+SUSPENDIDA no inicia nuevas renovaciones. Los intentos ya guardados conservan su
+recuperación incluso si cambió el estado; backend decide si admite el replay.
+
+Se reutiliza CatalogoPlanes: nombre, duración y precio reales; el usuario confirma
+el plan del siguiente período. Antes de cargar planes y de crear una intención se
+reconsulta /membresias/me. El POST sigue siendo /{id}/renovaciones, nunca un alta;
+planId y UUID se conservan ante red/5xx/F5 y conflictos. Cambiar de plan no convierte
+el período vigente, no prorratea y no toca snapshots ni comprobantes anteriores.
+Con períodos PROGRAMADA no se ofrece acumular otro. Si hay un hueco entre períodos,
+la UI lo deriva a administración: no decide cómo rellenarlo o reordenar pagos.
+
+La automática se consulta en el DTO y se cambia con PUT de habilitada true/false.
+Se informa que el cobro es simulado y ocurre al agotarse el último período pagado,
+con el último plan contratado, que puede ser futuro y distinto al vigente. Si el
+último período terminó, habilitar puede causar un cobro en la próxima ejecución
+del job (aproximadamente un minuto). No se prometen cargos mientras está suspendida.
+
+Para iniciar otra renovación manual se debe desactivar antes la automática y
+reconsultar la cuenta. La selección/pago manual y el cambio de preferencia se
+bloquean entre sí en esta pantalla; una intención monetaria pendiente impide cambiar
+la automática. Ante error del PUT se conserva el valor confirmado y se ofrece
+reenviar exactamente la misma preferencia, sin invertirla ni iniciar un pago manual.
+No se cambia el plan de la automática por fuera de una renovación consentida.
+
+Estas medidas UX no son autorización ni exclusión entre clientes: otras pestañas
+o llamadas directas siguen sujetas al bloqueo por titular, idempotencia y transacción
+existentes. No se amplía la garantía a intenciones distintas de otros clientes.
+La renovación conserva sus contratos, roles y reglas de precio. RF-01 agrega el
+upload, su contrato multipart y la migración V10 descritos arriba.
+
+Ver [alcance, validación y límites](rf01-rf02-experiencia-verificacion.md).

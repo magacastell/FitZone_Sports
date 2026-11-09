@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { CalendarDays, ChartColumn, DoorOpen, Dumbbell, LayoutGrid, LogOut, QrCode, ReceiptText, UserRound, Wrench } from 'lucide-react';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDays, CreditCard, DoorOpen, Dumbbell, LayoutGrid, LogOut, MapPin, QrCode, ReceiptText, UserRound, List, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { consultarMiMembresia } from '../services/m1Service';
+import { consultarMiMembresia, consultarMiPerfil } from '../services/m1Service';
+import { nombreActor, periodosConPago } from '../modules/m1-usuarios/estadoCuenta';
+import { AvatarCircle } from './ui/FitZoneUI';
 import './Layout.css';
 
-function NavigationLink({ to, icon: Icon, children, module }) {
+function NavigationLink({ to, icon: Icon, children }) {
   return (
     <li>
       <NavLink to={to} end className={({ isActive }) => `app-nav__link${isActive ? ' app-nav__link--active' : ''}`}>
         <Icon className="app-icon" size={20} strokeWidth={1.75} aria-hidden="true" />
         <span className="app-nav__label">{children}</span>
-        {module && <span className="app-nav__module">{module}</span>}
       </NavLink>
     </li>
   );
@@ -19,10 +20,17 @@ function NavigationLink({ to, icon: Icon, children, module }) {
 
 // Rol del JWT (nombre en backend) -> clave de vista que usa el menú
 const VISTA_POR_ROL = {
-  SOCIO_ACTIVO: 'SOCIO',
-  CLIENTE_EXTERNO: 'EXTERNO',
+  USUARIO: 'USUARIO',
   RECEPCIONISTA: 'RECEPCION',
   GERENTE: 'GERENTE',
+};
+
+const TITULO_POR_RUTA = {
+  '/gestion/panel': 'Panel general', '/gestion/sedes': 'Sedes', '/gestion/usuarios': 'Usuarios y membresías', '/gestion/reportes': 'Reportes',
+  '/recepcion/aforo': 'Aforo',
+  '/perfil': 'Perfil', '/membresia': 'Mi membresía', '/gestion/planes': 'Planes de membresía',
+  '/recepcion/acceso': 'Control de acceso', '/mi-qr': 'Mi QR',
+  '/comprobantes': 'Comprobantes', '/canchas': 'Canchas', '/clases': 'Clases',
 };
 
 export default function Layout() {
@@ -32,7 +40,41 @@ export default function Layout() {
 
 function LayoutAutenticado() {
   const { user, logout, isAuthenticated } = useAuth();
-  const [membresia, setMembresia] = useState({ estado: 'cargando' });
+  const { pathname } = useLocation();
+  const [perfilCuenta, setPerfilCuenta] = useState(null);
+  const revisionPerfil = useRef(0);
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const menuRef = useRef(null);
+  const botonMenuRef = useRef(null);
+
+  useEffect(() => {
+    let activo = true;
+    const revision = ++revisionPerfil.current;
+    setPerfilCuenta(null);
+    if (user?.email) consultarMiPerfil().then(
+      (datos) => { if (activo && revision === revisionPerfil.current) setPerfilCuenta(datos); },
+      () => { /* El enlace a Perfil conserva el email real de la sesión como alternativa. */ },
+    );
+    return () => { activo = false; };
+  }, [user?.email]);
+
+  const actualizarPerfil = (datos) => {
+    revisionPerfil.current++;
+    setPerfilCuenta(datos);
+  };
+
+  useEffect(() => { setMenuAbierto(false); }, [pathname]);
+  useEffect(() => {
+    if (menuAbierto) menuRef.current?.querySelector('a')?.focus();
+  }, [menuAbierto]);
+
+  const nombreCuenta = perfilCuenta
+    ? `${perfilCuenta.nombre} ${perfilCuenta.apellido}`.trim()
+    : user?.email || 'Mi cuenta';
+  const iniciales = nombreCuenta.split(/\s+/).map((parte) => parte[0]).slice(0, 2).join('').toUpperCase();
+  const rolActivo = VISTA_POR_ROL[user?.rol];
+  const esCliente = rolActivo === 'USUARIO';
+  const [membresia, setMembresia] = useState({ estado: esCliente ? 'cargando' : 'no-aplica' });
   const ultimaMembresia = useRef(membresia);
   const consulta = useRef(null);
   const revision = useRef(0);
@@ -47,8 +89,9 @@ function LayoutAutenticado() {
   }, []);
 
   const refrescarMembresia = useCallback(() => {
+    if (!esCliente) return Promise.resolve(ultimaMembresia.current);
     if (consulta.current) return consulta.current;
-    if (ultimaMembresia.current.estado === 'error') {
+    if (ultimaMembresia.current.estado === 'error' || ultimaMembresia.current.estado === 'no-aplica') {
       ultimaMembresia.current = { estado: 'cargando' };
       if (montado.current) setMembresia(ultimaMembresia.current);
     }
@@ -69,28 +112,25 @@ function LayoutAutenticado() {
     });
     consulta.current = tarea;
     return tarea;
-  }, []);
+  }, [esCliente]);
 
   useEffect(() => {
     montado.current = true;
-    refrescarMembresia();
+    if (esCliente) refrescarMembresia();
+    else actualizarMembresia({ estado: 'no-aplica' });
     const alRecuperarFoco = () => {
       if (document.visibilityState === 'visible') refrescarMembresia();
     };
-    window.addEventListener('focus', alRecuperarFoco);
+    if (esCliente) window.addEventListener('focus', alRecuperarFoco);
     return () => {
       montado.current = false;
       revision.current++;
       consulta.current = null;
       window.removeEventListener('focus', alRecuperarFoco);
     };
-  }, [refrescarMembresia]);
+  }, [esCliente, actualizarMembresia, refrescarMembresia]);
 
   const puedeAbrirQr = membresia.estado === 'cargada' && membresia.datos.estado === 'ACTIVA';
-  // Por defecto se muestra la vista del rol real; el desplegable de desarrollo
-  // permite previsualizar otro rol sin cambiar de sesión.
-  const [vistaForzada, setVistaForzada] = useState(null);
-  const rolActivo = vistaForzada ?? VISTA_POR_ROL[user?.rol] ?? 'SOCIO';
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -98,61 +138,66 @@ function LayoutAutenticado() {
     navigate('/login');
   };
 
+  const clienteSinMembresia = esCliente && membresia.estado === 'sin-membresia';
   return (
     <div className="app-layout">
       <a className="skip-link" href="#contenido">Ir al contenido</a>
 
-      <aside className="app-sidebar" aria-label="Menú de FitZone Sports">
+      <aside id="menu-principal" ref={menuRef} className={`app-sidebar${menuAbierto ? ' app-sidebar--open' : ''}${clienteSinMembresia ? ' app-sidebar--cliente' : ''}`} aria-label="Menú de FitZone Sports"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') { setMenuAbierto(false); botonMenuRef.current?.focus(); }
+        }}
+        onClick={(event) => { if (event.target.closest('a')) setMenuAbierto(false); }}>
         <div className="app-sidebar__header">
           <div className="app-brand">
             <Dumbbell size={26} strokeWidth={1.75} aria-hidden="true" />
             <div>
-              <p className="app-brand__name">FitZone Sports</p>
-              <p className="app-brand__description">Gestión de gimnasio</p>
+              <p className="app-brand__name">FitZone</p>
+              <p className="app-brand__description">SPORTS</p>
             </div>
-          </div>
-
-          <div className="actor-preview">
-            <label htmlFor="vista-desarrollo">Vista de desarrollo</label>
-            <select id="vista-desarrollo" value={rolActivo} onChange={(e) => setVistaForzada(e.target.value)}>
-              <option value="SOCIO">Socio Activo</option>
-              <option value="EXTERNO">Cliente Externo</option>
-              <option value="RECEPCION">Recepcionista / Admin Sede</option>
-              <option value="GERENTE">Gerente Central</option>
-            </select>
           </div>
         </div>
 
+        <div className="app-sidebar__context">
+          <span>Espacio de trabajo</span>
+          <strong>{rolActivo === 'GERENTE' ? 'Gerente Central' : clienteSinMembresia ? 'Cliente · Elegí tu plan' : nombreActor(user?.rol, membresia)}</strong>
+        </div>
+
         <nav className="app-nav" aria-label="Navegación principal">
+          {esCliente && <div className="app-nav__group"><p className="app-nav__heading">Actividades</p><ul className="app-nav__list">
+            {puedeAbrirQr && <NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink>}
+            <NavigationLink to="/canchas" icon={LayoutGrid}>Canchas</NavigationLink>
+          </ul></div>}
           <div className="app-nav__group">
-            <p className="app-nav__heading" id="nav-usuario">Módulos del usuario</p>
+            <p className="app-nav__heading" id="nav-usuario">{clienteSinMembresia ? 'Planes' : esCliente ? 'Mi espacio' : 'Mi cuenta'}</p>
             <ul className="app-nav__list" aria-labelledby="nav-usuario">
-              <NavigationLink to="/canchas" icon={LayoutGrid} module="M4">Canchas</NavigationLink>
-              {rolActivo === 'SOCIO' && (
-                <>
-                  <NavigationLink to="/clases" icon={CalendarDays} module="M3">Clases grupales</NavigationLink>
-                </>
-              )}
-              {puedeAbrirQr && <NavigationLink to="/mi-qr" icon={QrCode} module="M2">Mi QR</NavigationLink>}
-              <NavigationLink to="/perfil" icon={UserRound} module="M1">Perfil y membresía</NavigationLink>
-              <NavigationLink to="/comprobantes" icon={ReceiptText} module="M5">Mis comprobantes</NavigationLink>
+              <NavigationLink to={esCliente ? '/membresia' : '/perfil'} icon={clienteSinMembresia ? CreditCard : UserRound}>{esCliente ? (membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : 'Mi membresía') : 'Perfil'}</NavigationLink>
             </ul>
           </div>
 
+          {esCliente && (puedeAbrirQr || periodosConPago(membresia).length > 0) && (
+            <div className="app-nav__group">
+              <p className="app-nav__heading" id="nav-servicios">Servicios</p>
+              <ul className="app-nav__list" aria-labelledby="nav-servicios">
+                {puedeAbrirQr && <NavigationLink to="/mi-qr" icon={QrCode}>Mi QR</NavigationLink>}
+                {periodosConPago(membresia).length > 0 && <NavigationLink to="/comprobantes" icon={ReceiptText}>Comprobantes</NavigationLink>}
+              </ul>
+            </div>
+          )}
+
           {(rolActivo === 'RECEPCION' || rolActivo === 'GERENTE') && (
             <div className="app-nav__group">
-              <p className="app-nav__heading" id="nav-gestion">Operación y gestión</p>
+              <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Admin de Sede' : 'Administración global'}</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
-                <NavigationLink to="/recepcion/acceso" icon={DoorOpen} module="M2">Control de acceso y aforo</NavigationLink>
-                <NavigationLink to="/admin/canchas/mantenimiento" icon={Wrench} module="M4">Mantenimiento de canchas</NavigationLink>
-                {rolActivo === 'GERENTE' && (
-                  <NavigationLink to="/admin/reportes-consolidados" icon={ChartColumn}>Reportes consolidados</NavigationLink>
-                )}
+                {rolActivo === 'GERENTE' && <><NavigationLink to="/gestion/panel" icon={LayoutGrid}>Panel general</NavigationLink><NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink><NavigationLink to="/gestion/sedes" icon={MapPin}>Sedes</NavigationLink><NavigationLink to="/gestion/usuarios" icon={UserRound}>Usuarios / Membresías</NavigationLink><NavigationLink to="/gestion/reportes" icon={ReceiptText}>Reportes</NavigationLink></>}
+                {rolActivo === 'RECEPCION' && <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>Control de acceso</NavigationLink>}
+                {rolActivo === 'RECEPCION' && <><NavigationLink to="/recepcion/aforo" icon={LayoutGrid}>Aforo</NavigationLink><NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink><NavigationLink to="/canchas" icon={List}>Canchas</NavigationLink></>}
               </ul>
             </div>
           )}
         </nav>
 
+        {clienteSinMembresia && <div className="app-sidebar__experience"><MapPin aria-hidden="true" /><span><small>EXPERIENCIA</small><strong>Sin membresía</strong></span></div>}
         {isAuthenticated && (
           <button type="button" className="button button--secondary app-sidebar__logout" onClick={handleLogout}>
             <LogOut size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -161,12 +206,26 @@ function LayoutAutenticado() {
         )}
       </aside>
 
-      <main id="contenido" className="app-main" tabIndex={-1}>
-        <div className="app-content">
-          <p className="demo-notice">Vista de demostración: datos simulados. Las reservas, pagos y validaciones todavía no están implementados.</p>
-          <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr }} />
-        </div>
-      </main>
+      <div className="app-workspace">
+        <header className="app-topbar">
+          <div className="app-topbar__heading">
+            <button ref={botonMenuRef} type="button" className="app-menu-toggle" aria-expanded={menuAbierto} aria-controls="menu-principal"
+              aria-label={menuAbierto ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'} onClick={() => setMenuAbierto(!menuAbierto)}>
+              {menuAbierto ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+            </button>
+            <div><span className="app-topbar__brand">FitZone Sports</span><h1>{pathname === '/membresia' && membresia.estado === 'sin-membresia' ? 'Elegí tu plan' : TITULO_POR_RUTA[pathname] || 'Mi espacio'}</h1></div>
+          </div>
+          <Link to="/perfil" className="app-user" aria-label={`Ver perfil de ${nombreCuenta}`}>
+            <AvatarCircle className="app-user__avatar" initials={iniciales} foto={perfilCuenta?.foto} />
+            <span className="app-user__identity"><strong>{nombreCuenta}</strong><span>{rolActivo === 'GERENTE' ? 'Gerente Central' : nombreActor(user?.rol, membresia)}</span></span>
+          </Link>
+        </header>
+        <main id="contenido" className="app-main" tabIndex={-1}>
+          <div className="app-content">
+            <Outlet context={{ rolActivo, membresia, actualizarMembresia, refrescarMembresia, puedeAbrirQr, actualizarPerfil }} />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

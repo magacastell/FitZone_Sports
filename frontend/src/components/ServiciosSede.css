@@ -1,0 +1,13 @@
+.servicios-sede .servicios-filtros { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin-bottom: 20px; }
+.servicios-sede label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; }
+.servicios-sede .panel { padding: 24px; }
+.servicios-sede label > span { display: flex; align-items: center; gap: 6px; }
+.servicios-sede label svg { width: 18px; height: 18px; }
+.servicios-sede select,.servicios-sede input { min-width: 0; width: 100%; min-height: 44px; padding: 10px; border: 1px solid #bbcdbf; border-radius: 9px; background: white; color: #1e2d26; font: inherit; box-sizing: border-box; }
+.servicios-sede .servicios-pasos { display: flex; flex-wrap: wrap; gap: 12px; padding: 0; list-style-position: inside; color: #52665a; font-size: 13px; }
+.servicios-sede .servicios-pasos li { padding: 10px 14px; border: 1px solid #e2e9e3; border-radius: 20px; background: white; }
+.servicios-sede .servicios-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 20px; }
+.servicios-sede .servicio-card { min-width: 0; overflow-wrap: anywhere; padding: 18px; border: 1px solid #e2e9e3; border-radius: 12px; }
+.servicios-sede .servicio-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
+.servicios-sede .servicios-nota { color: #52665a; font-size: 14px; line-height: 1.6; }
+@media(max-width:640px) { .servicios-sede .servicios-filtros { grid-template-columns: minmax(0,1fr); } }

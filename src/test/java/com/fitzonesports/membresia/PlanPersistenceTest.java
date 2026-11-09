@@ -32,7 +32,7 @@ class PlanPersistenceTest {
         var plan = service.crearPlan(new PlanRequest("Persistencia", 1, new BigDecimal("15000.50")));
         Integer sede = jdbc.queryForObject("INSERT INTO sede(nombre, capacidad_maxima) VALUES ('Pruebas', 10) RETURNING id", Integer.class);
         Integer usuario = jdbc.queryForObject("INSERT INTO usuario(dni,email,rolid,sedeid,nombre,apellido,contrasenia) "
-                + "VALUES ('prueba','prueba@example.com',(SELECT id FROM rol WHERE nombre='CLIENTE_EXTERNO'),?, 'Test','Test','test') RETURNING id", Integer.class, sede);
+                + "VALUES ('prueba','prueba@example.com',(SELECT id FROM rol WHERE nombre='USUARIO'),?, 'Test','Test','test') RETURNING id", Integer.class, sede);
         jdbc.update("INSERT INTO membresia(fecha_inicio,estado,fecha_fin,renovacion_automatica,usuarioid,plan_membresiaid,sedeid) "
                 + "VALUES (CURRENT_TIMESTAMP,'ACTIVA',CURRENT_TIMESTAMP + INTERVAL '1 month',0,?,?,?)", usuario, plan.id(), sede);
         service.desactivarPlan(plan.id());
@@ -123,4 +123,29 @@ class PlanPersistenceTest {
             jdbc.update("DELETE FROM plan_membresia WHERE nombre=?", name);
         }
     }
+    @Test
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    void migraRolesLegadosSinPerderHistorialNiPagos() {
+        String esquema="actores_"+java.util.UUID.randomUUID().toString().replace("-", "");
+        var configuracion=org.flywaydb.core.Flyway.configure().dataSource(System.getenv("PLAN_TEST_DB_URL"),"postgres","").schemas(esquema);
+        configuracion.target("6").load().migrate();
+        jdbc.execute("INSERT INTO "+esquema+".sede(id,nombre,capacidad_maxima) VALUES (1,'Histórica',10)");
+        for (String rol : java.util.List.of("CLIENTE_EXTERNO","SOCIO_ACTIVO","RECEPCIONISTA","GERENTE")) {
+            jdbc.update("INSERT INTO "+esquema+".usuario(dni,email,rolid,sedeid,nombre,apellido,contrasenia) VALUES (?,?,(SELECT id FROM "+esquema+".rol WHERE nombre=?),1,'Nombre','Histórico','hash-preservado')",rol,rol,rol);
+        }
+        jdbc.execute("INSERT INTO "+esquema+".plan_membresia(id,nombre,duracion_meses,precio) VALUES (1,'Original',1,99.50)");
+        jdbc.execute("INSERT INTO "+esquema+".membresia(id,fecha_inicio,fecha_fin,estado,renovacion_automatica,usuarioid,plan_membresiaid,sedeid) VALUES (1,'2026-01-01','2026-02-01','VENCIDA',0,1,1,1)");
+        jdbc.execute("INSERT INTO "+esquema+".pago(id,monto,tipo_referencia,referencia_id,fecha_pago,usuarioid,estado) VALUES (1,99.50,'MEMBRESIA',1,'2026-01-01',1,'APROBADO')");
+        jdbc.execute("INSERT INTO "+esquema+".periodo_membresia(membresia_id,plan_id,nombre_plan,duracion_meses,precio,inicio,fin,pago_id) VALUES (1,1,'Original',1,99.50,'2026-01-01','2026-02-01',1)");
+        jdbc.execute("INSERT INTO "+esquema+".comprobante(numero_comprobante,fecha_emision,pagoid,contenido_pdf) VALUES ('Histórico','2026-01-01',1,decode('25504446','hex'))");
+        var antes=new java.util.HashMap<String,java.util.List<String>>();
+        for (String tabla:java.util.List.of("membresia","periodo_membresia","pago","comprobante"))
+            antes.put(tabla,jdbc.queryForList("SELECT row_to_json(t)::text FROM "+esquema+"."+tabla+" t ORDER BY id",String.class));
+        org.flywaydb.core.Flyway.configure().dataSource(System.getenv("PLAN_TEST_DB_URL"),"postgres","").schemas(esquema).load().migrate();
+        for (var entrada:antes.entrySet()) assertEquals(entrada.getValue(),jdbc.queryForList("SELECT row_to_json(t)::text FROM "+esquema+"."+entrada.getKey()+" t ORDER BY id",String.class));
+        assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM "+esquema+".usuario u JOIN "+esquema+".rol r ON r.id=u.rolid WHERE r.nombre='USUARIO'",Integer.class));
+        assertEquals(4,jdbc.queryForObject("SELECT count(*) FROM "+esquema+".usuario WHERE contrasenia='hash-preservado'",Integer.class));
+        assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM "+esquema+".rol WHERE nombre IN ('CLIENTE_EXTERNO','SOCIO_ACTIVO')",Integer.class));
+    }
+
 }

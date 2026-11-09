@@ -6,7 +6,7 @@ export default function FeaturePlaceholder({ title, description }) {
       <h2>{title}</h2>
       <p>{description}</p>
       <p>Esta pantalla es un punto de navegación inicial. La funcionalidad todavía no está implementada.</p>
-      <Link to="/canchas">Volver al inicio</Link>
+      <Link to="/">Volver al inicio</Link>
     </section>
   );
 }

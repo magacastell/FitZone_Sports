@@ -65,7 +65,7 @@ class PagosIntegrationTest {
         sede = jdbc.queryForObject("INSERT INTO sede(nombre,capacidad_maxima) VALUES (?,10) RETURNING id",Integer.class,"Pagos " + sufijo);
         email="titular-"+sufijo+"@test.com"; otroEmail="otro-"+sufijo+"@test.com";
         gerente="gerente-"+sufijo+"@test.com"; recepcion="recepcion-"+sufijo+"@test.com";
-        usuario=usuario(email,"CLIENTE_EXTERNO"); otro=usuario(otroEmail,"CLIENTE_EXTERNO");
+        usuario=usuario(email,"USUARIO"); otro=usuario(otroEmail,"USUARIO");
         usuario(gerente,"GERENTE"); usuario(recepcion,"RECEPCIONISTA");
         plan=jdbc.queryForObject("INSERT INTO plan_membresia(nombre,duracion_meses,precio) VALUES (?,1,15000.50) RETURNING id",Integer.class,"Plan " + sufijo);
         mvc=MockMvcBuilders.webAppContextSetup(contexto).apply(springSecurity()).build();
@@ -75,7 +75,7 @@ class PagosIntegrationTest {
                 + "VALUES (?,?,(SELECT id FROM rol WHERE nombre=?),?,'María','Muñoz','test') RETURNING id",Integer.class,mail,mail,rol,sede);
     }
     private com.fitzonesports.membresia.dto.MembresiaResponse contratar() {
-        return membresias.contratar(email,new CrearMembresiaRequest(plan),UUID.randomUUID());
+        return membresias.contratar(email,new CrearMembresiaRequest(plan,null),UUID.randomUUID());
     }
     private String bearer(String mail) { return "Bearer " + jwt.generateToken(detalles.loadUserByUsername(mail)); }
     private void assertEstado(int esperado, org.junit.jupiter.api.function.Executable operacion) {
@@ -96,13 +96,16 @@ class PagosIntegrationTest {
 
     @Test void emitePdfOriginalConCentavosYNoLoDuplica() throws Exception {
         var m=contratar(); int pago=m.periodos().getFirst().pagoId();
+        String nombreHistorico=m.periodos().getFirst().nombrePlan();
         byte[] original=comprobantes.descargar(email,pago).contenido();
         jdbc.update("UPDATE usuario SET nombre='Otro nombre' WHERE id=?",usuario);
         jdbc.update("UPDATE plan_membresia SET precio=20000,nombre=? WHERE id=?","Cambio "+UUID.randomUUID(),plan);
         assertArrayEquals(original,comprobantes.descargar(email,pago).contenido());
         try(var doc=Loader.loadPDF(original)) {
             String texto=new PDFTextStripper().getText(doc);
-            assertTrue(texto.contains("María Muñoz")); assertTrue(texto.contains("15000.50"));
+            assertTrue(texto.contains("María Muñoz")); assertTrue(texto.contains("15.000,50"));
+            assertTrue(texto.contains(nombreHistorico)); assertTrue(texto.contains(email));
+            assertTrue(texto.contains("FZ-P-"+pago)); assertTrue(texto.contains("Sin validez fiscal"));
             assertTrue(texto.contains("25/10/2026")); assertTrue(texto.contains("25/11/2026"));
         }
         assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM comprobante WHERE pagoid=?",Integer.class,pago));
@@ -179,11 +182,30 @@ class PagosIntegrationTest {
     }
 
     @Test void renovacionTambienEmitePdfConSuPeriodo() {
-        var m=contratar(); var renovada=membresias.renovar(email,m.id(),new RenovarMembresiaRequest(null),UUID.randomUUID());
+        var m=contratar(); var clave=UUID.randomUUID();
+        var renovada=membresias.renovar(email,m.id(),new RenovarMembresiaRequest(null),clave);
         int pago=renovada.periodos().getLast().pagoId();
-        assertNotNull(comprobantes.descargar(email,pago).contenido());
+        byte[] original=comprobantes.descargar(email,pago).contenido();
+        assertNotNull(original);
+        var replay=membresias.renovar(email,m.id(),new RenovarMembresiaRequest(null),clave);
+        assertEquals(renovada.periodos(),replay.periodos());
+        assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM pago WHERE usuarioid=?",Integer.class,usuario));
+        assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM comprobante c JOIN pago p ON p.id=c.pagoid WHERE p.usuarioid=?",Integer.class,usuario));
+        assertArrayEquals(original,comprobantes.descargar(email,pago).contenido());
         reembolsos.solicitar(email,pago);
         assertTrue(membresias.tieneMembresiaVigente(usuario));
+    }
+
+    @Test void canchasPermiteAutoridadEstableSinPrometerReservasImplementadas() throws Exception {
+        String token=bearer(email);
+        for (boolean conMembresia : List.of(false,true)) {
+            if (conMembresia) contratar();
+            mvc.perform(get("/canchas").header("Authorization",token)).andExpect(status().isNotImplemented());
+            mvc.perform(post("/canchas/1/reservas").header("Authorization",token)).andExpect(status().isNotImplemented());
+            mvc.perform(get("/reservas/me").header("Authorization",token)).andExpect(status().isNotImplemented());
+        }
+        mvc.perform(post("/canchas/1/reservas").header("Authorization",bearer(recepcion))).andExpect(status().isForbidden());
+        mvc.perform(get("/canchas")).andExpect(status().isUnauthorized());
     }
 
     @Test void reembolsosConcurrentesNoDuplicanDevolucion() throws Exception {

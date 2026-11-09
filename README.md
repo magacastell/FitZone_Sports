@@ -7,8 +7,10 @@ Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas 
 ## Stack
 
 - **Backend:** Java 21 + Spring Boot 4.1.1 (Maven), PostgreSQL, Flyway, Spring Data JPA, Spring Security + JWT
-- **Frontend:** React + Vite + React Router; login y registro conectados a la API, pantallas de negocio con datos de ejemplo.
-- **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, y a futuro `membresia`, `clase`, `reserva`, `pago`)
+- **Frontend:** React + Vite + React Router; Cliente/Socio, Recepción y Gerencia integrados según el soporte real de la API. Clases, Canchas y Reportes tienen frontend preparado y backend pendiente, con estados explícitos de no disponibilidad.
+- **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, `usuario`, `sede`, `membresia`, `acceso`, `clase`, `reserva`, `pago`, `reporte`). La presencia de un módulo no implica que su backend esté terminado.
+
+Entrega de la rama `feature/integracion-final-frontend`: [alcance, decisiones, pruebas y pendientes](docs/integracion-final-frontend.md).
 
 ## Requisitos
 
@@ -80,6 +82,7 @@ Con PostgreSQL local, conservá los valores del paso anterior. Luego, para ambas
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE = "dev"
+$env:JAVA_TOOL_OPTIONS = "-Duser.timezone=America/Argentina/Buenos_Aires"
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -212,14 +215,14 @@ La contratación, renovación manual/automática, consulta histórica, suspensi�
 
 | Email | Password | Rol |
 |---|---|---|
-| socio@fitzone.com | socio123 | SOCIO_ACTIVO |
-| cliente@fitzone.com | cliente123 | CLIENTE_EXTERNO |
+| socio@fitzone.com | socio123 | USUARIO |
+| cliente@fitzone.com | cliente123 | USUARIO |
 | recepcion@fitzone.com | recepcion123 | RECEPCIONISTA |
 | gerente@fitzone.com | gerente123 | GERENTE |
 
 Login: `POST /api/v1/auth/login` con `{ "email": "...", "password": "..." }`, devuelve un JWT para usar como `Authorization: Bearer <token>` en el resto de los endpoints.
 
-Registro: `POST /api/v1/auth/register` con `{ "nombre": "...", "apellido": "...", "dni": "...", "email": "...", "password": "...", "sedeId": 1 }`. La sede indicada debe existir.
+Registro: `POST /api/v1/auth/register` multipart, con parte `datos` JSON (`nombre`, `apellido`, `dni`, `email`, `password`) y archivo obligatorio `foto` PNG/JPEG hasta 2 MB. La foto se guarda en PostgreSQL mediante V10, sin carpeta de uploads ni servicio externo; reemplazo y consulta autenticada en `/usuarios/me/foto`. El alta comercial queda sin sede habitual. Se elige al contratar con sesión iniciada; GET /sedes sigue autenticado. Detalle en [verificación RF-01/RF-02](docs/rf01-rf02-experiencia-verificacion.md).
 
 ## Estructura del backend
 
@@ -255,10 +258,10 @@ Los stubs no consultan ni modifican datos. Sus contratos de solicitud/respuesta 
 están pendientes. Las anotaciones `@PreAuthorize` usan el soporte existente de
 Spring Security (`@EnableMethodSecurity`).
 
-Roles: **S** = SOCIO_ACTIVO, **C** = CLIENTE_EXTERNO,
+Roles: **S** y **C** = USUARIO (ambos actores comerciales del TP),
 **R** = RECEPCIONISTA, **G** = GERENTE. GERENTE tiene acceso a todas las rutas.
-Se conservan los roles actuales; en los documentos, socio activo se considera
-una condición de membresía y su futura representación requiere revisión.
+Socio es condición funcional derivada de membresía vigente; la autoridad USUARIO no cambia al pagar o vencer.
+Ver [ADR de actores y membresía](docs/adr/0007-actores-y-membresia.md). Los tokens legados requieren un nuevo login tras V7.
 
 Pendiente antes de implementar operaciones reales:
 
@@ -274,7 +277,7 @@ Pendiente antes de implementar operaciones reales:
   la modificación de cancha no define todavía ese contrato global.
 
 Reglas de `usuario`: recepción solo lista, consulta y modifica usuarios de su sede, y
-solo SOCIO_ACTIVO o CLIENTE_EXTERNO. Puede activar/desactivar cuentas (`activo`) con
+solo USUARIO. Puede activar/desactivar cuentas (`activo`) con
 `PATCH /usuarios/{usuarioId}`. Nadie puede desactivar su propia cuenta, y
 `PATCH /usuarios/me` no permite cambiar `activo`. El gerente opera sobre todas las
 sedes y roles. `GET /usuarios` acepta `?sedeId=` (recepción solo con su propia sede).
@@ -340,7 +343,8 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 | reporte | GET | `/reportes/ingresos` | G | consultarIngresos |
 
 La autenticación existente (`POST /auth/login` y `POST /auth/register`) sigue
-implementada y pública. Los stubs no están conectados todavía al frontend.
+implementada y pública. El frontend de Clases, Canchas y Reportes consulta las rutas
+preparadas y presenta `501` como servicio pendiente; no ofrece operaciones ficticias.
 
 ### Planes de membresía
 
@@ -381,7 +385,7 @@ No prueban la validación de JWT.
 
 Para activar las pruebas de persistencia, definir `PLAN_TEST_DB_URL` con una URL
 JDBC hacia una base PostgreSQL **vacía y descartable**, usuario `postgres` y sin
-contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V6 y Hibernate valida
+contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V9 y Hibernate valida
 el mapeo. Estas pruebas verifican decimales, restricciones, orden y conservación
 de referencias de membresía al desactivar, concurrencia y actualización desde V2.
 Sin la variable se omiten.
@@ -434,3 +438,22 @@ local de pruebas descartable, con las mismas condiciones indicadas arriba.
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
 - Diagramas C4 y ADR: `docs/`
 - Bitácoras del equipo: `LOGs/`
+
+
+## Dominio Cliente/Socio y comprobantes
+
+V7 unifica las autoridades comerciales en USUARIO sin borrar cuentas, períodos ni pagos.
+Registro y login emiten esa autoridad estable; la membresía decide condición de Socio
+sin volver a iniciar sesión al comprar. La sede habitual no cambia la condición.
+Ambas cuentas demo son USUARIO: sus nombres no garantizan membresía.
+La contratación POST /membresias incluye cobro fake aprobado y comprobante persistido.
+La interfaz consulta pagoId de los períodos y descarga GET /pagos/{id}/comprobante,
+con JWT y control de titularidad; no usa el listado demo ni inventa registros.
+
+Pruebas frontend (sin agregar dependencias): desde frontend, ejecutar
+`node --experimental-vm-modules scripts/test-dominio.mjs`,
+`node --experimental-vm-modules scripts/test-planes.mjs` y
+`node --experimental-vm-modules scripts/test-api.mjs`.
+Las integraciones PostgreSQL se habilitan con PLAN_TEST_DB_URL exclusivamente hacia
+una BD vacía y descartable, con usuario postgres sin contraseña; nunca la BD de desarrollo.
+Usar JAVA_TOOL_OPTIONS=-Duser.timezone=America/Argentina/Buenos_Aires para Java/PostgreSQL.

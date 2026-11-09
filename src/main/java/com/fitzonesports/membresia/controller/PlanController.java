@@ -26,7 +26,7 @@ public class PlanController {
     private final PlanService planService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SOCIO_ACTIVO', 'CLIENTE_EXTERNO', 'RECEPCIONISTA', 'GERENTE') and (!#incluirInactivos or hasAnyRole('RECEPCIONISTA', 'GERENTE'))")
+    @PreAuthorize("hasAnyRole('USUARIO', 'RECEPCIONISTA', 'GERENTE') and (!#incluirInactivos or hasAnyRole('RECEPCIONISTA', 'GERENTE'))")
     public ResponseEntity<List<PlanResponse>> listarPlanes(@RequestParam(defaultValue = "false") boolean incluirInactivos) {
         return ResponseEntity.ok(planService.listarPlanes(incluirInactivos));
     }

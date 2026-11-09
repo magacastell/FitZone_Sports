@@ -21,7 +21,7 @@ class MembresiaControllerTest {
     @Test void exigePlanPositivoYClaveUuid() throws Exception {
         mvc.perform(post("/membresias").contentType(MediaType.APPLICATION_JSON).content("{\"planId\":1}"))
                 .andExpect(status().isBadRequest());
-        for (String body : new String[]{"{}","{\"planId\":0}","{\"planId\":-1}"})
+        for (String body : new String[]{"{}","{\"planId\":0}","{\"planId\":-1}","{\"planId\":1,\"sedeId\":0}","{\"planId\":1,\"sedeId\":-1}"})
             mvc.perform(post("/membresias").header("Idempotency-Key",UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isBadRequest());
         mvc.perform(post("/membresias").header("Idempotency-Key","invalida").contentType(MediaType.APPLICATION_JSON).content("{\"planId\":1}"))

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
@@ -7,7 +7,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
-  const { login } = useAuth();
+  const { login, token, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -17,11 +17,13 @@ export default function LoginPage() {
     const result = await login({ email, password });
     
     if (result.success) {
-      navigate('/canchas');
+      navigate('/', { replace: true });
     } else {
       setError(result.message);
     }
   };
+
+  if (!loading && token) return <Navigate to="/" replace />;
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f1f5f9' }}>

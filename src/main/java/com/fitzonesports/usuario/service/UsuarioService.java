@@ -2,7 +2,6 @@ package com.fitzonesports.usuario.service;
 
 import com.fitzonesports.usuario.dto.RegisterRequest;
 import com.fitzonesports.auth.model.Rol;
-import com.fitzonesports.sede.model.Sede;
 import com.fitzonesports.auth.repository.RolRepository;
 import com.fitzonesports.sede.repository.SedeRepository;
 import com.fitzonesports.usuario.dto.ActualizarPerfilRequest;
@@ -25,27 +24,27 @@ public class UsuarioService {
 
     // Rol asignado a todo alta hecha via /auth/register: es un endpoint publico,
     // asi que nunca deja elegir un rol interno (RECEPCIONISTA, GERENTE, etc.).
-    private static final String ROL_REGISTRO_PUBLICO = "CLIENTE_EXTERNO";
+    private static final String ROL_REGISTRO_PUBLICO = "USUARIO";
 
     private static final String ROL_RECEPCIONISTA = "RECEPCIONISTA";
     // Roles que recepcion puede modificar; el personal (recepcion/gerente) solo lo gestiona el gerente.
-    private static final Set<String> ROLES_GESTIONABLES_POR_RECEPCION = Set.of("SOCIO_ACTIVO", "CLIENTE_EXTERNO");
+    private static final Set<String> ROLES_GESTIONABLES_POR_RECEPCION = Set.of("USUARIO");
 
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final SedeRepository sedeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FotoPerfilService fotos;
 
     @Transactional
-    public Usuario registrarCliente(RegisterRequest request) {
+    public Usuario registrarCliente(RegisterRequest request, org.springframework.web.multipart.MultipartFile foto) {
+        var imagen = fotos.validar(foto);
         if (usuarioRepository.existsByEmail(request.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya esta registrado");
         }
 
         Rol rol = rolRepository.findByNombre(ROL_REGISTRO_PUBLICO)
                 .orElseThrow(() -> new IllegalStateException("Falta seedear el rol " + ROL_REGISTRO_PUBLICO));
-        Sede sede = sedeRepository.findById(request.sedeId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe"));
 
         Usuario usuario = Usuario.builder()
                 .nombre(request.nombre())
@@ -54,14 +53,43 @@ public class UsuarioService {
                 .email(request.email())
                 .contrasenia(passwordEncoder.encode(request.password()))
                 .rol(rol)
-                .sede(sede)
                 .build();
-        return usuarioRepository.save(usuario);
+        try {
+            usuarioRepository.saveAndFlush(usuario);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // La restricción SQL sigue siendo el árbitro, incluso entre altas concurrentes.
+            for (Throwable causa = e; causa != null; causa = causa.getCause()) {
+                if (causa instanceof org.hibernate.exception.ConstraintViolationException restriccion
+                        && "23505".equals(restriccion.getSQLState())) {
+                    if ("usuario_dni_key".equals(restriccion.getConstraintName()))
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "El DNI ya esta registrado");
+                    if ("usuario_email_key".equals(restriccion.getConstraintName()))
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya esta registrado");
+                }
+            }
+            throw e;
+        }
+        fotos.guardar(usuario, imagen);
+        return usuario;
     }
 
     @Transactional(readOnly = true)
     public UsuarioResponse consultarPerfil(String email) {
         return UsuarioResponse.from(cargarPorEmail(email));
+    }
+
+    /** Uso interno del alta M1, bajo bloqueo del titular y en la misma transaccion. */
+    @Transactional
+    public void asignarSedeHabitualEnAlta(Integer usuarioId, Integer sedeId) {
+        Usuario usuario = cargarPorId(usuarioId);
+        if (!"USUARIO".equals(usuario.getRol().getNombre())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un usuario comercial puede contratar");
+        }
+        if (usuario.getSede() != null && !usuario.getSede().getId().equals(sedeId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La contratacion no permite cambiar tu sede habitual");
+        }
+        usuario.setSede(sedeRepository.findById(sedeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe")));
     }
 
     /** Consulta interna de M2 (acceso): sin restriccion de sede, porque el QR de un socio vale en todas (RF-03). */
@@ -139,7 +167,7 @@ public class UsuarioService {
 
     private void validarSede(Usuario solicitante, Usuario objetivo) {
         if (esRecepcionista(solicitante)
-                && !solicitante.getSede().getId().equals(objetivo.getSede().getId())) {
+                && (objetivo.getSede() == null || !solicitante.getSede().getId().equals(objetivo.getSede().getId()))) {
             throw sedeAjena();
         }
     }
