@@ -1,7 +1,8 @@
 # M2 offline: operación, reconciliación y defensa
 
 Fecha: 09/11/2026. Rama de implementación: `feat/m2-offline`, base `e0056b1`.
-MVP autorizado por el responsable de M1/M2; no supone integración aprobada a main.
+MVP autorizado por el responsable de M1/M2. La revisión de integración posterior
+se registra al final; los resultados de implementación conservan su corte original.
 Fuentes: TP oficial (21 páginas), RF-04/05, RN-01 y RNF-01; Lineamientos oficiales
 (25 páginas), secciones 5.2–5.4. Dos horas es una decisión del MVP, no una cifra del TP.
 
@@ -74,19 +75,64 @@ deriva del secreto de autenticación. Debe mantenerse igual al reiniciar Spring.
 Sin esa configuración, preparar offline devuelve **503**; M1/M2 online siguen disponibles.
 Nunca se genera silenciosamente una clave temporal para credenciales de dos horas.
 
-Ejemplo para generar una clave de desarrollo sin imprimirla ni versionarla, desde la raíz:
+La plantilla [.env.example](../.env.example) enumera perfil, puerto, conexión a BD,
+JWT_SECRET, FITZONE_OFFLINE_PRIVATE_KEY y VITE_API_URL. No contiene claves privadas
+ni contraseñas reales. Preparar desde la raíz, con Node disponible:
 
 ```powershell
-node --input-type=module -e "import {generateKeyPairSync} from 'node:crypto'; import {mkdirSync,writeFileSync} from 'node:fs'; mkdirSync('target/m2-config',{recursive:true}); writeFileSync('target/m2-config/private-key.b64',generateKeyPairSync('rsa',{modulusLength:2048}).privateKey.export({type:'pkcs8',format:'der'}).toString('base64'),{flag:'wx'});"
-$env:FITZONE_OFFLINE_PRIVATE_KEY = Get-Content -Raw target/m2-config/private-key.b64
+node scripts/preparar-config-m2.mjs
 ```
 
-Pasar esa variable al proceso/contenedor Spring con el mecanismo de entorno existente.
-`target/` está ignorado, pero el archivo sigue siendo privado: no adjuntarlo ni copiarlo
-a la documentación. En despliegue usar el gestor de secretos del entorno y acceso
-restringido. No rotar la clave con credenciales o movimientos pendientes: este MVP
-no incorpora un anillo de claves antiguas. La E2E utiliza una clave generada para
-su servidor aislado y elimina su archivo de entorno al finalizar.
+El comando crea `.env` desde la plantilla si falta y completa únicamente JWT_SECRET
+y la clave RSA vacíos. Repetirlo conserva exactamente las claves existentes; una
+RSA inválida se rechaza sin sobrescribir el archivo. Nunca se ejecuta al arrancar
+Spring. `.env` y sus variantes se excluyen tanto de Git como del contexto Docker.
+No imprimir/adjuntar el archivo; protegerlo y respaldarlo como secreto del proyecto.
+El archivo usa KEY=VALUE, sin comillas ni valores multilínea.
+
+Completar DB_PASSWORD con la contraseña de la BD elegida. Para el PostgreSQL del
+Compose actual, usar la credencial de desarrollo que declara ese archivo, no una
+contraseña personal. Ajustar DB_URL si el host/puerto es diferente. Spring Boot no
+carga `.env` automáticamente: inyectar sus valores explícitamente en el proceso.
+Ejemplo PowerShell, con JDK 21 y dependencias instaladas:
+
+```powershell
+# Cargar sólo en esta consola; no cambia el entorno global de Windows ni imprime secretos.
+Get-Content -LiteralPath .env | ForEach-Object {
+  if ($_ -match '^([A-Z][A-Z0-9_]*)=(.*)$') {
+    [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
+  }
+}
+# Con la BD disponible (el Compose actual sólo inicia PostgreSQL):
+./mvnw.cmd spring-boot:run
+```
+
+En otra consola cargar el mismo `.env`, instalar `frontend` sólo si faltan sus
+dependencias, y ejecutar `npm --prefix frontend run build` y
+`npm --prefix frontend run preview -- --host 127.0.0.1`. La API usa puerto 3000 y el
+preview 4173 por defecto; el proxy `/api` del preview hereda el de Vite y apunta a
+localhost:3000. `VITE_API_URL=/api/v1` conserva el mismo origen. Para cambiar puerto
+backend también debe ajustarse el destino del proxy. No usar npm run dev como demo
+de disponibilidad offline: requiere el build y el service worker.
+
+En esta notebook sin JDK local, el runner Docker de la demostración ya es un camino
+aislado reproducible: genera sus propios secretos de prueba, no toma claves personales,
+y verifica persistencia al reiniciar Spring. No requiere modificar el Compose ni usar
+la base de desarrollo. Ver los comandos de demostración más abajo.
+
+**Dependencia del cierre global Docker:** docker-compose.yml actualmente sólo define
+PostgreSQL. No define backend/frontend ni entrega estas variables a Spring; crear
+`.env` no soluciona eso por sí solo. El cierre global deberá agregar el backend con
+`env_file: .env` (o secretos equivalentes), DB_URL con host `postgres`, frontend servido
+con build PWA y un proxy de API, y mantener la misma clave externa al reconstruir la
+imagen. Esos cambios no se implementan en este cierre de M2. El Dockerfile actual sólo
+copia código/pom/wrapper; no se debe incorporar `.env` a la imagen.
+
+En despliegue usar el gestor de secretos del entorno y acceso restringido. No rotar
+la clave con credenciales o movimientos pendientes: este MVP no incorpora un anillo
+de claves antiguas. La E2E usa una clave generada para su servidor aislado y elimina
+su archivo de entorno al finalizar. Los perfiles temporales no son configuración de
+operación ni se necesitan para arrancar una instalación nueva.
 
 ## QR y compatibilidad online
 
@@ -244,7 +290,7 @@ Este contenido prepara dos decisiones, sin sobrescribir ni renumerar ADR existen
   Alternativas descartadas: reenvío ciego al POST online y replicación total de BD.
   Consecuencias: consistencia diferida, aforo provisional y revisión de conflictos.
 
-Estado técnico: implementado en esta rama; integración pendiente de revisión. Fecha:
+Estado técnico: implementado y revisado para integración. Fecha:
 09/11/2026. La numeración histórica del equipo ya usa ADR-007 para actores/membresías:
 la correspondencia definitiva debe resolverla el grupo antes de la entrega.
 
@@ -265,7 +311,8 @@ la correspondencia definitiva debe resolverla el grupo antes de la entrega.
 
 Los intentos previos fallidos permanecen como tales en target: no se confunden con
 la corrida final. El runner de prueba eliminó sus contenedores; no tocó volúmenes
-persistentes de desarrollo. No hubo merge, push ni tag en este cierre.
+persistentes de desarrollo. El corte de implementación e5769c8 se entregó sin
+merge/push; la revisión posterior para integración se registra debajo. Sin tag final.
 
 ## Qué entender para defenderlo
 
@@ -286,3 +333,24 @@ persistentes de desarrollo. No hubo merge, push ni tag en este cierre.
 5. **E2E real:** distingue mocks de transporte, MockMvc/PG y navegador/HTTP. Pregunta:
    ¿cómo sé que la pantalla no simula offline? Spring está pausado, los clientes sin
    red, Chrome se reabre y SQL verifica exactamente una visita tras replay/ACK perdido.
+
+## Revisión para integración — 09/11/2026
+
+Se verificaron los seis commits hasta e5769c8 frente a main e0056b1, permisos por
+operador/sede, deduplicación y evidencia de conflictos. V1–V10 permanecen intactas.
+No se encontraron secretos reales nuevos en el diff ni archivos generados versionados.
+La configuración se completa con .env.example, generador explícito y exclusión de
+secretos de Git/Docker; no cambia el backend ni el frontend funcional de la E2E.
+
+Se reutilizan los 94 tests backend y la E2E aprobada, porque sus fuentes no cambiaron.
+Se volvieron a ejecutar npm test y build PWA, ambos correctos. La comparación de
+cobertura por clase/método conserva las ramas anteriores (287/376); las nuevas
+offline agregan 113/194. Desglose completo en pruebas.md, sin agregar tests para
+subir un porcentaje. El generador de entorno conserva las claves entre ejecuciones
+y rechaza una RSA/base64 inválida sin tocar el archivo existente.
+
+La integración puede realizarse por fast-forward, conservando los commits de la
+rama, después de actualizar origin/main y validar el árbol temporal. La publicación
+fue autorizada por el responsable; el HEAD remoto exacto se verifica al publicarlo.
+Se mantiene pendiente el cierre global Docker descrito arriba, la resolución
+administrativa de conflictos y la correspondencia grupal de ADR-003/007.

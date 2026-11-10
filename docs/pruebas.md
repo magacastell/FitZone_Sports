@@ -302,3 +302,30 @@ RNF-01 tiene ahora demostración funcional; no es medición de 99,5 % de disponi
 RN-01 mantiene garantía online; durante partición sólo prevención local y
 reconciliación de conflictos. Siguen fuera listado/corrección generales, resolución
 administrativa de conflictos, módulos ajenos y cierre grupal de ADR/diagramas.
+
+## Revisión focalizada para integrar M2 offline — 09/11/2026
+
+Se compararon los XML JaCoCo del cierre online (884ecc50d9d74ab0b8d263c0ee37e28e)
+y del cierre offline (cf1cd1adad0c4a9c97cca016c6013fc9), incluyendo clases y métodos.
+No falta ninguna clase anterior ni disminuye un contador de ramas de un método
+anterior con el mismo denominador. El cambio se explica exactamente así:
+
+| Conjunto | Cubiertas | Sin cubrir | Total | Cobertura |
+|---|---:|---:|---:|---:|
+| Clases anteriores, antes y después | 287 | 89 | 376 | 76,33 % |
+| Clases nuevas offline | 113 | 81 | 194 | 58,25 % |
+| Backend completo después | 400 | 170 | 570 | 70,18 % |
+
+Se mantuvieron las 85 pruebas anteriores y se añadieron nueve; no se quitaron
+expectativas para mejorar la cifra. La menor cobertura global procede de las nuevas
+ramas de offline; no demuestra una regresión de los comportamientos anteriores.
+No se añadieron tests para inflar el porcentaje. Las ramas nuevas sin cubrir siguen
+siendo una limitación de la evidencia, no funcionalidades automáticamente acreditadas.
+
+Se revisaron resultado.json, código del runner y capturas de la E2E aprobada
+eec4c370-3ead-4fa4-967d-d954fcbbb9e3: Spring pausado y posteriormente reiniciado,
+65 s reales sin red, rotación, rechazo anterior, persistencia/reapertura, ACK perdido
+y replay. No se repite ese recorrido porque no cambió su código de negocio.
+La preparación de configuración local se verifica por separado: RSA PKCS8 de 2048
+bits, repetición sin rotar claves y rechazo de una configuración inválida sin
+sobrescribirla. Las claves de esa comprobación quedan sólo bajo target ignorado.

@@ -32,3 +32,8 @@ target/
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+
+# Configuración privada local; sólo se versiona la plantilla sin secretos.
+.env
+.env.*
+!.env.example

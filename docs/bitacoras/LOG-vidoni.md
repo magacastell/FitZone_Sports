@@ -189,3 +189,16 @@ evité dejar un egreso esperando indefinidamente un ingreso ya rechazado; agregu
 regresiones sin borrar la evidencia. La sonda de conexión reutiliza VITE_API_URL.
 La ejecución final figura en UTC como 10/11 00:09, correspondiente al 09/11 21:09
 local; mantuve la fecha local de esta actividad y los timestamps originales del runner.
+
+### 09/11/2026 — revisión final e integración de M2 offline
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Numeración pendiente de confirmar; revisión de calidad, configuración e integración de M2. |
+| Actividad | Verifiqué feat/m2-offline e5769c8, sus seis commits y el diff con origin/main e0056b1, sin cambios locales ajenos. Revisé autenticación/sede, idempotencia, conflictos, migraciones y evidencia E2E, sin otra auditoría general. |
+| Decisiones | Reutilicé backend/E2E porque no cambió código funcional. Preparé .env.example y un generador explícito de JWT/RSA persistentes que no rota valores existentes; excluí secretos del contexto Docker y de Git. Documenté carga de variables por proceso y la dependencia exacta del futuro Compose backend/frontend, sin rediseñarlo. |
+| Problema y solución | El porcentaje de ramas parecía una regresión: comparé XML por clases/métodos. Las anteriores conservan 287/376 (76,33 %); offline agrega 113/194 y el total es 400/570 (70,18 %). No borré casos ni agregué pruebas para subir la cifra. La clave dependía de instrucciones de entorno manuales: ahora existe una plantilla reproducible del proyecto y validación sin sobrescritura. |
+| Pruebas y evidencia | Revalidé los XML de 94/94 y resultado.json/capturas de la E2E eec4c370-3ead-4fa4-967d-d954fcbbb9e3: caída, rotación, reapertura, reinicio, ACK perdido y replay. Repetí npm test (seis suites) y build, correctos. Probé RSA PKCS8 de 2048 bits, dos ejecuciones sin cambiar claves y rechazo de configuración inválida conservando el archivo. Diff correcto; sin tocar BD ni volúmenes de desarrollo. |
+| Commits | e5769c8 cierra la implementación/pruebas previas. Esta entrada acompaña el commit de configuración y revisión posterior; no inventé su hash antes de crearlo. El responsable autorizó fast-forward o merge normal y publicación de main sólo tras verificar referencias y compatibilidad; sin squash, rebase, force push ni tag. |
+| Pendientes | Docker Compose global, resolución operativa de conflictos y numeración grupal de ADR. Se conservan la ventana de dos horas y la limitación RN-01 durante partición. |
+| Horas efectivas | Pendientes de confirmación; no deduje horas de la duración del chat ni reutilicé tiempos de otras tareas. |

@@ -8,3 +8,5 @@ docker-compose.yml
 README.md
 LOG.md
 LOGs/Cejas-LOG.md
+.env
+.env.*
