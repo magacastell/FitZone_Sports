@@ -1,12 +1,24 @@
-import { importJWK, jwtVerify } from 'jose';
+import { importJWK, jwtVerify, decodeProtectedHeader } from 'jose';
 
 export async function verificar(token, jwk, tipo, ahora = Date.now()) {
+  const cabecera=decodeProtectedHeader(token);
+  const estricta=tipo==='m2-autorizacion'||cabecera.kid!==undefined;
+  if (estricta && (!jwk.kid || cabecera.kid!==jwk.kid)) throw Error('Clave desconocida: actualizá el terminal con conexión.');
   const key = await importJWK(jwk, 'RS256');
   const { payload } = await jwtVerify(token, key, {
     algorithms: ['RS256'], issuer: 'fitzone-m2', currentDate: new Date(ahora), clockTolerance: 0,
+    ...(estricta && {audience:'fitzone-acceso',requiredClaims:['iat','nbf','exp']}),
   });
   if (payload.tipo !== tipo) throw Error('Tipo de autorización incorrecto');
   return payload;
+}
+
+export async function verificarAutorizacion(token,jwk,ahora) {
+  const p=await verificar(token,jwk,'m2-autorizacion',ahora);
+  if (!Number.isSafeInteger(p.uid)||p.uid<=0||p.permiso!=='INGRESO'||p.ambito!=='FITZONE'
+      ||typeof p.jti!=='string'||!p.jti||p.iat>p.nbf||p.exp-p.nbf>60||p.exp-p.iat>7200)
+    throw Error('Autorización de acceso inválida');
+  return p;
 }
 
 // Reloj corregido al preparar: máximo 30 s de desvío posterior, sin extender exp/nbf.

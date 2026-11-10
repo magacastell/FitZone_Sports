@@ -90,6 +90,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('m2Service'))return synthetic(e.m2,context);
   if(spec.includes('pagosService'))return synthetic({descargarComprobante:id=>{const d=deferred();d.args=[id];e.pdfs.push(d);return d.promise;}},context);
   if(spec.includes('services/offline/db'))return synthetic({qrPreparado:async()=>{throw Error('Sin lote en este test online');}},context);
+  if(spec.includes('services/offline/api'))return synthetic({obtenerQrAutomatico:()=>{const d=deferred();d.args=['/accesos/offline/credenciales/automaticas',{method:'POST'}];e.qrs.push(d);return d.promise;}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
   if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check'].map(k=>[k,()=>jsx('svg',{})])),context);
@@ -226,7 +227,7 @@ for(const status of [200,404,403,500])await test('contratacion 409 reconciliacio
 });
 for(const status of [403,500,undefined])await test('M2 '+(status??'red')+': mensaje real y revalidacion solo 403',async()=>{
  const e=env(),l=await layout(e);await setMember(e,dto());const route=await runner('route',e,{},'SocioQRRoute');
- const modal=await runner('qr',e,e.modal);await settle(e);assert.equal(e.qrs[0].args[0],'/accesos/qr');
+ const modal=await runner('qr',e,e.modal);await settle(e);assert.equal(e.qrs[0].args[0],'/accesos/offline/credenciales/automaticas');
  e.qrs[0].reject(err(status,'Denegacion real M2'));await settle(e);assert(text(modal.view).includes('Denegacion real M2'));
  assert.equal(e.members.length,status===403?2:1);
  if(status===403){

@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import { verificar, ahoraAutorizado, tokenActual } from './crypto.js';
+import { verificar, verificarAutorizacion, ahoraAutorizado, tokenActual } from './crypto.js';
 
 export const db = new Dexie('fitzone-m2-offline');
 db.version(1).stores({ meta:'id', movimientos:'id,estado,usuarioId,visitaId', presencias:'usuarioId,visitaId', usos:'id' });
@@ -51,11 +51,11 @@ export async function qrPreparado(autonomo=false) {
   let cuenta;
   try { cuenta=cuentaActual(); } catch { if(autonomo)cuenta=localStorage.getItem('fitzone:offline:socio'); }
   const lote=await db.meta.get('qr:'+cuenta);
-  if(!lote)throw Error('No preparaste credenciales offline. Conectate para generar una autorización.');
+  if(!lote)throw Error('No hay credenciales guardadas vigentes. Abrí Mi QR con conexión para obtenerlas automáticamente.');
   const ahora=ahoraAutorizado(lote);
   const token=tokenActual(lote.tokens,ahora);
   if(!token)throw Error('Las credenciales offline caducaron. Volvé a prepararlas con conexión.');
-  const datos=await verificar(token,lote.jwk,'m2-qr',ahora);
+  const datos=lote.version===2?await verificarAutorizacion(token,lote.jwk,ahora):await verificar(token,lote.jwk,'m2-qr',ahora);
   await db.meta.update(lote.id,{ultimoReloj:Date.now()});
   return {token,venceEn:new Date(datos.exp*1000).toISOString(),duracion:datos.exp*1000-ahora};
 }

@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { fetchAPI } from '../../services/api';
 import './SocioQRModal.css';
-import PrepararQrOffline from './PrepararQrOffline';
-import { qrPreparado } from '../../services/offline/db';
+import { obtenerQrAutomatico } from '../../services/offline/api';
 
 // RF-04: el QR cambia cada minuto. Se pide uno nuevo un poco antes de que venza el actual.
 const MARGEN_RENOVACION_MS = 5000;
@@ -26,7 +24,6 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
   const [vence, setVence] = useState(0);
   const [segundos, setSegundos] = useState(0);
   const [error, setError] = useState('');
-  const [revisionOffline,setRevisionOffline]=useState(0);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -45,9 +42,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
 
     const renovar = async () => {
       try {
-        let data;
-        try { data=await qrPreparado(); }
-        catch { data=await fetchAPI('/accesos/qr'); }
+        const data=await obtenerQrAutomatico();
         if (!activo) return;
         const duracion = data.duracion ?? vigenciaMs(data.token);
         setToken(data.token);
@@ -67,7 +62,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
       activo = false;
       clearTimeout(timer);
     };
-  }, [isOpen, onAccesoDenegado,revisionOffline]);
+  }, [isOpen, onAccesoDenegado]);
 
   useEffect(() => {
     if (!token) return;
@@ -98,7 +93,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
     >
       <h2 id="socio-qr-title">Acceso a Sede - Credencial Digital</h2>
       <p id="socio-qr-description">Mostrá este código en recepción. Se renueva solo cada minuto.</p>
-      <PrepararQrOffline onPreparado={()=>setRevisionOffline(v=>v+1)} />
+      <p>Se guarda automáticamente para cortes de conexión. <a href="/qr-offline">Abrir Mi QR sin conexión</a></p>
 
       <div style={qrContainerStyle}>
         {token ? (

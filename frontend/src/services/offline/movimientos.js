@@ -1,27 +1,31 @@
 import { db,copiaActual } from './db.js';
-import { verificar } from './crypto.js';
+import { verificar,verificarAutorizacion } from './crypto.js';
 
 export async function registrarLocal(tipo,codigo,porId=false,autonomo=false) {
   if(!['INGRESO','SALIDA'].includes(tipo))throw Error('Movimiento inválido');
   const {copia,ahora}=await copiaActual(autonomo);
   const datos=copia.datos;
   let qr=null;
+  let multisede=false;
   if(!porId) {
-    qr=await verificar(codigo,copia.jwk,'m2-qr',ahora);
-    if(qr.sid!==datos.sedeId)throw Error('El QR fue preparado para otra sede.');
+    try { qr=await verificarAutorizacion(codigo,copia.jwk,ahora);multisede=true; }
+    catch { qr=await verificar(codigo,copia.jwk,'m2-qr',ahora); }
+    if(multisede && datos.version!==2)throw Error('Actualizá el aprovisionamiento del terminal con conexión.');
+    if(!multisede && qr.sid!==datos.sedeId)throw Error('El QR fue preparado para otra sede.');
   } else if(tipo!=='SALIDA')throw Error('El ingreso requiere QR rotativo.');
   return db.transaction('rw',db.meta,db.presencias,db.movimientos,db.usos,async()=>{
     const actual=await db.meta.get('copia');
     if(actual?.evidencia!==copia.evidencia)throw Error('La copia cambió; verificá nuevamente.');
     const captura=Date.now()+copia.desfase;
     if(captura>=datos.exp*1000 || captura<datos.nbf*1000)throw Error('La autorización del terminal caducó.');
+    if(qr && (captura>=qr.exp*1000 || captura<qr.nbf*1000))throw Error('El QR caducó antes de registrar el movimiento.');
     let presencia;
     if(porId)presencia=await db.presencias.where('visitaId').equals(/^\d+$/.test(codigo)?'central:'+codigo:codigo).first();
     else presencia=await db.presencias.get(qr.uid);
     const miembro=qr && datos.miembros.find(m=>m.id===qr.uid && m.lotes.includes(qr.bid));
-    if(!porId && !miembro)throw Error('Socio no incluido en esta copia. Actualizala con conexión.');
+    if(!porId && !multisede && !miembro)throw Error('Socio no incluido en esta copia. Actualizala con conexión.');
     if(tipo==='INGRESO') {
-      if(!miembro.habilitado || miembro.suspendido || !miembro.periodos.some(p=>p.inicio<=captura && captura<p.fin))
+      if(multisede ? datos.bloqueados.includes(qr.uid) : !miembro.habilitado || miembro.suspendido || !miembro.periodos.some(p=>p.inicio<=captura && captura<p.fin))
         throw Error('La copia no autoriza una membresía vigente y habilitada.');
       if(presencia)throw Error('Ya existe presencia conocida de este socio.');
       if(await db.usos.get(qr.jti))throw Error('Este QR ya se utilizó para un ingreso; esperá la próxima rotación.');

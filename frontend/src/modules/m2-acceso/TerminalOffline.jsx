@@ -10,6 +10,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
   const [vista,setVista]=useState({}),[mensaje,setMensaje]=useState(''),[conexion,setConexion]=useState('consultando');
   const [codigo,setCodigo]=useState(''),[tipo,setTipo]=useState('INGRESO'),[porId,setPorId]=useState(false),[ocupado,setOcupado]=useState(false);
   const vivo=useRef(false),enviando=useRef(false);
+  const revisando=useRef(false);
   const actualizar=useCallback(async()=>{
     try {
       let copia,error;
@@ -24,11 +25,19 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
   useEffect(()=>{
     vivo.current=true;
     const revisar=async()=>{
+      if(revisando.current||enviando.current)return;
+      revisando.current=true;
+      try {
       let disponible=false;
       try{await hayConexion();disponible=true;if(vivo.current)setConexion('disponible');}
       catch(e){if(vivo.current)setConexion(e.status===401||e.status===403?'sesión requerida':'sin comunicación');}
-      if(disponible)try{await sincronizar();}catch(e){if(vivo.current)setMensaje(`Los pendientes se conservan: ${e.message}`);}
+      if(disponible)try{
+        await sincronizar();
+        const copia=await db.meta.get('copia');
+        if(copia && Date.now()-copia.relojLocal>=60000 && !(await db.movimientos.where('estado').equals('PENDIENTE').count()))await prepararTerminal();
+      }catch(e){if(vivo.current)setMensaje(`Los pendientes se conservan: ${e.message}`);}
       await actualizar();
+      } finally {revisando.current=false;}
     };
     revisar();const timer=setInterval(revisar,10000);window.addEventListener('online',revisar);
     return()=>{vivo.current=false;clearInterval(timer);window.removeEventListener('online',revisar);};
@@ -73,7 +82,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
       <p>Aforo local provisional: <strong data-testid="aforo-local">{vista.aforo}</strong> / {vista.copia.datos.capacidad}. Incluye presencia conocida y movimientos locales; puede diferir del central.</p>
       <form onSubmit={operar}><label>Movimiento<select aria-label="Movimiento offline" value={tipo} disabled={ocupado} onChange={e=>{setTipo(e.target.value);setPorId(false);}}><option value="INGRESO">Ingreso</option><option value="SALIDA">Egreso</option></select></label>
         {tipo==='SALIDA'&&<label><input type="checkbox" checked={porId} onChange={e=>setPorId(e.target.checked)}/>Usar ID de visita o número de ingreso central</label>}
-        <label>{porId?'ID de visita o número central':'QR preparado para esta sede'}<input aria-label="Código offline" value={codigo} required disabled={ocupado} onChange={e=>setCodigo(e.target.value)} autoComplete="off"/></label>
+        <label>{porId?'ID de visita o número central':'QR de acceso'}<input aria-label="Código offline" value={codigo} required disabled={ocupado} onChange={e=>setCodigo(e.target.value)} autoComplete="off"/></label>
         <AppButton type="submit" disabled={ocupado||!codigo.trim()}>Registrar movimiento preparado</AppButton>
       </form></>}
     <p role="status">{mensaje}</p>

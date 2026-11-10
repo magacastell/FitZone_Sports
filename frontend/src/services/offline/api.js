@@ -1,5 +1,5 @@
-import { fetchAPI,BASE_URL } from '../api';
-import { guardarCopia, guardarLote, idTerminal,cuentaActual,db } from './db';
+import { fetchAPI,BASE_URL } from '../api.js';
+import { guardarCopia, guardarLote, idTerminal,cuentaActual,db,qrPreparado } from './db.js';
 
 export async function prepararTerminal() {
   const cuenta=cuentaActual(),token=localStorage.getItem('token');
@@ -12,11 +12,19 @@ export async function prepararTerminal() {
   }
   return copia;
 }
-export async function prepararCredenciales(sedeId) {
+export async function obtenerQrAutomatico() {
   const cuenta=cuentaActual(),token=localStorage.getItem('token');
-  const respuesta=await fetchAPI('/accesos/offline/credenciales',{method:'POST',body:JSON.stringify({sedeId:Number(sedeId)})});
+  let respuesta;
+  try { respuesta=await fetchAPI('/accesos/offline/credenciales/automaticas',{method:'POST'}); }
+  catch (error) {
+    if (!error.status) return qrPreparado();
+    if (error.status===403) await db.meta.delete('qr:'+cuenta);
+    if (error.status===503) return fetchAPI('/accesos/qr');
+    throw error;
+  }
   if(cuentaActual()!==cuenta || localStorage.getItem('token')!==token)throw Error('Cambió la sesión durante la preparación.');
-  await guardarLote(respuesta);return respuesta;
+  await guardarLote(respuesta);
+  return qrPreparado();
 }
 export async function hayConexion() {
   const token=localStorage.getItem('token');

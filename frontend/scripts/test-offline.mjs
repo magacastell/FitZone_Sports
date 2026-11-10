@@ -83,3 +83,49 @@ globalThis.fetch=async()=>{localStorage.setItem('token','sesion-distinta');retur
 await assert.rejects(()=>sincronizar(),/Cambió la sesión/);assert.equal((await db.movimientos.get(salida.id)).estado,'PENDIENTE');
 console.log('OK offline: transporte con respuesta incierta conserva ID, ACK explícito, doble envío y cambio de sesión');
 await db.delete();
+
+// Autorización nueva: la clave es del aprovisionamiento, no del QR escaneado.
+jwk.kid='clave-terminal';
+localStorage.setItem('token','x.'+btoa(JSON.stringify({sub:'operador@test.invalid'}))+'.x');
+await db.open();
+async function pase(datos={},opciones={}) {
+  return new SignJWT({tipo:'m2-autorizacion',uid:777,permiso:'INGRESO',ambito:'FITZONE',jti:'global:777:minuto',...datos})
+    .setProtectedHeader({alg:'RS256',kid:opciones.kid??jwk.kid})
+    .setIssuer('fitzone-m2').setAudience(opciones.aud??'fitzone-acceso').setIssuedAt(opciones.iat??now)
+    .setNotBefore(now).setExpirationTime(opciones.exp??now+60).sign(opciones.key??privateKey);
+}
+const copiaV2={version:2,bloqueados:[],miembros:[]};
+await guardarCopia({evidencia:await firmarCopia(copiaV2),jwk,servidorAhora:Date.now()});
+const nuevo=await pase();
+await registrarLocal('INGRESO',nuevo);
+assert.equal((await db.presencias.get(777)).sedeId,1);
+db.close();await db.open();assert.equal(await db.movimientos.count(),1);
+await registrarLocal('SALIDA',nuevo);
+await assert.rejects(()=>registrarLocal('INGRESO',nuevo),/ya se utilizó/);
+await db.movimientos.clear();await db.usos.clear();
+await guardarCopia({evidencia:await firmarCopia({...copiaV2,bloqueados:[777]}),jwk,servidorAhora:Date.now()});
+await assert.rejects(()=>registrarLocal('INGRESO',nuevo),/no autoriza/);
+await guardarCopia({evidencia:await firmarCopia(copiaV2),jwk,servidorAhora:Date.now()});
+const desconocida=await generateKeyPair('RS256');
+for (const invalido of [await pase({tipo:'otro'}),await pase({permiso:'OTRO'}),await pase({}, {aud:'otro'}),
+  await pase({}, {kid:'no-aprovisionada'}),await pase({}, {key:desconocida.privateKey}),await pase({}, {exp:now-1}),await pase({}, {iat:now+30})]) {
+  await assert.rejects(()=>registrarLocal('INGRESO',invalido));
+}
+assert.equal(await db.movimientos.count(),0);
+console.log('OK automático: socio ausente del padrón, reapertura, replay, bloqueos, audiencia, tipo, caducidad y clave confiable');
+
+const {obtenerQrAutomatico}=await import('../src/services/offline/api.js');
+const loteV2={version:2,usuarioId:777,tokens:[nuevo],jwk,servidorAhora:Date.now()};
+globalThis.fetch=async(url,opciones)=>{
+  assert.ok(url.endsWith('/credenciales/automaticas'));assert.equal(opciones.method,'POST');assert.equal(opciones.body,undefined);
+  return Response.json(loteV2);
+};
+assert.equal((await obtenerQrAutomatico()).token,nuevo);
+assert.equal((await qrPreparado()).token,nuevo);
+globalThis.fetch=async()=>{throw new TypeError('Recepción o socio sin red');};
+assert.equal((await obtenerQrAutomatico()).token,nuevo);
+globalThis.fetch=async()=>Response.json({message:'Suspendida'},{status:403});
+await assert.rejects(()=>obtenerQrAutomatico(),/Suspendida/);
+await assert.rejects(()=>qrPreparado(),/No hay credenciales/);
+console.log('OK automático: obtención sin sede ni preparación, caché durable, fallback de red y 403 sin credencial vieja');
+await db.delete();
