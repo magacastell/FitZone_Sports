@@ -1,8 +1,8 @@
 # M2 offline: operación, reconciliación y defensa
 
-Fecha: 09/11/2026. Rama de implementación: `feat/m2-offline`, base `e0056b1`.
-MVP autorizado por el responsable de M1/M2. La revisión de integración posterior
-se registra al final; los resultados de implementación conservan su corte original.
+Actualización: 10/11/2026, `feat/m2-qr-offline-automatico`, base `78caf99`.
+La implementación inicial (`feat/m2-offline`, base `e0056b1`) conserva su evidencia
+histórica al final. Esta guía describe la evolución automática del MVP.
 Fuentes: TP oficial (21 páginas), RF-04/05, RN-01 y RNF-01; Lineamientos oficiales
 (25 páginas), secciones 5.2–5.4. Dos horas es una decisión del MVP, no una cifra del TP.
 
@@ -10,8 +10,8 @@ Fuentes: TP oficial (21 páginas), RF-04/05, RN-01 y RNF-01; Lineamientos oficia
 
 ```mermaid
 flowchart LR
-  S[Portal del socio · QR preemitidos] -->|QR RS256 de 60 s| T[Recepción PWA]
-  API[Monolito Spring Boot] -->|lote por sede| S
+  S[Mi QR · obtención automática] -->|autorización RS256 multisede de hasta 60 s| T[Recepción PWA]
+  API[Monolito Spring Boot] -->|lote firmado de hasta 2 h| S
   API -->|copia firmada de hasta 2 h| T
   T <-->|transacción local| IDB[IndexedDB · Dexie]
   IDB -->|eventos con UUID estable| API
@@ -28,12 +28,12 @@ Archivos nuevos principales:
 
 | Área | Archivos |
 |---|---|
-| Backend `acceso/offline/` | FirmaOffline, CredencialOfflineService, TerminalOfflineService, SincronizacionOfflineService y OfflineController |
+| Backend `acceso/offline/` | FirmaOffline, AutorizacionQrService, CredencialOfflineService (compatibilidad), TerminalOfflineService, SincronizacionOfflineService y OfflineController |
 | Frontend `services/offline/` | crypto.js, db.js, api.js, movimientos.js y sync.js |
-| Pantallas M2 | PrepararQrOffline.jsx, QrOffline.jsx, TerminalOffline.jsx y OfflineAcceso.css |
+| Pantallas M2 | SocioQRModal.jsx, QrOffline.jsx, TerminalOffline.jsx y OfflineAcceso.css |
 | PWA | src/sw.js y scripts/build-pwa.mjs |
 | Pruebas | FirmaOfflineTest, OfflineIntegrationTest, test-offline.mjs, e2e-m2-offline.mjs y scripts/prueba-m2-offline.ps1 |
-| Persistencia | V11__credenciales_m2_offline.sql, V12__terminal_y_copia_m2.sql y V13__reconciliacion_m2_offline.sql |
+| Persistencia | V11–V13 existentes y V14__uso_qr_multisede.sql |
 
 Hay un terminal principal y un operador autorizado por sede en este MVP. El UUID
 del navegador no basta: el backend exige RECEPCIONISTA activo, sede operativa y
@@ -42,17 +42,20 @@ administrativa; no se agregó una nueva consola ni se sustituye silenciosamente 
 
 ## Preparación y privacidad
 
-1. El socio inicia sesión, abre Mi QR, elige sede y prepara las credenciales offline.
-2. Recepción inicia sesión y usa «Preparar / actualizar terminal», después de que los
-   socios hayan preparado sus lotes. La copia sólo incluye a esos socios para esa sede.
+1. El socio inicia sesión y abre Mi QR. La aplicación obtiene y guarda automáticamente
+   autorizaciones multisede, sin formulario técnico ni elección previa de sucursal.
+2. Recepción inicia sesión y usa «Preparar / actualizar terminal» una vez. Mientras
+   haya conexión/sesión válida, se sincroniza cada 10 s y actualiza la copia cada minuto
+   si no hay pendientes. No necesita volver a descargar al socio que acaba de contratar.
 3. Se verifica y guarda la copia firmada. La aplicación solicita persistencia al navegador;
    si no la concede, lo informa. Nunca presenta una copia como guardada si falla IndexedDB.
 
-El snapshot contiene revisión, terminal, operador, sede, capacidad, nombre/ID mínimos,
-cuenta habilitada, suspensión conocida, intervalos no cancelados, lotes autorizados y
-presencia conocida. No incluye fotos, DNI, email de socios, contraseñas ni claves privadas.
-El email del operador vincula la sesión local al permiso firmado. No replica todo el padrón;
-el límite técnico es 1000 socios preparados por copia, con error explícito si se supera.
+El snapshot versión 2 contiene revisión, terminal, operador, sede, capacidad, IDs de
+cuentas bloqueadas y presencias abiertas conocidas (ID de titular, sede, visita e instante,
+incluidas otras sedes para impedir duplicidades conocidas). No replica un padrón completo
+de identidades. Conserva hasta 1000 miembros/lotes anteriores para compatibilidad.
+Las nuevas autorizaciones no dependen de esa lista. No incluye fotos, DNI, email de
+socios, contraseñas ni privadas. El email del operador vincula su sesión al permiso firmado.
 Los snapshots anteriores permanecen en el servidor como evidencia de captura.
 
 La autoridad offline caduca a las dos horas. El reloj se corrige al preparar; se controla
@@ -60,6 +63,26 @@ retroceso persistido y cambios de más de 30 segundos durante la sesión mediant
 monótono. No hay gracia en exp/nbf: el QR vence exactamente al terminar su ventana.
 El servidor rechaza capturas futuras de más de 30 segundos. No constituye un reloj
 hardware resistente a manipulación: presupone terminal y perfil del navegador administrados.
+
+### Riesgos de la autorización multisede
+
+- Una captura de pantalla es una credencial al portador durante su ventana. El jti
+  bloquea un segundo ingreso conocido por el mismo terminal o por el servidor, pero
+  no identifica físicamente al portador ni evita dos admisiones en sedes aisladas.
+- Una suspensión posterior a la emisión puede desconocerse hasta dos horas, limitada
+  además por la caducidad de la copia del terminal. Los bloqueos conocidos en la copia
+  se rechazan. Online se consulta el estado real; al reconciliar se conserva la decisión
+  provisional sustentada por evidencia válida al capturar, sin fingir revocación inmediata.
+- Robar el dispositivo/perfil puede exponer ventanas todavía vigentes. Logout elimina
+  el acceso rápido del socio, no sustituye bloqueo del equipo ni revoca copias ya extraídas.
+  No se guardan contraseñas, claves privadas ni fotografías en el material offline.
+- La clave pública se actualiza sólo mediante preparación autenticada sobre origen
+  seguro. Un kid desconocido se rechaza: nunca se descarga una clave indicada por el QR.
+  No hay rotación en caliente ni anillo de claves. Para rotar, detener emisión/admisión,
+  esperar que caduquen lotes y copias, sincronizar/revisar todos los pendientes, cambiar
+  la clave persistente y reprovisionar terminales antes de reabrir. Si un terminal no
+  puede conciliar, no se declara segura la rotación: requiere resolución operativa.
+  Una revocación de emergencia puede invalidar pendientes; deben conservarse para revisión.
 
 `/terminal-offline` y `/qr-offline` se abren sin el Layout que consulta al servidor.
 El terminal comprueba el permiso firmado, incluso si caducó el JWT de login; no permite
@@ -136,30 +159,41 @@ operación ni se necesitan para arrancar una instalación nueva.
 
 ## QR y compatibilidad online
 
-El lote tiene hasta 120 JWT RS256, con ventanas contiguas de 60 segundos y horizonte
-máximo de dos horas, alineado al minuto. Cada token incluye tipo `m2-qr`, uid, sid,
-bid y jti. La privada no sale del servidor; al terminal y socio sólo llega JWK pública.
-Una captura anterior no sirve en el minuto siguiente. No se aceptan token malformado,
-firma alterada, tipo distinto, sede ajena ni token fuera de su ventana.
+`POST /credenciales/automaticas` emite hasta 121 ventanas, acotadas al instante de
+emisión, períodos pagados no cancelados y horizonte de dos horas. Cada ventana dura
+como máximo 60 s: la primera/última o el vencimiento comercial pueden acortarla.
+No se autoriza un hueco ni tiempo posterior a un período pagado. La cuenta debe estar
+activa y la membresía vigente/no suspendida al emitir. No se fabrica autorización local.
+
+El tipo nuevo `m2-autorizacion` lleva uid, permiso INGRESO, ámbito FITZONE, jti estable
+por titular/minuto, issuer fitzone-m2, audience fitzone-acceso, iat/nbf/exp y kid.
+No lleva sede habitual, nombre, DNI, foto ni JWK aportada por el socio. La autorización
+vale en cualquier sede de FitZone; la sede efectiva procede de la copia del terminal.
+Se verifican firma RS256, clave conocida, audiencia, tipo, fechas y permiso. El terminal
+confía exclusivamente en su JWK aprovisionada desde la API autenticada por HTTPS/localhost.
+Una clave incluida en un QR no se instala ni reemplaza esa confianza.
 
 Se permite **un ingreso por jti**; después de egresar debe usarse el siguiente QR.
 El mismo QR vigente puede identificar el egreso. Un reintento del mismo evento usa
-su UUID original; no es una nueva admisión. Preparar otra vez en el mismo minuto
-reutiliza el lote del socio/sede. Otros lotes no se revocan instantáneamente durante
-una desconexión; siguen limitados por ventana y copia autorizada.
+su UUID original; no es una nueva admisión. Solicitar otro lote conserva el jti del
+titular/minuto; no permite un segundo ingreso en esa ventana. La caducidad es estricta
+y la revocación durante una partición sigue siendo diferida.
 
-El QR online anterior conserva HMAC, `codigo_qr` y la comparación del último emitido.
-Los lotes offline tienen otro tipo y otro circuito: se leen en el panel de terminal
-preparado, incluso con conexión, y se envían mediante el protocolo de reconciliación.
-No se envía un token offline al POST online tradicional. Con central disponible,
+El mismo QR automático funciona en el lector online existente y en el terminal offline.
+Online se consulta el estado comercial actual y la presencia central. V14 registra el
+jti usado; reconciliación y lector comparten ese control bajo bloqueo del titular.
+El QR HMAC anterior conserva `codigo_qr` y la comparación del último emitido; el endpoint
+por sede y las copias antiguas siguen verificables por el circuito anterior. Las nuevas
+autorizaciones requieren aprovisionar versión 2 una vez. Con central disponible,
 el panel sincroniza pendientes y renueva la copia antes de admitir una nueva operación.
 Así no usa deliberadamente una suspensión vieja cuando puede consultar al central.
 
 ## Transacción local y aforo
 
-`registrarLocal` verifica firma, permiso, sede, lote y períodos. Para ingreso exige
-cuenta habilitada, sin suspensión y un intervalo que cubra la captura; bloquea presencia
-conocida en cualquier sede. Para egreso exige visita abierta de su sede, por QR o
+`registrarLocal` verifica firma, permiso del terminal y autorización comercial firmada.
+Para ingreso rechaza bloqueos y presencia conocidos, incluso si el titular nunca figuró
+en la copia. Para tokens anteriores exige lote/períodos de esa copia. Para egreso exige
+visita abierta de su sede, por QR o
 ID de visita/número central. No exige renovar la membresía para poder salir.
 
 Una transacción Dexie guarda evento, presencia, uso del QR y secuencia. Lecturas y
@@ -182,12 +216,14 @@ Prefijo `/api/v1/accesos/offline`, contratos completos en OpenAPI:
 | Método/ruta | Resultado |
 |---|---|
 | POST `/credenciales` | Socio con vigencia prepara lote para sede; no-store |
+| POST `/credenciales/automaticas` | Mi QR obtiene autorizaciones multisede sin body ni preparación manual; no-store |
 | POST `/preparacion` | Recepción registra/autoriza su terminal y obtiene copia; no-store |
 | GET `/conexion` | 204 autenticado; comprueba comunicación real con la API |
 | POST `/sincronizacion` | Hasta 100 eventos; resultado por UUID, no-store |
 
-V11 crea los lotes autorizados; V12 terminal y copia firmada; V13 inbox, intentos
-incompatibles y referencia de visita/terminal en registro_acceso. V1–V10 no se editan.
+V11 crea los lotes anteriores; V12 terminal y copia firmada; V13 inbox, intentos
+incompatibles y referencia de visita/terminal. V14 agrega qr_jti e índice único parcial
+en registro_acceso; las filas históricas quedan null. V1–V13 no se editan.
 Las columnas nuevas de accesos son null para las cuentas/visitas históricas.
 
 El evento conserva UUID, visita local o referencia central, usuario, tipo, captura,
@@ -227,19 +263,24 @@ Una suspensión o inactivación posterior al snapshot puede desconocerse hasta r
 Lo mismo ocurre con una cancelación posterior de un período pagado.
 La reconciliación conserva la decisión sustentada por la copia válida al capturar;
 no presenta esa información como conocimiento en tiempo real. La ventana de dos horas
-acota el riesgo, sin eliminarlo. Un socio no preparado o no incluido en la copia no
-recibe una autorización nueva durante la caída. Tampoco se garantiza almacenamiento
+acota el riesgo, sin eliminarlo. Un socio nuevo con Internet móvil puede obtener su
+autorización aunque Recepción esté desconectada y no lo conozca. Un socio sin Internet
+sólo puede mostrar ventanas vigentes obtenidas durante un uso anterior de Mi QR.
+Tampoco se garantiza almacenamiento
 frente a borrado del perfil, pérdida del equipo o intervención de un administrador.
 
 La cola y los resultados locales permanecen para revisión; la copia se reemplaza al
-preparar nuevamente sin pendientes. La caducidad limita autorización, no elimina la
+actualizar nuevamente sin pendientes. La caducidad limita autorización, no elimina la
 evidencia histórica. El dispositivo debe estar protegido y no ser de uso público.
 Disponibilidad 99,5 % exige medición operativa; una demo funcional no acredita esa cifra.
 
 ## Ejecución y demostración reproducible
 
 Usar el build de producción sobre HTTPS o localhost; `npm run dev` no prepara service
-worker. Preparar ambos clientes antes de cortar red y abrir las rutas de contingencia.
+worker. Aprovisionar Recepción con conexión. Para demostrar el caso nuevo, desconectarla
+antes de registrar/contratar al socio; éste abre Mi QR con Internet móvil y el terminal
+acepta su autorización sin una nueva descarga. Para el socio también desconectado,
+abrir Mi QR previamente con conexión y luego usar la misma credencial guardada.
 En operación manual, esperar más de un minuto, comprobar rotación/rechazo anterior,
 ingresar, cerrar/reabrir el terminal, egresar y reconectar. Verificar ACK y aforo;
 un error no implica que el servidor no haya confirmado.
@@ -270,7 +311,8 @@ usa perfiles nuevos bajo target, nunca el perfil personal del usuario.
 Pausa Spring, desconecta ambos navegadores durante 65 s, prueba persistencia tras
 cerrar Chrome y reinicia Spring con la misma clave. El proxy de prueba deja confirmar
 el batch central y corta sus respuestas hasta liberar el ACK. SQL y replay HTTP
-comprueban exactamente una visita cerrada y dos eventos confirmados.
+comprueban exactamente dos visitas cerradas y cuatro eventos confirmados: una visita
+con socio nuevo conectado y otra con ambos clientes desconectados.
 
 El finally de Node y el supervisor PowerShell eliminan únicamente sus contenedores,
 incluso ante fallos; no usan prune ni borran volúmenes de desarrollo. Evidencia en
@@ -285,7 +327,7 @@ Este contenido prepara dos decisiones, sin sobrescribir ni renumerar ADR existen
   transacciones locales y continuidad provisional. Alternativa descartada: agente
   Java/SQLite por complejidad operativa. Consecuencias: preparación previa, navegador
   administrado y imposibilidad de revocación inmediata durante partición.
-- **ADR-007 oficial:** réplica acotada por lote/sede, actualización explícita del snapshot,
+- **ADR-007 oficial:** copia operativa por sede y claves confiables, actualización automática del snapshot,
   reintento cada 10 s y al reconectar, inbox idempotente y conflictos auditados.
   Alternativas descartadas: reenvío ciego al POST online y replicación total de BD.
   Consecuencias: consistencia diferida, aforo provisional y revisión de conflictos.
@@ -294,7 +336,7 @@ Estado técnico: implementado y revisado para integración. Fecha:
 09/11/2026. La numeración histórica del equipo ya usa ADR-007 para actores/membresías:
 la correspondencia definitiva debe resolverla el grupo antes de la entrega.
 
-## Evidencia de esta ejecución
+## Evidencia histórica de la primera implementación (09/11)
 
 - Backend completo: 94/94, sin fallos, errores ni omitidos. JaCoCo: 943/1083 líneas
   (87,07 %) y 400/570 ramas (70,18 %). Reportes en
@@ -316,13 +358,13 @@ merge/push; la revisión posterior para integración se registra debajo. Sin tag
 
 ## Qué entender para defenderlo
 
-1. **[FirmaOffline](../src/main/java/com/fitzonesports/acceso/offline/FirmaOffline.java) y [CredencialOfflineService.preparar](../src/main/java/com/fitzonesports/acceso/offline/CredencialOfflineService.java):** la privada firma en Spring;
-   jose verifica con pública. Los 120 tokens existen antes de desconectarse: el socio
-   selecciona la ventana vigente, no inventa un JWT. Pregunta: ¿por qué no copiar el
+1. **[FirmaOffline](../src/main/java/com/fitzonesports/acceso/offline/FirmaOffline.java) y [AutorizacionQrService.emitir](../src/main/java/com/fitzonesports/acceso/offline/AutorizacionQrService.java):** la privada firma en Spring;
+   jose verifica con la pública confiable. Las ventanas se obtienen automáticamente
+   con conexión; el socio selecciona la vigente, no inventa un JWT. Pregunta: ¿por qué no copiar el
    secreto del login? Permitiría suplantación y falsificación; la clave es exclusiva.
-2. **[TerminalOfflineService.preparar](../src/main/java/com/fitzonesports/acceso/offline/TerminalOfflineService.java):** permiso/DTO y consultas acotadas, no réplica
-   de entidades completas. Pregunta: ¿por qué guardar intervalos y no ACTIVA? Una
-   membresía puede vencer o tener períodos futuros/huecos durante la desconexión.
+2. **[AutorizacionQrService.emitir](../src/main/java/com/fitzonesports/acceso/offline/AutorizacionQrService.java) y [TerminalOfflineService.preparar](../src/main/java/com/fitzonesports/acceso/offline/TerminalOfflineService.java):** Spring limita cada token a períodos pagados reales;
+   el terminal conserva permiso de sede, bloqueos y presencias, sin exigir padrón previo.
+   Pregunta: ¿por qué no firmar sólo ACTIVA por dos horas? Un período puede vencer o tener huecos antes de ese plazo.
 3. **[movimientos.js](../frontend/src/services/offline/movimientos.js) → Dexie:** una transacción une movimiento, presencia y uso del
    QR. Pregunta: ¿qué ocurre si falla el último write? Todo revierte y no se muestra
    éxito; los tests inyectan falta de espacio para comprobarlo.
@@ -334,7 +376,7 @@ merge/push; la revisión posterior para integración se registra debajo. Sin tag
    ¿cómo sé que la pantalla no simula offline? Spring está pausado, los clientes sin
    red, Chrome se reabre y SQL verifica exactamente una visita tras replay/ACK perdido.
 
-## Revisión para integración — 09/11/2026
+## Revisión histórica para integración — 09/11/2026
 
 Se verificaron los seis commits hasta e5769c8 frente a main e0056b1, permisos por
 operador/sede, deduplicación y evidencia de conflictos. V1–V10 permanecen intactas.

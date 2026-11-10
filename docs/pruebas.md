@@ -329,3 +329,46 @@ y replay. No se repite ese recorrido porque no cambió su código de negocio.
 La preparación de configuración local se verifica por separado: RSA PKCS8 de 2048
 bits, repetición sin rotar claves y rechazo de una configuración inválida sin
 sobrescribirla. Las claves de esa comprobación quedan sólo bajo target ignorado.
+
+## QR automático multisede — 10/11/2026
+
+Base `78caf99`, rama `feat/m2-qr-offline-automatico`. Backend completo con Java 21
+y PG 18 aislada: **101 tests, cero fallos/errores/omitidos**. Se mantienen los 94
+anteriores y se agregan siete casos. Reportes:
+`target/test-runs/7f6c2d508d8d4f7dbadcf765e186ff68/{surefire-reports,jacoco}`.
+JaCoCo: **1003/1145 líneas (87,60 %) y 462/644 ramas (71,74 %)**.
+Comprueba emisión sin sede, ventanas limitadas por períodos pagados, permisos HTTP,
+audiencia/kid, claves desconocidas, suspensión conocida/diferida, lector online,
+replay compartido y conflictos multisede con tokens de minutos distintos.
+
+Las seis suites de `npm test` pasaron, conservando API 18, dominio/UI 185, Planes 16,
+Actividades 18 y Gerencia 7. `test:offline` mantiene sus cuatro bloques anteriores
+y agrega dos de autorización sin padrón y obtención/caché automáticas. Son pruebas
+Node/fake-indexeddb, no un navegador. Se comprueban firma, audiencia, tipo, clave,
+fechas, permisos, bloqueo conocido, reapertura y 403 sin reutilizar una credencial vieja.
+Build PWA correcto; no se agregaron ni actualizaron dependencias.
+
+E2E real Chrome/Spring/PG aprobada en
+`target/e2e-m2/6c80484a-2d95-41eb-afa6-7341af712749`:
+
+1. Recepción aprovisionada, copia sin socios y desconexión anterior al registro.
+2. Alta y contratación posteriores por HTTP real; Mi QR obtiene y guarda la credencial
+   sin botón de preparación ni sede. Recepción offline registra ingreso/egreso.
+3. Spring pausado y ambos contextos sin red durante 65 s; rotación y QR anterior rechazado.
+4. Segundo ingreso, Chrome cerrado/reabierto offline, pendientes conservados y egreso.
+5. Reinicio de Spring con la misma clave, ACK perdido tras commit y replay HTTP real:
+   **dos visitas cerradas, cuatro eventos confirmados, cero duplicados**.
+6. Renovación automática de la copia del terminal con conexión después del ACK,
+   comprobando que cambia su revisión sin borrar movimientos.
+
+`resultado.json` y capturas (`socio-nuevo-sin-padron.png`, `ingreso-provisional.png`,
+`terminal-movil.png`, `confirmado.png`) son evidencia local ignorada por Git. Se verificó
+ausencia de overflow a 390 px. Runner: `./scripts/prueba-m2-offline.ps1`; instrucciones
+y límites en [m2-offline.md](m2-offline.md). Contenedores propios eliminados, sin tocar
+volúmenes de desarrollo. Dos intentos iniciales fallaron por la espera menor al polling
+y por buscar un título en vez del rol accesible del SVG; se conservaron como fallidos.
+La prueba de iat futuro detectó que su fixture sobrescribía ese campo: se corrigió el
+generador del fixture, conservando la expectativa de rechazo, y volvió a pasar.
+
+No se midió SLA, cobertura frontend, resistencia a manipulación de un equipo robado
+ni revocación instantánea durante partición. La rotación en caliente sigue fuera del MVP.

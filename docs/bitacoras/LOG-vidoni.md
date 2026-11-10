@@ -202,3 +202,16 @@ local; mantuve la fecha local de esta actividad y los timestamps originales del 
 | Commits | e5769c8 cierra la implementación/pruebas previas. Esta entrada acompaña el commit de configuración y revisión posterior; no inventé su hash antes de crearlo. El responsable autorizó fast-forward o merge normal y publicación de main sólo tras verificar referencias y compatibilidad; sin squash, rebase, force push ni tag. |
 | Pendientes | Docker Compose global, resolución operativa de conflictos y numeración grupal de ADR. Se conservan la ventana de dos horas y la limitación RN-01 durante partición. |
 | Horas efectivas | Pendientes de confirmación; no deduje horas de la duración del chat ni reutilicé tiempos de otras tareas. |
+
+### 10/11/2026 — QR automático y autorización multisede de M2
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | M2 — Gimnasio y Control de Acceso. Numeración académica pendiente de confirmación. |
+| Actividad | Como responsable de M2, evolucioné el acceso offline en una rama nueva desde main 78caf99. Mi QR obtiene y guarda credenciales automáticamente; Recepción admite un socio nuevo sin descargar previamente su identidad y actualiza su copia mientras tiene conexión. |
+| Decisiones | Reutilicé RS256, jose, Dexie, Workbox y la reconciliación existente, sin dependencias nuevas. Autorización multisede limitada a períodos pagados y dos horas, clave confiable aprovisionada al terminal, audiencia/kid y jti de un solo ingreso. Conservé los formatos anteriores y agregué V14 sin editar migraciones aplicadas. |
+| Problema y solución | La copia por socio/sede impedía admitir altas posteriores al corte. La autorización comercial viaja firmada en el QR y el terminal aporta su sede/operador, bloqueos y presencia conocidos. V14 comparte la detección de reutilización entre lector online y sincronización. Se mantiene explícita la revocación diferida y la imposibilidad de garantizar RN-01 global durante una partición. |
+| Verificaciones | Backend completo: 101/101, sin omitidas; seis suites frontend y build PWA correctos. E2E real Chrome/Spring/PG: alta posterior al corte, QR automático, admisión sin padrón, rotación, reapertura offline, ACK perdido, replay y actualización automática de la copia; dos visitas y cuatro eventos sin duplicados. Reportes, cobertura y fallos previos documentados en docs/pruebas.md. Contenedores temporales eliminados sin tocar volúmenes de desarrollo. |
+| Commits | 4da0a00 — autorizaciones verificables y V14; 769cafc — QR automático y actualización del terminal. Pruebas E2E y documentación acompañan esta entrada en el commit de cierre. |
+| Pendientes | Revisión antes de integrar/publicar. Reaprovisionar terminales a versión 2; mantener clave persistente y aplicar el procedimiento de rotación con pendientes conciliados. ADR-003/007 pendientes de preparación grupal, sin renumeración unilateral. |
+| Horas efectivas | Pendientes de confirmación. |
