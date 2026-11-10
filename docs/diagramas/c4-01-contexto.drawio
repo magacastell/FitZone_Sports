@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" version="24.7.17">
+  <diagram name="FitZone Sports | C4 nivel 1 — Contexto implementado" id="c4-01-contexto">
+    <mxGraphModel dx="1400" dy="940" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="940" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e4" value="[Person]&#10;Socio activo&#10;Membresía vigente&#10;Autoridad USUARIO" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="300" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="[Person]&#10;Cliente externo&#10;Cuenta USUARIO&#10;sin beneficio vigente" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="380" y="160" width="300" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="[Person]&#10;Recepción / administración de sede&#10;Autoridad RECEPCIONISTA" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="160" width="300" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="[Person]&#10;Gerencia central&#10;Autoridad GERENTE" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="160" width="300" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="FitZone Sports&#10;[Software System]&#10;Membresías, QR, accesos y aforo;&#10;cobros/comprobantes de membresía" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=22;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="440" y="520" width="520" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" value="Pasarela simulada: capacidad interna (PasarelaPagoFake, sin red ni cargos reales).&#10;No hay sistema de pagos externo conectado. M3/M4 y reportes conservan rutas pendientes; no se acreditan aquí." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="740" width="1320" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="190" y="295" as="sourcePoint" />
+            <mxPoint x="490" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="295" as="sourcePoint" />
+            <mxPoint x="630" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="870" y="295" as="sourcePoint" />
+            <mxPoint x="770" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e15" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1210" y="295" as="sourcePoint" />
+            <mxPoint x="910" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="FitZone Sports | C4 nivel 1 — Contexto implementado" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=26;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="25" width="1330" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="Alcance: actores y sistema en d4ceaa3. Capacidades pendientes se explicitan, sin dibujar integraciones inexistentes." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="65" width="1330" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="Gestiona membresía&#10;y obtiene QR" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="50" y="360" width="280" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" value="Consulta planes&#10;y contrata membresía" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="390" y="360" width="280" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" value="Registra accesos&#10;y opera su sede" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="730" y="360" width="280" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" value="Administra planes, sedes&#10;y membresías" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="360" width="280" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" value="Convención C4: Person = actor de negocio; Software System = sistema en alcance; flecha = interacción iniciada por el actor." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="849" width="1330" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v1 | Código: d4ceaa3" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="888" width="1330" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

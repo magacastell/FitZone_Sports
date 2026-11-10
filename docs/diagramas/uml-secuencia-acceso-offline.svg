@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2140" viewBox="0 0 1800 2140" role="img">
+<title>uml-secuencia-acceso-offline</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker></defs>
+<rect width="1800" height="2140" fill="white"/>
+<polyline points="180,205 180,1990" fill="none" stroke="#a5b4c5" stroke-width="2" stroke-dasharray="7 5"/>
+<polyline points="540,205 540,1990" fill="none" stroke="#a5b4c5" stroke-width="2" stroke-dasharray="7 5"/>
+<polyline points="900,205 900,1990" fill="none" stroke="#a5b4c5" stroke-width="2" stroke-dasharray="7 5"/>
+<polyline points="1260,205 1260,1990" fill="none" stroke="#a5b4c5" stroke-width="2" stroke-dasharray="7 5"/>
+<polyline points="1620,205 1620,1990" fill="none" stroke="#a5b4c5" stroke-width="2" stroke-dasharray="7 5"/>
+<polyline points="395,1790 1745,1790" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5"/>
+<rect x="45" y="125" width="270" height="80" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="180.0" y="152.85">Portal del socio</tspan><tspan x="180.0" y="177.15">React / Mi QR</tspan></text>
+<rect x="405" y="125" width="270" height="80" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="540.0" y="152.85">Terminal de sede</tspan><tspan x="540.0" y="177.15">React / M2</tspan></text>
+<rect x="765" y="125" width="270" height="80" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="152.85">IndexedDB del terminal</tspan><tspan x="900.0" y="177.15">Dexie</tspan></text>
+<rect x="1125" y="125" width="270" height="80" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1260.0" y="152.85">API central</tspan><tspan x="1260.0" y="177.15">Spring / M2</tspan></text>
+<rect x="1485" y="125" width="270" height="80" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1620.0" y="152.85">PostgreSQL</tspan><tspan x="1620.0" y="177.15">central</tspan></text>
+<rect x="40" y="225" width="1720" height="32" fill="#edf2f7" stroke="#94a3b8" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#16324f" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="241.0">1. Con conexión: preparación autenticada y obtención automática</tspan></text>
+<rect x="40" y="645" width="1720" height="32" fill="#edf2f7" stroke="#94a3b8" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#16324f" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="661.0">2. Sin comunicación con el central: selección local, verificación y captura provisional</tspan></text>
+<rect x="45" y="695" width="270" height="75" fill="#fff8dc" stroke="#ad8c40" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="180.0" y="710.9">Seleccionar ventana vigente</tspan><tspan x="180.0" y="732.5">del lote guardado</tspan><tspan x="180.0" y="754.1">(no se firma en el móvil)</tspan></text>
+<rect x="395" y="850" width="650" height="80" fill="#fff8dc" stroke="#ad8c40" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="878.525">Terminal: validar copia/operador, firma con JWK confiable,</tspan><tspan x="720.0" y="901.475">audiencia, kid, tipo, fechas, bloqueos y presencia conocidos.</tspan></text>
+<rect x="395" y="1090" width="650" height="55" fill="#fff8dc" stroke="#ad8c40" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="1117.5">UI de Recepción: ingreso y aforo provisionales; cola PENDIENTE.</tspan></text>
+<rect x="395" y="1180" width="650" height="130" fill="none" stroke="#64748b" stroke-width="2"/>
+<rect x="40" y="1350" width="1720" height="32" fill="#edf2f7" stroke="#94a3b8" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#16324f" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="1366.0">3. Reconexión: sesión válida del operador original, sincronización transaccional y ACK</tspan></text>
+<rect x="395" y="1610" width="1350" height="330" fill="none" stroke="#64748b" stroke-width="2"/>
+<polyline points="540,300 1260,300" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1260,360 1620,360" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1260,420 540,420" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<polyline points="540,480 900,480" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="180,540 1260,540" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1260,600 180,600" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<polyline points="180,815 540,815" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="540,990 900,990" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="900,1050 540,1050" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<polyline points="540,1280 900,1280" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="540,1440 1260,1440" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1260,1500 1620,1500" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1620,1560 1260,1560" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<polyline points="1260,1690 540,1690" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<polyline points="540,1750 900,1750" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="540,1870 1260,1870" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1260,1920 540,1920" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text font-family="Arial, sans-serif" font-size="26" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="42.5">FitZone Sports | UML — Acceso offline y reconciliación</tspan></text>
+<text font-family="Arial, sans-serif" font-size="17" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="82.5">Escenario del QR automático; egreso y reintentos conservan la visita/evento original. No se garantiza RN-01 entre sedes aisladas.</tspan></text>
+<rect x="550" y="257" width="700" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="275.0">POST /preparacion (terminalId; sesión de Recepción)</tspan></text>
+<rect x="1270" y="317" width="340" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1440.0" y="335.0">Registrar terminal y copia firmada</tspan></text>
+<rect x="550" y="377" width="700" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="395.0">Copia v2 + JWK + hora central (hasta 2 h)</tspan></text>
+<rect x="550" y="437" width="340" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="455.0">Verificar y guardar copia / confianza</tspan></text>
+<rect x="190" y="497" width="1060" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="515.0">POST /credenciales/automaticas (sesión del socio; sin sede)</tspan></text>
+<rect x="190" y="557" width="1060" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="575.0">Ventanas RS256 ≤ 60 s, períodos pagados y horizonte ≤ 2 h; el portal guarda el lote en su propio IndexedDB</tspan></text>
+<rect x="190" y="772" width="340" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="360.0" y="790.0">Mostrar / leer QR vigente</tspan></text>
+<rect x="550" y="928" width="340" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="944.7">Transacción: evento UUID + presencia +</tspan><tspan x="720.0" y="966.3000000000001">uso jti + secuencia</tspan></text>
+<rect x="550" y="1007" width="340" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="1025.0">Commit local; si falla, no hay éxito</tspan></text>
+<rect x="410" y="1185" width="620" height="32" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="410" y="1201.0">opt [egreso con copia vigente]</tspan></text>
+<rect x="550" y="1218" width="340" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="1234.7">SALIDA: misma visita, otro UUID;</tspan><tspan x="720.0" y="1256.3">actualizar presencia y cola</tspan></text>
+<rect x="550" y="1397" width="700" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="1415.0">POST /sincronizacion: ≤ 100 eventos con UUID original y revisión</tspan></text>
+<rect x="1270" y="1438" width="340" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1440.0" y="1454.7">TX: inbox y bloqueo; integrar visita o</tspan><tspan x="1440.0" y="1476.3">conservar conflicto</tspan></text>
+<rect x="1270" y="1498" width="340" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1440.0" y="1514.7">Commit conjunto de inbox, resultado y</tspan><tspan x="1440.0" y="1536.3">acceso</tspan></text>
+<rect x="410" y="1613" width="1315" height="30" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="410" y="1628.0">alt [ACK recibido]</tspan></text>
+<rect x="550" y="1647" width="700" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="1665.0">Por UUID: CONFIRMADO / CONFLICTO / RECHAZADO / EN_ESPERA</tspan></text>
+<rect x="550" y="1688" width="340" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="720.0" y="1704.7">Guardar resultado; EN_ESPERA sigue</tspan><tspan x="720.0" y="1726.3">PENDIENTE</tspan></text>
+<rect x="410" y="1797" width="1315" height="30" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="410" y="1812.0">[respuesta perdida: conservar pendientes y reintentar]</tspan></text>
+<rect x="550" y="1827" width="700" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="1845.0">Reintentar mismo UUID y contenido (no crear otro evento)</tspan></text>
+<rect x="550" y="1877" width="700" height="36" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="900.0" y="1895.0">Resultado almacenado (repetido=true); sin nueva visita</tspan></text>
+<rect x="45" y="1965" width="1710" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="45" y="1992.5">Copia validada al capturar; recibirla vencida no invalida por sí solo el evento. Conflictos preservados; resolución administrativa pendiente.</tspan></text>
+<text font-family="Arial, sans-serif" font-size="15" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="2065.0">UML: línea continua = llamada; discontinua = respuesta / línea de vida; opt/alt = fragmentos combinados; notas = acciones y condiciones.</tspan></text>
+<text font-family="Arial, sans-serif" font-size="14" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="2103.0">Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v1 | Código: d4ceaa3</tspan></text>
+</svg>
