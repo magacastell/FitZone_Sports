@@ -14,6 +14,11 @@ public class OfflineController {
     private final CredencialOfflineService credenciales;
     private final TerminalOfflineService terminales;
     private final SincronizacionOfflineService sincronizacion;
+    private final AutorizacionQrService autorizaciones;
+    @PostMapping("/credenciales/automaticas") @PreAuthorize("hasAnyRole('USUARIO','GERENTE')")
+    public ResponseEntity<AutorizacionQrService.Lote> automaticas(Authentication auth) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(autorizaciones.emitir(auth.getName()));
+    }
     public record Batch(@NotNull java.util.UUID terminalId,@jakarta.validation.constraints.NotEmpty @jakarta.validation.constraints.Size(max=100) java.util.List<@Valid Evento> eventos) {}
     @PostMapping("/sincronizacion") @PreAuthorize("hasRole('RECEPCIONISTA')")
     public ResponseEntity<java.util.List<SincronizacionOfflineService.Resultado>> sincronizar(Authentication auth,@Valid @RequestBody Batch batch) {

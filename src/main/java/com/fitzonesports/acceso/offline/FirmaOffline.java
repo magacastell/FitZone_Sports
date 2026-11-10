@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 @Component
 public class FirmaOffline {
     public static final String EMISOR = "fitzone-m2";
+    public static final String AUDIENCIA = "fitzone-acceso";
     private final PrivateKey privada;
     private final PublicKey publica;
     private final Clock clock;
@@ -37,7 +38,7 @@ public class FirmaOffline {
     }
     public String firmar(String tipo, Map<String,?> datos, Instant desde, Instant hasta) {
         comprobarConfiguracion();
-        return Jwts.builder().issuer(EMISOR).claim("tipo",tipo).claims(datos)
+        return Jwts.builder().header().keyId(kid()).and().issuer(EMISOR).audience().add(AUDIENCIA).and().claim("tipo",tipo).claims(datos)
                 .issuedAt(Date.from(clock.instant())).notBefore(Date.from(desde)).expiration(Date.from(hasta))
                 .signWith(privada,Jwts.SIG.RS256).compact();
     }
@@ -48,6 +49,10 @@ public class FirmaOffline {
                     .clock(()->Date.from(instante)).build().parseSignedClaims(token);
             if(!"RS256".equals(jws.getHeader().getAlgorithm()) || !tipo.equals(jws.getPayload().get("tipo"))
                     || jws.getPayload().getExpiration()==null || !instante.isBefore(jws.getPayload().getExpiration().toInstant()))throw new IllegalArgumentException();
+            if ("m2-autorizacion".equals(tipo) || jws.getHeader().getKeyId()!=null) {
+                if (!kid().equals(jws.getHeader().getKeyId()) || jws.getPayload().getAudience()==null
+                        || !jws.getPayload().getAudience().contains(AUDIENCIA)) throw new IllegalArgumentException();
+            }
             return jws.getPayload();
         } catch(JwtException | IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Evidencia offline inválida o caducada");
@@ -56,7 +61,12 @@ public class FirmaOffline {
     public Map<String,String> jwk() {
         comprobarConfiguracion();
         var rsa=(RSAPublicKey)publica;
-        return Map.of("kty","RSA","alg","RS256","use","sig","n",sinSigno(rsa.getModulus().toByteArray()),"e",sinSigno(rsa.getPublicExponent().toByteArray()));
+        return Map.of("kty","RSA","alg","RS256","use","sig","kid",kid(),"n",sinSigno(rsa.getModulus().toByteArray()),"e",sinSigno(rsa.getPublicExponent().toByteArray()));
+    }
+    private String kid() {
+        comprobarConfiguracion();
+        try { return Base64.getUrlEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(publica.getEncoded())); }
+        catch (GeneralSecurityException e) { throw new IllegalStateException(e); }
     }
     private String sinSigno(byte[] bytes) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes[0]==0?Arrays.copyOfRange(bytes,1,bytes.length):bytes);

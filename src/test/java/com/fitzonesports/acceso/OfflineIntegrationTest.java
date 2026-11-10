@@ -29,6 +29,8 @@ class OfflineIntegrationTest {
     @Autowired RelojOffline reloj;
     @Autowired jakarta.persistence.EntityManager entityManager;
     @Autowired SincronizacionOfflineService sync;
+    @Autowired AutorizacionQrService automaticas;
+    @Autowired com.fitzonesports.acceso.service.AccesoService accesos;
     Integer sede,otra,uid;String socio,operador,ajeno;
     UUID terminal;
     @TestConfiguration static class Config {
@@ -80,6 +82,71 @@ class OfflineIntegrationTest {
         return new SincronizacionOfflineService.Evento(UUID.randomUUID(),visita,uid,tipo,ms,qr,revision,"INGRESO".equals(tipo)?1:2);
     }
     private UUID revision(TerminalOfflineService.Copia copia) { return UUID.fromString((String)firma.verificar(copia.evidencia(),"m2-copia",clock.instant()).get("revision")); }
+    @Test void autorizacionMultisedeAdmiteSinPadronPrevioYConservaReplay() {
+        var copia=terminales.preparar(operador,terminal);
+        assertTrue(((List<?>)firma.verificar(copia.evidencia(),"m2-copia",clock.instant()).get("miembros")).isEmpty());
+        var lote=automaticas.emitir(socio);
+        String token=lote.tokens().getFirst();
+        assertEquals(automaticas.verificar(token,clock.instant()).getId(),automaticas.verificar(automaticas.emitir(socio).tokens().getFirst(),clock.instant()).getId());
+        assertNull(automaticas.verificar(token,clock.instant()).get("sid"));
+        assertNull(automaticas.verificar(token,clock.instant()).get("nombre"));
+        var rev=revision(copia);long t=clock.instant().toEpochMilli();String visita=UUID.randomUUID().toString();
+        var entrada=evento(visita,"INGRESO",rev,token,t);var salida=evento(visita,"SALIDA",rev,null,t+5);
+        var resultado=sync.sincronizar(operador,terminal,List.of(salida,entrada));
+        assertTrue(resultado.stream().allMatch(r->"CONFIRMADO".equals(r.estado())));
+        assertTrue(sync.sincronizar(operador,terminal,List.of(entrada,salida)).stream().allMatch(SincronizacionOfflineService.Resultado::repetido));
+        assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM registro_acceso WHERE usuarioid=?",Integer.class,uid));
+        UUID otroTerminal=UUID.randomUUID();var otraRevision=revision(terminales.preparar(ajeno,otroTerminal));
+        var repetido=evento(UUID.randomUUID().toString(),"INGRESO",otraRevision,token,t+10);
+        assertEquals("CONFLICTO",sync.sincronizar(ajeno,otroTerminal,List.of(repetido)).getFirst().estado());
+    }
+    @Test void qrAutomaticoFuncionaEnLectorOnlineYComparteProteccionDeReutilizacion() {
+        var token=automaticas.emitir(socio).tokens().getFirst();
+        var copia=terminales.preparar(operador,terminal);
+        var ingreso=accesos.registrarIngreso(operador,new com.fitzonesports.acceso.dto.RegistrarIngresoRequest(token,null));
+        accesos.registrarSalida(operador,new com.fitzonesports.acceso.dto.RegistrarSalidaRequest(null,token));
+        assertThrows(ResponseStatusException.class,()->accesos.registrarIngreso(operador,new com.fitzonesports.acceso.dto.RegistrarIngresoRequest(token,null)));
+        var reuso=evento(UUID.randomUUID().toString(),"INGRESO",revision(copia),token,clock.instant().toEpochMilli());
+        assertEquals("CONFLICTO",sync.sincronizar(operador,terminal,List.of(reuso)).getFirst().estado());
+        assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM registro_acceso WHERE id=?",Integer.class,ingreso.id()));
+    }
+    @Test void autorizacionNoSuperaPeriodosPagadosNiAutorizaHuecos() {
+        jdbc.update("UPDATE periodo_membresia p SET fin=? FROM membresia m WHERE p.membresia_id=m.id AND m.usuarioid=?",LocalDateTime.now(clock).plusSeconds(20),uid);
+        entityManager.clear();
+        var lote=automaticas.emitir(socio);assertEquals(1,lote.tokens().size());
+        assertThrows(ResponseStatusException.class,()->automaticas.verificar(lote.tokens().getFirst(),clock.instant().plusSeconds(20)));
+        reloj.ahora=reloj.ahora.plusSeconds(21);entityManager.clear();
+        assertThrows(ResponseStatusException.class,()->automaticas.emitir(socio));
+    }
+    @Test void suspensionPosteriorEsDiferidaPeroNoIgnoraBloqueosConocidos() {
+        var vieja=terminales.preparar(operador,terminal);
+        var token=automaticas.emitir(socio).tokens().getFirst();
+        jdbc.update("UPDATE membresia SET suspendida=true WHERE usuarioid=?",uid);entityManager.clear();
+        assertThrows(ResponseStatusException.class,()->automaticas.emitir(socio));
+        var nueva=terminales.preparar(operador,terminal);long t=clock.instant().toEpochMilli();
+        assertEquals("RECHAZADO",sync.sincronizar(operador,terminal,List.of(evento(UUID.randomUUID().toString(),"INGRESO",revision(nueva),token,t))).getFirst().estado());
+        // La captura apoyada por la copia anterior conserva su admisión provisional.
+        assertEquals("CONFIRMADO",sync.sincronizar(operador,terminal,List.of(evento(UUID.randomUUID().toString(),"INGRESO",revision(vieja),token,t))).getFirst().estado());
+    }
+    @Test void permisoInvalidoOClaveDesconocidaNoIngresaPorElNuevoCircuito() {
+        var otraFirma=new FirmaOffline(clock,FirmaOfflineTest.clavePruebas());
+        var datos=Map.<String,Object>of("uid",uid,"jti","prueba","permiso","INGRESO","ambito","FITZONE");
+        var desconocido=otraFirma.firmar("m2-autorizacion",datos,clock.instant(),clock.instant().plusSeconds(60));
+        assertThrows(ResponseStatusException.class,()->automaticas.verificar(desconocido,clock.instant()));
+        var tipo=firma.firmar("m2-copia",datos,clock.instant(),clock.instant().plusSeconds(60));
+        assertThrows(ResponseStatusException.class,()->automaticas.verificar(tipo,clock.instant()));
+        var sinPermiso=firma.firmar("m2-autorizacion",Map.of("uid",uid,"jti","prueba","permiso","OTRO","ambito","FITZONE"),clock.instant(),clock.instant().plusSeconds(60));
+        assertThrows(ResponseStatusException.class,()->automaticas.verificar(sinPermiso,clock.instant()));
+    }
+    @Test void dosSedesDesconectadasConQrDistintosConservanElConflictoDePresencia() {
+        var lote=automaticas.emitir(socio);UUID tb=UUID.randomUUID();
+        var ra=revision(terminales.preparar(operador,terminal));var rb=revision(terminales.preparar(ajeno,tb));
+        long t=clock.instant().toEpochMilli();reloj.ahora=reloj.ahora.plusSeconds(120);
+        String a=UUID.randomUUID().toString(),b=UUID.randomUUID().toString();
+        assertTrue(sync.sincronizar(operador,terminal,List.of(evento(a,"INGRESO",ra,lote.tokens().getFirst(),t),evento(a,"SALIDA",ra,null,t+90000))).stream().allMatch(r->"CONFIRMADO".equals(r.estado())));
+        assertTrue(sync.sincronizar(ajeno,tb,List.of(evento(b,"INGRESO",rb,lote.tokens().get(1),t+60000),evento(b,"SALIDA",rb,null,t+80000))).stream().allMatch(r->"CONFLICTO".equals(r.estado())));
+        assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM acceso_evento_offline WHERE terminal_id=? AND estado='CONFLICTO'",Integer.class,tb));
+    }
     @Test void batchDesordenadoSeConfirmaUnaVezYNoPermiteCambiarLaIntencion() {
         var lote=credenciales.preparar(socio,sede);var rev=revision(terminales.preparar(operador,terminal));
         String visita=UUID.randomUUID().toString();long t=clock.instant().toEpochMilli();
@@ -140,10 +207,18 @@ class OfflineIntegrationTest {
         String cuerpo="{\"terminalId\":\""+terminal+"\"}";
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/accesos/offline/preparacion").contentType("application/json").content(cuerpo))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isUnauthorized());
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/accesos/offline/credenciales/automaticas"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isUnauthorized());
         String bearer="Bearer "+jwt.generateToken(detalles.loadUserByUsername(socio));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/accesos/offline/credenciales/automaticas").header("Authorization",bearer))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.version").value(2))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.sedeId").doesNotExist());
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/accesos/offline/preparacion").header("Authorization",bearer).contentType("application/json").content(cuerpo))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isForbidden());
         bearer="Bearer "+jwt.generateToken(detalles.loadUserByUsername(operador));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/accesos/offline/credenciales/automaticas").header("Authorization",bearer))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isForbidden());
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/accesos/offline/sincronizacion").header("Authorization",bearer).contentType("application/json").content("{\"terminalId\":\""+terminal+"\",\"eventos\":[]}"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isBadRequest());
     }

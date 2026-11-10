@@ -1006,7 +1006,7 @@ paths:
       x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Autorizar el terminal principal de Recepción y obtener su copia
-      description: Sólo RECEPCIONISTA habilitado de la sede. Un terminal y operador por sede; otro UUID devuelve 403. Incluye exclusivamente socios con lotes offline preparados para esa sede, hasta 1000; sin fotos, DNI, email de socios ni contraseñas. Evidencia RS256 tipo m2-copia, válida dos horas, con períodos y presencia conocida. No-store. No se debe reemplazar una copia con pendientes.
+      description: Sólo RECEPCIONISTA habilitado de la sede. Un terminal y operador por sede; otro UUID devuelve 403. Copia versión 2 con sede, operador, capacidad, presencia abierta mínima entre sedes y IDs bloqueados conocidos. Los miembros con períodos/lotes anteriores se conservan para compatibilidad, hasta 1000; no son necesarios para verificar las nuevas autorizaciones multisede. Sin fotos, DNI, email de socios ni contraseñas. Evidencia RS256 tipo m2-copia con audiencia fitzone-acceso y kid, válida dos horas. La JWK se aprovisiona por esta respuesta autenticada, nunca desde un QR. No-store. No reemplazar una copia con pendientes.
       requestBody:
         required: true
         content:
@@ -1025,7 +1025,7 @@ paths:
                 type: object
                 required: [evidencia, jwk, servidorAhora, sedeNombre]
                 properties:
-                  evidencia: {type: string, description: JWS con revision, terminalId, operadorId, sedeId, capacidad, miembros y presencias}
+                  evidencia: {type: string, description: JWS con version 2, revision, terminalId, operadorId, sedeId, capacidad, miembros anteriores, presencias y bloqueados}
                   jwk: {type: object}
                   servidorAhora: {type: integer, format: int64}
                   sedeNombre: {type: string}
@@ -1034,12 +1034,38 @@ paths:
         '403': {$ref: '#/components/responses/SinPermiso'}
         '409': {$ref: '#/components/responses/Conflicto'}
         '503': {description: Se requiere clave RSA privada persistente exclusiva de M2 en el servidor}
+  /accesos/offline/credenciales/automaticas:
+    post:
+      x-implementation-status: implemented
+      x-contract-status: stable
+      tags: [M2 · Accesos]
+      summary: Obtener automáticamente autorizaciones QR multisede
+      description: USUARIO o GERENTE con cuenta activa y membresía vigente no suspendida. Sin body ni sede. Ventanas de hasta 60 segundos, limitadas a períodos pagados reales y horizonte máximo de dos horas. Cada JWS RS256 incluye issuer fitzone-m2, audience fitzone-acceso, kid, tipo m2-autorizacion, uid, permiso INGRESO, ambito FITZONE, iat, nbf, exp y jti estable por usuario/minuto. No incluye datos personales ni secretos. Recepción verifica contra su clave previamente aprovisionada sin exigir al socio en el snapshot. Capturas y revocación diferida siguen limitadas por caducidad; RN-01 global no se garantiza bajo partición. No-store.
+      responses:
+        '200':
+          description: Lote que Mi QR guarda automáticamente; no-store
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [version, usuarioId, servidorAhora, hasta, jwk, tokens]
+                properties:
+                  version: {type: integer, enum: [2]}
+                  usuarioId: {type: integer}
+                  servidorAhora: {type: integer, format: int64}
+                  hasta: {type: integer, format: int64}
+                  jwk: {type: object, description: Pública con kid para el portal del socio; el terminal usa exclusivamente su aprovisionamiento}
+                  tokens: {type: array, maxItems: 121, items: {type: string}}
+        '401': {$ref: '#/components/responses/NoAutenticado'}
+        '403': {$ref: '#/components/responses/SinPermiso'}
+        '503': {description: Falta configuración RSA persistente; el QR online anterior sigue disponible}
   /accesos/offline/credenciales:
     post:
       x-implementation-status: implemented
       x-contract-status: stable
       tags: [M2 · Accesos]
-      summary: Preparar QR rotativos offline para una sede
+      summary: Preparar QR rotativos offline para una sede (compatibilidad anterior)
+      deprecated: true
       description: Cuenta y membresía vigentes. Lote RS256 exclusivo de M2 de hasta dos horas, ventanas estrictas de 60 segundos. No reemplaza el último QR online. Preparar habilita incluir los datos mínimos del titular en la copia de esa sede. Sin fotos, contraseñas ni secretos de login.
       requestBody:
         required: true
@@ -1123,6 +1149,7 @@ paths:
         Validaciones, en orden: QR auténtico (firma y tipo; 400 si no lo es), no vencido (409), y que sea el último QR
         emitido para ese titular (409 si se emitió uno más nuevo). El titular sale del QR, no de un usuarioId enviado.
         El titular debe tener cuenta activa y membresía vigente no suspendida (403); M1 valida sus períodos.
+        También admite m2-autorizacion RS256 multisede, verificando audiencia, kid y permisos (400 si es inválida o caducó, 409 si se reutilizó). En ese formato el jti es de un solo ingreso y no aplica el último QR HMAC; su uso se comparte con reconciliación offline mediante V14. El formato HMAC anterior conserva íntegra su regla de último emitido.
         RN-01: si el titular ya tiene un ingreso abierto, en cualquier sede, responde 409; también ante escaneos
         simultáneos, por el índice único parcial uk_registro_acceso_abierto (V4).
         Sede: RECEPCIONISTA opera la de su usuario (si envía otra sedeId, 403). GERENTE debe indicar sedeId (400 si
@@ -1184,6 +1211,7 @@ paths:
         mostrar su QR). Debe venir exactamente uno de los dos; ambos o ninguno producen 400.
         Con qrToken se valida como en el ingreso (400 si no es auténtico; 409 si venció o fue reemplazado) y se busca
         el ingreso abierto del titular (404 si no tiene uno). Con accesoId: 404 si no existe.
+        También acepta m2-autorizacion RS256 vigente: 400 ante firma, audiencia, kid, permisos o caducidad inválidos. No aplica último QR HMAC ni exige una nueva membresía para salir; accesoId sigue disponible si la credencial caducó.
         Un acceso que ya tiene salida responde 409 y no registra otra. RECEPCIONISTA sólo cierra accesos de su sede (403).
         No exige que el titular siga habilitado para ingresar: quien está adentro siempre puede salir.
         Cierre diario: a las 23:59 (America/Argentina/Buenos_Aires) los ingresos que siguen abiertos se cierran

@@ -49,11 +49,13 @@ public class TerminalOfflineService {
             datos.put("lotes",jdbc.queryForList("SELECT id::text FROM acceso_credencial_offline WHERE usuario_id=? AND sede_id=? AND hasta>?",String.class,id,u.sedeId(),java.sql.Timestamp.from(ahora)));
             miembros.add(datos);
         }
-        var presencia=jdbc.query("SELECT a.id,a.usuarioid,a.sedeid,a.fecha_hora_ingreso FROM registro_acceso a WHERE a.fecha_hora_salida IS NULL AND (a.sedeid=? OR EXISTS(SELECT 1 FROM acceso_credencial_offline c WHERE c.usuario_id=a.usuarioid AND c.sede_id=? AND c.hasta>?))",
-                (r,n)->Map.of("visitaId","central:"+r.getInt(1),"usuarioId",r.getInt(2),"sedeId",r.getInt(3),"ingreso",fecha(r.getTimestamp(4))),u.sedeId(),u.sedeId(),java.sql.Timestamp.from(ahora));
+        var presencia=jdbc.query("SELECT a.id,a.usuarioid,a.sedeid,a.fecha_hora_ingreso FROM registro_acceso a WHERE a.fecha_hora_salida IS NULL",
+                (r,n)->Map.of("visitaId","central:"+r.getInt(1),"usuarioId",r.getInt(2),"sedeId",r.getInt(3),"ingreso",fecha(r.getTimestamp(4))));
         var datos=new LinkedHashMap<String,Object>();
         datos.put("revision",revision.toString());datos.put("terminalId",terminal.toString());datos.put("operadorId",u.id());datos.put("sedeId",u.sedeId());
         datos.put("cuenta",u.email());
+        datos.put("version",2);
+        datos.put("bloqueados",jdbc.queryForList("SELECT u.id FROM usuario u WHERE NOT u.activo OR EXISTS(SELECT 1 FROM membresia m WHERE m.usuarioid=u.id AND m.suspendida)",Integer.class));
         datos.put("miembros",miembros);datos.put("presencias",presencia);
         datos.put("capacidad",jdbc.queryForObject("SELECT capacidad_maxima FROM sede WHERE id=?",Integer.class,u.sedeId()));
         String evidencia=firma.firmar("m2-copia",datos,ahora,hasta);

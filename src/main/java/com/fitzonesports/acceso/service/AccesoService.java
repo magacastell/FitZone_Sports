@@ -38,6 +38,7 @@ public class AccesoService {
     private final MembresiaService membresiaService;
     private final com.fitzonesports.usuario.service.FotoPerfilService fotos;
     private final org.springframework.jdbc.core.JdbcTemplate jdbc;
+    private final com.fitzonesports.acceso.offline.AutorizacionQrService autorizaciones;
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager entityManager;
 
@@ -58,10 +59,12 @@ public class AccesoService {
         UsuarioResponse operador = usuarioService.consultarPerfil(emailOperador);
         Integer sedeId = resolverSede(operador, request.sedeId());
 
-        Integer usuarioId = qrTokenService.validar(request.qrToken());
+        boolean multisede=autorizaciones.esAsimetrico(request.qrToken());
+        var autorizacion=multisede?autorizaciones.verificar(request.qrToken(),clock.instant()):null;
+        Integer usuarioId = multisede?(Integer)autorizacion.get("uid"):qrTokenService.validar(request.qrToken());
         // Comparte exclusión por titular con la reconciliación offline, sin sustituir V4.
         jdbc.queryForObject("SELECT id FROM usuario WHERE id=? FOR UPDATE",Integer.class,usuarioId);
-        codigoQrRepository.findByUsuarioId(usuarioId)
+        if (!multisede) codigoQrRepository.findByUsuarioId(usuarioId)
                 .filter(emitido -> emitido.getToken().equals(request.qrToken()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
                         "El QR ya no esta vigente: se emitio uno mas reciente"));
@@ -72,6 +75,8 @@ public class AccesoService {
         if (registroAccesoRepository.existsByUsuarioIdAndFechaHoraSalidaIsNull(usuarioId)) {
             throw ingresoAbierto();
         }
+        if (multisede && Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM registro_acceso WHERE qr_jti=?)",Boolean.class,autorizacion.getId())))
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Este QR ya se utilizó; esperá la próxima rotación");
         RegistroAcceso registro;
         try {
             registro = registroAccesoRepository.saveAndFlush(RegistroAcceso.builder()
@@ -83,6 +88,7 @@ public class AccesoService {
             // Dos escaneos simultaneos: el indice unico parcial rechaza el segundo.
             throw ingresoAbierto();
         }
+        if (multisede) jdbc.update("UPDATE registro_acceso SET qr_jti=? WHERE id=?",autorizacion.getId(),registro.getId());
         return AccesoResponse.from(registro,
                 titularValidado(titular), clock.getZone());
     }
@@ -133,8 +139,9 @@ public class AccesoService {
     }
 
     private RegistroAcceso accesoAbiertoDelQr(String qrToken) {
-        Integer usuarioId = qrTokenService.validar(qrToken);
-        codigoQrRepository.findByUsuarioId(usuarioId)
+        boolean multisede=autorizaciones.esAsimetrico(qrToken);
+        Integer usuarioId = multisede?(Integer)autorizaciones.verificar(qrToken,clock.instant()).get("uid"):qrTokenService.validar(qrToken);
+        if (!multisede) codigoQrRepository.findByUsuarioId(usuarioId)
                 .filter(emitido -> emitido.getToken().equals(qrToken))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
                         "El QR ya no esta vigente: se emitio uno mas reciente"));

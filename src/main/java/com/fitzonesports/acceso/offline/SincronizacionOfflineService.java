@@ -19,6 +19,7 @@ public class SincronizacionOfflineService {
     private final TerminalOfflineService terminales;
     private final FirmaOffline firma;
     private final Clock clock;
+    private final AutorizacionQrService autorizaciones;
     private final ObjectMapper json=tools.jackson.databind.json.JsonMapper.builder().build();
     public record Evento(@NotNull UUID id,@NotBlank @Size(max=64) String visitaId,@NotNull @Positive Integer usuarioId,
             @NotNull @Pattern(regexp="INGRESO|SALIDA") String tipo,@NotNull @Positive Long instante,
@@ -83,7 +84,22 @@ public class SincronizacionOfflineService {
             if(!conocida && !local && !diferida)throw error(403,"Visita no autorizada");
             return;
         }
-        Claims qr=firma.verificar(e.qrToken(),"m2-qr",Instant.ofEpochMilli(e.instante()));
+        Claims qr;
+        try { qr=autorizaciones.verificar(e.qrToken(),Instant.ofEpochMilli(e.instante())); }
+        catch (ResponseStatusException ex) {
+            qr=firma.verificar(e.qrToken(),"m2-qr",Instant.ofEpochMilli(e.instante()));
+            validarQrAnterior(e,sede,copia,qr);
+            return;
+        }
+        if (!e.usuarioId().equals(qr.get("uid"))) throw error(403,"QR ajeno");
+        if (!Integer.valueOf(2).equals(copia.get("version"))) throw error(403,"Actualizar el aprovisionamiento del terminal");
+        if ("INGRESO".equals(e.tipo()) && ((List<?>)copia.get("bloqueados")).contains(e.usuarioId()))
+            throw error(403,"Cuenta bloqueada según la copia del terminal");
+        if ("INGRESO".equals(e.tipo())) jdbc.update("UPDATE acceso_evento_offline SET qr_jti=? WHERE id=?",qr.getId(),e.id());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void validarQrAnterior(Evento e,Integer sede,Claims copia,Claims qr) {
         if(!e.usuarioId().equals(qr.get("uid")) || !sede.equals(qr.get("sid")))throw error(403,"QR ajeno");
         var miembros=(List<Map<String,Object>>)copia.get("miembros");
         var miembro=miembros.stream().filter(m->e.usuarioId().equals(m.get("id")) && ((List<?>)m.get("lotes")).contains(qr.get("bid"))).findFirst().orElseThrow(()->error(403,"No incluido en la copia"));
@@ -117,12 +133,12 @@ public class SincronizacionOfflineService {
             if(!LocalDateTime.now(clock).isBefore(cierre) && (fin==null || fin.isAfter(cierre)))fin=cierre;
             boolean solapa=Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM registro_acceso WHERE usuarioid=? AND (?::timestamp IS NULL OR fecha_hora_ingreso<?) AND (fecha_hora_salida IS NULL OR fecha_hora_salida>?))",Boolean.class,entrada.usuarioId(),fin,fin,inicio));
             String jti=jdbc.queryForObject("SELECT qr_jti FROM acceso_evento_offline WHERE id=?",String.class,entrada.id());
-            boolean usado=Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM acceso_evento_offline WHERE qr_jti=? AND estado='CONFIRMADO' AND tipo='INGRESO' AND id<>?)",Boolean.class,jti,entrada.id()));
+            boolean usado=Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM acceso_evento_offline WHERE qr_jti=? AND estado='CONFIRMADO' AND tipo='INGRESO' AND id<>?) OR EXISTS(SELECT 1 FROM registro_acceso WHERE qr_jti=?)",Boolean.class,jti,entrada.id(),jti));
             if(solapa && fin==null && Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM registro_acceso WHERE usuarioid=? AND fecha_hora_ingreso>?)",Boolean.class,entrada.usuarioId(),inicio))) {
                 for(var e:eventos)marcar(e,"EN_ESPERA","Falta egreso para delimitar el intervalo histórico",null);return;
             }
             if(solapa || usado) { for(var e:eventos)marcar(e,"CONFLICTO",solapa?"Presencia o intervalo incompatible entre sedes; evidencia conservada":"QR ya utilizado",null);return; }
-            Integer id=jdbc.queryForObject("INSERT INTO registro_acceso(fecha_hora_ingreso,fecha_hora_salida,usuarioid,sedeid,offline_visita,offline_terminal) VALUES (?,?,?,?,?,?) RETURNING id",Integer.class,inicio,fin,entrada.usuarioId(),sede,UUID.fromString(visita),terminal);
+            Integer id=jdbc.queryForObject("INSERT INTO registro_acceso(fecha_hora_ingreso,fecha_hora_salida,usuarioid,sedeid,offline_visita,offline_terminal,qr_jti) VALUES (?,?,?,?,?,?,?) RETURNING id",Integer.class,inicio,fin,entrada.usuarioId(),sede,UUID.fromString(visita),terminal,jti);
             marcar(entrada,"CONFIRMADO","Admisión reconciliada con copia de captura",id);
             for(var e:eventos)if("INGRESO".equals(e.tipo()) && !e.id().equals(entrada.id()))marcar(e,"CONFLICTO","Otro evento de ingreso para la misma visita",id);
             if(salida!=null)marcar(salida,"CONFIRMADO",fin.equals(local(salida.instante()))?"Egreso reconciliado":"Egreso conservado; se aplicó el cierre diario",id);
