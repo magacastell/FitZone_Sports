@@ -15,3 +15,11 @@ INSERT INTO usuario (dni, email, rolid, sedeid, nombre, apellido, foto, contrase
     ('10000003', 'recepcion@fitzone.com', (SELECT id FROM rol WHERE nombre = 'RECEPCIONISTA'), (SELECT id FROM sede WHERE nombre = 'Sede Central' ORDER BY id LIMIT 1), 'Recepcionista', 'de Prueba', NULL, '$2a$10$0VpjDq6zoF2SNrnc5Vr7QO4m4BbfZnVa.KQ8CVWXo9ry3QzX34DYG', TRUE),
     ('10000004', 'gerente@fitzone.com', (SELECT id FROM rol WHERE nombre = 'GERENTE'), (SELECT id FROM sede WHERE nombre = 'Sede Central' ORDER BY id LIMIT 1), 'Gerente', 'de Prueba', NULL, '$2a$10$hb0HDKgm0mO.JLIsmt5Z6u9ZFoBoz1aJfKslXPUKfDQb/7PEuEH0O', TRUE)
 ON CONFLICT (email) DO NOTHING;
+
+-- M3 (dev): tipos de clase e instructores de ejemplo para poder crear clases desde la aplicacion.
+INSERT INTO tipo_clase (nombre) VALUES ('Spinning'), ('Yoga'), ('Funcional'), ('Pilates')
+ON CONFLICT ((lower(btrim(nombre)))) DO NOTHING;
+
+INSERT INTO instructor (nombre, apellido)
+SELECT v.nombre, v.apellido FROM (VALUES ('Lucía', 'Fernández'), ('Martín', 'Gómez')) AS v(nombre, apellido)
+WHERE NOT EXISTS (SELECT 1 FROM instructor i WHERE i.nombre = v.nombre AND i.apellido = v.apellido);
