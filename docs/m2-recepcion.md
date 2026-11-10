@@ -14,6 +14,8 @@ Base: b2b3a11e4ec99d56891c604e845259ab5caf2224. Fecha: 30/10/2026.
 > Cierre online 09/11/2026: foto canónica del titular en la respuesta autorizada y
 > salida por número de ingreso disponibles; ver actualización al final. El informe
 > original debajo conserva su evidencia histórica.
+> Evolución en feat/m2-offline, 09/11/2026: PWA, copia y sincronización reales;
+> [operación, demostración y defensa](m2-offline.md). Este informe conserva el corte online.
 
 ## Auditoría del modelo actual
 

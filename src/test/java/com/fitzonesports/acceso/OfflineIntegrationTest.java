@@ -111,6 +111,7 @@ class OfflineIntegrationTest {
         assertTrue(conflicto.stream().allMatch(r->"CONFLICTO".equals(r.estado())));
         assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM registro_acceso WHERE usuarioid=?",Integer.class,uid));
         assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM acceso_evento_offline WHERE terminal_id=? AND estado='CONFLICTO'",Integer.class,tb));
+        assertEquals("CONFLICTO",sync.sincronizar(ajeno,tb,List.of(evento(vb,"SALIDA",rb,null,t+12))).getFirst().estado());
         assertThrows(ResponseStatusException.class,()->sync.sincronizar(ajeno,ta,List.of(evento(vb,"INGRESO",rb,b.tokens().getFirst(),t))));
     }
     @Test void capturaSinCopiaVigenteOConQrFalsificadoNoConcedeAcceso() {

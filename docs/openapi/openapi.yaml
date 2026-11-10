@@ -9,7 +9,7 @@ info:
     openapi.yaml es la fuente técnica de las partes stable. Las partes draft sirven para revisión y mocks; no obligan a otros módulos ni deben usarse como acuerdos definitivos para generar validaciones de negocio. x-contract-pending referencia temas P01–P12 de DECISIONES.md. x-propuesta-* preserva alternativas anteriores como metadata no normativa.
     JWT/Bearer global. Login y registro públicos. GET /sedes conserva la autorización actual; la elección de sede ocurre autenticada al contratar (P12). x-roles-actuales registra las anotaciones del controller, sin afirmar que existan validaciones funcionales de propiedad/sede en stubs. Las modificaciones de permisos se separan como propuestas.
     DTO implementados exactos; PATCH application/json con omitido/null = no modificar. Problem Details con code y errores de campo es objetivo técnico, no garantía del runtime actual. Paginación selectiva base 0, size 20 y máximo 100; operationId únicos en español.
-    Campos/precios/estados futuros, coordinación entre módulos, métricas y políticas permanecen draft cuando falta implementación o acuerdo. Las rutas de membresías reflejan el backend con cobros fake y arrepentimiento por período; ver docs/membresias.md. La sincronización offline continúa como propuesta en DECISIONES.md.
+    Campos/precios/estados futuros, coordinación entre módulos, métricas y políticas permanecen draft cuando falta implementación o acuerdo. Las rutas de membresías reflejan el backend con cobros fake y arrepentimiento por período; ver docs/membresias.md. El MVP offline se implementa en /accesos/offline/*; alcance y límites en docs/m2-offline.md.
 servers:
 - url: http://localhost:3000/api/v1
   description: Servidor local; los paths son relativos a /api/v1.
@@ -941,6 +941,8 @@ paths:
           description: Conflicto de estado, plan inactivo o reintento incompatible.
   /accesos/offline/sincronizacion:
     post:
+      x-implementation-status: implemented
+      x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Reconciliar eventos del terminal sin duplicarlos
       description: Sólo el operador autorizado del terminal y sede. Hasta 100 eventos por batch; inbox y accesos en una transacción. Reintentar los mismos IDs tras respuesta incierta. Verifica la copia y el QR al instante de captura, no al recibir; copias de hasta dos horas y futuro limitado a 30 segundos. Admisiones provisionales; conflictos de presencia y solapamiento histórico conservan evidencia sin sobrescribir accesos. EN_ESPERA conserva el pendiente por dependencia faltante. ID reutilizado con otro payload registra intento incompatible. QR offline sólo es admisible mediante este protocolo; los endpoints online conservan su QR anterior y la regla de último emitido.
@@ -991,6 +993,8 @@ paths:
         '503': {description: Configuración de firma offline no disponible; conservar pendientes para reintentar}
   /accesos/offline/conexion:
     get:
+      x-implementation-status: implemented
+      x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Comprobar comunicación autenticada con el servidor
       responses:
@@ -998,6 +1002,8 @@ paths:
         '401': {$ref: '#/components/responses/NoAutenticado'}
   /accesos/offline/preparacion:
     post:
+      x-implementation-status: implemented
+      x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Autorizar el terminal principal de Recepción y obtener su copia
       description: Sólo RECEPCIONISTA habilitado de la sede. Un terminal y operador por sede; otro UUID devuelve 403. Incluye exclusivamente socios con lotes offline preparados para esa sede, hasta 1000; sin fotos, DNI, email de socios ni contraseñas. Evidencia RS256 tipo m2-copia, válida dos horas, con períodos y presencia conocida. No-store. No se debe reemplazar una copia con pendientes.
@@ -1030,6 +1036,8 @@ paths:
         '503': {description: Se requiere clave RSA privada persistente exclusiva de M2 en el servidor}
   /accesos/offline/credenciales:
     post:
+      x-implementation-status: implemented
+      x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Preparar QR rotativos offline para una sede
       description: Cuenta y membresía vigentes. Lote RS256 exclusivo de M2 de hasta dos horas, ventanas estrictas de 60 segundos. No reemplaza el último QR online. Preparar habilita incluir los datos mínimos del titular en la copia de esa sede. Sin fotos, contraseñas ni secretos de login.
@@ -1233,7 +1241,7 @@ paths:
         RECEPCIONISTA y GERENTE (RF-05). ocupacionActual es la cantidad de ingresos sin salida en la sede
         (de cualquier persona) y capacidadMaxima la capacidad de la sede. Es informativo: superar la capacidad no
         bloquea ingresos. RECEPCIONISTA sólo consulta su sede (403); GERENTE cualquiera (404 si no existe).
-        Vuelve a 0 con el cierre diario de las 23:59. No incluye movimientos offline (P04, no implementado).
+        Vuelve a 0 con el cierre diario de las 23:59. Sólo incluye offline reconciliado; pendientes locales se muestran como aforo provisional del terminal.
       operationId: consultarAforo
       x-implementation-status: implemented
       x-contract-status: stable
@@ -3535,8 +3543,8 @@ components:
       description: |-
         Registro de acceso a una sede. salida es null mientras la persona sigue adentro.
         titular lo devuelven hoy el ingreso y la salida (datos para el control visual en recepción).
-        origen y corregido están reservados para la contingencia offline (P04) y la corrección manual:
-        el backend todavía no los devuelve, porque no tienen columna en registro_acceso.
+        origen y corregido siguen reservados para futura lectura/corrección del historial y no se devuelven.
+        El protocolo offline usa resultados de reconciliación separados; las visitas se identifican internamente por offline_visita/offline_terminal.
       required:
       - id
       - usuarioId
@@ -3629,7 +3637,7 @@ components:
       type: object
       description: |-
         Aforo informativo (RF-05): ingresos sin salida en la sede, de cualquier persona, frente a su capacidad máxima.
-        No bloquea ingresos. Vuelve a 0 con el cierre diario de las 23:59. El offline (P04) no está implementado.
+        No bloquea ingresos. Vuelve a 0 con el cierre diario de las 23:59. Incluye offline reconciliado; el aforo provisional local se presenta por separado.
       required:
       - sedeId
       - ocupacionActual

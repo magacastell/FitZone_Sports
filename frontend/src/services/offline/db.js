@@ -22,8 +22,12 @@ export async function guardarCopia(respuesta) {
   const copia={id:'copia',...respuesta,datos,cuenta,relojLocal,ultimoReloj:relojLocal,desfase:respuesta.servidorAhora-relojLocal};
   await db.transaction('rw',db.meta,db.movimientos,db.presencias,async()=>{
     if(await db.movimientos.where('estado').equals('PENDIENTE').count())throw Error('Sincronizá los pendientes antes de reemplazar la copia.');
+    const enConflicto=new Set((await db.movimientos.where('estado').equals('CONFLICTO').toArray()).map(m=>m.usuarioId));
+    const conservadas=await db.presencias.filter(p=>p.sedeId===datos.sedeId && enConflicto.has(p.usuarioId)).toArray();
     await db.presencias.clear();
     for(const p of datos.presencias)await db.presencias.put(p);
+    // La actualización central no borra una presencia física provisional en conflicto.
+    for(const p of conservadas)await db.presencias.put(p);
     await db.meta.put(copia);
   });
   return copia;

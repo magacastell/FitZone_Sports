@@ -102,7 +102,11 @@ public class SincronizacionOfflineService {
         var existentes=visita.startsWith("central:")
                 ?jdbc.queryForList("SELECT * FROM registro_acceso WHERE id=?",Integer.parseInt(visita.substring(8)))
                 :jdbc.queryForList("SELECT * FROM registro_acceso WHERE offline_visita=? AND offline_terminal=?",UUID.fromString(visita),terminal);
-        if(existentes.isEmpty() && entrada==null) { for(var e:eventos)marcar(e,"EN_ESPERA","Falta recibir el ingreso de esta visita",null);return; }
+        if(existentes.isEmpty() && entrada==null) {
+            boolean rechazado=Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM acceso_evento_offline WHERE terminal_id=? AND visita_id=? AND tipo='INGRESO' AND estado IN ('CONFLICTO','RECHAZADO'))",Boolean.class,terminal,visita));
+            for(var e:eventos)marcar(e,rechazado?"CONFLICTO":"EN_ESPERA",rechazado?"Egreso conservado; el ingreso no fue incorporado al registro central":"Falta recibir el ingreso de esta visita",null);
+            return;
+        }
         if(existentes.isEmpty()) {
             if(salida!=null && (!salida.usuarioId().equals(entrada.usuarioId()) || salida.instante()<entrada.instante())) {
                 marcar(salida,"RECHAZADO","Egreso incompatible con el ingreso",null);salida=null;

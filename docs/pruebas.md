@@ -250,3 +250,55 @@ No se repitió el ensayo anterior de scheduler por HTTP ni de respuesta monetari
 perdida con proxy. El servicio automático y la idempotencia se ejecutan en la suite
 backend; no se confunden con una nueva prueba del temporizador o del navegador.
 Las brechas de otros módulos no fueron implementadas por esta tarea.
+
+## M2 offline — verificación del 09/11/2026
+
+Rama feat/m2-offline desde e0056b1, sin merge/push a main. Ejecución backend completa:
+**94 tests, cero fallos/errores/omitidos**, Java 21 y PostgreSQL 18 nueva/tmpfs.
+Son los 85 anteriores más FirmaOfflineTest (1) y OfflineIntegrationTest (8), quince
+clases en total. JaCoCo: **943/1083 líneas (87,07 %)** y **400/570 ramas (70,18 %)**.
+Cambió el denominador al incorporar código; no se oculta la menor cobertura de ramas
+ni se inventa un umbral aprobado. Reportes completos locales:
+`target/test-runs/cf1cd1adad0c4a9c97cca016c6013fc9/{surefire-reports,jacoco}`.
+
+`npm test` incluye ahora test:offline además de API 18, dominio/UI 185, Planes 16,
+Actividades 18 y Gerencia 7. Todas pasaron. El script nuevo usa node:assert, jose y
+fake-indexeddb: cuatro bloques con aserciones de firma/tipos/tiempos, copia/reapertura,
+concurrencia/replay/rollback y transporte incierto/cambio de sesión. No se equiparan
+a cuatro E2E ni a una medida de cobertura JS. Build Vite/PWA correcto.
+
+Integración backend: preparación por consentimiento/sede, permisos, suspensión,
+captura fuera de autorización, batch desordenado, egreso antes del ingreso, doble
+envío, payload cambiado bajo el mismo UUID, sincronización tardía y conflicto entre
+visitas ya cerradas en distintas sedes. MockMvc verifica HTTP/seguridad sin socket;
+los servicios/SQL usan PG real. La suite anterior de M1/M2 online sigue íntegra.
+
+E2E de Chrome real con perfiles nuevos, servidor Spring por HTTP y PG descartable:
+preparación, caída, QR rotativo tras 65 s, rechazo del anterior, ingreso persistente,
+cierre/reapertura sin red, egreso, reinicio del backend con clave estable, pérdida
+de respuestas tras commit, ACK y replay sin duplicados. No hay respuestas API mock.
+El proxy de prueba corta respuestas reales y Chrome usa modo de red desconectado;
+Spring permanece pausado durante la caída. Un resultado.json con aprobada=true
+y sus capturas acreditan esta prueba. Procedimiento/runner y evidencia final se
+detallan en [m2-offline.md](m2-offline.md).
+
+Los intentos fallidos se conservaron en target, sin versionarlos. Detectaron el
+refresh JPA que descartaba un egreso aún no flusheado, la clave ID de caché pisada
+por el UUID del lote y un guard booleano usado como ref en QrOffline. Se corrigió
+el código conservando las expectativas. La pérdida de ACK se mantuvo hasta su
+liberación explícita porque Chrome puede reintentar una conexión rota automáticamente.
+Una caída nativa de Node 24.15.0 motivó el supervisor PowerShell; la ejecución E2E
+usó Node 24.22.1 del runtime disponible, sin instalación global.
+
+Dependencias nuevas fijadas: Dexie 4.4.7 (Apache-2.0), jose 6.2.17 (MIT),
+workbox-precaching 7.4.1 (MIT); testing Playwright 1.65.0 (Apache-2.0) y
+fake-indexeddb 6.2.8 (Apache-2.0), procedencias verificadas en npm y repositorios
+oficiales. Se descartó workbox-build porque su árbol agregaba alertas. npm audit
+mantiene las **cinco alertas de la base** (tres moderadas, dos altas), sin alertas
+adicionales: Vite/esbuild, react-router(-dom) y source-map-js. No se hizo audit fix
+ni actualización mayor del stack. Informes JSON locales en target/auditoria.
+
+RNF-01 tiene ahora demostración funcional; no es medición de 99,5 % de disponibilidad.
+RN-01 mantiene garantía online; durante partición sólo prevención local y
+reconciliación de conflictos. Siguen fuera listado/corrección generales, resolución
+administrativa de conflictos, módulos ajenos y cierre grupal de ADR/diagramas.

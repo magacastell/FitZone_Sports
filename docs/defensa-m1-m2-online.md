@@ -2,6 +2,7 @@
 
 Cierre del 09/11/2026. Guía para recorrer el código; resultados reproducibles en
 [pruebas.md](pruebas.md). No describe offline, reservas ni un gateway de pagos real.
+La evolución posterior tiene su [guía de M2 offline y demostración](m2-offline.md).
 
 ## 1. Del formulario a PostgreSQL
 

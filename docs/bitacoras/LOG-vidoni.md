@@ -170,3 +170,22 @@ Conservé las entradas históricas anteriores tal como estaban; no completé has
 | Alcance y pendientes | No implementé offline/sincronización, listados/corrección de accesos 501 ni módulos ajenos. No repetí revisión de navegador, proxy de respuesta perdida o reinicio de persistencia: son evidencias históricas. No renumeré ADR-007 ni definí reglas nuevas para huecos de períodos. El responsable autorizó integrar y publicar main tras validar referencias y ausencia de conflictos, sin rebase, squash, force push ni tag de entrega. |
 | Commits | `d294674` — `fix(m1-m2): mostrar la foto del socio y completar el egreso online`. La documentación, esta entrada y la guía de defensa se consolidan en el commit documental posterior. |
 | Horas efectivas | Pendientes de confirmación; no estimé una duración ni reutilicé las tres horas confirmadas del 07/11. |
+
+### 09/11/2026 — implementación y demostración de M2 offline
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Numeración pendiente de confirmar con la planificación del grupo. M2 offline, pruebas e integración; no asigné un sprint ni una unidad numéricos no verificados. |
+| Actividad | Hice fetch y creé feat/m2-offline desde origin/main e0056b1 limpio. Implementé por etapas QR preemitidos RS256, terminal principal por sede, copia acotada por preparación del socio, PWA/IndexedDB, registro transaccional local y reconciliación con PostgreSQL. Conservé M1/M2 online y no trabajé en otros módulos. |
+| Decisiones | Ventana de dos horas aprobada para el MVP, reloj controlado con límite de 30 segundos sin extender exp/nbf, clave RSA persistente exclusiva del servidor, sin fotos/contraseñas en el snapshot. Elegí Dexie, jose y precaché Workbox compatibles con el stack. Descarté workbox-build por nuevas alertas en dependencias. Priorizamos admisión provisional y conflictos auditados; no prometí RN-01 global bajo partición. |
+| Problemas y soluciones | Corregí imports de Jackson 3 y validación de DTO anidado al compilar. Las pruebas detectaron una lectura JPA que descartaba el egreso sin flush, el ID de caché sobrescrito por el lote y un guard booleano usado como ref: corregí código y mantuve expectativas. Un aborto nativo de Node 24.15.0 motivó un supervisor PowerShell que limpia incluso si Node no ejecuta finally; usé Node 24.22.1 disponible sin instalarlo globalmente. Mantuve la pérdida de respuesta de prueba hasta liberar el ACK porque Chrome podía reintentar automáticamente. |
+| Pruebas y evidencia | Backend completo Java 21/PG 18 aislada: 94 tests, cero fallos, errores u omitidos; JaCoCo 943/1083 líneas (87,07 %) y 400/570 ramas (70,18 %). npm test, ahora con script offline, y build PWA correctos. Pruebas VM/fake-indexeddb distinguidas de MockMvc/PG y E2E real. La E2E final eec4c370-3ead-4fa4-967d-d954fcbbb9e3 preparó ambos clientes, pausó Spring y cortó red 65 s, probó rotación y rechazo del anterior, ingreso persistente, reapertura de Chrome sin conexión, egreso, reinicio de Spring, ACK perdido y replay: una visita cerrada, dos eventos y cero duplicados. Sin overflow a 390 px. XML, JSON y capturas locales bajo target; informe en docs/m2-offline.md y docs/pruebas.md. |
+| Commits reales | 9439872 — credenciales QR; 84f0aab — preparación de terminal; 4a63b89 — movimientos locales; 27e2ce4 — sincronización; a35f790 — recuperación, clave persistente y controles finales. El runner reproducible y la documentación se consolidan en el commit de pruebas posterior. |
+| Limitaciones y cierre | Un terminal/operador por sede, preparación previa, navegador administrado y suspensión desconocida hasta actualizar copia. Conflictos conservados para revisión, sin consola administrativa nueva. Advertencias npm preexistentes sin ampliar; no actualicé todo el stack. Documenté correspondencia con ADR-003/007 sin renumerar los del equipo. No hice merge, push ni tag y preservé main y las ramas anteriores. |
+| Horas efectivas | Pendientes de confirmación; no inferí horas a partir de la duración del chat ni reutilicé las tres horas del 07/11. |
+
+En la pasada final preservé la presencia local conflictiva al renovar la copia y
+evité dejar un egreso esperando indefinidamente un ingreso ya rechazado; agregué
+regresiones sin borrar la evidencia. La sonda de conexión reutiliza VITE_API_URL.
+La ejecución final figura en UTC como 10/11 00:09, correspondiente al 09/11 21:09
+local; mantuve la fecha local de esta actividad y los timestamps originales del runner.

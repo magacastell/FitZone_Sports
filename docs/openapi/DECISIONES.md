@@ -109,6 +109,16 @@ Validación técnica: Redocly sin agregar dependencias al proyecto, sintaxis YAM
 
 ### P04 — Contingencia offline, sincronización y acceso (D11/D12)
 
+Actualización 09/11/2026, rama feat/m2-offline: el responsable autorizó el MVP PWA
+con ventana de dos horas, QR preemitidos RS256 por sede, copia local acotada y
+sincronización idempotente. Los endpoints efectivos están en `/accesos/offline/*`
+del OpenAPI. La política prioriza admisión provisional y audita conflictos; no
+promete RN-01 global durante partición. Diseño, seguridad, límites y correspondencia
+con ADR-003/007 oficiales en [m2-offline.md](../m2-offline.md). La numeración histórica
+de ADR no se modifica. El listado/corrección generales permanecen en 501.
+Lo siguiente conserva el antecedente anterior al desarrollo; el batch ilustrativo
+de 500 nunca fue un contrato aprobado. El implementado admite 100 eventos.
+
 - **Tema:** ingreso/salida durante desconexión y aforo.
 - **Qué está confirmado:** QR, ingreso, salida y aforo online están implementados (ver fila de `acceso/` en la sección 1). Los ingresos que siguen abiertos se cierran a las 23:59 y el aforo vuelve a 0. La bitácora del 23/09 contempla caché y sincronización posterior. No hay backend offline.
 - **Qué falta decidir:** credencial o búsqueda admitida para ingreso, elegibilidad del cliente, barrera o carácter informativo de capacidad, caché, dispositivos, deduplicación, cronología, manejo de rechazo, tolerancia de reloj, protocolo y transporte de sincronización.

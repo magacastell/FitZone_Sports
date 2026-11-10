@@ -41,9 +41,9 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
   async function operar(e) {
     e.preventDefault();await ejecutar(async()=>{
       if(conexion==='sesión requerida')throw Error('Volvé a iniciar sesión antes de operar con el servidor disponible.');
-      if(conexion==='disponible') {
+      if(conexion==='disponible' && tipo==='INGRESO') {
         await sincronizar();
-        if(await db.movimientos.where('estado').anyOf('PENDIENTE','CONFLICTO','RECHAZADO').count())throw Error('Revisá los pendientes y conflictos antes de preparar una nueva operación con conexión.');
+        if(await db.movimientos.where('estado').equals('PENDIENTE').count())throw Error('Sincronizá los pendientes antes de preparar un nuevo ingreso con conexión; los egresos siguen disponibles.');
         // Con central disponible se renueva la copia: no autorizar con una suspensión vieja.
         await prepararTerminal();
       }
@@ -64,6 +64,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
     <AppButton disabled={ocupado||conexion!=='disponible'||vista.pendientes>0} onClick={()=>ejecutar(async()=>{await prepararTerminal();setMensaje('Copia autorizada guardada por hasta dos horas.');})}>Preparar / actualizar terminal</AppButton>
     <AppButton disabled={ocupado||conexion!=='disponible'} onClick={()=>ejecutar(async()=>{await sincronizar();setMensaje('Respuesta central recibida. Revisá pendientes y conflictos.');onMovimiento();})}>Reintentar sincronización</AppButton>
     <p>Pendientes: <strong data-testid="pendientes">{vista.pendientes??'—'}</strong> · conflictos/rechazos: {vista.conflictos||0}.</p>
+    {vista.conflictos>0&&<p role="alert">Hay conflictos que requieren revisión: el aforo provisional puede incluir presencia no confirmada centralmente.</p>}
     {vista.resultados?.map(r=><p role="alert" key={r.id}>{r.id}: {r.estado} · {r.detalle}</p>)}
     <p><a href="/terminal-offline">Abrir terminal sin conexión</a> · <a href="/recepcion/acceso">Volver a Recepción</a></p>
     {vista.copia&&<><p>Sede: {vista.copia.sedeNombre}. Copia del {new Date(vista.copia.servidorAhora).toLocaleString()} · vence {new Date(vista.copia.datos.exp*1000).toLocaleString()}.</p>

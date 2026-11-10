@@ -1,4 +1,4 @@
-import { fetchAPI } from '../api';
+import { fetchAPI,BASE_URL } from '../api';
 import { guardarCopia, guardarLote, idTerminal,cuentaActual,db } from './db';
 
 export async function prepararTerminal() {
@@ -20,7 +20,7 @@ export async function prepararCredenciales(sedeId) {
 }
 export async function hayConexion() {
   const token=localStorage.getItem('token');
-  const respuesta=await fetch('/api/v1/accesos/offline/conexion',{headers:{Authorization:`Bearer ${token}`},cache:'no-store',signal:AbortSignal.timeout(4000)});
+  const respuesta=await fetch(`${BASE_URL}/accesos/offline/conexion`,{headers:{Authorization:`Bearer ${token}`},cache:'no-store',signal:AbortSignal.timeout(4000)});
   if(!respuesta.ok)throw Object.assign(Error('La sesión del operador necesita conexión para renovarse.'),{status:respuesta.status});
   return true;
 }
