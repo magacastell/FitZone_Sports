@@ -158,3 +158,19 @@
   - Verificó lectura y paginación del PDF, acentos, importes y conservación del contenido original; inspeccionó visualmente un comprobante de ejemplo.
   - Actualizó README, OpenAPI y decisiones del contrato para reflejar el alcance implementado de membresías y distinguir la integración futura con canchas.
   - Comprobó el formato mediante `git diff --check` y detuvo la instancia PostgreSQL de pruebas al finalizar.
+
+### 11/11/2026 — M4 Canchas e integración con M5
+
+- **Actividad:** implementé catálogo y administración por sede, tipos con tarifa global, turnos sin solapamiento, disponibilidad y retenciones de reserva. Agregué Strategy estándar/socio, recargo pico por sede y cálculo de precio con BigDecimal y snapshot al reservar.
+- **Decisión:** elegí bloqueo pesimista por cancha para coordinar reserva y mantenimiento. V16 agrega índice parcial de una ocupación activa por turno, exclusión GiST para horarios y triggers de compatibilidad. Comparé alternativas en `docs/adr/ADR-004-tif-concurrencia-canchas.md`.
+- **Actividad:** conecté pago de reservas con M5, registro de aprobación/rechazo, PDF original persistido y cancelación con reembolso completo/parcial. Implementé consultas de pagos y reservas con controles de propietario y sede.
+- **Decisión:** el DNI ficticio `99999999`, obtenido del titular en el backend y configurable por entorno, rechaza el pago fake sin alterar el importe. Los demás se aprueban. El rechazo queda persistido, libera el turno y no genera PDF.
+- **Decisión operativa:** usé turnos de 60 minutos y retención de 10 minutos configurables, recargo inicial de 20 % por sede, prorrateo de minutos en `[19,21)`, descuento de 15 % posterior al recargo y cancelación de 100 % con >=2h / 50 % con menos. Documenté qué valores son decisiones de implementación y cuáles exige el enunciado.
+- **Problema y resolución:** actualicé una prueba anterior que esperaba `501` en Canchas. Para verificar el `403` de Recepción fue necesario enviar un cuerpo y una clave válidos: de otro modo MVC devolvía `400` antes de evaluar la autorización del método. Corregí también la configuración record para evitar que la validación intentara crear un proxy sobre una clase final.
+- **Verificación:** probé dos usuarios compitiendo por un turno, mantenimiento concurrente, cobros repetidos, expiración, mora, descuentos, reembolso, permisos JWT y conservación del PDF. La suite completa inicial pasó 121 pruebas sin fallos ni omisiones; después verifiqué también el seed repetible y las referencias de OpenAPI.
+- **Cierre de verificación:** la ejecución final de `mvnw verify` completó 122 pruebas sin fallos, errores ni omisiones y generó el reporte de cobertura. El seed aplicado dos veces conservó 25 sedes, 50 canchas y 4200 turnos, incluida la cuenta de rechazo con contraseña verificada.
+- **Rendimiento:** medí 30 consultas de disponibilidad sobre 25 sedes, 100 canchas y 8400 turnos; primera mediana 3,84 ms y p95 5,69 ms. Registré método, repetición y límites en `docs/rnf/RNF-03-canchas.md`, sin atribuir un SLA productivo a la prueba local.
+- **Documentación:** actualicé OpenAPI, README y decisiones; agregué `docs/canchas-pagos-backend.md`, ADR-004 y la cuenta de rechazo en el seed dev. El frontend sigue a cargo de su responsable.
+- **Sprint y horas:** pendientes de completar con el registro personal y la planificación; no se estiman retrospectivamente.
+- **Commits:** [`10d7943`](https://github.com/magacastell/FitZone_Sports/commit/10d7943) — implementación de Canchas, pagos de reservas, migración V16, pruebas y documentación técnica/de integración.
+- **Integración:** dejé `docs/integracion-canchas-pagos.md` con ejemplos HTTP/JSON, recuperación e idempotencia, cambios necesarios en el cliente frontend, permisos, estados, criterios para reportes y el contrato pendiente de M2 para ingreso de externos por reserva. Enlacé la guía desde README y la documentación técnica.
