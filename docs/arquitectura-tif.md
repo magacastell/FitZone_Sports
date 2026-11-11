@@ -1,6 +1,6 @@
-# Arquitectura TIF — Índice y estado de revisión
+# Arquitectura TIF — Índice y cierre de esta etapa
 
-Edición documental: **2026-11-10**. Código contrastado: **`d4ceaa33bd7a8a588ccab2a9789a875a9f31ba15`**. Rama: `docs/arquitectura-tif`. Este corte prepara seis ADR y cuatro diagramas para revisión; no declara cerrado el TIF ni aprobadas sus decisiones. No modifica implementación, contratos, migraciones, manuales, planificación ni bitácoras.
+Edición documental: **2026-11-10**, diagramas **v2**. Código funcional contrastado: **`d4ceaa33bd7a8a588ccab2a9789a875a9f31ba15`**. Preparación en la rama `docs/arquitectura-tif` para integración a `main`. Esta etapa cierra seis ADR en estado **Aceptado** y cuatro diagramas actualizados. Aceptado corresponde a la decisión técnica adoptada y materializada en la implementación, según la confirmación de cierre recibida; no certifica completitud funcional, ausencia de deuda ni cierre del TIF. No modifica implementación, contratos, migraciones, manuales, planificación ni bitácoras.
 
 ## Referencia normativa y alcance
 
@@ -13,21 +13,21 @@ Se consultaron los PDF originales locales, no sólo extracciones anteriores:
 
 Ambos se leyeron en la carpeta local `facultad/prog 5`; no se incorporan copias al repositorio. El hash permite reconocer la versión aunque cambie su ubicación. Una extracción anterior de lineamientos de **22 páginas** asignaba ADR-007 a pruebas y enumeraba nueve ADR: no se usa para esta serie. En la versión de 25 páginas, ADR-007 es sincronización, ADR-008 pruebas, ADR-009 despliegue y ADR-010 pagos. El Anexo B define la estructura, mientras la tabla de §5.2.1 define los temas.
 
-Se mantienen los encabezados y campos del Anexo B. La fecha indica esta redacción, no una reunión ni la fecha original de decisión. Autor, sprint y ratificación se dejan pendientes cuando no se acreditan. La aceptación declarada en un antecedente se cita como dato histórico y no se transfiere automáticamente al documento nuevo. Los seis integrantes autorizados son un dato aportado por el equipo; las referencias genéricas del enunciado a cuatro integrantes no se utilizan para reducirlo ni para reconstruir planificación.
+Se mantienen los encabezados y campos del Anexo B. **Fecha** identifica la redacción documental; **Fecha histórica de decisión** distingue lo consignado en antecedentes de lo no acreditado. No se asignan reuniones ni una fecha de aprobación grupal. Autor y sprint permanecen pendientes donde no se acreditan. Los seis ADR registran decisiones técnicas ya adoptadas; esa aceptación conserva todas sus consecuencias negativas y limitaciones. Los seis integrantes autorizados son un dato aportado por el equipo; las referencias genéricas del enunciado a cuatro integrantes no se utilizan para reducirlo ni para reconstruir planificación.
 
-## Serie oficial: seis borradores y cuatro pendientes
+## Serie oficial: seis ADR aceptados y cuatro pendientes
 
 Se reserva el prefijo inequívoco `ADR-NNN-tif-`. No se crean archivos vacíos para decisiones aún no redactadas ni se renumeran los históricos.
 
 | ADR / tema oficial | Archivo o nombre reservado | Evidencia principal / estado |
 |---|---|---|
-| 001 — Estilo arquitectónico | [ADR-001-tif-monolito-modular.md](adr/ADR-001-tif-monolito-modular.md) | Un artefacto backend Spring; paquetes de dominio y dependencias cruzadas reales. **Propuesto**. |
-| 002 — Motor relacional e integridad | [ADR-002-tif-postgresql-e-integridad.md](adr/ADR-002-tif-postgresql-e-integridad.md) | PostgreSQL, Flyway V1–V14, entidades y SQL; RN-01 central sí tiene índice, RN-02 de reservas aún no acreditada. **Propuesto**. |
-| 003 — Estrategia offline de acceso | [ADR-003-tif-validacion-qr-offline.md](adr/ADR-003-tif-validacion-qr-offline.md) | Emisor RS256 multisede, confianza aprovisionada, verificación local y caducidad. **Propuesto**. |
+| 001 — Estilo arquitectónico | [ADR-001-tif-monolito-modular.md](adr/ADR-001-tif-monolito-modular.md) | Un artefacto backend Spring; paquetes de dominio y dependencias cruzadas reales. **Aceptado**. |
+| 002 — Motor relacional e integridad | [ADR-002-tif-postgresql-e-integridad.md](adr/ADR-002-tif-postgresql-e-integridad.md) | PostgreSQL como motor y Flyway como gestión del esquema, comparados en apartados separados; RN-02 de reservas aún no acreditada. **Aceptado**. |
+| 003 — Estrategia offline de acceso | [ADR-003-tif-validacion-qr-offline.md](adr/ADR-003-tif-validacion-qr-offline.md) | Emisor RS256 multisede, confianza aprovisionada, verificación local y caducidad. **Aceptado**. |
 | 004 — Concurrencia de canchas | Reservado: `ADR-004-tif-concurrencia-canchas.md` | **Pendiente**. Contrastar servicio de reservas/bloqueos/SQL y pruebas RN-02 con responsable M4. V1 sólo hace único el turno, no su ocupación. No convertir propuestas de Drive en implementación. |
-| 005 — Backend, IoC y ORM | [ADR-005-tif-spring-di-y-persistencia.md](adr/ADR-005-tif-spring-di-y-persistencia.md) | Spring Boot 4.1.1/Java 21; constructor/Clock; Spring Data JPA y SQL complementario. **Propuesto**. |
-| 006 — Frontend, componentes y estado | [ADR-006-tif-react-componentes-y-estado.md](adr/ADR-006-tif-react-componentes-y-estado.md) | React, FitZoneUI propio, AuthContext, hooks y persistencia separada. Elección comparativa de estado/UI no acreditada. **Propuesto**. |
-| 007 — Sincronización de terminal | [ADR-007-tif-replica-y-reconciliacion.md](adr/ADR-007-tif-replica-y-reconciliacion.md) | Copia firmada v2, Dexie/IndexedDB, UUID, inbox SQL, ACK y conflictos. **Propuesto**. |
+| 005 — Backend, IoC y ORM | [ADR-005-tif-spring-di-y-persistencia.md](adr/ADR-005-tif-spring-di-y-persistencia.md) | Spring Boot 4.1.1/Java 21; constructor/Clock; Spring Data JPA y SQL complementario. **Aceptado**. |
+| 006 — Frontend, componentes y estado | [ADR-006-tif-react-componentes-y-estado.md](adr/ADR-006-tif-react-componentes-y-estado.md) | React, FitZoneUI propio, AuthContext, hooks y persistencia separada. Comparación histórica de estado/UI no acreditada. **Aceptado**. |
+| 007 — Sincronización de terminal | [ADR-007-tif-replica-y-reconciliacion.md](adr/ADR-007-tif-replica-y-reconciliacion.md) | Copia firmada v2, Dexie/IndexedDB, UUID, inbox SQL, ACK y conflictos. **Aceptado**. |
 | 008 — Pruebas, pirámide y umbral | Reservado: `ADR-008-tif-estrategia-pruebas.md` | **Pendiente**. Insumos: suites, reportes y brechas en [pruebas](pruebas.md); umbral grupal no acordado/verificado. Requiere integrar evidencia real M3/M4/M5 y definir pirámide/umbral; no derivarlo del porcentaje actual. |
 | 009 — Despliegue, contenedores y reversión | Reservado: `ADR-009-tif-despliegue-y-reversion.md` | **Pendiente**. Compose sólo ejecuta PostgreSQL; Dockerfile construye backend. Falta despliegue integrado frontend/API, secretos persistentes, reversión y evidencia de entorno limpio. No hay pipeline versionado localizado en este corte. |
 | 010 — Medios de pago/tokenización | Reservado: `ADR-010-tif-medios-de-pago.md` | **Pendiente**. Fake interno, referencias y PDF de membresías existentes; contrastar integración de reservas, ausencia de datos de tarjeta y alcance de tokenización con M5. No afirmar proveedor remoto ni tokenización real de tarjetas. |
@@ -36,7 +36,7 @@ Se reserva el prefijo inequívoco `ADR-NNN-tif-`. No se crean archivos vacíos p
 
 [0007-actores-y-membresia.md](adr/0007-actores-y-membresia.md) queda **intacto**. Su ADR-007 es una serie histórica distinta: autoridades estables y condición comercial derivada, no reconciliación. En referencias nuevas se lo denomina **«ADR histórico H-0007 (archivo original 0007-actores-y-membresia.md)»**. El alias del índice no cambia su contenido, estado declarado ni identificador original.
 
-Los ADR de Drive quedan en sus documentos originales y se citan por título/sección/URL. Para conservarlos se propone mantener esta tabla de correspondencias, sin moverlos, borrar sus duplicados de origen ni atribuir aceptación nueva. Una futura decisión grupal puede archivar copias con prefijo histórico en una tarea separada; aquí no se importan documentos completos innecesarios.
+Los ADR de Drive quedan en sus documentos originales y se citan por título/sección/URL. Esta tabla conserva las correspondencias sin moverlos, borrar sus duplicados de origen ni alterar sus estados históricos. Una futura decisión grupal puede archivar copias con prefijo histórico en una tarea separada; aquí no se importan documentos completos innecesarios.
 
 | Referencia histórica | Correspondencia actual |
 |---|---|
@@ -52,7 +52,7 @@ Los ADR de Drive quedan en sus documentos originales y se citan por título/secc
 
 ## Inventario de diagramas y reutilización
 
-En el árbol Git del corte y en las referencias `origin/*` disponibles tras fetch no se localizaron fuentes C4/UML independientes ni una carpeta `docs/diagramas/` previa. [m2-offline.md](m2-offline.md) contiene un esquema Mermaid embebido: queda intacto y sirve de síntesis operativa, no se contabiliza como otro diagrama obligatorio con exportación.
+En el árbol Git del corte funcional `d4ceaa3` y en las referencias `origin/*` disponibles al elaborar esta documentación no se localizaron fuentes C4/UML independientes ni una carpeta `docs/diagramas/` previa. [m2-offline.md](m2-offline.md) contiene un esquema Mermaid embebido: queda intacto y sirve de síntesis operativa, no se contabiliza como otro diagrama obligatorio con exportación.
 
 Se accedió realmente a las dos carpetas de Drive indicadas y a sus documentos relevantes. Se descargaron y leyeron las imágenes C4 de contexto/contenedores y el XML Archi; el DOCX C4-3 fue recuperado como texto, sin inspeccionar su figura incrustada. No se afirma una revisión visual de esa figura.
 
@@ -74,18 +74,20 @@ Cada archivo `.drawio` es XML editable no comprimido y cada `.svg` es su represe
 
 | Alcance | Fuente editable | Exportación |
 |---|---|---|
-| C4-1 — Contexto implementado | [c4-01-contexto.drawio](diagramas/c4-01-contexto.drawio) | [SVG](diagramas/c4-01-contexto.svg) |
+| C4-1 — Contexto completo: capacidades actuales y previstas | [c4-01-contexto.drawio](diagramas/c4-01-contexto.drawio) | [SVG](diagramas/c4-01-contexto.svg) |
 | C4-2 — Contenedores y operación desconectada | [c4-02-contenedores.drawio](diagramas/c4-02-contenedores.drawio) | [SVG](diagramas/c4-02-contenedores.svg) |
-| C4-3 — Componentes M2 online/offline | [c4-03-m2.drawio](diagramas/c4-03-m2.drawio) | [SVG](diagramas/c4-03-m2.svg) |
+| C4-3 — Componentes del backend M2 | [c4-03-m2.drawio](diagramas/c4-03-m2.drawio) | [SVG](diagramas/c4-03-m2.svg) |
 | UML — Acceso offline y reconciliación | [uml-secuencia-acceso-offline.drawio](diagramas/uml-secuencia-acceso-offline.drawio) | [SVG](diagramas/uml-secuencia-acceso-offline.svg) |
 
-La secuencia es obligatoria en §5.3.2 de la versión de 25 páginas; no sustituye otra secuencia. La vista C4-3 coordina dos recuadros explícitos: componentes del frontend terminal y componentes del backend; IndexedDB/PostgreSQL siguen como contenedores de datos externos a esos recuadros. No convierte funciones JavaScript, servicios Java ni módulos M1–M5 en procesos desplegables.
+La secuencia es obligatoria en §5.3.2 de la versión de 25 páginas; no sustituye otra secuencia. Explicita que el socio puede obtener el lote con conexión propia después del corte de Recepción, siempre que el terminal conserve aprovisionamiento vigente. Si el socio también está desconectado, necesita ventanas previamente guardadas. La captura provisional, la cola durable, el ACK perdido y el reintento idempotente conservan su funcionamiento.
 
-En C4-1 se identifican los cuatro actores de negocio; Socio y Cliente corresponden a una autoridad técnica estable USUARIO con distinta condición comercial. La pasarela fake se menciona como capacidad interna: **no existe pasarela externa conectada en este corte**. Los C4 históricos que la mostraban externa por HTTPS requieren corrección. Un proveedor externo real y los flujos de reservas pendientes se contrastarán con M4/M5 antes del cierre; no se dibuja una dependencia remota inexistente para completar la figura.
+En C4-1 se muestran las responsabilidades de M1–M5 y los cuatro actores; Socio y Cliente corresponden a una autoridad técnica estable USUARIO con distinta condición comercial. La reserva de canchas sin membresía del cliente externo se identifica como capacidad prevista. La pasarela externa requerida figura como **integración prevista/no implementada**, con relación discontinua. `PasarelaPagoFake` sigue siendo interna al backend y no se representa como servicio remoto. Las relaciones actuales y futuras están rotuladas por separado.
+
+C4-2 representa un solo frontend React con instancias en distintos navegadores/dispositivos. IndexedDB y Cache Storage son mecanismos locales del navegador, visualmente distintos de los contenedores principales. C4-3 descompone únicamente la API backend M2: frontend/terminal y PostgreSQL quedan fuera de su límite. El detalle JavaScript continúa descrito en ADR-003/007 y en la secuencia, sin generar una quinta vista ni nuevos procesos de despliegue.
 
 ### Inventario obligatorio restante
 
-La tabla de §5.3 enumera 14 diagramas obligatorios: cuatro C4, siete UML y tres de datos/despliegue/integración. En esta etapa se preparan cuatro de esos catorce para revisión, **no se declaran catorce aprobados**.
+La tabla de §5.3 enumera 14 diagramas obligatorios: cuatro C4, siete UML y tres de datos/despliegue/integración. Esta etapa actualiza cuatro de esos catorce; los diez siguientes permanecen pendientes. **No se declara completo el inventario obligatorio.**
 
 | Diagrama restante | Dependencias de cierre |
 |---|---|
@@ -123,13 +125,13 @@ Los reportes locales pueden desaparecer; el repositorio conserva pruebas, runner
 | Numeraciones históricas incompatibles | Serie oficial `ADR-NNN-tif-`, alias H-0007 y correspondencias; originales preservados. |
 | Propuesta manual/consentimiento por sede vs. QR automático actual | Se documenta automático multisede como principal; circuitos anteriores sólo como compatibilidad. |
 | Propuesta de firmar en el móvil | No implementada: privada sólo en backend, móvil selecciona autorizaciones prefirmadas. |
-| Pasarela externa REST en C4 históricos | El fake es un bean interno sin red; proveedor externo pendiente de contraste M5. |
+| Pasarela externa REST en C4 históricos | El fake es un bean interno sin red; la pasarela externa se distingue como integración prevista/no implementada, pendiente de contraste M5. |
 | Fronteras de módulo estrictas propuestas | El código incluye SQL cruzado y base compartida; modularidad parcial, no aislamiento certificado. |
 | Esquema SQL por módulo propuesto en guía | Las migraciones reales usan tablas compartidas; no se representa un esquema `canchas_deportivas` inexistente. |
 | Unicidad de turno vs. ausencia de sobreventa | V1 no garantiza una reserva ocupante por turno; ADR-004 y pruebas RN-02 pendientes. |
-| RN-01 global vs. continuidad offline | Sólo prevención local/conocimiento disponible y conciliación posterior durante partición. Falta ratificar explícitamente el riesgo operativo. |
+| RN-01 global vs. continuidad offline | La decisión técnica adoptada conserva la prevención local y conciliación posterior; no garantiza doble presencia global ausente durante partición. La resolución administrativa de conflictos permanece pendiente. |
 | QR rotativo como prevención de capturas | Reduce ventana; no impide uso de capturas vigentes ni acredita identidad física. Revocación diferida. |
 | Históricos de pruebas incompletos vs. M2 actual | Se usa la sección más reciente y se inspeccionan reportes; no se afirma que las brechas antiguas sigan todas abiertas. |
 | Comentario de perfil obligatorio sin default vs. configuración | `spring.profiles.active` realmente tiene fallback `dev`; no se afirma fallo por ausencia de perfil ni se modifica la configuración. |
 
-Faltan ratificación de los seis textos, identificación de autores/sprints, confirmación de alternativas no acreditadas (SOA/serverless y estado/UI), aceptación expresa de límites offline y contraste M3/M4/M5. Para el cierre de entrega habrá que resolver los ADR Propuestos y los metadatos de diagramas: estos borradores no cumplen por sí solos el checklist final. La planificación y las bitácoras quedan fuera de esta tarea.
+Los seis ADR de esta etapa quedan Aceptados como decisiones técnicas adoptadas, manteniendo deuda y limitaciones. Faltan identificar autores/sprints no acreditados, conservar explícita la falta de evidencia de ciertas comparaciones históricas (SOA/serverless y estado/UI), contrastar M3/M4/M5 y completar los cuatro ADR y diez diagramas inventariados como pendientes. Los metadatos nominales de los diagramas tampoco se inventan. Este cierre parcial no completa el checklist global del TIF. La planificación y las bitácoras quedan fuera de esta tarea.

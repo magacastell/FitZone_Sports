@@ -1,7 +1,8 @@
 # ADR-006 — React, componentes propios y estado frontend
 
-- **Estado:** Propuesto
-- **Fecha:** 2026-11-10 (redacción documental; fecha de ratificación pendiente)
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** 2026-09-05 para React, consignada en el antecedente; no acreditada para la gestión de estado y componentes propios.
 - **Autor:** Pendiente de identificación y revisión grupal.
 - **Sprint:** Pendiente de contraste con la planificación histórica.
 
@@ -18,9 +19,9 @@ El [ADR-004 histórico de React](https://docs.google.com/document/d/1sgUz-_ovSKQ
 | Vue | Componentes reactivos y consumo REST; contemplado por el enunciado. | Requería adoptar su ecosistema en lugar del elegido. | El antecedente priorizó React para el enfoque de componentes del equipo; no aportó benchmark. |
 | HTML/CSS/JavaScript sin React | Menos dependencias y configuración inicial. | Reutilización, actualización del DOM y organización del estado debían resolverse manualmente al crecer las pantallas. | Razón registrada en el antecedente de React. |
 | React | Composición y estado declarativo para interfaces dinámicas. | Necesita decisiones adicionales de rutas, estado, errores y persistencia. | Adoptada y verificable en el código. |
-| Context/hook local + componentes propios | Coincide con la implementación, sin un store central de todo el dominio. | Coordinación de peticiones y estados repartida entre pantallas. | Adoptada de hecho; falta acta de elección comparativa para estado/UI. |
+| Context/hook local + componentes propios | Coincide con la implementación, sin un store central de todo el dominio. | Coordinación de peticiones y estados repartida entre pantallas. | Adoptada; no consta una evaluación comparativa histórica de estado/UI. |
 
-No hay evidencia de evaluación real Redux/Zustand, Material UI u otras bibliotecas. No se inventan descartes. La revisión grupal debe ratificar el uso actual de Context y componentes propios como decisión explícita.
+No hay evidencia de evaluación real Redux/Zustand, Material UI u otras bibliotecas. No se inventan descartes. El uso actual de Context y componentes propios se registra como decisión técnica adoptada, sin atribuir al equipo comparaciones no documentadas.
 
 ## Decisión
 
@@ -42,7 +43,7 @@ Esta distribución permite reutilizar controles y separar estado efímero, sesi�
 
 - **Positivas:** presentación reutilizable; rutas por actor y módulos; recuperación offline persistente sin exigir un proceso local; reglas de negocio centrales conservadas en backend.
 - **Negativas:** coordinación manual de efectos, peticiones, temporizadores y actualizaciones entre vistas; token accesible al JavaScript del origen en `localStorage`; obligación de proteger el contexto del navegador. Un guard visual no protege datos de la API.
-- **Deuda asumida:** no consta selección formal de estado global/UI; no hay instrumentación de cobertura frontend. Los harness VM no reproducen todo React real. IndexedDB puede perderse al borrar el perfil y no sustituye un respaldo. M3/M4 muestran estados de servicio pendiente y necesitan contraste con sus responsables.
+- **Deuda asumida:** no consta evaluación comparativa histórica de estado global/UI; no hay instrumentación de cobertura frontend. Los harness VM no reproducen todo React real. IndexedDB puede perderse al borrar el perfil y no sustituye un respaldo. M3/M4 muestran estados de servicio pendiente y necesitan contraste con sus responsables.
 
 ## Requisitos relacionados
 
@@ -50,4 +51,4 @@ Unidad IV (disparador oficial), RF-01, RF-02, RF-04, RF-05 y RNF-01; interfaces 
 
 ## Validación y límites
 
-Se leyeron componentes, Context, servicios, scripts de prueba y build PWA. Las seis suites Node y el build están documentados en [pruebas](../pruebas.md); los reportes recuperables y la E2E real de M2 se describen en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). Son verificaciones preexistentes, no ejecuciones nuevas. No acreditan usabilidad completa, cobertura frontend ni operaciones pendientes de M3/M4. Autor, sprint y ratificación del enfoque de estado/UI quedan pendientes. Ver [ADR-007](ADR-007-tif-replica-y-reconciliacion.md) para datos durables y [C4-2](../diagramas/c4-02-contenedores.svg) para sus instancias de ejecución.
+Se leyeron componentes, Context, servicios, scripts de prueba y build PWA. Las seis suites Node y el build están documentados en [pruebas](../pruebas.md); los reportes recuperables y la E2E real de M2 se describen en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). Son verificaciones preexistentes, no ejecuciones nuevas. No acreditan usabilidad completa, cobertura frontend ni operaciones pendientes de M3/M4. El enfoque técnico está Aceptado; autor y sprint siguen sin acreditarse. Ver [ADR-007](ADR-007-tif-replica-y-reconciliacion.md) para datos durables y [C4-2](../diagramas/c4-02-contenedores.svg) para sus instancias de ejecución.

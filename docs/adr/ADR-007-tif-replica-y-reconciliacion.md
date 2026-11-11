@@ -1,7 +1,8 @@
 # ADR-007 — Réplica local acotada, cola de movimientos y reconciliación offline
 
-- **Estado:** Propuesto
-- **Fecha:** 2026-11-10 (redacción documental; fecha de ratificación pendiente)
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** No acreditada en las fuentes consultadas.
 - **Autor:** Pendiente de identificación y revisión grupal.
 - **Sprint:** Pendiente de contraste con la planificación histórica.
 
@@ -61,4 +62,4 @@ RNF-01 y RN-01 (disparadores oficiales), RF-04 y RF-05. [ADR-003](ADR-003-tif-va
 
 ## Validación y límites
 
-`OfflineIntegrationTest` cubre batch desordenado, egreso anticipado, UUID con payload distinto, sincronización tardía, suspensión diferida y conflictos multisede incluso de visitas cerradas. `test-offline.mjs` usa Node/fake-indexeddb para transacciones, replay y transporte incierto; no equivale a navegador. La E2E existente usa Chrome real, Spring/PostgreSQL aislados, caída de red, reapertura, reinicio con clave estable y respuesta perdida tras commit: [evidencia consultada](../arquitectura-tif.md#evidencia-de-validación-consultada). No se ejecutó de nuevo en esta tarea. No acredita SLA ni resistencia a robo/manipulación. Falta ratificar esta política de continuidad/conflicto, autor y sprint. Ver [secuencia UML](../diagramas/uml-secuencia-acceso-offline.svg).
+`OfflineIntegrationTest` cubre batch desordenado, egreso anticipado, UUID con payload distinto, sincronización tardía, suspensión diferida y conflictos multisede incluso de visitas cerradas. `test-offline.mjs` usa Node/fake-indexeddb para transacciones, replay y transporte incierto; no equivale a navegador. La E2E existente usa Chrome real, Spring/PostgreSQL aislados, caída de red, reapertura, reinicio con clave estable y respuesta perdida tras commit: [evidencia consultada](../arquitectura-tif.md#evidencia-de-validación-consultada). No se ejecutó de nuevo en esta tarea. No acredita SLA ni resistencia a robo/manipulación. La política técnica de continuidad y reconciliación está Aceptada con las limitaciones expuestas; autor y sprint siguen sin acreditarse. Ver [secuencia UML](../diagramas/uml-secuencia-acceso-offline.svg).

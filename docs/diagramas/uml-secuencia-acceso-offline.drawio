@@ -1,44 +1,44 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mxfile host="app.diagrams.net" version="24.7.17">
   <diagram name="FitZone Sports | UML — Acceso offline y reconciliación" id="uml-secuencia-acceso-offline">
-    <mxGraphModel dx="1800" dy="2140" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1800" pageHeight="2140" math="0" shadow="0">
+    <mxGraphModel dx="1800" dy="2240" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1800" pageHeight="2240" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="e5" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#a5b4c5;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="180" y="205" as="sourcePoint" />
-            <mxPoint x="180" y="1990" as="targetPoint" />
+            <mxPoint x="180" y="2090" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e7" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#a5b4c5;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="540" y="205" as="sourcePoint" />
-            <mxPoint x="540" y="1990" as="targetPoint" />
+            <mxPoint x="540" y="2090" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e9" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#a5b4c5;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="900" y="205" as="sourcePoint" />
-            <mxPoint x="900" y="1990" as="targetPoint" />
+            <mxPoint x="900" y="2090" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e11" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#a5b4c5;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1260" y="205" as="sourcePoint" />
-            <mxPoint x="1260" y="1990" as="targetPoint" />
+            <mxPoint x="1260" y="2090" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e13" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#a5b4c5;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1620" y="205" as="sourcePoint" />
-            <mxPoint x="1620" y="1990" as="targetPoint" />
+            <mxPoint x="1620" y="2090" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e54" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+        <mxCell id="e55" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=none;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="395" y="1790" as="sourcePoint" />
-            <mxPoint x="1745" y="1790" as="targetPoint" />
+            <mxPoint x="395" y="1890" as="sourcePoint" />
+            <mxPoint x="1745" y="1890" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e4" value="Portal del socio&#10;React / Mi QR" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
@@ -56,29 +56,32 @@
         <mxCell id="e12" value="PostgreSQL&#10;central" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="1485" y="125" width="270" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="e14" value="1. Con conexión: preparación autenticada y obtención automática" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+        <mxCell id="e14" value="1. Con conexión de Recepción: aprovisionar el terminal antes de su desconexión" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="40" y="225" width="1720" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e27" value="2. Sin comunicación con el central: selección local, verificación y captura provisional" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="645" width="1720" height="32" as="geometry" />
+        <mxCell id="e23" value="2. Recepción pierde conectividad; el socio puede seguir conectado por su propia red" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="1720" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e28" value="Seleccionar ventana vigente&#10;del lote guardado&#10;(no se firma en el móvil)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#fff8dc;strokeColor=#ad8c40;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="45" y="695" width="270" height="75" as="geometry" />
+        <mxCell id="e28" value="3. Terminal sin conexión al central: validación local y captura provisional" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="745" width="1720" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e31" value="Terminal: validar copia/operador, firma con JWK confiable,&#10;audiencia, kid, tipo, fechas, bloqueos y presencia conocidos." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#fff8dc;strokeColor=#ad8c40;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="395" y="850" width="650" height="80" as="geometry" />
+        <mxCell id="e29" value="Selecciona ventana guardada.&#10;Si el socio también está sin red,&#10;necesita un lote previo vigente." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#fff8dc;strokeColor=#ad8c40;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="45" y="790" width="270" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="e36" value="UI de Recepción: ingreso y aforo provisionales; cola PENDIENTE." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#fff8dc;strokeColor=#ad8c40;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="395" y="1090" width="650" height="55" as="geometry" />
+        <mxCell id="e32" value="Terminal: validar copia/operador, firma con JWK confiable,&#10;audiencia, kid, tipo, fechas, bloqueos y presencia conocidos." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#fff8dc;strokeColor=#ad8c40;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="395" y="950" width="650" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="e37" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="395" y="1180" width="650" height="130" as="geometry" />
+        <mxCell id="e37" value="UI de Recepción: ingreso y aforo provisionales; cola PENDIENTE." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#fff8dc;strokeColor=#ad8c40;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="395" y="1190" width="650" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e41" value="3. Reconexión: sesión válida del operador original, sincronización transaccional y ACK" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="1350" width="1720" height="32" as="geometry" />
+        <mxCell id="e38" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="395" y="1280" width="650" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="e48" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="395" y="1610" width="1350" height="330" as="geometry" />
+        <mxCell id="e42" value="4. Reconexión de Recepción: sesión del operador original, sincronización transaccional y ACK" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#edf2f7;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1450" width="1720" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="e49" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="395" y="1710" width="1350" height="330" as="geometry" />
         </mxCell>
         <mxCell id="e15" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
@@ -104,88 +107,88 @@
             <mxPoint x="900" y="480" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e23" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e24" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="180" y="540" as="sourcePoint" />
-            <mxPoint x="1260" y="540" as="targetPoint" />
+            <mxPoint x="180" y="610" as="sourcePoint" />
+            <mxPoint x="1260" y="610" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e25" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+        <mxCell id="e26" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1260" y="600" as="sourcePoint" />
-            <mxPoint x="180" y="600" as="targetPoint" />
+            <mxPoint x="1260" y="670" as="sourcePoint" />
+            <mxPoint x="180" y="670" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e29" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e30" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="180" y="815" as="sourcePoint" />
-            <mxPoint x="540" y="815" as="targetPoint" />
+            <mxPoint x="180" y="925" as="sourcePoint" />
+            <mxPoint x="540" y="925" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e32" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e33" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="990" as="sourcePoint" />
-            <mxPoint x="900" y="990" as="targetPoint" />
+            <mxPoint x="540" y="1090" as="sourcePoint" />
+            <mxPoint x="900" y="1090" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e34" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+        <mxCell id="e35" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="900" y="1050" as="sourcePoint" />
-            <mxPoint x="540" y="1050" as="targetPoint" />
+            <mxPoint x="900" y="1150" as="sourcePoint" />
+            <mxPoint x="540" y="1150" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e39" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e40" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="1280" as="sourcePoint" />
-            <mxPoint x="900" y="1280" as="targetPoint" />
+            <mxPoint x="540" y="1380" as="sourcePoint" />
+            <mxPoint x="900" y="1380" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e42" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e43" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="1440" as="sourcePoint" />
-            <mxPoint x="1260" y="1440" as="targetPoint" />
+            <mxPoint x="540" y="1540" as="sourcePoint" />
+            <mxPoint x="1260" y="1540" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e44" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e45" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1260" y="1500" as="sourcePoint" />
-            <mxPoint x="1620" y="1500" as="targetPoint" />
+            <mxPoint x="1260" y="1600" as="sourcePoint" />
+            <mxPoint x="1620" y="1600" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e46" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+        <mxCell id="e47" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1620" y="1560" as="sourcePoint" />
-            <mxPoint x="1260" y="1560" as="targetPoint" />
+            <mxPoint x="1620" y="1660" as="sourcePoint" />
+            <mxPoint x="1260" y="1660" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e50" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+        <mxCell id="e51" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1260" y="1690" as="sourcePoint" />
-            <mxPoint x="540" y="1690" as="targetPoint" />
+            <mxPoint x="1260" y="1790" as="sourcePoint" />
+            <mxPoint x="540" y="1790" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e52" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e53" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="1750" as="sourcePoint" />
-            <mxPoint x="900" y="1750" as="targetPoint" />
+            <mxPoint x="540" y="1850" as="sourcePoint" />
+            <mxPoint x="900" y="1850" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e56" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+        <mxCell id="e57" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="1870" as="sourcePoint" />
-            <mxPoint x="1260" y="1870" as="targetPoint" />
+            <mxPoint x="540" y="1970" as="sourcePoint" />
+            <mxPoint x="1260" y="1970" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e58" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+        <mxCell id="e59" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1260" y="1920" as="sourcePoint" />
-            <mxPoint x="540" y="1920" as="targetPoint" />
+            <mxPoint x="1260" y="2020" as="sourcePoint" />
+            <mxPoint x="540" y="2020" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e2" value="FitZone Sports | UML — Acceso offline y reconciliación" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=26;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="25" width="1730" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="e3" value="Escenario del QR automático; egreso y reintentos conservan la visita/evento original. No se garantiza RN-01 entre sedes aisladas." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e3" value="Recepción puede estar sin red y el socio obtener el QR con conexión propia. La terminal requiere aprovisionamiento previo vigente." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="65" width="1730" height="35" as="geometry" />
         </mxCell>
         <mxCell id="e16" value="POST /preparacion (terminalId; sesión de Recepción)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
@@ -200,62 +203,62 @@
         <mxCell id="e22" value="Verificar y guardar copia / confianza" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="550" y="437" width="340" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e24" value="POST /credenciales/automaticas (sesión del socio; sin sede)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="190" y="497" width="1060" height="36" as="geometry" />
+        <mxCell id="e25" value="POST /credenciales/automaticas por la conexión del socio (sesión válida; sin sede)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="190" y="567" width="1060" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e26" value="Ventanas RS256 ≤ 60 s, períodos pagados y horizonte ≤ 2 h; el portal guarda el lote en su propio IndexedDB" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="190" y="557" width="1060" height="36" as="geometry" />
+        <mxCell id="e27" value="Ventanas RS256 ≤ 60 s, períodos pagados y horizonte ≤ 2 h; guardar lote en IndexedDB del socio" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="190" y="627" width="1060" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e30" value="Mostrar / leer QR vigente" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="190" y="772" width="340" height="36" as="geometry" />
+        <mxCell id="e31" value="Mostrar / leer QR vigente" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="190" y="882" width="340" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e33" value="Transacción: evento UUID + presencia +&#10;uso jti + secuencia" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="928" width="340" height="55" as="geometry" />
+        <mxCell id="e34" value="Transacción: evento UUID + presencia +&#10;uso jti + secuencia" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1028" width="340" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e35" value="Commit local; si falla, no hay éxito" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1007" width="340" height="36" as="geometry" />
+        <mxCell id="e36" value="Commit local; si falla, no hay éxito" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1107" width="340" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e38" value="opt [egreso con copia vigente]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="410" y="1185" width="620" height="32" as="geometry" />
+        <mxCell id="e39" value="opt [egreso con copia vigente]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1285" width="620" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e40" value="SALIDA: misma visita, otro UUID;&#10;actualizar presencia y cola" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1218" width="340" height="55" as="geometry" />
+        <mxCell id="e41" value="SALIDA: misma visita, otro UUID;&#10;actualizar presencia y cola" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1318" width="340" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e43" value="POST /sincronizacion: ≤ 100 eventos con UUID original y revisión" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1397" width="700" height="36" as="geometry" />
+        <mxCell id="e44" value="POST /sincronizacion: ≤ 100 eventos con UUID original y revisión" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1497" width="700" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e45" value="TX: inbox y bloqueo; integrar visita o&#10;conservar conflicto" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1270" y="1438" width="340" height="55" as="geometry" />
+        <mxCell id="e46" value="TX: inbox y bloqueo; integrar visita o&#10;conservar conflicto" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1270" y="1538" width="340" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e47" value="Commit conjunto de inbox, resultado y&#10;acceso" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1270" y="1498" width="340" height="55" as="geometry" />
+        <mxCell id="e48" value="Commit conjunto de inbox, resultado y&#10;acceso" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1270" y="1598" width="340" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e49" value="alt [ACK recibido]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="410" y="1613" width="1315" height="30" as="geometry" />
+        <mxCell id="e50" value="alt [ACK recibido]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1713" width="1315" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="e51" value="Por UUID: CONFIRMADO / CONFLICTO / RECHAZADO / EN_ESPERA" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1647" width="700" height="36" as="geometry" />
+        <mxCell id="e52" value="Por UUID: CONFIRMADO / CONFLICTO / RECHAZADO / EN_ESPERA" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1747" width="700" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e53" value="Guardar resultado; EN_ESPERA sigue&#10;PENDIENTE" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1688" width="340" height="55" as="geometry" />
+        <mxCell id="e54" value="Guardar resultado; EN_ESPERA sigue&#10;PENDIENTE" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1788" width="340" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e55" value="[respuesta perdida: conservar pendientes y reintentar]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="410" y="1797" width="1315" height="30" as="geometry" />
+        <mxCell id="e56" value="[respuesta perdida: conservar pendientes y reintentar]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1897" width="1315" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="e57" value="Reintentar mismo UUID y contenido (no crear otro evento)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1827" width="700" height="36" as="geometry" />
+        <mxCell id="e58" value="Reintentar mismo UUID y contenido (no crear otro evento)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1927" width="700" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e59" value="Resultado almacenado (repetido=true); sin nueva visita" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="550" y="1877" width="700" height="36" as="geometry" />
+        <mxCell id="e60" value="Resultado almacenado (repetido=true); sin nueva visita" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="1977" width="700" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="e60" value="Copia validada al capturar; recibirla vencida no invalida por sí solo el evento. Conflictos preservados; resolución administrativa pendiente." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="45" y="1965" width="1710" height="55" as="geometry" />
+        <mxCell id="e61" value="Copia validada al capturar; caducidad posterior no invalida por sí sola el evento. Conflictos preservados; RN-01 global no garantizado sin red." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="45" y="2065" width="1710" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="e61" value="UML: línea continua = llamada; discontinua = respuesta / línea de vida; opt/alt = fragmentos combinados; notas = acciones y condiciones." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="35" y="2049" width="1730" height="32" as="geometry" />
+        <mxCell id="e62" value="UML: continua = llamada; discontinua = respuesta / línea de vida; opt/alt = fragmentos combinados. La caída afecta a Recepción, no necesariamente al socio." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="2149" width="1730" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e62" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v1 | Código: d4ceaa3" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="35" y="2088" width="1730" height="30" as="geometry" />
+        <mxCell id="e63" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v2 | Código: d4ceaa3" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="2188" width="1730" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -1,7 +1,8 @@
 # ADR-005 — Spring Boot, inyección de dependencias y persistencia híbrida JPA/SQL
 
-- **Estado:** Propuesto
-- **Fecha:** 2026-11-10 (redacción documental; fecha de ratificación pendiente)
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** No acreditada; el antecedente de backend registraba una propuesta.
 - **Autor:** Pendiente de identificación y revisión grupal.
 - **Sprint:** Pendiente de contraste con la planificación histórica.
 
@@ -51,4 +52,4 @@ Unidad II (disparador oficial), Repository/ORM del enunciado p. 15, RF-01, RF-02
 
 ## Validación y límites
 
-Se contrastaron entidades, servicios, repositorios, migraciones y tests del corte `d4ceaa3`. Los reportes existentes incluyen pruebas con Spring/PostgreSQL, tests de servicios con dobles y validación de contratos: ver [evidencia](../arquitectura-tif.md#evidencia-de-validación-consultada). No se corrieron nuevas pruebas de negocio ni se certifica ausencia de N+1 o desacoplamiento completo. Estado, autor y sprint pendientes de ratificación. Ver [componentes M2](../diagramas/c4-03-m2.svg).
+Se contrastaron entidades, servicios, repositorios, migraciones y tests del corte `d4ceaa3`. Los reportes existentes incluyen pruebas con Spring/PostgreSQL, tests de servicios con dobles y validación de contratos: ver [evidencia](../arquitectura-tif.md#evidencia-de-validación-consultada). No se corrieron nuevas pruebas de negocio ni se certifica ausencia de N+1 o desacoplamiento completo. La decisión técnica se registra como Aceptada; autor y sprint quedan pendientes de identificación histórica. Ver [componentes M2](../diagramas/c4-03-m2.svg).

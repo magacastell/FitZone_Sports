@@ -1,7 +1,8 @@
 # ADR-003 — Validación del QR sin conexión al sistema central
 
-- **Estado:** Propuesto
-- **Fecha:** 2026-11-10 (redacción documental; fecha de ratificación pendiente)
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** No acreditada en las fuentes consultadas.
 - **Autor:** Pendiente de identificación y revisión grupal.
 - **Sprint:** Pendiente de contraste con la planificación histórica.
 
@@ -49,4 +50,4 @@ RNF-01 (disparador oficial), RF-03, RF-04, RF-05 y RN-01. El objetivo de disponi
 
 ## Validación y límites
 
-Se contrastó con [OpenAPI](../openapi/openapi.yaml), `FirmaOfflineTest`, `OfflineIntegrationTest` y `frontend/scripts/test-offline.mjs`, además de reportes y E2E existentes detallados en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). Hay evidencia de socio posterior al corte, rotación real tras 65 segundos, rechazo de clave/permiso inválidos y suspensión conocida/diferida. No se acredita SLA, invulnerabilidad del dispositivo ni revocación inmediata. Ratificación grupal pendiente. Ver [C4 M2](../diagramas/c4-03-m2.svg) y [secuencia offline](../diagramas/uml-secuencia-acceso-offline.svg).
+Se contrastó con [OpenAPI](../openapi/openapi.yaml), `FirmaOfflineTest`, `OfflineIntegrationTest` y `frontend/scripts/test-offline.mjs`, además de reportes y E2E existentes detallados en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). Hay evidencia de socio posterior al corte, rotación real tras 65 segundos, rechazo de clave/permiso inválidos y suspensión conocida/diferida. No se acredita SLA, invulnerabilidad del dispositivo ni revocación inmediata. La aceptación de la decisión técnica conserva esos límites; autor y sprint siguen sin acreditarse. Ver [C4 M2](../diagramas/c4-03-m2.svg) y [secuencia offline](../diagramas/uml-secuencia-acceso-offline.svg).

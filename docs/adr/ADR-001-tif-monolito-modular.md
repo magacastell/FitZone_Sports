@@ -1,7 +1,8 @@
 # ADR-001 — Monolito modular para el backend de FitZone Sports
 
-- **Estado:** Propuesto
-- **Fecha:** 2026-11-10 (redacción documental; fecha de ratificación pendiente)
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** 2026-09-05, consignada en el antecedente de Unidad I.
 - **Autor:** Pendiente de identificación y revisión grupal.
 - **Sprint:** Pendiente de contraste con la planificación histórica.
 
@@ -9,7 +10,7 @@
 
 El sistema necesitaba integrar usuarios y membresías (M1), acceso (M2), clases (M3), canchas (M4) y pagos (M5). RN-02 exigía evitar reservas concurrentes del mismo turno y RNF-04 permitía incorporar sedes sin detener el sistema. El equipo contaba con seis integrantes, según la información aportada para este cierre; no se reconstruye su dedicación ni su planificación.
 
-El enunciado, p. 14, definía monolito modular y PostgreSQL. El antecedente [Unidad I, §3.1](https://docs.google.com/document/d/1sgUz-_ovSKQPJSD3dFt6M5ycwiDxV6LK/edit) registró la elección como aceptada el 2026-09-05. Ese estado histórico no equivale a aprobación de esta nueva redacción ni prueba aislamiento efectivo entre módulos.
+El enunciado, p. 14, definía monolito modular y PostgreSQL. El antecedente [Unidad I, §3.1](https://docs.google.com/document/d/1sgUz-_ovSKQPJSD3dFt6M5ycwiDxV6LK/edit) registró la elección como aceptada el 2026-09-05. Ese registro histórico no prueba aislamiento efectivo entre módulos.
 
 ## Alternativas consideradas
 
@@ -47,4 +48,4 @@ RN-02 y RNF-04 (disparadores oficiales); RF-01 a RF-14 como alcance funcional. L
 
 ## Validación y límites
 
-La topología se verificó en `d4ceaa33bd7a8a588ccab2a9789a875a9f31ba15`. La suite backend existente y sus límites se identifican en el [índice de arquitectura](../arquitectura-tif.md#evidencia-de-validación-consultada). No valida separación estricta de módulos ni RN-02 de M4: sus controllers siguen parcialmente en 501. SOA/serverless, autor, sprint y ratificación del texto quedan pendientes. Ver [C4 de contenedores](../diagramas/c4-02-contenedores.svg).
+La topología se verificó en `d4ceaa33bd7a8a588ccab2a9789a875a9f31ba15`. La suite backend existente y sus límites se identifican en el [índice de arquitectura](../arquitectura-tif.md#evidencia-de-validación-consultada). No valida separación estricta de módulos ni RN-02 de M4: sus controllers siguen parcialmente en 501. La consideración histórica de SOA/serverless y los metadatos de autor/sprint no están acreditados. El estado Aceptado registra la decisión técnica adoptada, sin acreditar los requisitos pendientes. Ver [C4 de contenedores](../diagramas/c4-02-contenedores.svg).

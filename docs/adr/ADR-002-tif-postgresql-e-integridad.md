@@ -1,7 +1,8 @@
 # ADR-002 — PostgreSQL, persistencia e integridad de datos
 
-- **Estado:** Propuesto
-- **Fecha:** 2026-11-10 (redacción documental; fecha de ratificación pendiente)
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** 2026-09-03 para PostgreSQL, consignada en el antecedente de Unidad I; no acreditada para la adopción de Flyway.
 - **Autor:** Pendiente de identificación y revisión grupal.
 - **Sprint:** Pendiente de contraste con la planificación histórica.
 
@@ -13,10 +14,21 @@ Era necesario, además, reproducir la evolución del esquema entre entornos. El 
 
 ## Alternativas consideradas
 
+### Motor de base de datos
+
+PostgreSQL fue definido por el enunciado y justificado por integridad transaccional. Las fuentes no acreditan una selección comparativa entre motores; no se atribuye al equipo un descarte de MySQL, MongoDB u otro producto.
+
 | Alternativa | A favor | En contra | Por qué se descartó |
 |---|---|---|---|
 | PostgreSQL relacional | Restricciones, relaciones y transacciones adecuadas al dominio; coincide con el enunciado. | Exige diseñar consultas, índices, migraciones y operación del motor. | Adoptada por definición técnica; no fue el resultado de un benchmark de motores. |
 | Otros motores | No consta evaluación comparativa. | No consta análisis del equipo. | No se afirma descarte técnico: quedan fuera de la elección fijada por la cátedra. |
+
+### Gestión de la evolución del esquema
+
+Esta comparación corresponde a herramientas y procedimientos de migración sobre PostgreSQL. Es una decisión complementaria a la elección del motor; sus alternativas históricas proceden del antecedente de Flyway.
+
+| Alternativa | A favor | En contra | Por qué se descartó |
+|---|---|---|---|
 | SQL aplicado manualmente | Control directo sobre cada cambio. | No registra automáticamente orden y estado de aplicación en cada entorno. | Antecedente Flyway: riesgo de omisiones y divergencias. |
 | Hibernate `ddl-auto=update` | Facilita evolución inicial desde entidades. | No ofrece el historial SQL revisable requerido para coordinar el esquema. | Antecedente Flyway: se prefirió control explícito. |
 | Liquibase | También permite versionar el esquema y usar distintos formatos. | Más posibilidades/configuración que las necesarias según el antecedente. | La fuente eligió la integración sencilla de Flyway con SQL. |
@@ -50,4 +62,4 @@ RNF-03 (disparador oficial), RN-01, RN-02, RF-01, RF-02, RF-04, RF-05, RF-13 y R
 
 ## Validación y límites
 
-Se consultaron las 14 migraciones, entidades y repositorios del corte `d4ceaa3`, las pruebas de persistencia/integración y los reportes existentes citados en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). No se ejecutaron nuevas pruebas de negocio ni se fijó un umbral de rendimiento. La aprobación histórica del motor no ratifica este texto completo. Faltan autor, sprint, revisión grupal y evidencia de RN-02/RNF-03. Ver [ADR-005](ADR-005-tif-spring-di-y-persistencia.md).
+Se consultaron las 14 migraciones, entidades y repositorios del corte `d4ceaa3`, las pruebas de persistencia/integración y los reportes existentes citados en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). No se ejecutaron nuevas pruebas de negocio ni se fijó un umbral de rendimiento. El estado Aceptado registra el uso técnico adoptado de PostgreSQL y Flyway; siguen pendientes los metadatos de autor/sprint y la evidencia de RN-02/RNF-03. Ver [ADR-005](ADR-005-tif-spring-di-y-persistencia.md).
