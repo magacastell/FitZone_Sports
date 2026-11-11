@@ -189,7 +189,7 @@ function LayoutAutenticado() {
             <div className="app-nav__group">
               <p className="app-nav__heading" id="nav-gestion">{rolActivo === 'RECEPCION' ? 'Admin de Sede' : 'Administración global'}</p>
               <ul className="app-nav__list" aria-labelledby="nav-gestion">
-                {rolActivo === 'GERENTE' && <><NavigationLink to="/gestion/panel" icon={LayoutGrid}>Panel general</NavigationLink><NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink><NavigationLink to="/gestion/sedes" icon={MapPin}>Sedes</NavigationLink><NavigationLink to="/gestion/usuarios" icon={UserRound}>Usuarios / Membresías</NavigationLink><NavigationLink to="/gestion/reportes" icon={ReceiptText}>Reportes</NavigationLink></>}
+                {rolActivo === 'GERENTE' && <><NavigationLink to="/gestion/panel" icon={LayoutGrid}>Panel general</NavigationLink><NavigationLink to="/gestion/planes" icon={List}>Planes</NavigationLink><NavigationLink to="/gestion/sedes" icon={MapPin}>Sedes</NavigationLink><NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink><NavigationLink to="/gestion/usuarios" icon={UserRound}>Usuarios / Membresías</NavigationLink><NavigationLink to="/gestion/reportes" icon={ReceiptText}>Reportes</NavigationLink></>}
                 {rolActivo === 'RECEPCION' && <NavigationLink to="/recepcion/acceso" icon={DoorOpen}>Control de acceso</NavigationLink>}
                 {rolActivo === 'RECEPCION' && <><NavigationLink to="/recepcion/aforo" icon={LayoutGrid}>Aforo</NavigationLink><NavigationLink to="/clases" icon={CalendarDays}>Clases</NavigationLink><NavigationLink to="/canchas" icon={List}>Canchas</NavigationLink></>}
               </ul>
