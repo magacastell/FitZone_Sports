@@ -26,10 +26,10 @@
         <mxCell id="e11" value="Terminal de sede / PWA&#10;[Instancia del mismo frontend: navegador de sede]&#10;Validación local, movimientos y aforo provisional" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="100" y="505" width="570" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="e14" value="API backend — monolito modular&#10;[Container: Java 21 / Spring Boot 4.1.1]&#10;M1/M2 y pagos de membresía implementados;&#10;M3/M4 parcialmente pendientes.&#10;PasarelaPagoFake interna: invocación Java, sin REST." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=19;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+        <mxCell id="e14" value="API backend — monolito modular&#10;[Container: Java 21 / Spring Boot 4.1.1]&#10;M1/M2 y pagos de membresía; M3 incorporado:&#10;agenda, reservas, espera y Observer (avisos por log).&#10;M3: asistencia/penalidades pendientes; M4 parcial.&#10;PasarelaPagoFake interna, sin REST." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=19;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="890" y="385" width="580" height="205" as="geometry" />
         </mxCell>
-        <mxCell id="e15" value="PostgreSQL central&#10;[Container: base de datos relacional]&#10;Flyway V1–V14 · tablas compartidas e inbox offline" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=20;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+        <mxCell id="e15" value="PostgreSQL central&#10;[Container: base de datos relacional]&#10;Flyway V1–V15 · tablas compartidas e inbox offline" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=20;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="890" y="775" width="580" height="125" as="geometry" />
         </mxCell>
         <mxCell id="e28" value="IndexedDB y Cache Storage pertenecen al navegador; no son servidores ni procesos desplegables. Cada equipo guarda su propia copia.&#10;Offline: copia y ventanas vigentes. Sin servidor local ni réplica física de PostgreSQL en sede." style="rounded=0;whiteSpace=wrap;html=0;fillColor=white;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
@@ -119,7 +119,7 @@
         <mxCell id="e29" value="Azul: aplicaciones; PostgreSQL: contenedor de datos; verde punteado: mecanismos locales; relación discontinua: dependiente de red." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="1099" width="1530" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e30" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v2 | Código: d4ceaa3" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e30" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v3 | Código: 5f71e61" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="1138" width="1530" height="30" as="geometry" />
         </mxCell>
       </root>

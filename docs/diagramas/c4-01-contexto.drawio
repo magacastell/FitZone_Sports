@@ -23,7 +23,7 @@
         <mxCell id="e8" value="FitZone Sports&#10;[Software System]&#10;M1 — Usuarios y membresías&#10;M2 — Acceso y aforo · M3 — Clases grupales&#10;M4 — Reservas de canchas&#10;M5 — Pagos y comprobantes" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=22;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="370" y="500" width="780" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="e20" value="Implementado: M1/M2 y cobros/comprobantes de membresía.&#10;M3/M4 y el resto de M5 requieren contraste con sus responsables.&#10;PasarelaPagoFake es interna al backend; no es un servicio remoto." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+        <mxCell id="e20" value="Incorporado: M1/M2, agenda/reservas/espera M3 y pagos de membresía.&#10;M3: asistencia y penalidades pendientes; avisos simulados por log.&#10;M4 y resto de M5 pendientes; PasarelaPagoFake interna, sin red." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
           <mxGeometry x="40" y="830" width="1030" height="125" as="geometry" />
         </mxCell>
         <mxCell id="e9" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
@@ -62,19 +62,19 @@
         <mxCell id="e2" value="FitZone Sports | C4 nivel 1 — Contexto del sistema completo" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=26;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="25" width="1450" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="e3" value="Alcance de negocio M1–M5. Se distingue capacidad actual de prevista; el corte funcional continúa siendo d4ceaa3." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e3" value="Alcance M1–M5 en 5f71e61. [Actual] identifica código incorporado; no certifica cumplimiento completo de requisitos." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="65" width="1450" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="e10" value="Gestiona membresía y QR [actual]&#10;Reserva clases y canchas [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e10" value="Gestiona membresía, QR y clases [actual]&#10;Reserva canchas [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="40" y="340" width="330" height="90" as="geometry" />
         </mxCell>
         <mxCell id="e12" value="Consulta planes / contrata [actual]&#10;Reserva canchas sin membresía [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="410" y="340" width="330" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="e14" value="Controla accesos y aforo [actual]&#10;Gestiona agenda/canchas [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e14" value="Gestiona accesos, aforo y agenda [actual]&#10;Gestiona canchas [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="780" y="340" width="330" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="e16" value="Administra planes y sedes [actual]&#10;Consulta reportes [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e16" value="Administra planes, sedes y clases [actual]&#10;Consulta reportes [previsto]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="1150" y="340" width="330" height="90" as="geometry" />
         </mxCell>
         <mxCell id="e19" value="M5: cobro / resultado&#10;[relación prevista, sin tráfico real]" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
@@ -83,7 +83,7 @@
         <mxCell id="e21" value="C4: Person = actor; Software System = sistema. [Actual] / [previsto] distinguen estado; la relación externa discontinua es futura." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="1019" width="1450" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="e22" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v2 | Código: d4ceaa3" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="e22" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v3 | Código: 5f71e61" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="35" y="1058" width="1450" height="30" as="geometry" />
         </mxCell>
       </root>

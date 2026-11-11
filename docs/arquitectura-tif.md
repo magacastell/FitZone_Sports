@@ -1,6 +1,6 @@
 # Arquitectura TIF — Índice y cierre de esta etapa
 
-Edición documental: **2026-11-10**, diagramas **v2**. Código funcional contrastado: **`d4ceaa33bd7a8a588ccab2a9789a875a9f31ba15`**. Preparación en la rama `docs/arquitectura-tif` para integración a `main`. Esta etapa cierra seis ADR en estado **Aceptado** y cuatro diagramas actualizados. Aceptado corresponde a la decisión técnica adoptada y materializada en la implementación, según la confirmación de cierre recibida; no certifica completitud funcional, ausencia de deuda ni cierre del TIF. No modifica implementación, contratos, migraciones, manuales, planificación ni bitácoras.
+Edición documental: **2026-11-10**. Base inicial M1/M2: **`d4ceaa33bd7a8a588ccab2a9789a875a9f31ba15`**; referencias afectadas por M3 contrastadas con **`5f71e61cd86598a1318f88d231fe488ba80a3991`**. C4-1/2 **v3** reflejan esa incorporación; C4-3 M2 y secuencia offline conservan **v2** y su base funcional sin cambios. Preparación en `docs/arquitectura-tif` e integración a `main` conservando los commits de M3. Esta etapa cierra seis ADR en estado **Aceptado** y cuatro diagramas. Aceptado corresponde a la decisión técnica adoptada y materializada en la implementación; no certifica completitud funcional, ausencia de deuda ni cierre del TIF. Este trabajo documental no modifica implementación, contratos, migraciones, manuales, planificación ni bitácoras de otros responsables.
 
 ## Referencia normativa y alcance
 
@@ -81,7 +81,7 @@ Cada archivo `.drawio` es XML editable no comprimido y cada `.svg` es su represe
 
 La secuencia es obligatoria en §5.3.2 de la versión de 25 páginas; no sustituye otra secuencia. Explicita que el socio puede obtener el lote con conexión propia después del corte de Recepción, siempre que el terminal conserve aprovisionamiento vigente. Si el socio también está desconectado, necesita ventanas previamente guardadas. La captura provisional, la cola durable, el ACK perdido y el reintento idempotente conservan su funcionamiento.
 
-En C4-1 se muestran las responsabilidades de M1–M5 y los cuatro actores; Socio y Cliente corresponden a una autoridad técnica estable USUARIO con distinta condición comercial. La reserva de canchas sin membresía del cliente externo se identifica como capacidad prevista. La pasarela externa requerida figura como **integración prevista/no implementada**, con relación discontinua. `PasarelaPagoFake` sigue siendo interna al backend y no se representa como servicio remoto. Las relaciones actuales y futuras están rotuladas por separado.
+En C4-1 se muestran las responsabilidades de M1–M5 y los cuatro actores; Socio y Cliente corresponden a una autoridad técnica estable USUARIO con distinta condición comercial. Agenda, reservas y espera de clases están incorporadas en M3; asistencia y penalidades siguen pendientes y los avisos son simulados por log. La reserva de canchas sin membresía del cliente externo se identifica como capacidad prevista. La pasarela externa requerida figura como **integración prevista/no implementada**, con relación discontinua. `PasarelaPagoFake` sigue siendo interna al backend y no se representa como servicio remoto. Las relaciones actuales y futuras están rotuladas por separado; «actual» identifica código incorporado, no cumplimiento completo de requisitos.
 
 C4-2 representa un solo frontend React con instancias en distintos navegadores/dispositivos. IndexedDB y Cache Storage son mecanismos locales del navegador, visualmente distintos de los contenedores principales. C4-3 descompone únicamente la API backend M2: frontend/terminal y PostgreSQL quedan fuera de su límite. El detalle JavaScript continúa descrito en ADR-003/007 y en la secuencia, sin generar una quinta vista ni nuevos procesos de despliegue.
 
@@ -92,13 +92,13 @@ La tabla de §5.3 enumera 14 diagramas obligatorios: cuatro C4, siete UML y tres
 | Diagrama restante | Dependencias de cierre |
 |---|---|
 | C4-3 — Canchas/M4 | Servicio de reservas, PricingStrategy, repositorios y bloqueo reales; revisión M4/M5. |
-| UML — Clases del dominio | Entidades, multiplicidades y Strategy/Observer/Repository reales; revisión M3/M4/M5. |
+| UML — Clases del dominio | M3 ya aporta entidades y Observer; falta elaborar el diagrama conjunto con multiplicidades y Strategy/Repository y contrastar M4/M5. |
 | UML — Secuencia reserva de cancha con pago | Precio, retención, cobro y PDF de cancha implementados; M4/M5. |
 | UML — Secuencia reserva concurrente | Bloqueo y respuesta del perdedor demostrados, garantía SQL RN-02; M4. |
 | UML — Estados de membresía | Estados derivados, suspensión y disparadores actuales de M1; pendiente de elaboración, no de desarrollo en esta tarea. |
 | UML — Estados de reserva | Ciclo real de clases/canchas, pagos/cancelación/penalidad; M3/M4/M5. |
-| UML — Actividad lista de espera | Observer y notificación reales de M3. |
-| DER físico | V1–V14 y nuevas migraciones acordadas al integrar M3/M4/M5; no confundir catálogo único de turnos con reserva única. |
+| UML — Actividad lista de espera | Diagramar el Observer incorporado de M3, ofertas FIFO y avisos por log; validación funcional pendiente. No se crea en esta tarea. |
+| DER físico | V1–V15 incorporadas, incluida la evolución de clases/ofertas de M3; contrastar futuras migraciones M4/M5. No confundir catálogo único de turnos con reserva única. |
 | Despliegue | Compose completo, red, secretos, PWA y terminales; contraste con responsable de despliegue. C4-2 no lo sustituye. |
 | Pipeline CI/CD | Etapas y entorno de pruebas reales; no se encontró configuración CI versionada en el corte. |
 
@@ -106,7 +106,14 @@ C4-4/PricingStrategy es opcional y permanece fuera de esta etapa.
 
 ## Evidencia de validación consultada
 
-Se inspeccionaron código backend/frontend, Flyway V1–V14, entidades/repositorios, [OpenAPI](openapi/openapi.yaml), tests y documentos operativos [M2](m2-offline.md), [Recepción](m2-recepcion.md), [pruebas](pruebas.md) y el ADR histórico local. El contraste describe `d4ceaa3`, no el eventual trabajo aún no integrado de otros responsables.
+La revisión inicial inspeccionó código backend/frontend, Flyway V1–V14, entidades/repositorios, [OpenAPI](openapi/openapi.yaml), tests y documentos operativos [M2](m2-offline.md), [Recepción](m2-recepcion.md), [pruebas](pruebas.md) y el ADR histórico local en `d4ceaa3`. El cierre añade únicamente el contraste de las referencias afectadas por la incorporación de M3 en `5f71e61`.
+
+### Incorporación de M3 y alcance de su evidencia
+
+- [ClaseController](../src/main/java/com/fitzonesports/clase/controller/ClaseController.java), `ClaseService`, `ReservaClaseService` y `ListaEsperaService` incorporan agenda, administración por sede, reservas/cancelaciones y lista de espera con ofertas. El registro de asistencia continúa en 501; las penalidades siguen pendientes. No se describe M3 completo como stub ni se declaran RF-06/07/08 íntegramente acreditados.
+- [PublicadorClase](../src/main/java/com/fitzonesports/clase/observer/PublicadorClase.java) publica eventos en el mismo proceso; [GestorListaEspera](../src/main/java/com/fitzonesports/clase/observer/GestorListaEspera.java) genera ofertas en orden de espera. [NotificadorClase](../src/main/java/com/fitzonesports/clase/observer/NotificadorClase.java) difiere avisos hasta después del commit y [NotificadorLog](../src/main/java/com/fitzonesports/clase/observer/NotificadorLog.java) los simula en el log, sin correo ni proveedor externo implementado. La existencia del patrón no prueba entrega externa de notificaciones.
+- [V15](../src/main/resources/db/migration/V15__clases_grupales.sql) incorpora evolución de clases, reservas, espera y ofertas; [AgendaClases](../frontend/src/modules/m3-clases/AgendaClases.jsx) y [m3Service](../frontend/src/services/m3Service.js) incorporan las vistas y operaciones correspondientes. Los plazos existentes en `ReglasClase` y sus pendientes de acuerdo se conservan según [decisiones del contrato](openapi/DECISIONES.md), sin redefinirlos aquí.
+- No se ejecutaron nuevas pruebas de negocio ni se acreditó una suite completa de M3. El cambio recibido en `MembresiaIntegrationTest` sustituye expectativas 501 por 404 para una clase inexistente; su código no acredita por sí solo cupos, concurrencia, ofertas, notificaciones ni el recorrido completo de M3. Los reportes siguientes corresponden al corte anterior y no se extrapolan al código incorporado.
 
 Además de leer fuentes, se abrieron reportes **preexistentes**, ignorados por Git; no se ejecutaron nuevamente suites de negocio por este cambio documental:
 
@@ -134,4 +141,4 @@ Los reportes locales pueden desaparecer; el repositorio conserva pruebas, runner
 | Históricos de pruebas incompletos vs. M2 actual | Se usa la sección más reciente y se inspeccionan reportes; no se afirma que las brechas antiguas sigan todas abiertas. |
 | Comentario de perfil obligatorio sin default vs. configuración | `spring.profiles.active` realmente tiene fallback `dev`; no se afirma fallo por ausencia de perfil ni se modifica la configuración. |
 
-Los seis ADR de esta etapa quedan Aceptados como decisiones técnicas adoptadas, manteniendo deuda y limitaciones. Faltan identificar autores/sprints no acreditados, conservar explícita la falta de evidencia de ciertas comparaciones históricas (SOA/serverless y estado/UI), contrastar M3/M4/M5 y completar los cuatro ADR y diez diagramas inventariados como pendientes. Los metadatos nominales de los diagramas tampoco se inventan. Este cierre parcial no completa el checklist global del TIF. La planificación y las bitácoras quedan fuera de esta tarea.
+Los seis ADR de esta etapa quedan Aceptados como decisiones técnicas adoptadas, manteniendo deuda y limitaciones. Faltan identificar autores/sprints no acreditados, conservar explícita la falta de evidencia de ciertas comparaciones históricas (SOA/serverless y estado/UI), validar los pendientes y la evidencia integral del M3 incorporado, contrastar M4/M5 y completar los cuatro ADR y diez diagramas inventariados como pendientes. Los metadatos nominales de los diagramas tampoco se inventan. Este cierre parcial no completa el checklist global del TIF. La planificación y las bitácoras quedan fuera de esta tarea.
