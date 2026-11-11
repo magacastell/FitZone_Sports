@@ -92,6 +92,13 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La sede no existe")));
     }
 
+    /** Consulta interna de M3: datos de varios usuarios de una vez (listado de asistentes y avisos). */
+    @Transactional(readOnly = true)
+    public java.util.Map<Integer, UsuarioResponse> consultarPorIds(java.util.Collection<Integer> ids) {
+        return usuarioRepository.findAllById(ids).stream()
+                .collect(java.util.stream.Collectors.toMap(Usuario::getId, UsuarioResponse::from));
+    }
+
     /** Consulta interna de M2 (acceso): sin restriccion de sede, porque el QR de un socio vale en todas (RF-03). */
     @Transactional(readOnly = true)
     public UsuarioResponse consultarParaAcceso(Integer usuarioId) {

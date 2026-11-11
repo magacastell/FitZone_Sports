@@ -42,3 +42,13 @@
 - Implementó la salida (`POST /accesos/salidas`, por `accesoId` o volviendo a escanear el QR) y el aforo real por sede (`GET /accesos/sedes/{id}/aforo`: ingresos sin salida frente a la capacidad máxima, informativo).
 - Agregó el cierre diario `CierreDiarioAccesos`: a las 23:59 (zona de Buenos Aires) cierra los ingresos olvidados y el aforo vuelve a 0. Fijó la zona horaria en el `Clock` porque el servidor corre en UTC.
 - Frontend: `SocioQRModal` muestra el QR real con cuenta regresiva y se renueva solo (`qrcode.react`); `ControlAccesoSede` valida ingreso y salida con lo que escribe el lector 2D y muestra el aforo real, reemplazando el simulado.
+
+### Claudio — 10/11/2026
+
+- Implementó M3 Clases grupales (RF-06, RF-07, RF-08): agenda paginada con filtros por sede y día, alta, edición y cancelación administrativa de clases por sede (recepción solo la suya, gerente cualquiera), y catálogos de instructores y tipos de clase (`/instructores`, `/tipos-clase`). El nombre de la clase sale del tipo. La migración V15 agrega `fin` y `estado` a la clase, saca `fecha` (repetía el día de `horario`) y crea la tabla de ofertas con sus índices.
+- Reservas y cancelaciones: se reserva hasta 48 h antes del inicio y se cancela sin penalización hasta 2 h antes; después queda como cancelación tardía (solo se marca, sin sanciones). Una cancelación del admin no cuenta como falta.
+- Garantías de concurrencia: la clase se bloquea (`FOR UPDATE`) al contar el cupo (reservas confirmadas más ofertas pendientes) y al reservar, así nunca se excede la capacidad; el índice único parcial `uk_reserva_clase_confirmada` evita reservas duplicadas; un bloqueo por usuario y otro por instructor evitan clases superpuestas.
+- Lista de espera con Observer: `PublicadorClase` avisa los eventos (cupo liberado, oferta generada, clase modificada o cancelada); `GestorListaEspera` ofrece el lugar al primero de la fila (vigencia de 8 h o hasta 1 h antes de la clase) y `NotificadorClase` avisa después del commit (canal simulado en log, detrás del puerto `Notificador`). Un job vence las ofertas no respondidas y pasa el lugar al siguiente.
+- Agregó `GET /clases/me` (reservas, lista de espera y ofertas del usuario). El registro de asistencia queda en 501.
+- Frontend: nueva pantalla de Clases con reservar, cancelar, anotarse y salir de la lista, aceptar o rechazar la oferta, y para recepción y gerente crear, editar y cancelar clases y ver asistentes; se sumó el enlace en el menú del gerente.
+- Actualizó el contrato OpenAPI y `DECISIONES.md` con las operaciones y rutas nuevas de M3.

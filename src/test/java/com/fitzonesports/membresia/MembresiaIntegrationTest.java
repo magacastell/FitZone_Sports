@@ -390,7 +390,7 @@ class MembresiaIntegrationTest {
         assertEquals(0,accesos.consultarAforo(recepcion,otraSede).ocupacionActual());
     }
 
-    @Test void clasesSiguenStubPeroElBeneficioExigeMembresia() throws Exception {
+    @Test void clasesExigenMembresiaParaReservarPeroNoParaCancelar() throws Exception {
         var mvc=org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup(contexto)
                 .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity()).build();
         String bearer="Bearer "+jwt.generateToken(detalles.loadUserByUsername(email));
@@ -398,10 +398,10 @@ class MembresiaIntegrationTest {
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isForbidden());
         contratar();
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/clases/1/reservas").header("Authorization",bearer))
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotImplemented());
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotFound());
         reloj.fijar("2030-01-01T15:00:00Z");
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/clases/1/reservas/1").header("Authorization",bearer))
-                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotImplemented());
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test void registroLoginNoPermitenElegirPrivilegios() throws Exception {
