@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1430" viewBox="0 0 1800 1430" role="img">
+<title>c4-03-m2</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker></defs>
+<rect width="1800" height="1430" fill="white"/>
+<rect x="500" y="130" width="1240" height="1030" fill="#f8fafc" stroke="#64748b" stroke-width="2" stroke-dasharray="8 5"/>
+<rect x="45" y="250" width="350" height="210" fill="#edf2f7" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="220.0" y="306.4">Frontend React</tspan><tspan x="220.0" y="330.7">[Container externo a la API]</tspan><tspan x="220.0" y="355.0">Terminal de sede / Mi QR / lector</tspan><tspan x="220.0" y="379.29999999999995">Validación y cola en el navegador</tspan><tspan x="220.0" y="403.59999999999997">Sin servidor local propio</tspan></text>
+<rect x="45" y="570" width="350" height="160" fill="#fff8dc" stroke="#ad8c40" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="17" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="220.0" y="604.1">Detalle local en ADR-003/007</tspan><tspan x="220.0" y="627.0500000000001">y en la secuencia UML:</tspan><tspan x="220.0" y="650.0">crypto.js, db.js, movimientos.js</tspan><tspan x="220.0" y="672.95">y sync.js pertenecen al frontend,</tspan><tspan x="220.0" y="695.9000000000001">no al contenedor backend.</tspan></text>
+<rect x="550" y="230" width="500" height="100" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="800.0" y="255.7">OfflineController</tspan><tspan x="800.0" y="280.0">[Component: REST / seguridad]</tspan><tspan x="800.0" y="304.3">Emisión automática, preparación y batch</tspan></text>
+<rect x="1180" y="230" width="500" height="100" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1430.0" y="255.7">AccesoController</tspan><tspan x="1430.0" y="280.0">[Component: REST online]</tspan><tspan x="1430.0" y="304.3">Ingreso, salida y aforo</tspan></text>
+<rect x="550" y="450" width="500" height="130" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="800.0" y="478.55">Provisión / emisión offline</tspan><tspan x="800.0" y="502.85">[Component: servicios Spring]</tspan><tspan x="800.0" y="527.15">AutorizacionQrService · TerminalOfflineService</tspan><tspan x="800.0" y="551.45">CredencialOfflineService (compatibilidad)</tspan></text>
+<rect x="1180" y="450" width="500" height="130" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1430.0" y="478.55">Validación online</tspan><tspan x="1430.0" y="502.85">[Component: servicios Spring]</tspan><tspan x="1430.0" y="527.15">AccesoService · QrTokenService (HMAC legado)</tspan><tspan x="1430.0" y="551.45">Vigencia actual, presencia central y uso del jti</tspan></text>
+<rect x="550" y="700" width="500" height="110" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="800.0" y="730.7">FirmaOffline</tspan><tspan x="800.0" y="755.0">[Component: firma / verificación RS256]</tspan><tspan x="800.0" y="779.3000000000001">Privada RSA persistente; JWK pública de confianza</tspan></text>
+<rect x="1180" y="700" width="500" height="110" fill="#edf2f7" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1430.0" y="730.7">Servicios de usuario, membresía y sede</tspan><tspan x="1430.0" y="755.0">[Components Spring colaboradores]</tspan><tspan x="1430.0" y="779.3000000000001">Estado comercial y permisos</tspan></text>
+<rect x="550" y="950" width="500" height="120" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="800.0" y="985.7">SincronizacionOfflineService</tspan><tspan x="800.0" y="1010.0">[Component: reconciliador transaccional]</tspan><tspan x="800.0" y="1034.3">Inbox, idempotencia, intervalos y resultados por UUID</tspan></text>
+<rect x="1180" y="950" width="500" height="120" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1430.0" y="985.7">Repositorios de acceso</tspan><tspan x="1430.0" y="1010.0">[Components: Spring Data JPA]</tspan><tspan x="1430.0" y="1034.3">RegistroAccesoRepository · CodigoQrRepository</tspan></text>
+<rect x="550" y="1240" width="1130" height="100" fill="#e1f1e9" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="20" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1115.0" y="1263.0">PostgreSQL central</tspan><tspan x="1115.0" y="1290.0">[Container externo a la API]</tspan><tspan x="1115.0" y="1317.0">Visitas, terminal/copia e inbox · V4: presencia abierta única · V14: jti único</tspan></text>
+<polyline points="220,250 220,200 1430,200 1430,230" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="395,350 460,350 460,280 550,280" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="800,330 800,450" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1430,330 1430,450" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="550,280 520,280 520,1010 550,1010" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="800,580 800,700" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="800,950 800,810" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1430,580 1430,700" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1050,560 1140,560 1140,755 1180,755" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1180,485 1110,485 1110,420 990,420 990,450" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1680,515 1710,515 1710,1010 1680,1010" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1050,515 1085,515 1085,1240" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="800,1070 800,1240" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1430,1070 1430,1240" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<text font-family="Arial, sans-serif" font-size="26" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="42.5">FitZone Sports | C4 nivel 3 — Componentes del backend M2</tspan></text>
+<text font-family="Arial, sans-serif" font-size="17" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="82.5">Contenedor descompuesto: API backend Spring. El frontend y PostgreSQL se muestran fuera de ese límite, como colaboradores.</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="515" y="153.0">API backend — componentes Spring del recorte M2 y colaboradores internos</tspan></text>
+<rect x="45" y="130" width="350" height="60" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="220.0" y="149.2">Lector online</tspan><tspan x="220.0" y="170.79999999999998">REST / JSON con sesión</tspan></text>
+<rect x="400" y="385" width="145" height="85" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="472.5" y="405.9">Preparación /</tspan><tspan x="472.5" y="427.5">QR / batch</tspan><tspan x="472.5" y="449.09999999999997">REST / JSON</tspan></text>
+<rect x="590" y="360" width="420" height="50" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="800.0" y="385.0">Delega preparación / emisión</tspan></text>
+<rect x="1320" y="355" width="350" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1495.0" y="382.5">Delega validación online</tspan></text>
+<rect x="530" y="855" width="180" height="45" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="620.0" y="877.5">Delega batch</tspan></text>
+<rect x="820" y="620" width="200" height="45" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="920.0" y="642.5">Firma / JWK</tspan></text>
+<rect x="720" y="855" width="310" height="45" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="875.0" y="877.5">Verifica evidencia de captura</tspan></text>
+<rect x="1450" y="620" width="220" height="45" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1560.0" y="642.5">Consulta estado actual</tspan></text>
+<rect x="1095" y="600" width="110" height="75" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1150.0" y="626.7">Consulta</tspan><tspan x="1150.0" y="648.3000000000001">M1 / sede</tspan></text>
+<rect x="1055" y="345" width="235" height="50" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1172.5" y="370.0">Verifica QR RS256</tspan></text>
+<rect x="1460" y="855" width="240" height="45" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1580.0" y="877.5">Persiste / consulta</tspan></text>
+<rect x="995" y="1180" width="270" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1130.0" y="1196.7">Provisión: SQL</tspan><tspan x="1130.0" y="1218.3">JdbcTemplate</tspan></text>
+<rect x="550" y="1180" width="420" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="760.0" y="1196.7">Inbox + acceso</tspan><tspan x="760.0" y="1218.3">Una transacción SQL</tspan></text>
+<rect x="1340" y="1180" width="300" height="55" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="16" fill="#64748b" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1490.0" y="1207.5">JPA / SQL</tspan></text>
+<rect x="550" y="1090" width="1130" height="65" fill="white" stroke="none" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="15" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="550" y="1112.375">AccesoService también usa JdbcTemplate para bloqueo/jti; comparte la exclusión por titular con reconciliación.</tspan><tspan x="550" y="1132.625">Los componentes y sus dependencias se ejecutan en la misma API; no son servicios desplegables separados.</tspan></text>
+<text font-family="Arial, sans-serif" font-size="15" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="1355.0">C4: recuadro discontinuo = contenedor descompuesto; azul = componente; gris = colaborador; flechas = llamadas; verde = datos externos.</tspan></text>
+<text font-family="Arial, sans-serif" font-size="14" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="35" y="1393.0">Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v2 | Código: d4ceaa3</tspan></text>
+</svg>

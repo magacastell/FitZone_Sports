@@ -1,0 +1,55 @@
+# ADR-006 — React, componentes propios y estado frontend
+
+- **Estado:** Aceptado
+- **Fecha:** 2026-11-10 (redacción documental).
+- **Fecha histórica de decisión:** 2026-09-05 para React, consignada en el antecedente; no acreditada para la gestión de estado y componentes propios.
+- **Autor:** Pendiente de identificación y revisión grupal.
+- **Sprint:** Pendiente de contraste con la planificación histórica.
+
+## Contexto
+
+El portal y la consola necesitaban formularios, navegación y visualización de datos cambiantes de membresías, accesos y disponibilidad. Había elementos comunes entre pantallas y una API REST separada. El equipo necesitaba reutilizar presentación y representar el estado de sesión sin trasladar al navegador la autoridad sobre vigencia comercial o permisos. El modo offline agregaba estado durable que debía sobrevivir a recargas y no podía depender sólo de los hooks de una pantalla.
+
+El [ADR-004 histórico de React](https://docs.google.com/document/d/1sgUz-_ovSKQPJSD3dFt6M5ycwiDxV6LK/edit) registró aceptación el 2026-09-05. No documentó una selección comparativa de gestores globales ni de bibliotecas visuales. Se preserva esa diferencia frente al ADR-006 oficial, que exige describir los tres aspectos.
+
+## Alternativas consideradas
+
+| Alternativa | A favor | En contra | Por qué se descartó |
+|---|---|---|---|
+| Vue | Componentes reactivos y consumo REST; contemplado por el enunciado. | Requería adoptar su ecosistema en lugar del elegido. | El antecedente priorizó React para el enfoque de componentes del equipo; no aportó benchmark. |
+| HTML/CSS/JavaScript sin React | Menos dependencias y configuración inicial. | Reutilización, actualización del DOM y organización del estado debían resolverse manualmente al crecer las pantallas. | Razón registrada en el antecedente de React. |
+| React | Composición y estado declarativo para interfaces dinámicas. | Necesita decisiones adicionales de rutas, estado, errores y persistencia. | Adoptada y verificable en el código. |
+| Context/hook local + componentes propios | Coincide con la implementación, sin un store central de todo el dominio. | Coordinación de peticiones y estados repartida entre pantallas. | Adoptada; no consta una evaluación comparativa histórica de estado/UI. |
+
+No hay evidencia de evaluación real Redux/Zustand, Material UI u otras bibliotecas. No se inventan descartes. El uso actual de Context y componentes propios se registra como decisión técnica adoptada, sin atribuir al equipo comparaciones no documentadas.
+
+## Decisión
+
+Se construye una aplicación React por componentes, con una biblioteca visual propia, Context para la sesión, hooks para estado de pantalla y servicios separados para transporte y persistencia offline.
+
+### Evidencia y justificación
+
+- [package.json](../../frontend/package.json): React/ReactDOM `^18.3.1`, React Router `^6.26.0`, Vite `^5.3.4`, `lucide-react`, `qrcode.react`, Dexie y jose. Los rangos declarados no se presentan como versiones exactas de cada instalación.
+- [FitZoneUI](../../frontend/src/components/ui/FitZoneUI.jsx) y su CSS aportan `AppButton`, `AppLink`, badges y encabezados propios. Lucide aporta iconos y qrcode.react genera QR; ninguna constituye una biblioteca completa de widgets de dominio.
+- [AuthContext](../../frontend/src/context/AuthContext.jsx): `AuthProvider/useAuth`, token en `localStorage` y estado React de usuario/carga/sesión. Decodifica claims para presentación; la autorización real queda en backend. Logout elimina el acceso rápido offline del socio, sin borrar la cola de Recepción ni garantizar revocación de material ya copiado.
+- [AppRoutes](../../frontend/src/routes/AppRoutes.jsx), [ProtectedRoute](../../frontend/src/components/ProtectedRoute.jsx) y [Layout](../../frontend/src/components/Layout.jsx) organizan rutas y navegación. `/terminal-offline` y `/qr-offline` tienen recorridos autónomos que no dependen del Layout online.
+- [api.js](../../frontend/src/services/api.js) centraliza transporte y sesión; los adaptadores por módulo no convierten un endpoint pendiente en una funcionalidad implementada. [estadoCuenta](../../frontend/src/modules/m1-usuarios/estadoCuenta.js) usa datos de M1 para presentación comercial.
+- Desde la integración M3 en `5f71e61`, [AgendaClases](../../frontend/src/modules/m3-clases/AgendaClases.jsx) compone tarjetas, formulario y consulta de asistentes, mantiene filtros/paginación/actividad con hooks y consume [m3Service](../../frontend/src/services/m3Service.js) para agenda, reservas, lista de espera y respuesta a ofertas. Es código frontend incorporado con backend de clases; ya no se describe toda la vista M3 como servicio pendiente. Asistencia y penalidades siguen pendientes y el notificador backend es un log simulado, no un canal externo acreditado.
+- [TerminalOffline](../../frontend/src/modules/m2-acceso/TerminalOffline.jsx) mantiene UI/temporizadores con hooks y delega captura a `registrarLocal` y envío a `sincronizar`. [db.js](../../frontend/src/services/offline/db.js) conserva datos durables en IndexedDB/Dexie, no en Context.
+- [sw.js](../../frontend/src/sw.js) precachea recursos estáticos y permite navegación de la PWA cuando falla la red. No cachea respuestas API ni ejecuta una cola de POST por Workbox; la cola de negocio tiene implementación propia.
+
+Esta distribución permite reutilizar controles y separar estado efímero, sesión y movimientos durables sin incorporar un gestor global adicional. No se declara una implementación completa de Atomic Design: existen componentes propios, pero no una taxonomía atoms/molecules/organisms verificada. Tampoco hay aplicación móvil nativa en este corte; el socio usa el portal web responsive.
+
+## Consecuencias
+
+- **Positivas:** presentación reutilizable; rutas por actor y módulos; recuperación offline persistente sin exigir un proceso local; reglas de negocio centrales conservadas en backend.
+- **Negativas:** coordinación manual de efectos, peticiones, temporizadores y actualizaciones entre vistas; token accesible al JavaScript del origen en `localStorage`; obligación de proteger el contexto del navegador. Un guard visual no protege datos de la API.
+- **Deuda asumida:** no consta evaluación comparativa histórica de estado global/UI; no hay instrumentación de cobertura frontend. Los harness VM no reproducen todo React real. IndexedDB puede perderse al borrar el perfil y no sustituye un respaldo. M3 tiene agenda/reservas/espera incorporadas, con asistencia, penalidades y validación integral pendientes; M4 conserva operaciones de servicio pendiente. La entrega funcional y sus pruebas requieren contraste con los responsables.
+
+## Requisitos relacionados
+
+Unidad IV (disparador oficial), RF-01, RF-02, RF-04, RF-05 y RNF-01; interfaces de RF-06 a RF-14 sujetas al estado real de cada backend.
+
+## Validación y límites
+
+Se leyeron componentes, Context, servicios, scripts de prueba y build PWA en el corte original `d4ceaa3`; se contrastaron las referencias a M3 con el código incorporado en `5f71e61`. Las seis suites Node y el build están documentados en [pruebas](../pruebas.md); los reportes recuperables y la E2E real de M2 se describen en el [índice](../arquitectura-tif.md#evidencia-de-validación-consultada). Son verificaciones preexistentes, no ejecuciones nuevas ni evidencia de una suite completa del nuevo M3. No acreditan usabilidad completa, cobertura frontend ni los pendientes de M3/M4. El enfoque técnico está Aceptado; autor y sprint siguen sin acreditarse. Ver [ADR-007](ADR-007-tif-replica-y-reconciliacion.md) para datos durables y [C4-2](../diagramas/c4-02-contenedores.svg) para sus instancias de ejecución.
