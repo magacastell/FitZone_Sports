@@ -2,6 +2,25 @@
 
 # Contratos API v1 — evidencia, decisiones técnicas y propuestas
 
+## Actualización M4/M5 — 11/11/2026
+
+El contrato implementado de Canchas y Pagos reemplaza los drafts de sus rutas.
+Ver [guía backend](../canchas-pagos-backend.md) y [ADR-004](../adr/ADR-004-tif-concurrencia-canchas.md).
+Tarifa global por tipo; recargo por sede inicial 20%, prorrateo de minutos en
+`[19,21)`, descuento de socio del 15% después del recargo, HALF_UP a centavos.
+Retención de 10 minutos y turnos de 60 por defecto, configurables. Cancelación
+antes del inicio: >=2h 100%, <2h 50%; excepción administrativa 50/100 solo gerente.
+No se atribuyen esas decisiones operativas a los valores exigidos por el PDF.
+Dos fases: POST reserva retiene, POST pagos cobra por recursoId con una operación
+por reserva. Fake local síncrona: DNI 99999999 rechazado; resto aprobado. El rechazo
+se registra y libera el turno sin PDF. Se implementaron consultas generales de
+pagos y comprobantes/reembolsos de canchas preservando membresías.
+
+P07/P08 quedan resueltos para este alcance operativo; P09/P10 mantienen deuda
+para una pasarela remota/asíncrona, compensaciones y múltiples devoluciones.
+Los apartados históricos de abajo conservan sus propuestas y limitaciones de
+los cortes anteriores; no describen como stub las operaciones M4/M5 actuales.
+
 El contrato sigue en `docs/openapi/openapi.yaml`. **Sus partes `stable` son la fuente técnica de referencia. Sus partes `draft` son interfaces de trabajo para revisión y mocks, sin convertir alternativas funcionales en obligaciones para otros módulos.** Los campos y ejemplos de un schema draft tampoco son evidencia de aprobación funcional.
 
 Se separan dos ejes por operación:

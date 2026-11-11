@@ -37,9 +37,9 @@ public class ComprobantePdfRenderer {
             lienzo.texto("DNI: " + datos.dni(), 11, false);
             lienzo.texto("Email: " + datos.email(), 11, false);
             lienzo.separador();
-            lienzo.texto("MEMBRESÍA", 10, true);
+            lienzo.texto(datos.rubro(), 10, true);
             lienzo.texto(datos.plan(), 15, true);
-            lienzo.texto("Período contratado (hora argentina)", 10, false);
+            lienzo.texto("MEMBRESÍA".equals(datos.rubro())?"Período contratado (hora argentina)":"Turno reservado (hora argentina)", 10, false);
             lienzo.texto(datos.inicio().format(fecha) + " a " + datos.fin().format(fecha), 12, false);
             lienzo.texto("Cantidad: 1", 11, false);
             lienzo.separador();

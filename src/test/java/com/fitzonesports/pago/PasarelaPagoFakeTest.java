@@ -8,6 +8,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class PasarelaPagoFakeTest {
     private final PasarelaPago pasarela = new PasarelaPagoFake();
 
+    @Test void dniDePruebaRechazaSinCambiarElImporte() {
+        var solicitud=new SolicitudCobro("reserva-rechazada",new BigDecimal("12000.00"),"ARS","99999999");
+        assertEquals(ResultadoCobro.Estado.RECHAZADO,pasarela.cobrar(solicitud).estado());
+        assertEquals(ResultadoCobro.Estado.APROBADO,pasarela.cobrar(new SolicitudCobro("reserva-aprobada",solicitud.monto(),"ARS","12345678")).estado());
+    }
+
     @Test
     void apruebaCobroYConservaReferenciaEntreInstancias() {
         var solicitud = new SolicitudCobro("membresia-1-periodo-1", new BigDecimal("15000.50"), "ARS");

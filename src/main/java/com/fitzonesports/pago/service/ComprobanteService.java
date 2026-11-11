@@ -38,27 +38,29 @@ public class ComprobanteService {
         var pagos = jdbc.queryForList("SELECT * FROM pago WHERE id=? FOR UPDATE", pagoId);
         if (pagos.isEmpty()) throw error(404, "El pago no existe");
         var pago = pagos.getFirst();
-        if (!List.of("APROBADO", "REEMBOLSADO").contains(pago.get("estado")))
+        if (!List.of("APROBADO", "REEMBOLSADO", "REEMBOLSADO_PARCIAL").contains(pago.get("estado")))
             throw error(409, "Solo los pagos aprobados pueden tener comprobante");
         var existentes = jdbc.queryForList("SELECT numero_comprobante,contenido_pdf FROM comprobante WHERE pagoid=?", pagoId);
         if (!existentes.isEmpty() && existentes.getFirst().get("contenido_pdf") instanceof byte[] contenido)
             return new ComprobantePdf((String) existentes.getFirst().get("numero_comprobante"), contenido);
-        if (!"MEMBRESIA".equals(pago.get("tipo_referencia")))
-            throw error(409, "La emision para reservas de cancha requiere la integracion con M4");
-        var periodos = jdbc.queryForList("SELECT nombre_plan,inicio,fin,precio FROM periodo_membresia WHERE pago_id=?", pagoId);
-        if (periodos.isEmpty()) throw error(409, "El pago no tiene un periodo de membresia asociado");
+        boolean esCancha="RESERVA_CANCHA".equals(pago.get("tipo_referencia"));
+        if(!esCancha && !"MEMBRESIA".equals(pago.get("tipo_referencia")))throw error(409,"El concepto no admite comprobante");
+        var periodos = esCancha
+                ? jdbc.queryForList("SELECT cancha_nombre || ' - ' || tipo_nombre || ' - ' || sede_nombre nombre_plan,inicio,fin,precio_aplicado precio FROM reserva_cancha WHERE id=?",pago.get("referencia_id"))
+                : jdbc.queryForList("SELECT nombre_plan,inicio,fin,precio FROM periodo_membresia WHERE pago_id=?", pagoId);
+        if (periodos.isEmpty()) throw error(409, "El pago no tiene un recurso asociado");
         var periodo = periodos.getFirst();
         var titular = usuarios.consultarParaAcceso((Integer) pago.get("usuarioid"));
         String numero = existentes.isEmpty() ? "FZ-P-" + pagoId : (String) existentes.getFirst().get("numero_comprobante");
         var fecha = LocalDateTime.now(clock);
         BigDecimal monto = (BigDecimal) pago.get("monto");
-        String concepto = "Membresia: " + periodo.get("nombre_plan");
+        String concepto = (esCancha?"Reserva de cancha: ":"Membresia: ") + periodo.get("nombre_plan");
         byte[] pdf = renderer.generar(new DatosComprobante(numero, pagoId, fecha,
                 ((java.sql.Timestamp)pago.get("fecha_pago")).toLocalDateTime(),
                 titular.nombre() + " " + titular.apellido(), titular.dni(), titular.email(),
                 (String) periodo.get("nombre_plan"),
                 ((java.sql.Timestamp)periodo.get("inicio")).toLocalDateTime(),
-                ((java.sql.Timestamp)periodo.get("fin")).toLocalDateTime(), monto));
+                ((java.sql.Timestamp)periodo.get("fin")).toLocalDateTime(), monto,esCancha?"CANCHA DEPORTIVA":"MEMBRESÍA"));
         Integer id;
         if (existentes.isEmpty()) {
             id = jdbc.queryForObject("INSERT INTO comprobante(numero_comprobante,fecha_emision,pagoid,contenido_pdf) VALUES (?,?,?,?) RETURNING id",

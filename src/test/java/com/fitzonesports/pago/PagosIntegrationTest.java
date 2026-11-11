@@ -196,15 +196,16 @@ class PagosIntegrationTest {
         assertTrue(membresias.tieneMembresiaVigente(usuario));
     }
 
-    @Test void canchasPermiteAutoridadEstableSinPrometerReservasImplementadas() throws Exception {
+    @Test void canchasPermiteAutoridadEstableConConsultasReales() throws Exception {
         String token=bearer(email);
         for (boolean conMembresia : List.of(false,true)) {
             if (conMembresia) contratar();
-            mvc.perform(get("/canchas").header("Authorization",token)).andExpect(status().isNotImplemented());
-            mvc.perform(post("/canchas/1/reservas").header("Authorization",token)).andExpect(status().isNotImplemented());
-            mvc.perform(get("/reservas/me").header("Authorization",token)).andExpect(status().isNotImplemented());
+            mvc.perform(get("/canchas").param("sedeId",sede.toString()).header("Authorization",token)).andExpect(status().isOk());
+            mvc.perform(post("/canchas/1/reservas").header("Authorization",token)).andExpect(status().isBadRequest());
+            mvc.perform(get("/reservas/me").header("Authorization",token)).andExpect(status().isOk());
         }
-        mvc.perform(post("/canchas/1/reservas").header("Authorization",bearer(recepcion))).andExpect(status().isForbidden());
+        mvc.perform(post("/canchas/1/reservas").contentType("application/json").content("{\"turnoId\":1}")
+                .header("Idempotency-Key",UUID.randomUUID()).header("Authorization",bearer(recepcion))).andExpect(status().isForbidden());
         mvc.perform(get("/canchas")).andExpect(status().isUnauthorized());
     }
 

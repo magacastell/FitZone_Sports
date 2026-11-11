@@ -39,7 +39,8 @@ public class CobroMembresiaService {
 
     @Transactional(propagation=Propagation.MANDATORY)
     public Integer cobrar(Integer usuarioId, Integer membresiaId, BigDecimal importe, String clave, LocalDateTime ahora) {
-        var resultado = pasarela.cobrar(new SolicitudCobro(clave, importe, "ARS"));
+        String dni=jdbc.queryForObject("SELECT dni FROM usuario WHERE id=?",String.class,usuarioId);
+        var resultado = pasarela.cobrar(new SolicitudCobro(clave, importe, "ARS",dni));
         if (resultado.estado() != ResultadoCobro.Estado.APROBADO) {
             throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "El pago no fue aprobado; no se otorgo vigencia");
         }

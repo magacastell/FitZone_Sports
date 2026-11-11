@@ -203,9 +203,9 @@ Los valores por defecto sirven para desarrollo local sin configurar nada. Para p
 
 ## Pasarela de pagos fake (temporal)
 
-El backend incluye el puerto `PasarelaPago` y su implementacion `PasarelaPagoFake`, seleccionada mediante `pagos.pasarela=fake` (valor predeterminado, configurable con `PAGOS_PASARELA`). Aprueba siempre los cobros validos en ARS, sin red, datos de tarjeta ni movimientos de dinero reales. Devuelve estado `APROBADO`, proveedor `FAKE` y una referencia estable para la misma clave de idempotencia.
+El backend incluye el puerto `PasarelaPago` y su implementación `PasarelaPagoFake`, seleccionada mediante `pagos.pasarela=fake` (valor predeterminado, configurable con `PAGOS_PASARELA`). Sin red ni datos de tarjeta: rechaza los cobros del DNI ficticio `99999999` y aprueba el resto. El DNI se obtiene del titular en el backend; la excepción se configura con `PAGOS_FAKE_DNI_RECHAZADO`. Devuelve proveedor `FAKE` y una referencia estable para la misma clave de idempotencia.
 
-Los servicios de pagos deben inyectar `PasarelaPago` y enviar una `SolicitudCobro` con clave de idempotencia, monto positivo calculado por el backend (hasta dos decimales) y moneda `ARS`. El simulador no persiste pagos ni activa membresias: esas responsabilidades siguen en los servicios de M5 y M1. Tampoco implementa los endpoints pendientes de `/pagos`.
+Los servicios de pagos inyectan `PasarelaPago` y envían clave de idempotencia, monto positivo calculado por el backend (hasta dos decimales), moneda `ARS` y DNI derivado del titular. El simulador no persiste pagos ni activa membresías: esas responsabilidades siguen en los servicios de M5/M1/M4. Las devoluciones fake se aprueban.
 
 Para reemplazarla, agregar un adaptador que implemente la misma interfaz y activarlo con otro valor de `pagos.pasarela`. El adaptador real debera convertir sus resultados a `APROBADO`, `RECHAZADO` o `PENDIENTE`. La persistencia de idempotencia y la validacion de reintentos con distinto importe corresponden a M5; una referencia fake estable no reemplaza esos controles.
 
@@ -251,7 +251,7 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 ## Endpoints iniciales de los módulos
 
 Borrador para organizar el trabajo. Las rutas de negocio usan el prefijo
-`/api/v1`. Usuarios, sedes, planes, membresías y QR/ingresos/salidas/aforo ya tienen implementación; las rutas pendientes devuelven
+`/api/v1`. Usuarios, sedes, planes, membresías, clases, Canchas/Pagos y QR/ingresos/salidas/aforo tienen implementación; las rutas que aún estén pendientes devuelven
 `501 Not Implemented` sin cuerpo si el rol tiene permiso.
 Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
 Los stubs no consultan ni modifican datos. Sus contratos de solicitud/respuesta y filtros
@@ -392,7 +392,7 @@ Sin la variable se omiten.
 
 ### Comprobantes PDF y reembolsos de membresías (M5)
 
-La pasarela simulada mantiene la aprobación de cobros y devoluciones. Al contratar
+La pasarela simulada aprueba cobros excepto para el DNI ficticio `99999999`. Al contratar
 o renovar una membresía se emite un comprobante único por pago, con número, fecha,
 titular, DNI, email, plan, período e importe en ARS. Apache PDFBox genera el PDF;
 se guarda en PostgreSQL para conservar los datos originales aunque luego cambien
@@ -417,9 +417,9 @@ el usuario o el plan. Es un comprobante académico, sin validez fiscal.
 
 Sin sesión se devuelve `401`, por pago ajeno o rol no autorizado `403`, pago
 inexistente `404`, y plazo vencido o pago incompatible `409`. Recepción no tiene
-acceso a estas dos operaciones. Los casos de reservas de cancha devuelven `409`
-hasta su integración con M4. La creación y las consultas generales de pagos siguen
-en `501`; no se modifica el flujo de reservas.
+acceso a estas dos operaciones. Las reservas de cancha ya están integradas: sus
+comprobantes incluyen recurso, sede y horario; la devolución aplica la política
+de anticipación de M4 (100 %/50 %). También funcionan creación y consultas de pagos.
 
 V6 agrega unicidad por pago y número de comprobante, almacenamiento del PDF,
 centavos en detalle de facturación y el registro de una devolución por pago.
@@ -430,6 +430,19 @@ paginación. Con `PLAN_TEST_DB_URL`, `PagosIntegrationTest` verifica emisión,
 descarga HTTP autenticada, permisos, recuperación de PDFs históricos, plazo,
 concurrencia y consistencia de membresías/reembolsos. Usa exclusivamente una base
 local de pruebas descartable, con las mismas condiciones indicadas arriba.
+
+### Canchas y pagos de reservas (M4/M5)
+
+Guía y contratos: [Canchas y Pagos backend](docs/canchas-pagos-backend.md).
+Para conectar frontend y otros módulos: [Guía de integración M4/M5](docs/integracion-canchas-pagos.md).
+Incluye catálogo por sede, tarifas globales por tipo, disponibilidad, Strategy,
+retención, cobro aprobado/rechazado, PDF, cancelación/reembolso y mantenimiento.
+V16 agrega la garantía SQL de ocupación y requiere `btree_gist`.
+
+En dev hay 25 sedes con canchas y turnos para los próximos siete días. Para probar
+el rechazo sin cambiar código: `rechazo@fitzone.com` / `cliente123`, DNI `99999999`.
+Para aprobación: `cliente@fitzone.com` / `cliente123`. Usar las mismas rutas de
+reserva y pago; nunca enviar importes desde el cliente.
 
 ## Documentación
 

@@ -19,17 +19,27 @@ public class ReembolsoService {
     private final UsuarioService usuarios;
     private final MembresiaService membresias;
     private final Clock clock;
+    private final com.fitzonesports.reserva.service.ReservaCanchaService reservas;
 
     @Transactional
     public ReembolsoResponse solicitar(String email, Integer pagoId) {
         var usuario = usuarios.consultarPerfil(email);
-        var pagos = jdbc.queryForList("SELECT usuarioid,tipo_referencia FROM pago WHERE id=?", pagoId);
+        var pagos = jdbc.queryForList("SELECT usuarioid,tipo_referencia,referencia_id FROM pago WHERE id=?", pagoId);
         if (pagos.isEmpty()) throw error(404, "El pago no existe");
         var pago = pagos.getFirst();
         if (!usuario.activo() || (!"GERENTE".equals(usuario.rol()) && !usuario.id().equals(pago.get("usuarioid"))))
             throw error(403, "No tenes permiso para reembolsar este pago");
-        if (!"MEMBRESIA".equals(pago.get("tipo_referencia")))
-            throw error(409, "El reembolso de reservas requiere la integracion con M4");
+        if ("RESERVA_CANCHA".equals(pago.get("tipo_referencia"))) {
+            var existentes=jdbc.queryForList("SELECT id FROM reserva_cancha WHERE id=?",Integer.class,pago.get("referencia_id"));
+            if(existentes.isEmpty())throw error(409,"El pago no tiene una reserva asociada");
+            var reserva=reservas.consultar(email,(Integer)pago.get("referencia_id"));
+            reservas.cancelar(email,reserva.canchaId(),reserva.id(),null);
+            var devolucion=jdbc.queryForMap("SELECT monto,fecha,referencia_externa FROM reembolso_pago WHERE pago_id=?",pagoId);
+            String estado=jdbc.queryForObject("SELECT estado FROM pago WHERE id=?",String.class,pagoId);
+            return new ReembolsoResponse(pagoId,estado,(BigDecimal)devolucion.get("monto"),"ARS",
+                    ((java.sql.Timestamp)devolucion.get("fecha")).toLocalDateTime().atZone(clock.getZone()).toOffsetDateTime(),(String)devolucion.get("referencia_externa"));
+        }
+        if (!"MEMBRESIA".equals(pago.get("tipo_referencia")))throw error(409,"El concepto no admite devolucion");
         var periodos = jdbc.queryForList("SELECT id,membresia_id FROM periodo_membresia WHERE pago_id=?", pagoId);
         if (periodos.isEmpty()) throw error(409, "El pago no tiene un periodo de membresia asociado");
         var periodo = periodos.getFirst();

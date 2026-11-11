@@ -2033,877 +2033,726 @@ paths:
     parameters:
     - $ref: '#/components/parameters/claseId'
     - $ref: '#/components/parameters/ofertaId'
-  /canchas:
-    get:
-      tags:
-      - M4 · Canchas
-      summary: Listar canchas
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P07.'
-      operationId: listarCanchas
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Cancha'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/SedeFiltro'
-      x-roles-actuales:
-      - USUARIO
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P07
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Array por sede: Recepción sólo propia, Gerente global o por sede. Clientes consultan otras
-          sedes cuando el servicio lo permita.'
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    post:
-      tags:
-      - M4 · Canchas
-      summary: Crear cancha
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P07.'
-      operationId: crearCancha
-      x-implementation-status: stub
-      responses:
-        '201':
-          description: Recurso creado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Cancha'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CanchaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P07
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción deriva sede; Gerente indica sede. No modifica tarifas por tipo ni recibe estados
-          de reservas.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /canchas/{canchaId}:
-    patch:
-      tags:
-      - M4 · Canchas
-      summary: Actualizar cancha
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P07.'
-      operationId: actualizarCancha
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Cancha'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActualizarCanchaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P07
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo su sede; Gerente cualquiera. Omitido/null no modifica. Desactivar con compromisos
-          activos incompatibles produce 409. Sin ETag por ausencia de GET individual.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/canchaId'
-  /canchas/{canchaId}/turnos:
-    get:
-      tags:
-      - M4 · Canchas
-      summary: Consultar disponibilidad de turnos
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P07, P08.'
-      operationId: listarTurnosCancha
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Turno'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-      parameters:
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      x-roles-actuales:
-      - USUARIO
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P07
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Sede derivada de cancha; Recepción sólo propia, Gerente cualquiera. Clientes habilitados por
-          servicio pueden usar otras sedes. Turnos con inicio en [desde,hasta); orden inicio ascendente, id ascendente.
-          Consulta informativa: se revalida al reservar.'
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    post:
-      tags:
-      - M4 · Canchas
-      summary: Crear turno predefinido
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P07, P08.'
-      operationId: crearTurnoCancha
-      x-implementation-status: stub
-      responses:
-        '201':
-          description: Recurso creado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Turno'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CrearTurnoRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P07
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo su sede; Gerente cualquiera. Garantía BD evita solapamientos y duplicados; 409
-          si incompatible. Precio calculado por servidor según tarifas y reglas del servicio.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/canchaId'
-  /canchas/{canchaId}/reservas:
-    post:
-      tags:
-      - M4 · Canchas
-      summary: Retener turno de cancha
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P07, P08.'
-      operationId: retenerTurnoCancha
-      x-implementation-status: stub
-      responses:
-        '201':
-          description: Recurso creado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ReservaCancha'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReservarCanchaRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - USUARIO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P02
-      - P07
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Titular del JWT; sede derivada de cancha/turno. turnoId debe pertenecer a cancha. Servidor
-          valida disponibilidad, mantenimiento y reglas del servicio, calcula precio y venceEn. Optimistic locking
-          + integridad BD: dos competidores, uno obtiene 201 y otro 409. Crea PENDIENTE_PAGO; luego POST /pagos.
-          No mantiene lock/transacción durante ventana de pago. Expiración libera turno; 201 no indica pago aprobado.'
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/canchaId'
-  /canchas/{canchaId}/reservas/{reservaId}:
-    delete:
-      tags:
-      - M4 · Canchas
-      summary: Cancelar reserva de cancha
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P08, P10.'
-      operationId: cancelarReservaCancha
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResultadoCancelacionCancha'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      x-roles-actuales:
-      - USUARIO
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P08
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente sólo propia aunque membresía haya vencido; Recepción operación normal de su sede; Gerente
-          cualquiera. Reserva debe pertenecer a cancha. >= 2 h a tiempo, < 2 h tardía. M4 decide elegibilidad según
-          política; M5 ejecuta devolución con clave interna estable. Cancelación y reembolso tienen estados separados.
-          No acepta una excepción financiera en esta ruta; Gerente puede solicitarla en M5. No cancela una reserva
-          finalizada.
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/canchaId'
-    - $ref: '#/components/parameters/reservaId'
-  /canchas/{canchaId}/mantenimientos:
-    post:
-      tags:
-      - M4 · Canchas
-      summary: Bloquear cancha por mantenimiento
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P08.'
-      operationId: crearMantenimientoCancha
-      x-implementation-status: stub
-      responses:
-        '201':
-          description: Recurso creado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Mantenimiento'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MantenimientoRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo sede de cancha; Gerente cualquiera. El servidor deriva sede y comprueba cruces
-          contra turnos, retenciones/reservas activas y bloqueos; conflicto produce 409 con garantía BD.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/canchaId'
-  /canchas/{canchaId}/mantenimientos/{mantenimientoId}:
-    delete:
-      tags:
-      - M4 · Canchas
-      summary: Eliminar bloqueo de mantenimiento
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P08.'
-      operationId: eliminarMantenimientoCancha
-      x-implementation-status: stub
-      responses:
-        '204':
-          description: Operación completada sin cuerpo.
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/CanchaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P08
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo sede de cancha; Gerente cualquiera. Verifica pertenencia del mantenimiento a
-          cancha; eliminación auditada e idempotente, sin cuerpo de respuesta.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/canchaId'
-    - $ref: '#/components/parameters/mantenimientoId'
-  /reservas/me:
-    get:
-      tags:
-      - M4 · Canchas
-      summary: Listar mis reservas y penalización
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P06, P08, P10.'
-      operationId: listarMisReservas
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginaMisReservas'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
-      x-roles-actuales:
-      - USUARIO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/ReservaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P06
-      - P08
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Titular derivado del JWT; historial de clases y canchas en cualquier sede habilitada. Filtro
-          temporal por inicio en [desde,hasta); orden inicio descendente, id descendente y tipo de reserva para
-          desempate. Incluye estado de penalización de clases con duración configurable.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /reservas:
-    get:
-      tags:
-      - M4 · Canchas
-      summary: Listar reservas de canchas
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P08, P10.'
-      operationId: listarReservasCancha
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginaReservasCancha'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/SedeFiltro'
-      - $ref: '#/components/parameters/UsuarioFiltro'
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
-      x-roles-actuales:
-      - RECEPCIONISTA
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/reserva/controller/ReservaController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P08
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo propia sede, Gerente global o por sede. Historial con estado separado del reembolso.
-          Filtra inicio en [desde,hasta); orden inicio descendente, id descendente.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /pagos:
-    post:
-      tags:
-      - M5 · Pagos
-      summary: Iniciar pago de recurso
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P07, P08, P09.'
-      operationId: iniciarPago
-      x-implementation-status: stub
-      responses:
-        '201':
-          description: Recurso creado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pago'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      parameters:
-      - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CrearPagoRequest'
-        x-propuesta-required: true
-      x-roles-actuales:
-      - USUARIO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P07
-      - P08
-      - P09
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente sólo recurso propio; Gerente cualquiera. Importe, titular y sede derivados del recurso,
-          nunca recibidos del cliente. Revalida recurso pendiente y no vencido. Idempotency-Key obligatorio. 201
-          crea operación, no garantiza aprobación. Si la confirmación llega después de vencer la retención, conserva
-          reserva EXPIRADA/CANCELADA, libera turno e inicia compensación/reembolso; nunca revive ni reasigna. Concurrencia
-          entre vencimiento y aprobación se resuelve atómicamente sin lock durante espera externa.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    get:
-      tags:
-      - M5 · Pagos
-      summary: Listar pagos administrativos
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P09, P10.'
-      operationId: listarPagos
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginaPagos'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/SedeFiltro'
-      - $ref: '#/components/parameters/UsuarioFiltro'
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
-      x-roles-actuales:
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P09
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Sólo Gerente; sin sedeId consulta global. Filtra creadoEn en [desde,hasta); orden creadoEn
-          descendente, id descendente.
-      x-propuesta-permisos:
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /pagos/me:
-    get:
-      tags:
-      - M5 · Pagos
-      summary: Consultar mis pagos
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P09, P10.'
-      operationId: listarMisPagos
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginaPagos'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
-      x-roles-actuales:
-      - USUARIO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P09
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Titular JWT; incluye historial, pagos tardíos y compensaciones. Filtra creadoEn en [desde,hasta);
-          orden creadoEn descendente, id descendente.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-  /pagos/{pagoId}:
-    get:
-      tags:
-      - M5 · Pagos
-      summary: Consultar pago y compensación
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P09, P10.'
-      operationId: consultarPago
-      x-implementation-status: stub
-      responses:
-        '200':
-          description: Resultado de la operación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pago'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-      x-roles-actuales:
-      - USUARIO
-      - GERENTE
-      x-contract-source:
-      - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P09
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Cliente sólo propio; Gerente cualquier sede. Estado del pago separado de sus reembolsos. Recepción
-          gestiona reembolso normal por ruta dedicada, sin habilitar consulta global de M5.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
-    parameters:
-    - $ref: '#/components/parameters/pagoId'
-  /pagos/{pagoId}/comprobante:
-    get:
-      tags:
-      - M5 · Pagos
-      summary: Descargar comprobante PDF de membresía
-      description: >-
-        Entrega el PDF original, emitido automáticamente al contratar o renovar una membresía.
-        Cliente sólo pago propio; gerente cualquier pago. Pago aprobado o previamente reembolsado;
-        el PDF acredita el cobro original y no la vigencia actual. Recupera pagos históricos de
-        membresías sin PDF al descargar. Reservas de cancha pendientes de integración con M4 (409).
-      operationId: descargarComprobantePago
-      x-implementation-status: implemented
-      x-contract-status: stable
-      responses:
-        '200':
-          description: Comprobante PDF original descargable.
-          headers:
-            Content-Disposition:
-              $ref: '#/components/headers/ContentDisposition'
-            Cache-Control:
-              schema:
-                type: string
-                enum: [no-store]
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      x-roles-actuales: [USUARIO, GERENTE]
-      x-contract-source:
-      - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      - src/main/java/com/fitzonesports/pago/service/ComprobanteService.java
-    parameters:
-    - $ref: '#/components/parameters/pagoId'
-  /pagos/{pagoId}/reembolsos:
-    post:
-      tags:
-      - M5 · Pagos
-      summary: Reembolsar un pago de membresía dentro de 24 horas
-      description: >-
-        Sin cuerpo ni Idempotency-Key: una devolución completa por pago, con clave interna estable.
-        Cliente sólo pago propio; gerente cualquier pago, sujeto al mismo plazo estricto menor a 24 h
-        desde el cobro. M1 cancela el período y recalcula la vigencia; M5 registra el reembolso
-        simulado aprobado. Reintentos, incluso concurrentes o por la ruta de cancelación de M1,
-        no duplican la devolución. La repetición de una devolución completada devuelve 200
-        incluso después del plazo. No admite excepciones, importes parciales ni reservas de cancha;
-        estas últimas requieren integración con M4 (409). La pasarela fake sigue siempre aprobando.
-      operationId: solicitarReembolsoPago
-      x-implementation-status: implemented
-      x-contract-status: stable
-      responses:
-        '200':
-          description: Reembolso completo confirmado o resultado de una devolución ya realizada.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ReembolsoMembresiaResponse'
-        '400':
-          $ref: '#/components/responses/Validacion'
-        '401':
-          $ref: '#/components/responses/NoAutenticado'
-        '403':
-          $ref: '#/components/responses/SinPermiso'
-        '404':
-          $ref: '#/components/responses/NoEncontrado'
-        '409':
-          $ref: '#/components/responses/Conflicto'
-      x-roles-actuales: [USUARIO, GERENTE]
-      x-contract-source:
-      - src/main/java/com/fitzonesports/pago/controller/PagoController.java
-      - src/main/java/com/fitzonesports/pago/service/ReembolsoService.java
-    parameters:
-    - $ref: '#/components/parameters/pagoId'
+  "/tipos-cancha":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Listar tipos y tarifas globales"
+      "description": ""
+      "operationId": "listarTiposCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "RECEPCIONISTA", "GERENTE"]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M4Tipo"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+    "post":
+      "tags": ["M4 · Canchas"]
+      "summary": "Crear tipo y tarifa global"
+      "description": ""
+      "operationId": "crearTipoCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["GERENTE"]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4TipoRequest"
+      "responses":
+        "201":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Tipo"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/tipos-cancha/{id}":
+    "put":
+      "tags": ["M4 · Canchas"]
+      "summary": "Reemplazar nombre y tarifa de tipo"
+      "description": ""
+      "operationId": "actualizarTipoCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["GERENTE"]
+      "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4TipoRequest"
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Tipo"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/sedes/{sedeId}/recargo-pico":
+    "put":
+      "tags": ["M4 · Canchas"]
+      "summary": "Configurar recargo porcentual de la sede"
+      "description": ""
+      "operationId": "configurarRecargoPico"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["GERENTE"]
+      "parameters": [{"name": "sedeId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4Tarifa"
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Tarifa"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/canchas":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Listar canchas de una sede"
+      "description": "Recepcion deriva su sede; USUARIO y gerente indican sedeId. Maximo 100 canchas por respuesta."
+      "operationId": "listarCanchas"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "sedeId", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M4Cancha"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+    "post":
+      "tags": ["M4 · Canchas"]
+      "summary": "Crear cancha"
+      "description": "Recepcion administra solo su sede; gerente indica sedeId. Tarifa global del tipo, no precio recibido por reserva."
+      "operationId": "crearCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4CrearCancha"
+      "responses":
+        "201":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Cancha"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/canchas/{canchaId}":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Consultar cancha"
+      "description": ""
+      "operationId": "consultarCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Cancha"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+    "patch":
+      "tags": ["M4 · Canchas"]
+      "summary": "Actualizar cancha"
+      "description": "Omitido o null no modifica. Baja logica no elimina reservas historicas."
+      "operationId": "actualizarCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4ActualizarCancha"
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Cancha"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/canchas/{canchaId}/turnos":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Consultar disponibilidad y precio por usuario"
+      "description": "Rango inclusivo de hasta 31 dias, maximo 1000 turnos. Horario argentino. Precio informativo; se fija al retener. Pico [19,21), prorrateado por minuto; luego descuento del 15% con membresia vigente. HALF_UP a centavos."
+      "operationId": "listarTurnos"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}, {"name": "desde", "in": "query", "required": true, "schema": {"type": "string", "format": "date"}}, {"name": "hasta", "in": "query", "required": true, "schema": {"type": "string", "format": "date"}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M4Turno"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+    "post":
+      "tags": ["M4 · Canchas"]
+      "summary": "Crear turno predefinido"
+      "description": "Duracion configurada (60 min por defecto), mismo dia, sin segundos y futuro. Solapamientos rechazados por PostgreSQL."
+      "operationId": "crearTurno"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4CrearTurno"
+      "responses":
+        "201":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Turno"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/canchas/{canchaId}/reservas":
+    "post":
+      "tags": ["M4 · Canchas"]
+      "summary": "Retener turno sin cobrar"
+      "description": "Una ocupacion activa por turno. Retencion 10 min configurable y nunca posterior al inicio. Importe, titular y vigencia derivados del servidor. Misma clave con otro turno: 409."
+      "operationId": "reservarTurno"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}, {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "format": "uuid"}}]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4Reservar"
+      "responses":
+        "201":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Reserva"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/canchas/{canchaId}/reservas/{reservaId}":
+    "delete":
+      "tags": ["M4 · Canchas"]
+      "summary": "Cancelar reserva y reembolsar si corresponde"
+      "description": "Titular, recepcion de su sede o gerente. No permite turno iniciado. >=2h devuelve 100%, menos devuelve 50%. Repetir no duplica devolucion; una cancelacion sin cobro no genera pago."
+      "operationId": "cancelarReserva"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}, {"name": "reservaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Reserva"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+      "requestBody":
+        "required": false
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4Cancelar"
+  "/canchas/{canchaId}/mantenimientos":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Listar bloqueos y su historial"
+      "description": "Maximo 100 bloqueos, mas recientes primero."
+      "operationId": "listarMantenimientosCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M4Mantenimiento"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+    "post":
+      "tags": ["M4 · Canchas"]
+      "summary": "Crear bloqueo de mantenimiento"
+      "description": "No permite solaparse con reservas activas. Fin null indica bloqueo indefinido. Comparte bloqueo SQL con reservas."
+      "operationId": "crearMantenimiento"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M4MantenimientoRequest"
+      "responses":
+        "201":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Mantenimiento"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/canchas/{canchaId}/mantenimientos/{mantenimientoId}":
+    "delete":
+      "tags": ["M4 · Canchas"]
+      "summary": "Desactivar bloqueo"
+      "description": "Baja logica idempotente; bloqueo ajeno o inexistente: 404."
+      "operationId": "eliminarMantenimiento"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "canchaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}, {"name": "mantenimientoId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "204":
+          "description": "Resultado de la operacion."
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/reservas/me":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Consultar reservas propias"
+      "description": ""
+      "operationId": "listarMisReservas"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "parameters": [{"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 0, "maximum": 100000, "default": 0}}, {"name": "size", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1, "maximum": 100, "default": 20}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M4Reserva"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/reservas":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Consultar reservas administrativas"
+      "description": "Recepcion solo su sede; gerente global o filtrado. Orden por creacion descendente."
+      "operationId": "listarReservas"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "sedeId", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1}}, {"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 0, "maximum": 100000, "default": 0}}, {"name": "size", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1, "maximum": 100, "default": 20}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M4Reserva"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/reservas/{reservaId}":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Consultar reserva individual"
+      "description": ""
+      "operationId": "consultarReservaCancha"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "reservaId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Reserva"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/pagos":
+    "get":
+      "tags": ["M5 · Pagos"]
+      "summary": "Consultar pagos globales"
+      "description": ""
+      "operationId": "listarPagos"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["GERENTE"]
+      "parameters": [{"name": "sedeId", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1}}, {"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 0, "maximum": 100000, "default": 0}}, {"name": "size", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1, "maximum": 100, "default": 20}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M5Pago"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+    "post":
+      "tags": ["M5 · Pagos"]
+      "summary": "Pagar reserva retenida"
+      "description": "Precio y DNI del titular se obtienen en servidor. DNI fake 99999999: RECHAZADO, libera turno y no emite PDF. Otros DNI: APROBADO, confirma y emite PDF. Una operacion por reserva; repetir devuelve mismo pago. Rechazo es recurso persistido, no error HTTP. No recibe monto ni datos de tarjeta."
+      "operationId": "crearPago"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/M5CrearPagoCancha"
+      "responses":
+        "201":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M5Pago"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/pagos/me":
+    "get":
+      "tags": ["M5 · Pagos"]
+      "summary": "Consultar pagos propios"
+      "description": ""
+      "operationId": "listarMisPagos"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "parameters": [{"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 0, "maximum": 100000, "default": 0}}, {"name": "size", "in": "query", "required": false, "schema": {"type": "integer", "format": "int32", "minimum": 1, "maximum": 100, "default": 20}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "type": "array"
+                "items":
+                  "$ref": "#/components/schemas/M5Pago"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/pagos/{pagoId}":
+    "get":
+      "tags": ["M5 · Pagos"]
+      "summary": "Consultar pago propio o por gerente"
+      "description": ""
+      "operationId": "consultarPago"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "parameters": [{"name": "pagoId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M5Pago"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/pagos/{pagoId}/comprobante":
+    "get":
+      "tags": ["M5 · Pagos"]
+      "summary": "Descargar comprobante original de membresia o cancha"
+      "description": ""
+      "operationId": "descargarComprobantePago"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "parameters": [{"name": "pagoId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "PDF original persistido, incluso tras reembolso."
+          "headers":
+            "Content-Disposition":
+              "schema":
+                "type": "string"
+                "example": "attachment; filename=\"comprobante-50.pdf\""
+            "Cache-Control":
+              "schema":
+                "type": "string"
+                "enum": ["no-store"]
+          "content":
+            "application/pdf":
+              "schema":
+                "type": "string"
+                "format": "binary"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
+  "/pagos/{pagoId}/reembolsos":
+    "post":
+      "tags": ["M5 · Pagos"]
+      "summary": "Reembolsar mediante la politica del recurso"
+      "description": "Sin cuerpo ni clave externa. Membresias: plazo menor a 24h, devolucion total. Canchas: cancela la reserva y aplica 100%/50% segun anticipacion; no cancela turnos iniciados. Idempotente y coordinado con la ruta DELETE de M4. El PDF original se conserva."
+      "operationId": "solicitarReembolsoPago"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["USUARIO", "GERENTE"]
+      "parameters": [{"name": "pagoId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Resultado de la operacion."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M5Reembolso"
+        "400":
+          "description": "Entrada invalida."
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Recurso inexistente."
+        "409":
+          "description": "Conflicto de negocio o concurrencia."
   /reportes/ocupacion:
     get:
       tags:
@@ -3005,6 +2854,310 @@ components:
       bearerFormat: JWT
       description: JWT emitido por login o registro. El servidor resuelve actor, permisos, propiedad y sede.
   schemas:
+    "M4TipoRequest":
+      "type": "object"
+      "required": ["nombre", "precioHora"]
+      "properties":
+        "nombre":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 255
+        "precioHora":
+          "type": "number"
+          "minimum": 0.01
+          "multipleOf": 0.01
+    "M4Tipo":
+      "type": "object"
+      "required": ["id", "nombre", "precioHora"]
+      "properties":
+        "id":
+          "type": "integer"
+          "format": "int32"
+        "nombre":
+          "type": "string"
+        "precioHora":
+          "type": "number"
+          "nullable": true
+    "M4Tarifa":
+      "type": "object"
+      "required": ["recargoPico"]
+      "properties":
+        "recargoPico":
+          "type": "number"
+          "minimum": 0
+          "maximum": 100
+          "multipleOf": 0.01
+          "example": 20
+    "M4CrearCancha":
+      "type": "object"
+      "required": ["nombre", "tipo"]
+      "properties":
+        "nombre":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 255
+        "tipo":
+          "type": "string"
+          "description": "Nombre de un tipo existente con tarifa global configurada."
+        "sedeId":
+          "type": "integer"
+          "format": "int32"
+          "minimum": 1
+          "nullable": true
+        "activa":
+          "type": "boolean"
+    "M4ActualizarCancha":
+      "type": "object"
+      "required": []
+      "properties":
+        "nombre":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 255
+          "nullable": true
+        "tipo":
+          "type": "string"
+          "nullable": true
+        "activa":
+          "type": "boolean"
+          "nullable": true
+    "M4Cancha":
+      "type": "object"
+      "required": ["id", "nombre", "tipo", "sedeId", "activa", "precioHora", "recargoPico"]
+      "properties":
+        "id":
+          "type": "integer"
+          "format": "int32"
+        "nombre":
+          "type": "string"
+        "tipo":
+          "type": "string"
+        "sedeId":
+          "type": "integer"
+          "format": "int32"
+        "activa":
+          "type": "boolean"
+        "precioHora":
+          "type": "number"
+          "nullable": true
+        "recargoPico":
+          "type": "number"
+    "M4CrearTurno":
+      "type": "object"
+      "required": ["inicio", "fin"]
+      "properties":
+        "inicio":
+          "type": "string"
+          "format": "date-time"
+        "fin":
+          "type": "string"
+          "format": "date-time"
+    "M4Precio":
+      "type": "object"
+      "required": ["base", "recargo", "descuento", "total", "estrategia"]
+      "properties":
+        "base":
+          "type": "number"
+        "recargo":
+          "type": "number"
+        "descuento":
+          "type": "number"
+        "total":
+          "type": "number"
+        "estrategia":
+          "type": "string"
+          "enum": ["ESTANDAR", "SOCIO"]
+    "M4Turno":
+      "type": "object"
+      "required": ["id", "canchaId", "inicio", "fin", "disponible", "precio"]
+      "properties":
+        "id":
+          "type": "integer"
+          "format": "int32"
+        "canchaId":
+          "type": "integer"
+          "format": "int32"
+        "inicio":
+          "type": "string"
+          "format": "date-time"
+        "fin":
+          "type": "string"
+          "format": "date-time"
+        "disponible":
+          "type": "boolean"
+        "precio":
+          "$ref": "#/components/schemas/M4Precio"
+    "M4Reservar":
+      "type": "object"
+      "required": ["turnoId"]
+      "properties":
+        "turnoId":
+          "type": "integer"
+          "format": "int32"
+          "minimum": 1
+    "M4Reserva":
+      "type": "object"
+      "required": ["id", "canchaId", "turnoId", "usuarioId", "sedeId", "cancha", "sede", "tipo", "inicio", "fin", "estado", "precioAplicado", "creadaEn", "venceEn", "pagoId", "estadoPago"]
+      "properties":
+        "id":
+          "type": "integer"
+          "format": "int32"
+        "canchaId":
+          "type": "integer"
+          "format": "int32"
+        "turnoId":
+          "type": "integer"
+          "format": "int32"
+        "usuarioId":
+          "type": "integer"
+          "format": "int32"
+        "sedeId":
+          "type": "integer"
+          "format": "int32"
+        "cancha":
+          "type": "string"
+        "sede":
+          "type": "string"
+        "tipo":
+          "type": "string"
+        "inicio":
+          "type": "string"
+          "format": "date-time"
+        "fin":
+          "type": "string"
+          "format": "date-time"
+        "estado":
+          "type": "string"
+          "enum": ["PENDIENTE_PAGO", "CONFIRMADA", "RECHAZADA", "EXPIRADA", "CANCELADA", "CUMPLIDA"]
+        "precioAplicado":
+          "type": "number"
+        "creadaEn":
+          "type": "string"
+          "format": "date-time"
+        "venceEn":
+          "type": "string"
+          "format": "date-time"
+          "nullable": true
+        "pagoId":
+          "type": "integer"
+          "format": "int32"
+          "nullable": true
+        "estadoPago":
+          "type": "string"
+          "nullable": true
+    "M4MantenimientoRequest":
+      "type": "object"
+      "required": ["inicio", "motivo"]
+      "properties":
+        "inicio":
+          "type": "string"
+          "format": "date-time"
+        "fin":
+          "type": "string"
+          "format": "date-time"
+          "nullable": true
+        "motivo":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 255
+    "M4Mantenimiento":
+      "type": "object"
+      "required": ["id", "canchaId", "inicio", "fin", "motivo", "activo", "creadoPor"]
+      "properties":
+        "id":
+          "type": "integer"
+          "format": "int32"
+        "canchaId":
+          "type": "integer"
+          "format": "int32"
+        "inicio":
+          "type": "string"
+          "format": "date-time"
+        "fin":
+          "type": "string"
+          "format": "date-time"
+          "nullable": true
+        "motivo":
+          "type": "string"
+        "activo":
+          "type": "boolean"
+        "creadoPor":
+          "type": "integer"
+          "format": "int32"
+          "nullable": true
+    "M4Cancelar":
+      "type": "object"
+      "required": []
+      "properties":
+        "porcentajeReembolso":
+          "type": "number"
+          "enum": [50, 100]
+          "nullable": true
+          "description": "Opcional, exclusivo del gerente. Sin valor: 100% con >=2 h; 50% con menos de 2 h."
+    "M5CrearPagoCancha":
+      "type": "object"
+      "required": ["concepto", "recursoId"]
+      "properties":
+        "concepto":
+          "type": "string"
+          "enum": ["RESERVA_CANCHA"]
+        "recursoId":
+          "type": "integer"
+          "format": "int32"
+          "minimum": 1
+    "M5Pago":
+      "type": "object"
+      "required": ["id", "usuarioId", "concepto", "recursoId", "monto", "moneda", "estado", "fecha", "referenciaExterna", "montoReembolsado"]
+      "properties":
+        "id":
+          "type": "integer"
+          "format": "int32"
+        "usuarioId":
+          "type": "integer"
+          "format": "int32"
+        "concepto":
+          "type": "string"
+        "recursoId":
+          "type": "integer"
+          "format": "int32"
+        "monto":
+          "type": "number"
+        "moneda":
+          "type": "string"
+          "enum": ["ARS"]
+        "estado":
+          "type": "string"
+          "enum": ["APROBADO", "RECHAZADO", "PENDIENTE", "REEMBOLSADO", "REEMBOLSADO_PARCIAL"]
+        "fecha":
+          "type": "string"
+          "format": "date-time"
+        "referenciaExterna":
+          "type": "string"
+          "nullable": true
+        "montoReembolsado":
+          "type": "number"
+    "M5Reembolso":
+      "type": "object"
+      "required": ["pagoId", "estado", "monto", "moneda", "fechaReembolso", "referenciaExterna"]
+      "properties":
+        "pagoId":
+          "type": "integer"
+          "format": "int32"
+        "estado":
+          "type": "string"
+          "enum": ["REEMBOLSADO", "REEMBOLSADO_PARCIAL"]
+        "monto":
+          "type": "number"
+        "moneda":
+          "type": "string"
+          "enum": ["ARS"]
+        "fechaReembolso":
+          "type": "string"
+          "format": "date-time"
+          "nullable": true
+        "referenciaExterna":
+          "type": "string"
+          "nullable": true
     LoginRequest:
       type: object
       required:
