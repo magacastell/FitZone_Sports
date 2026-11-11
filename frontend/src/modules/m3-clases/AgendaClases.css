@@ -1,0 +1,42 @@
+.agenda-clases .panel { padding: 24px; }
+.agenda-clases label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; }
+.agenda-clases label > span { display: flex; align-items: center; gap: 6px; }
+.agenda-clases label svg { width: 18px; height: 18px; }
+.agenda-clases select, .agenda-clases input { min-width: 0; width: 100%; min-height: 44px; padding: 10px; border: 1px solid #bbcdbf; border-radius: 9px; background: white; color: #1e2d26; font: inherit; box-sizing: border-box; }
+.agenda-clases .agenda-filtros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 20px; }
+.agenda-clases .agenda-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.agenda-clases .clase-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-wrap: anywhere; padding: 18px; border: 1px solid #e2e9e3; border-radius: 12px; background: white; }
+.agenda-clases .clase-card__cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.agenda-clases .clase-card h3 { margin: 0; font-size: 18px; }
+.agenda-clases .clase-card p { margin: 0; }
+.agenda-clases .clase-card__dato { display: flex; align-items: center; gap: 8px; color: #33463c; font-size: 14px; }
+.agenda-clases .clase-card__dato svg { flex: none; width: 16px; height: 16px; color: #2f704f; }
+.agenda-clases .clase-card__instructor { color: #52665a; font-size: 14px; }
+.agenda-clases .clase-card__situacion { display: flex; flex-wrap: wrap; gap: 6px; }
+.agenda-clases .clase-card__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 8px; }
+.agenda-clases .clase-card__acciones small, .agenda-clases .clase-card__acciones p { flex-basis: 100%; color: #52665a; font-size: 13px; line-height: 1.5; }
+.agenda-clases .clase-card__acciones--gestion { border-top: 1px solid #e2e9e3; }
+.agenda-clases .clase-card__cancelacion { display: grid; flex-basis: 100%; gap: 8px; }
+.agenda-clases .clase-card__cancelacion div { display: flex; flex-wrap: wrap; gap: 8px; }
+.agenda-clases .mis-clases { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.agenda-clases .mis-clases li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #e2e9e3; border-radius: 10px; }
+.agenda-clases .mis-clases li > div:first-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.agenda-clases .mis-clases li > div:last-child { display: flex; gap: 8px; }
+.agenda-clases .mis-clases__oferta { border-color: #e6c35c; background: #fffbea; }
+.agenda-clases .asistentes-lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.agenda-clases .asistentes-lista li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid #e2e9e3; border-radius: 10px; }
+.agenda-clases .clase-formulario { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
+.agenda-clases .clase-formulario__alta { grid-column: 1 / -1; display: grid; gap: 10px; padding: 12px 14px; border: 1px dashed #bbcdbf; border-radius: 10px; }
+.agenda-clases .clase-formulario__alta legend { padding: 0 6px; font-size: 13px; font-weight: 600; color: #52665a; }
+.agenda-clases .clase-formulario__alta div { display: flex; flex-wrap: wrap; gap: 8px; }
+.agenda-clases .clase-formulario__alta input { flex: 1 1 160px; width: auto; }
+.agenda-clases .clase-formulario__botones, .agenda-clases .agenda-error { grid-column: 1 / -1; }
+.agenda-clases .clase-formulario__botones { display: flex; flex-wrap: wrap; gap: 10px; }
+.agenda-clases .agenda-error, .agenda-clases .agenda-aviso--error { margin: 0; padding: 10px 14px; border-radius: 9px; background: #fdecec; color: #8f1d1d; }
+.agenda-clases .agenda-aviso { margin: 0; padding: 10px 14px; border-radius: 9px; }
+.agenda-clases .agenda-aviso--ok { background: #e8f4ec; color: #1f5a3a; }
+.agenda-clases .agenda-paginacion { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 20px; color: #52665a; font-size: 14px; }
+.agenda-clases .agenda-nota { color: #52665a; font-size: 14px; line-height: 1.6; }
+@media (max-width: 640px) {
+  .agenda-clases .agenda-filtros, .agenda-clases .clase-formulario { grid-template-columns: minmax(0, 1fr); }
+}
