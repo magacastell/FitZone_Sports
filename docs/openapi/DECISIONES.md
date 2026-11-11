@@ -27,6 +27,19 @@ devoluciones parciales, excepciones y procesamiento asíncrono; no se generaliza
 de membresías a M4. Los schemas anteriores de reembolso siguen como propuestas para esos flujos;
 la respuesta implementada usa `ReembolsoMembresiaResponse`.
 
+Actualización M3 (10/11/2026): se implementaron clases grupales (RF-06, RF-07 y RF-08): agenda, alta/edición/cancelación
+administrativa por sede, catálogos de instructores y tipos de clase, reservas, cancelaciones y lista de espera con
+ofertas de lugar. Las reservas y la lista de espera cierran 48 h antes del inicio; se cancela sin penalización hasta 2 h
+antes (después queda CANCELADA con tipoCancelacion TARDIA y cuentaComoFalta true, sólo marcada: P06 sigue pendiente).
+El cupo se cuenta con la clase bloqueada (`FOR UPDATE`) sumando reservas confirmadas y ofertas pendientes; el índice
+único parcial `uk_reserva_clase_confirmada` y un bloqueo por usuario evitan duplicados y clases superpuestas. Al liberarse
+un lugar, el patrón Observer (`PublicadorClase`) hace que `GestorListaEspera` ofrezca el lugar al primero de la fila y que
+`NotificadorClase` avise después del commit (el canal es un log simulado detrás del puerto `Notificador`). Las ofertas
+vencen a las 8 h o 1 h antes del inicio, lo que ocurra primero (job `VencimientoOfertasJob`). Se agregaron
+`GET /clases/me`, `/instructores` y `/tipos-clase`, fuera del contrato original. El registro de asistencia
+(`registrarAsistenciaClase`) sigue siendo un stub 501. La migración V15 elimina `clase_grupal.fecha` (repetía el día de
+`horario`) y agrega `fin`, `estado` y las tablas/índices de ofertas.
+
 Los D1–D20 del intercambio anterior fueron antecedentes de diseño. Esta revisión **no los presenta como acta ni aprobación inequívoca del equipo**. Sus aspectos técnicos se conservan y sus alternativas funcionales se trazan en P01–P12. No se encontraron en el checkout los textos completos de requisitos/ADR citados por las bitácoras; no se atribuye aprobación a documentos no leídos. Los prototipos frontend sólo aportan contexto.
 
 ## 1. Confirmado por el proyecto
@@ -46,9 +59,9 @@ Se considera confirmado lo verificable en estas fuentes locales, con su alcance 
 | README y `LOGs/Orge-LOG.MD`, 04/10/2026 | Alcance modular, endpoints iniciales y validaciones de propiedad/sede/membresía pendientes; definición de acceso de Recepción a pagos/reembolsos pendiente. | Son documentación de baseline, no cierre de nuevas reglas funcionales. |
 | `LOGs/Denis-LOG.md`, 18 y 23/09/2026 | Se investigó RN-02, diseño de errores/contratos, distintas opciones de concurrencia y contingencia offline con sincronización posterior. | No cierra estrategia de bloqueo, endpoint batch, límites, caché, tolerancia de reloj ni contratos concretos. |
 
-Operaciones stable: `iniciarSesion`, `registrarCliente`, `consultarPerfil`, `actualizarPerfil`, `listarUsuarios`, `consultarUsuario`, `actualizarUsuario`, `listarSedes`, `crearSede`, `actualizarSede`, `listarPlanes`, `crearPlan`, `actualizarPlan`, `desactivarPlan`, `obtenerQrAcceso`, `registrarIngreso`, `registrarSalida`, `consultarAforo` y `descargarComprobantePago`. Las dieciocho primeras conservan DTO y reglas funcionales del código, con las divergencias técnicas objetivo indicadas abajo y en el YAML; la última estabiliza ruta/representación PDF como decisión técnica, dejando emisión/elegibilidad pendientes.
+Operaciones stable: `iniciarSesion`, `registrarCliente`, `consultarPerfil`, `actualizarPerfil`, `listarUsuarios`, `consultarUsuario`, `actualizarUsuario`, `listarSedes`, `crearSede`, `actualizarSede`, `listarPlanes`, `crearPlan`, `actualizarPlan`, `desactivarPlan`, `obtenerQrAcceso`, `registrarIngreso`, `registrarSalida`, `consultarAforo`, `descargarComprobantePago` y, de M3, `listarClases`, `crearClase`, `actualizarClase`, `cancelarClase`, `reservarClase`, `listarReservasClase`, `cancelarReservaClase`, `incorporarListaEspera`, `salirListaEspera`, `responderOfertaClase`, `consultarMiActividadClases`, `listarInstructores`, `crearInstructor`, `listarTiposClase` y `crearTipoClase`. Las dieciocho primeras y las de M3 conservan DTO y reglas funcionales del código, con las divergencias técnicas objetivo indicadas abajo y en el YAML; `descargarComprobantePago` estabiliza ruta/representación PDF como decisión técnica, dejando emisión/elegibilidad pendientes.
 
-Las restantes 37 operaciones mantienen sus schemas útiles como draft. Su ruta y roles actuales están confirmados; sus propuestas de workflow, entradas/respuestas y alcance funcional se identifican por tema pendiente en el YAML.
+Las restantes 20 operaciones mantienen sus schemas útiles como draft. Su ruta y roles actuales están confirmados; sus propuestas de workflow, entradas/respuestas y alcance funcional se identifican por tema pendiente en el YAML.
 
 ## 2. Decisiones técnicas del contrato
 
@@ -131,7 +144,7 @@ de 500 nunca fue un contrato aprobado. El implementado admite 100 eventos.
 ### P05 — Lista de espera, cupos y tiempos (D13)
 
 - **Tema:** inscripciones, ofertas y aceptación.
-- **Qué está confirmado:** existen rutas de reserva/lista/ofertas; tabla de inscripción con posición. No hay servicios de espera ni ofertas implementados.
+- **Qué está confirmado:** M3 implementa reservas, lista de espera FIFO y ofertas con la propuesta de abajo (cierre 48 h antes, ofertas hasta 1 h antes con vigencia de 8 h o el límite operativo). El equipo aún debe validar esos números; están como constantes en `ReglasClase`.
 - **Qué falta decidir:** apertura/cierre, criterio FIFO y desempate, requisitos de ingreso, duplicados, tratamiento del cupo durante una oferta, caducidad, recepción de notificaciones y condiciones de rechazo/aceptación.
 - **Propuesta actual:** FIFO sin duplicados; cierre de inscripción 48 h antes; ofertas a inscritos previos hasta 1 h antes, vencen a las 8 h o al límite operativo, lo anterior. Esos números se conservan como propuesta en metadata, sin validaciones contractuales obligatorias. La frase del prototipo sobre apertura de reservas 48 h antes no resuelve esta política.
 - **Motivo de la propuesta:** orden previsible y ofertas que puedan aprovecharse antes de la clase.
@@ -142,7 +155,7 @@ de 500 nunca fue un contrato aprobado. El implementado admite 100 eventos.
 ### P06 — Faltas y penalizaciones (D14)
 
 - **Tema:** cálculo de faltas, sanción y correcciones.
-- **Qué está confirmado:** hay asistencia/reservas de clase y tabla de penalización; no existe lógica funcional que cierre ventana, umbral o duración.
+- **Qué está confirmado:** las cancelaciones de clase distinguen a tiempo (>= 2 h) de tardía (< 2 h, `cuentaComoFalta`); la cancelación administrativa nunca es falta. Sigue sin existir lógica que cierre ventana, umbral o duración, y el registro de asistencia es un stub.
 - **Qué falta decidir:** qué cuenta como falta, margen de cancelación, umbral, ventana móvil, duración, reincidencia, correcciones, levantamiento y dónde exponer estado/configuración.
 - **Propuesta actual:** tres faltas en 30 días; cancelación >= 2 h no cuenta y < 2 h tardía cuenta una vez; ausencia también cuenta; duración configurable. Exponer penalización en `/reservas/me` era una alternativa, sin hacerla campo obligatorio. Umbral, ventana y tiempos no son enums ni constantes normativas.
 - **Motivo de la propuesta:** aplicación consistente y correcciones sin duplicar faltas.

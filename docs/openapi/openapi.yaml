@@ -1418,12 +1418,14 @@ paths:
       tags:
       - M3 · Clases
       summary: Consultar agenda de clases
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P05.'
+      description: |-
+        USUARIO, RECEPCIONISTA y GERENTE; consultar la agenda no exige membresía.
+        Filtros opcionales: sedeId, desde y hasta (el inicio de la clase debe caer en [desde, hasta)). Sin desde se lista desde las
+        00:00 de hoy (hora de Argentina); hasta debe ser posterior a desde (400). RECEPCIONISTA ve siempre su sede y recibe 403 si pide
+        otra; USUARIO y GERENTE ven cualquiera. Orden por inicio e id ascendentes; size entre 1 y 100 (400 fuera de rango).
+        lugaresDisponibles = cupo − reservas confirmadas − ofertas pendientes. El estado FINALIZADA se deriva de fin < ahora.
       operationId: listarClases
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '200':
           description: Resultado de la operación.
@@ -1437,8 +1439,6 @@ paths:
           $ref: '#/components/responses/NoAutenticado'
         '403':
           $ref: '#/components/responses/SinPermiso'
-      x-divergencias-backend:
-      - 'USUARIO puede consultar el stub. Las acciones de reserva/lista de espera requieren vigencia en M1; las cancelaciones conservan autorización para recuperar recursos propios.'
       parameters:
       - $ref: '#/components/parameters/SedeFiltro'
       - $ref: '#/components/parameters/Desde'
@@ -1451,32 +1451,19 @@ paths:
       - RECEPCIONISTA
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P02
-      - P05
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Clientes consultan agenda donde el servicio/membresía lo permita; reservar exige membresía
-          activa sin penalización. Recepción sólo su sede, Gerente global o por sede. Inicio en [desde,hasta); orden
-          inicio ascendente, id ascendente.
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     post:
       tags:
       - M3 · Clases
       summary: Crear clase
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P05.'
+      description: |-
+        RECEPCIONISTA y GERENTE. Recepción omite sedeId (se toma de su usuario; si envía otra, 403); el Gerente debe
+        indicarla (400 si falta, 404 si no existe). El nombre de la clase es el del tipo de clase. Valida fin > inicio e inicio futuro (400),
+        que el tipo y el instructor existan (404) y que el instructor no tenga otra clase superpuesta (409; el instructor se bloquea
+        mientras se verifica, así dos altas simultáneas no lo duplican). Cupo entre 1 y 1000.
       operationId: crearClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '201':
           description: Recurso creado.
@@ -1495,43 +1482,194 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO ClaseRequest.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ClaseRequest'
-        x-propuesta-required: true
       x-roles-actuales:
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P05
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción deriva sede; Gerente indica sede. Valida horarios y cupo. No permite asignar estado
-          ni disponibilidad desde el cliente.
-      x-propuesta-permisos:
-      - RECEPCION
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
+  /clases/me:
+    get:
+      tags:
+      - M3 · Clases
+      summary: Consultar mi actividad en clases
+      description: |-
+        USUARIO y GERENTE. Lo que el titular del JWT tiene en curso: reservas confirmadas de clases que no terminaron, entradas
+        activas de lista de espera (EN_ESPERA u OFERTADA) y ofertas pendientes de responder, cada una junto a su clase.
+        Sirve para que el cliente vea de un vistazo sus lugares y los que se liberaron para él.
+      operationId: consultarMiActividadClases
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: ClaseController y MiActividadService. Ruta agregada en M3; no estaba en el contrato original.
+      responses:
+        '200':
+          description: Actividad del titular.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiActividadClases'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+      x-roles-actuales:
+      - USUARIO
       - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-source:
+      - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
+      - src/main/java/com/fitzonesports/clase/service/MiActividadService.java
+  /instructores:
+    get:
+      tags:
+      - M3 · Clases
+      summary: Listar instructores
+      description: |-
+        RECEPCIONISTA y GERENTE. Catálogo de instructores, ordenado por apellido y nombre. Los instructores no pertenecen a
+        una sede: cualquier sede puede asignarlos a sus clases.
+      operationId: listarInstructores
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: InstructorController y CatalogoClaseService. Ruta agregada en M3.
+      responses:
+        '200':
+          description: Instructores.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instructor'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+      x-roles-actuales:
+      - RECEPCIONISTA
+      - GERENTE
+      x-contract-source:
+      - src/main/java/com/fitzonesports/clase/controller/InstructorController.java
+    post:
+      tags:
+      - M3 · Clases
+      summary: Crear instructor
+      description: |-
+        RECEPCIONISTA y GERENTE. Alta de un instructor con nombre y apellido (hasta 255 caracteres cada uno).
+      operationId: crearInstructor
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: InstructorController y CatalogoClaseService. Ruta agregada en M3.
+      requestBody:
+        required: true
+        description: DTO InstructorRequest.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstructorRequest'
+      responses:
+        '201':
+          description: Instructor creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instructor'
+        '400':
+          $ref: '#/components/responses/Validacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+      x-roles-actuales:
+      - RECEPCIONISTA
+      - GERENTE
+      x-contract-source:
+      - src/main/java/com/fitzonesports/clase/controller/InstructorController.java
+  /tipos-clase:
+    get:
+      tags:
+      - M3 · Clases
+      summary: Listar tipos de clase
+      description: |-
+        USUARIO, RECEPCIONISTA y GERENTE. Catálogo de tipos de actividad (Spinning, Yoga, etc.), ordenado por nombre.
+      operationId: listarTiposClase
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: TipoClaseController y CatalogoClaseService. Ruta agregada en M3.
+      responses:
+        '200':
+          description: Tipos de clase.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TipoClase'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+      x-roles-actuales:
+      - USUARIO
+      - RECEPCIONISTA
+      - GERENTE
+      x-contract-source:
+      - src/main/java/com/fitzonesports/clase/controller/TipoClaseController.java
+    post:
+      tags:
+      - M3 · Clases
+      summary: Crear tipo de clase
+      description: |-
+        RECEPCIONISTA y GERENTE. Alta de un tipo de actividad. El nombre es único sin distinguir mayúsculas ni espacios
+        sobrante (409 si ya existe; lo garantiza el índice uk_tipo_clase_nombre de V15). Es el nombre que muestran las clases.
+      operationId: crearTipoClase
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: TipoClaseController y CatalogoClaseService. Ruta agregada en M3.
+      requestBody:
+        required: true
+        description: DTO TipoClaseRequest.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoClaseRequest'
+      responses:
+        '201':
+          description: Tipo creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoClase'
+        '400':
+          $ref: '#/components/responses/Validacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '409':
+          $ref: '#/components/responses/Conflicto'
+      x-roles-actuales:
+      - RECEPCIONISTA
+      - GERENTE
+      x-contract-source:
+      - src/main/java/com/fitzonesports/clase/controller/TipoClaseController.java
   /clases/{claseId}:
     patch:
       tags:
       - M3 · Clases
       summary: Actualizar clase
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P05.'
+      description: |-
+        RECEPCIONISTA (sólo su sede, 403) y GERENTE. Campo omitido o null = no modificar. Una clase cancelada o
+        finalizada no se modifica (409). No permite bajar el cupo por debajo de los lugares ocupados, que son reservas confirmadas más
+        ofertas pendientes (409). Si el cupo sube, los lugares nuevos se ofrecen a la lista de espera. Cambiar el horario revalida
+        fin > inicio y la superposición del instructor, y avisa a quienes tienen reserva o lista de espera (Observer).
       operationId: actualizarClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '200':
           description: Resultado de la operación.
@@ -1550,32 +1688,19 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO ActualizarClaseRequest.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ActualizarClaseRequest'
-        x-propuesta-required: true
       x-roles-actuales:
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P05
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo su sede; Gerente cualquiera. Omitido/null no modifica. No reduce cupo por debajo
-          de reservas vigentes ni introduce solapamientos incompatibles. Sin ETag por ausencia de GET individual.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
   /clases/{claseId}/cancelacion:
@@ -1583,12 +1708,13 @@ paths:
       tags:
       - M3 · Clases
       summary: Cancelar clase administrativa
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P05, P06, P10.'
+      description: |-
+        RECEPCIONISTA (sólo su sede, 403) y GERENTE. El motivo es obligatorio (hasta 255 caracteres). Cancela la clase,
+        pasa las reservas confirmadas a CANCELADA sin tipo de cancelación (tipoCancelacion NO_APLICA, no cuenta como falta), vence las ofertas
+        pendientes, retira la lista de espera y avisa a las personas afectadas. Repetir sobre una clase ya cancelada devuelve el resultado sin
+        cambios; una clase finalizada responde 409.
       operationId: cancelarClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '200':
           description: Resultado de la operación.
@@ -1607,35 +1733,19 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO MotivoRequest.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/MotivoRequest'
-        x-propuesta-required: true
       x-roles-actuales:
       - RECEPCIONISTA
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P05
-      - P06
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo su sede; Gerente cualquiera. Audita motivo, cancela reservas y cierra lista/ofertas.
-          No registra faltas de clientes por cancelación administrativa. Repetir conserva resultado y no duplica
-          compensaciones.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
   /clases/{claseId}/reservas:
@@ -1643,12 +1753,14 @@ paths:
       tags:
       - M3 · Clases
       summary: Reservar plaza en clase
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P05, P06.'
+      description: |-
+        USUARIO con membresía vigente (403 si no la tiene) y GERENTE. Reserva para el titular del JWT. Las reservas cierran 48 h
+        antes del inicio (409). Con la clase bloqueada se cuenta el cupo (confirmadas + ofertas pendientes) y se inserta la reserva en la misma
+        transacción: sin cupo responde 409 y nunca se excede la capacidad. Una persona no puede tener dos reservas confirmadas de la misma clase
+        (409, garantizado también por el índice único parcial uk_reserva_clase_confirmada), estar a la vez en su lista de espera (409) ni tener
+        otra clase superpuesta (409). La clase cancelada, finalizada o inexistente responde 409/404.
       operationId: reservarClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '201':
           description: Recurso creado.
@@ -1671,31 +1783,17 @@ paths:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P05
-      - P06
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Titular del JWT; sede derivada de la clase. Membresía activa habilitada y sin penalización.
-          Valida cupo y ausencia de duplicados atómicamente; cupo agotado produce 409. El Gerente respeta las mismas
-          reglas para reservar para sí.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     get:
       tags:
       - M3 · Clases
       summary: Listar reservas de clase
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P05.'
+      description: |-
+        RECEPCIONISTA (sólo la sede de la clase, 403) y GERENTE. Asistentes de la clase con nombre y apellido del titular.
+        Orden por id ascendente; size entre 1 y 100.
       operationId: listarReservasClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '200':
           description: Resultado de la operación.
@@ -1719,18 +1817,8 @@ paths:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P05
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Recepción sólo sede de clase; Gerente cualquiera. Incluye estados y asistencia. Orden id ascendente.
-      x-propuesta-permisos:
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
   /clases/{claseId}/reservas/{reservaId}:
@@ -1738,12 +1826,14 @@ paths:
       tags:
       - M3 · Clases
       summary: Cancelar reserva de clase
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P02, P06, P10.'
+      description: |-
+        El titular de la reserva (aunque su membresía haya vencido), RECEPCIONISTA de la sede de la clase o GERENTE; otro
+        usuario recibe 403 y una reserva que no es de la clase, 404. Con 2 h o más de anticipación el estado queda CANCELADA con tipoCancelacion
+        A_TIEMPO; con menos, CANCELADA con tipoCancelacion TARDIA y cuentaComoFalta true (sólo se marca; no se aplica penalización). Después del
+        inicio responde 409. Repetir devuelve la reserva tal como quedó. Libera el lugar y se lo ofrece al primero de la lista de espera
+        (Observer).
       operationId: cancelarReservaClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '200':
           description: Resultado de la operación.
@@ -1767,24 +1857,8 @@ paths:
       - RECEPCIONISTA
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P02
-      - P06
-      - P10
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Cliente sólo propia aunque membresía esté vencida/suspendida; Recepción sólo su sede; Gerente
-          cualquiera. Verifica que reserva pertenezca a clase. Servidor calcula margen al inicio: >= 2 h a tiempo
-          y no falta; < 2 h tardía cuenta una vez. Tres faltas/30 días disparan penalización de duración configurada.
-          Repetir no suma faltas.'
-      x-propuesta-permisos:
-      - CLIENTE
-      - RECEPCION
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
     - $ref: '#/components/parameters/reservaId'
@@ -1851,12 +1925,12 @@ paths:
       tags:
       - M3 · Clases
       summary: Ingresar a lista de espera
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P05, P06.'
+      description: |-
+        USUARIO con membresía vigente y GERENTE. Sólo para clases sin cupo (409 si todavía hay lugares). Cierra 48 h antes del
+        inicio (409). FIFO: la posición se asigna con la clase bloqueada y es única por clase. Sin duplicados: 409 si ya tiene reserva o ya está
+        en la espera. Si se libera un lugar, el primero de la fila recibe una oferta (ver responderOfertaClase) y se le notifica.
       operationId: incorporarListaEspera
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '201':
           description: Recurso creado.
@@ -1879,22 +1953,8 @@ paths:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P05
-      - P06
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Titular del JWT, sede de clase; membresía habilitada sin penalización y clase sin cupo. Inscripción
-          cierra al alcanzar inicio - 48 h (igualdad cerrada). FIFO por instante de inscripción, desempate por id;
-          sin duplicados ni reserva confirmada simultánea. Ya inscritos pueden recibir ofertas después del cierre:
-          sólo antes de inicio - 1 h. Cada oferta vence en min(creación + 8 h, inicio - 1 h).'
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
   /clases/{claseId}/lista-espera/me:
@@ -1902,12 +1962,11 @@ paths:
       tags:
       - M3 · Clases
       summary: Salir de lista de espera propia
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P05.'
+      description: |-
+        USUARIO y GERENTE; titular del JWT, también con la membresía vencida. Retira la entrada activa y vence su oferta pendiente, que
+        se pasa al siguiente. Si no tiene una entrada activa responde 404.
       operationId: salirListaEspera
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '204':
           description: Operación completada sin cuerpo.
@@ -1924,19 +1983,8 @@ paths:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P05
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Titular del JWT, incluso con membresía vencida. Retira entrada e invalida ofertas pendientes;
-          repetir conserva ausencia de entrada sin error.
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
   /clases/{claseId}/ofertas/{ofertaId}/respuesta:
@@ -1944,12 +1992,13 @@ paths:
       tags:
       - M3 · Clases
       summary: Responder oferta de plaza
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P01, P05, P06.'
+      description: |-
+        USUARIO con membresía vigente (sólo su oferta, 403) y GERENTE. La oferta reserva el lugar para esa persona hasta
+        min(creación + 8 h, inicio − 1 h); no se generan ofertas desde inicio − 1 h. ACEPTAR crea la reserva confirmada de forma atómica y
+        RECHAZAR pasa el lugar al siguiente. Repetir la misma respuesta devuelve el resultado original; una oferta vencida o ya resuelta con otra
+        respuesta responde 409, igual que una clase que ya no admite reservas o un horario superpuesto.
       operationId: responderOfertaClase
-      x-implementation-status: stub
+      x-implementation-status: implemented
       responses:
         '200':
           description: Resultado de la operación.
@@ -1968,37 +2017,19 @@ paths:
         '409':
           $ref: '#/components/responses/Conflicto'
       requestBody:
-        required: false
-        description: Cuerpo de trabajo draft; su obligatoriedad y campos funcionales requieren validar los temas
-          pendientes.
+        required: true
+        description: DTO ResponderOfertaRequest.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ResponderOfertaRequest'
-        x-propuesta-required: true
       x-roles-actuales:
       - USUARIO
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/clase/controller/ClaseController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P01
-      - P05
-      - P06
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: 'Cliente sólo oferta propia; Gerente puede administrarla respetando elegibilidad del titular
-          y sede de clase. Valida oferta pertenece a clase. Inscripción cierra al alcanzar inicio - 48 h (igualdad
-          cerrada). FIFO por instante de inscripción, desempate por id; sin duplicados ni reserva confirmada simultánea.
-          Ya inscritos pueden recibir ofertas después del cierre: sólo antes de inicio - 1 h. Cada oferta vence
-          en min(creación + 8 h, inicio - 1 h). ACEPTAR crea reserva atómicamente; oferta vencida o respuesta incompatible:
-          409. Repetir la misma respuesta devuelve resultado original.'
-      x-propuesta-permisos:
-      - CLIENTE
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      x-contract-status: stable
+      x-contract-basis: ClaseController, servicios de M3 y migración V15.
     parameters:
     - $ref: '#/components/parameters/claseId'
     - $ref: '#/components/parameters/ofertaId'
@@ -3696,102 +3727,79 @@ components:
       type: object
       additionalProperties: false
       properties:
-        nombre:
-          type: string
-          example: Yoga
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 255
         tipoClaseId:
           type: integer
           format: int32
+          minimum: 1
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         instructorId:
           type: integer
           format: int32
+          minimum: 1
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         sedeId:
           type: integer
           format: int32
+          minimum: 1
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
+          description: Obligatoria para GERENTE; RECEPCIONISTA la omite (se toma de su usuario).
         inicio:
           type: string
           format: date-time
-          example: '2026-10-10T18:00:00-03:00'
+          example: '2026-12-10T18:00:00-03:00'
         fin:
           type: string
           format: date-time
-          example: '2026-10-10T19:00:00-03:00'
+          example: '2026-12-10T19:00:00-03:00'
         cupo:
           type: integer
           format: int32
+          minimum: 1
+          maximum: 1000
           example: 20
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
-      - nombre
+      required:
       - tipoClaseId
       - instructorId
       - inicio
       - fin
       - cupo
-      x-propuesta-descripcion: Recepción omite sedeId, derivada de sesión; Gerente debe indicarla. fin > inicio.
-        Tipo e instructor deben existir; no se permite solapamiento incompatible de instructor.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
+      description: Alta de clase (ClaseRequest). El nombre sale del tipo de clase, por eso no se envía.
     ActualizarClaseRequest:
       type: object
       additionalProperties: false
       properties:
-        nombre:
-          type: string
-          example: Yoga
-          nullable: true
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 255
         tipoClaseId:
           type: integer
           format: int32
-          example: 1
+          minimum: 1
           nullable: true
-          x-propuesta-validacion:
-            minimum: 1
+          example: 1
         instructorId:
           type: integer
           format: int32
-          example: 1
+          minimum: 1
           nullable: true
-          x-propuesta-validacion:
-            minimum: 1
+          example: 1
         inicio:
           type: string
           format: date-time
-          example: '2026-10-10T18:00:00-03:00'
           nullable: true
+          example: '2026-12-10T18:00:00-03:00'
         fin:
           type: string
           format: date-time
-          example: '2026-10-10T19:00:00-03:00'
           nullable: true
+          example: '2026-12-10T19:00:00-03:00'
         cupo:
           type: integer
           format: int32
-          example: 20
+          minimum: 1
+          maximum: 1000
           nullable: true
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-descripcion: Campo omitido o null significa no modificar. application/json; no es JSON Merge Patch.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+          example: 20
+      x-contract-status: stable
+      description: Campo omitido o null significa no modificar. application/json; no es JSON Merge Patch.
     Clase:
       type: object
       additionalProperties: false
@@ -3800,71 +3808,64 @@ components:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         nombre:
           type: string
           example: Yoga
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 255
+          description: Nombre del tipo de clase.
         tipoClaseId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         instructorId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
+        instructorNombre:
+          type: string
+          example: Lucía Fernández
         sedeId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         inicio:
           type: string
           format: date-time
-          example: '2026-10-10T18:00:00-03:00'
+          example: '2026-12-10T18:00:00-03:00'
         fin:
           type: string
           format: date-time
-          example: '2026-10-10T19:00:00-03:00'
+          example: '2026-12-10T19:00:00-03:00'
         cupo:
           type: integer
           format: int32
           example: 20
-          x-propuesta-validacion:
-            minimum: 1
         estado:
           type: string
-          example: PROGRAMADA
-          x-propuesta-valores:
+          enum:
           - PROGRAMADA
           - CANCELADA
           - FINALIZADA
+          example: PROGRAMADA
+          description: FINALIZADA se deriva de fin < ahora; no se guarda.
         lugaresDisponibles:
           type: integer
           format: int32
+          minimum: 0
           example: 5
-          x-propuesta-validacion:
-            minimum: 0
-      x-propuesta-required:
+          description: cupo − reservas confirmadas − ofertas pendientes; 0 en clases canceladas o finalizadas.
+      required:
       - id
       - nombre
+      - tipoClaseId
+      - instructorId
+      - instructorNombre
       - sedeId
       - inicio
       - fin
       - cupo
       - estado
       - lugaresDisponibles
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     PenalizacionClases:
       type: object
       additionalProperties: false
@@ -3927,54 +3928,58 @@ components:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         claseId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         usuarioId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         sedeId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         estado:
           type: string
-          example: CONFIRMADA
-          x-propuesta-valores:
+          enum:
           - CONFIRMADA
           - CANCELADA
           - ASISTIDA
           - AUSENTE
+          example: CONFIRMADA
+          description: ASISTIDA y AUSENTE quedan reservados para el registro de asistencia, aún no implementado.
         creadaEn:
           type: string
           format: date-time
-          example: '2026-10-06T18:00:00-03:00'
+          example: '2026-12-01T18:00:00-03:00'
         canceladaEn:
           type: string
           format: date-time
           nullable: true
-          example: '2026-10-06T18:00:00-03:00'
+          example: '2026-12-02T18:00:00-03:00'
         tipoCancelacion:
           type: string
-          example: NO_APLICA
-          x-propuesta-valores:
+          enum:
           - NO_APLICA
           - A_TIEMPO
           - TARDIA
+          example: NO_APLICA
+          description: A_TIEMPO si faltaban 2 h o más, TARDIA si faltaba menos; NO_APLICA si la persona no canceló.
         cuentaComoFalta:
           type: boolean
           example: false
-      x-propuesta-required:
+          description: Sólo se marca (cancelación tardía); todavía no se aplican penalizaciones.
+        titular:
+          type: object
+          nullable: true
+          description: Sólo viene en el listado de asistentes que ven recepción y gerente.
+          properties:
+            nombre:
+              type: string
+            apellido:
+              type: string
+      required:
       - id
       - claseId
       - usuarioId
@@ -3983,24 +3988,20 @@ components:
       - creadaEn
       - tipoCancelacion
       - cuentaComoFalta
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     MotivoRequest:
       type: object
       additionalProperties: false
       properties:
         motivo:
           type: string
+          minLength: 1
+          maxLength: 255
           example: Mantenimiento del salón
-          x-propuesta-validacion:
-            minLength: 1
-            maxLength: 1000
-      x-propuesta-required:
+      required:
       - motivo
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
+      description: Motivo de la cancelación administrativa (MotivoRequest).
     AsistenciaRequest:
       type: object
       additionalProperties: false
@@ -4023,49 +4024,41 @@ components:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         claseId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         usuarioId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         inscriptaEn:
           type: string
           format: date-time
-          example: '2026-10-06T18:00:00-03:00'
+          example: '2026-12-01T18:00:00-03:00'
         posicion:
           type: integer
           format: int32
+          minimum: 1
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
+          description: Orden de llegada dentro de la clase; única por clase.
         estado:
           type: string
-          example: EN_ESPERA
-          x-propuesta-valores:
+          enum:
           - EN_ESPERA
           - OFERTADA
           - ACEPTADA
           - RETIRADA
           - VENCIDA
-      x-propuesta-required:
+          example: EN_ESPERA
+      required:
       - id
       - claseId
       - usuarioId
       - inscriptaEn
       - posicion
       - estado
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     OfertaClase:
       type: object
       additionalProperties: false
@@ -4074,65 +4067,158 @@ components:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         claseId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         usuarioId:
           type: integer
           format: int32
           example: 1
-          x-propuesta-validacion:
-            minimum: 1
         creadaEn:
           type: string
           format: date-time
-          example: '2026-10-06T18:00:00-03:00'
+          example: '2026-12-01T18:00:00-03:00'
         venceEn:
           type: string
           format: date-time
-          example: '2026-10-06T18:00:00-03:00'
+          example: '2026-12-02T02:00:00-03:00'
+          description: min(creadaEn + 8 h, inicio de la clase − 1 h).
         estado:
           type: string
-          example: PENDIENTE
-          x-propuesta-valores:
+          enum:
           - PENDIENTE
           - ACEPTADA
           - RECHAZADA
           - VENCIDA
+          example: PENDIENTE
         reserva:
-          $ref: '#/components/schemas/ReservaClase'
-      x-propuesta-required:
+          allOf:
+          - $ref: '#/components/schemas/ReservaClase'
+          nullable: true
+          description: Sólo viene cuando la oferta fue aceptada.
+      required:
       - id
       - claseId
       - usuarioId
       - creadaEn
       - venceEn
       - estado
-      x-propuesta-descripcion: Oferta FIFO al titular. Vence en min(creadaEn + 8 h, inicioClase - 1 h); no se genera
-        desde inicioClase - 1 h. Aceptar valida vigencia, elegibilidad y cupo de forma atómica.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     ResponderOfertaRequest:
       type: object
       additionalProperties: false
       properties:
         respuesta:
           type: string
-          example: ACEPTAR
-          x-propuesta-valores:
+          enum:
           - ACEPTAR
           - RECHAZAR
-      x-propuesta-required:
+          example: ACEPTAR
+      required:
       - respuesta
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
+      description: Respuesta a una oferta de lugar (ResponderOfertaRequest).
+    Instructor:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        nombre:
+          type: string
+          example: Lucía
+        apellido:
+          type: string
+          example: Fernández
+      required:
+      - id
+      - nombre
+      - apellido
+      x-contract-status: stable
+    InstructorRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Lucía
+        apellido:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Fernández
+      required:
+      - nombre
+      - apellido
+      x-contract-status: stable
+    TipoClase:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        nombre:
+          type: string
+          example: Spinning
+      required:
+      - id
+      - nombre
+      x-contract-status: stable
+    TipoClaseRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Spinning
+      required:
+      - nombre
+      x-contract-status: stable
+    MiActividadClases:
+      type: object
+      additionalProperties: false
+      properties:
+        reservas:
+          type: array
+          items:
+            type: object
+            properties:
+              reserva:
+                $ref: '#/components/schemas/ReservaClase'
+              clase:
+                $ref: '#/components/schemas/Clase'
+        listaEspera:
+          type: array
+          items:
+            type: object
+            properties:
+              entrada:
+                $ref: '#/components/schemas/EntradaListaEspera'
+              clase:
+                $ref: '#/components/schemas/Clase'
+        ofertas:
+          type: array
+          items:
+            type: object
+            properties:
+              oferta:
+                $ref: '#/components/schemas/OfertaClase'
+              clase:
+                $ref: '#/components/schemas/Clase'
+      required:
+      - reservas
+      - listaEspera
+      - ofertas
+      x-contract-status: stable
     CanchaRequest:
       type: object
       additionalProperties: false
@@ -5009,11 +5095,9 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Clase'
-        x-propuesta-required:
+        required:
         - items
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     PaginaReservasClase:
       allOf:
       - $ref: '#/components/schemas/PaginaBase'
@@ -5023,11 +5107,9 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ReservaClase'
-        x-propuesta-required:
+        required:
         - items
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+      x-contract-status: stable
     PaginaReservasCancha:
       allOf:
       - $ref: '#/components/schemas/PaginaBase'
