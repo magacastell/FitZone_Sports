@@ -5,100 +5,100 @@
 ### 23/09/2026
 
 - **[S1] Revisión del flujo de trabajo y estado actual del proyecto — 1.0 hs**
-  - Revisó la organización actual del equipo, las tareas asignadas y el flujo definido para trabajo colaborativo, revisión y cierre de tareas.
-  - Analizó el historial del repositorio para comprender el uso actual de ramas, commits, Pull Requests y archivos de bitácora.
-  - Identificó el flujo acordado para futuras funcionalidades: rama por tarea, commits, Pull Request, revisión de otro integrante y posterior integración a `main`.
+  - Revisé la organización actual del equipo, las tareas asignadas y el flujo definido para trabajo colaborativo, revisión y cierre de tareas.
+  - Analicé el historial del repositorio para comprender el uso actual de ramas, commits, Pull Requests y archivos de bitácora.
+  - Identifiqué el flujo acordado para futuras funcionalidades: rama por tarea, commits, Pull Request, revisión de otro integrante y posterior integración a `main`.
 
 - **[S1] Revisión técnica de ADR-005 y ADR-006 — 1.5 hs**
-  - Revisó los borradores correspondientes a Flyway y autenticación con JWT + Spring Security.
-  - Contrastó las decisiones propuestas con los ADR ya normalizados y con el estado actual del backend.
-  - Detectó inconsistencias entre algunos detalles de los borradores y la implementación existente, especialmente en el uso de JWT, roles, `@PreAuthorize` y evolución del esquema de base de datos.
-  - Diferenció decisiones arquitectónicas de detalles de implementación que pueden definirse posteriormente.
+  - Revisé los borradores correspondientes a Flyway y autenticación con JWT + Spring Security.
+  - Contrasté las decisiones propuestas con los ADR ya normalizados y con el estado actual del backend.
+  - Detecté inconsistencias entre algunos detalles de los borradores y la implementación existente, especialmente en el uso de JWT, roles, `@PreAuthorize` y evolución del esquema de base de datos.
+  - Diferencié decisiones arquitectónicas de detalles de implementación que pueden definirse posteriormente.
 
 - **[S1] Formalización de ADR-005 — Flyway — 0.75 hs**
-  - Formalizó la decisión de utilizar Flyway para versionar y ejecutar las migraciones de PostgreSQL.
-  - Definió contexto, decisión, consecuencias y alternativas consideradas siguiendo el formato utilizado por los ADR existentes.
-  - Dejó fuera de la decisión arquitectónica detalles de implementación todavía no resueltos, como la estrategia de `baseline`, la transición de bases existentes y el tratamiento definitivo de `data.sql`.
+  - Formalicé la decisión de utilizar Flyway para versionar y ejecutar las migraciones de PostgreSQL.
+  - Definí contexto, decisión, consecuencias y alternativas consideradas siguiendo el formato utilizado por los ADR existentes.
+  - Dejé fuera de la decisión arquitectónica detalles de implementación todavía no resueltos, como la estrategia de `baseline`, la transición de bases existentes y el tratamiento definitivo de `data.sql`.
 
 - **[S1] Formalización de ADR-006 — JWT + Spring Security — 0.75 hs**
-  - Formalizó Spring Security como infraestructura de autenticación y autorización y JWT como mecanismo de autenticación stateless.
-  - Ajustó el alcance del ADR para no fijar detalles innecesarios como los claims definitivos del token, `userId` o decisiones específicas del frontend.
-  - Aclaró la diferencia entre autenticación y autorización y documentó la autorización por roles como una capacidad a implementar progresivamente.
+  - Formalicé Spring Security como infraestructura de autenticación y autorización y JWT como mecanismo de autenticación stateless.
+  - Ajusté el alcance del ADR para no fijar detalles innecesarios como los claims definitivos del token, `userId` o decisiones específicas del frontend.
+  - Aclaré la diferencia entre autenticación y autorización y documenté la autorización por roles como una capacidad a implementar progresivamente.
 
 ## Período 3 — Semana 1
 
 ### 01/10/2026
 
 - **[S2] Construir estructura base React modular y navegación — 2.5 hs**
-  - Revisó la estructura React modular existente, las rutas y la navegación con los actores simulados SOCIO, EXTERNO, RECEPCION y GERENTE.
-  - Ajustó los destinos de mantenimiento y reportes con placeholders explícitos y el cierre del QR con retorno a canchas; eliminó un proveedor de sesión redundante.
-  - Mejoró la coherencia de la experiencia de navegación con iconografía consistente, estado activo, foco visible y estilos compartidos; corrigió el foco del modal QR, las etiquetas y el contraste del botón del login y el desbordamiento de la tabla de comprobantes en ventanas angostas.
-  - Retiró las dependencias instaladas del control de versiones y excluyó `node_modules/`, `dist/` y `.vite/`, conservando los archivos de declaración y bloqueo de dependencias.
-  - Verificó la instalación con `npm ci`, el build de producción y las rutas en navegador, incluyendo navegación con teclado y vistas desktop y angostas.
-  - Documentó en `frontend/README.md` la ejecución local, estructura, rutas, navegación y límites de los datos simulados y funcionalidades pendientes.
+  - Revisé la estructura React modular existente, las rutas y la navegación con los actores simulados SOCIO, EXTERNO, RECEPCION y GERENTE.
+  - Ajusté los destinos de mantenimiento y reportes con placeholders explícitos y el cierre del QR con retorno a canchas; eliminé un proveedor de sesión redundante.
+  - Mejoré la coherencia de la experiencia de navegación con iconografía consistente, estado activo, foco visible y estilos compartidos; corregí el foco del modal QR, las etiquetas y el contraste del botón del login y el desbordamiento de la tabla de comprobantes en ventanas angostas.
+  - Retiré las dependencias instaladas del control de versiones y excluí `node_modules/`, `dist/` y `.vite/`, conservando los archivos de declaración y bloqueo de dependencias.
+  - Verifiqué la instalación con `npm ci`, el build de producción y las rutas en navegador, incluyendo navegación con teclado y vistas desktop y angostas.
+  - Documenté en `frontend/README.md` la ejecución local, estructura, rutas, navegación y límites de los datos simulados y funcionalidades pendientes.
 
 ### 06/10/2026
 
 - **Cierre de la tarjeta de contratos API/OpenAPI - 4 hs**
-  - Consolidó en la rama `docs/openapi-contratos` el contrato de las 55 operaciones existentes de FitZone Sports.
-  - Separó el estado de implementación (`implemented`/`stub`) de la madurez del contrato (`stable`/`draft`).
+  - Consolidé en la rama `docs/openapi-contratos` el contrato de las 55 operaciones existentes de FitZone Sports.
+  - Separé el estado de implementación (`implemented`/`stub`) de la madurez del contrato (`stable`/`draft`).
   - El resultado final comprende 10 operaciones implemented, 45 stub, 11 contratos stable y 44 draft.
-  - Documentó en `docs/openapi/DECISIONES.md` las decisiones todavía no confirmadas para revisión del equipo, diferenciándolas de la evidencia del proyecto y las decisiones técnicas del contrato.
-  - Validó OpenAPI con Redocly sin errores; quedaron únicamente las advertencias conocidas de licencia y servidor localhost.
-  - No modificó backend, frontend, migraciones ni persistencia; el alcance se limitó al contrato, sus decisiones, los enlaces del README y esta bitácora.
-  - Dejó el trabajo listo para revisión mediante Pull Request.
+  - Documenté en `docs/openapi/DECISIONES.md` las decisiones todavía no confirmadas para revisión del equipo, diferenciándolas de la evidencia del proyecto y las decisiones técnicas del contrato.
+  - Validé OpenAPI con Redocly sin errores; quedaron únicamente las advertencias conocidas de licencia y servidor localhost.
+  - No modifiqué backend, frontend, migraciones ni persistencia; el alcance se limitó al contrato, sus decisiones, los enlaces del README y esta bitácora.
+  - Dejé el trabajo listo para revisión mediante Pull Request.
 
 ### 12/10/2026
 
 - **Revisión final del contrato contra main actualizado**
-  - Integró `origin/main` en `docs/openapi-contratos` sin conflictos y revisó la implementación nueva de planes de membresía.
-  - Alineó GET/POST/PATCH/DELETE de planes con sus DTO, precio decimal en ARS, duraciones 1/3/12, permisos, validaciones, filtro de inactivos y baja/reactivación lógica.
-  - Recalculó la cobertura: 56 operaciones, 14 implemented, 42 stub, 15 stable y 41 draft; conservó las decisiones funcionales todavía pendientes.
-  - Verificó YAML sin claves duplicadas, referencias resolubles, operationId únicos, cobertura de controllers, trece DTO y seguridad; Redocly terminó sin errores y con las dos advertencias conocidas.
-  - Ejecutó las pruebas: 12 aprobadas y 7 de persistencia omitidas por no configurar una base PostgreSQL vacía y descartable; sin fallos ni errores.
-  - Limitó las correcciones a OpenAPI, decisiones, README y esta bitácora; no modificó código funcional, migraciones ni configuración.
+  - Integré `origin/main` en `docs/openapi-contratos` sin conflictos y revisé la implementación nueva de planes de membresía.
+  - Alineé GET/POST/PATCH/DELETE de planes con sus DTO, precio decimal en ARS, duraciones 1/3/12, permisos, validaciones, filtro de inactivos y baja/reactivación lógica.
+  - Recalculé la cobertura: 56 operaciones, 14 implemented, 42 stub, 15 stable y 41 draft; conservé las decisiones funcionales todavía pendientes.
+  - Verifiqué YAML sin claves duplicadas, referencias resolubles, operationId únicos, cobertura de controllers, trece DTO y seguridad; Redocly terminó sin errores y con las dos advertencias conocidas.
+  - Ejecuté las pruebas: 12 aprobadas y 7 de persistencia omitidas por no configurar una base PostgreSQL vacía y descartable; sin fallos ni errores.
+  - Limité las correcciones a OpenAPI, decisiones, README y esta bitácora; no modifiqué código funcional, migraciones ni configuración.
 
 ### 29/10/2026
 
 - **[S4] Integración frontend de perfil y membresía — 2.0 hs aproximadamente**
-  - Integró el frontend de M1 con los endpoints reales de perfil, membresía y planes, reemplazando la información simulada e incorporando contratación y renovación manual.
-  - Trabajó el manejo de errores y la idempotencia para evitar operaciones duplicadas, conservando la intención de renovación mediante `sessionStorage` frente a recargas.
-  - Compartió el estado real de membresía con la navegación y ajustó Mi QR para que dependa de una membresía `ACTIVA`, no únicamente del rol del usuario.
-  - Verificó el comportamiento con pruebas aisladas temporales, build frontend y revisión manual básica. No pudo completar manualmente la contratación contra PostgreSQL porque no había planes activos ni una UI administrativa de planes disponible; las pruebas aisladas utilizaron servicios simulados.
-  - Durante la revisión manual detectó problemas generales de navegación, datos simulados y coherencia entre módulos, que quedaron fuera de esta tarea para abordarlos por separado.
+  - Integré el frontend de M1 con los endpoints reales de perfil, membresía y planes, reemplazando la información simulada e incorporando contratación y renovación manual.
+  - Trabajé el manejo de errores y la idempotencia para evitar operaciones duplicadas, conservando la intención de renovación mediante `sessionStorage` frente a recargas.
+  - Compartí el estado real de membresía con la navegación y ajusté Mi QR para que dependa de una membresía `ACTIVA`, no únicamente del rol del usuario.
+  - Verifiqué el comportamiento con pruebas aisladas temporales, build frontend y revisión manual básica. No pude completar manualmente la contratación contra PostgreSQL porque no había planes activos ni una UI administrativa de planes disponible; las pruebas aisladas utilizaron servicios simulados.
+  - Durante la revisión manual detecté problemas generales de navegación, datos simulados y coherencia entre módulos, que quedaron fuera de esta tarea para abordarlos por separado.
   - Commits funcionales: `65e1d54`, `9617656`, `117a6f0`, `05c312c`, `355ec45` y `7802bac`.
 
 ### 30/10/2026
 
 - **Integración final — revisión de dominio Cliente/Socio, Canchas y comprobantes**
-  - Separó autoridad estable USUARIO de la condición Socio derivada de membresía; documentó decisión en ADR-007 y verificó migración V7, JWT y permisos sin mutar rol al contratar/vencer.
-  - Conservó contratación/renovación M1/M5 fake, idempotencia y validación QR M2; diferenció catálogo Cliente y Portal Socio con datos reales.
-  - Auditó Canchas/Clases: continúan stub; ocultó capacidades no integradas y mantuvo pantallas honestas sin tarifas/descuentos ni reservas ficticias.
-  - Integró comprobantes de períodos reales con descarga autorizada, cards, importes argentinos, estados recuperables y feedback temporal. Mejoró nuevas emisiones PDF preservando documentos existentes y snapshots; explicitó límites del listado y de pagos antiguos sin PDF.
-  - Ejecutó 56 tests backend (37 con PostgreSQL aislado), 77 verificaciones frontend de dominio/portal/comprobantes, 16 de Planes y 12 de transporte; builds frontend/backend correctos.
-  - Repitió contratación y renovación fake por UI, descarga PDF real y revisión responsive. La auditoría previa quedó sin commit, push ni merge. El cierre fue aprobado para dos commits locales según la sección T de docs/refactor-actores-verificacion.md, con integración conjunta a la rama paraguas y sin push ni merge a main.
+  - Separé autoridad estable USUARIO de la condición Socio derivada de membresía; documenté decisión en ADR-007 y verifiqué migración V7, JWT y permisos sin mutar rol al contratar/vencer.
+  - Conservé contratación/renovación M1/M5 fake, idempotencia y validación QR M2; diferencié catálogo Cliente y Portal Socio con datos reales.
+  - Audité Canchas/Clases: continúan stub; oculté capacidades no integradas y mantuve pantallas honestas sin tarifas/descuentos ni reservas ficticias.
+  - Integré comprobantes de períodos reales con descarga autorizada, cards, importes argentinos, estados recuperables y feedback temporal. Mejoré nuevas emisiones PDF preservando documentos existentes y snapshots; explicité límites del listado y de pagos antiguos sin PDF.
+  - Ejecuté 56 tests backend (37 con PostgreSQL aislado), 77 verificaciones frontend de dominio/portal/comprobantes, 16 de Planes y 12 de transporte; builds frontend/backend correctos.
+  - Repetí contratación y renovación fake por UI, descarga PDF real y revisión responsive. La auditoría previa quedó sin commit, push ni merge. El cierre fue aprobado para dos commits locales según la sección T de docs/refactor-actores-verificacion.md, con integración conjunta a la rama paraguas y sin push ni merge a main.
 
 - **Recepción — composición v0 e integración M2 (pendiente de revisión manual)**
-  - Auditó relación de usuario/sede, JWT y permisos; conservó sede única y restricciones backend, sin nueva decisión de arquitectura ni cambios a permisos.
-  - Portó scanner, Ingreso/Salida, resultado y aforo al sistema visual existente, con servicio M2, bloqueo inmediato, cleanup y refresco sin optimismo.
-  - Omitió movimientos ficticios y módulos 501; conservó Perfil, identidad real y selección existente de Gerente sin rediseñarlo.
-  - Ejecutó 62 tests backend (43 PostgreSQL), 97 verificaciones de dominio/portal/Recepción, 16 de Planes y 13 de transporte; builds correctos. Probó un ingreso/salida real y aforo 0→1→0, teclado y responsive.
-  - Documentó contrato y limitaciones en docs/m2-recepcion.md. Sin tiempo estimado, commit, push ni merge.
+  - Audité relación de usuario/sede, JWT y permisos; conservé sede única y restricciones backend, sin nueva decisión de arquitectura ni cambios a permisos.
+  - Porté scanner, Ingreso/Salida, resultado y aforo al sistema visual existente, con servicio M2, bloqueo inmediato, cleanup y refresco sin optimismo.
+  - Omití movimientos ficticios y módulos 501; conservé Perfil, identidad real y selección existente de Gerente sin rediseñarlo.
+  - Ejecuté 62 tests backend (43 PostgreSQL), 97 verificaciones de dominio/portal/Recepción, 16 de Planes y 13 de transporte; builds correctos. Probé un ingreso/salida real y aforo 0→1→0, teclado y responsive.
+  - Documenté contrato y limitaciones en docs/m2-recepcion.md. Sin tiempo estimado, commit, push ni merge.
 
 
 - **Sede habitual durante primera contratación — pendiente de revisión manual**
-  - Eliminó sede hardcodeada del registro; perfil nullable, elección real al contratar y origen histórico de membresía, sin restringir multisede.
-  - Agregó V8/V9 preservando datos/FK y sede obligatoria del personal; documentó corrección forward-only por aplicación automática inicial de DevTools, sin repair ni downgrade.
-  - Conservó transacción M1/M5, rollback de pago, idempotencia plan+sede, recuperación por sesión y renovación sin reasignación; reutilizó lectura autenticada de sedes.
-  - Verificó 69 tests backend (50 PostgreSQL), 111 de dominio/portal/Recepción, 16 de Planes y 14 de transporte; builds correctos. E2E con nueva cuenta, contratación fake, QR, PDF y F5; segunda cuenta Cliente para revisión.
-  - Actualizó P12, OpenAPI, membresías e informe de integración. Sin tiempo/hash/PR inventados; sin commit, push ni merge.
+  - Eliminé sede hardcodeada del registro; perfil nullable, elección real al contratar y origen histórico de membresía, sin restringir multisede.
+  - Agregué V8/V9 preservando datos/FK y sede obligatoria del personal; documenté corrección forward-only por aplicación automática inicial de DevTools, sin repair ni downgrade.
+  - Conservé transacción M1/M5, rollback de pago, idempotencia plan+sede, recuperación por sesión y renovación sin reasignación; reutilicé lectura autenticada de sedes.
+  - Verifiqué 69 tests backend (50 PostgreSQL), 111 de dominio/portal/Recepción, 16 de Planes y 14 de transporte; builds correctos. E2E con nueva cuenta, contratación fake, QR, PDF y F5; segunda cuenta Cliente para revisión.
+  - Actualicé P12, OpenAPI, membresías e informe de integración. Sin tiempo/hash/PR inventados; sin commit, push ni merge.
 
 - **Ciclo Cliente/Socio — pendiente de revisión final**
-  - Auditó vencimiento derivado, sincronización existente, suspensión administrativa y renovación max(último fin, ahora); conservó backend, V1–V9, sede, multisede e idempotencia.
-  - Diferenció Cliente nuevo, ACTIVA, VENCIDA y SUSPENDIDA; recuperó plan/vigencia histórica y agregó aviso visual <=7 días sin falsa urgencia cuando hay continuidad programada.
-  - Ejecutó 73 tests backend (54 PostgreSQL aislado), 119 frontend de dominio/portal/Recepción, 16 Planes y 14 transporte; builds correctos y diff sin errores de whitespace.
-  - Probó contratación, renovación anticipada/vencida, QR real, perfil, comprobantes y F5 por UI/HTTP; replay sin duplicados. Revisó responsive 390/768/1024/1280/1440.
-  - Conservó cuentas locales de fixture identificadas para revisión; respaldo previo, sin alterar datos anteriores. Eliminó sólo PostgreSQL temporal de tests y su volumen exclusivo. Documentó preparación y límites en docs/ciclo-vida-membresia-verificacion.md.
+  - Audité vencimiento derivado, sincronización existente, suspensión administrativa y renovación max(último fin, ahora); conservé backend, V1–V9, sede, multisede e idempotencia.
+  - Diferencié Cliente nuevo, ACTIVA, VENCIDA y SUSPENDIDA; recuperé plan/vigencia histórica y agregué aviso visual <=7 días sin falsa urgencia cuando hay continuidad programada.
+  - Ejecuté 73 tests backend (54 PostgreSQL aislado), 119 frontend de dominio/portal/Recepción, 16 Planes y 14 transporte; builds correctos y diff sin errores de whitespace.
+  - Probé contratación, renovación anticipada/vencida, QR real, perfil, comprobantes y F5 por UI/HTTP; replay sin duplicados. Revisé responsive 390/768/1024/1280/1440.
+  - Conservé cuentas locales de fixture identificadas para revisión; respaldo previo, sin alterar datos anteriores. Eliminé sólo PostgreSQL temporal de tests y su volumen exclusivo. Documenté preparación y límites en docs/ciclo-vida-membresia-verificacion.md.
   - Sin commit, push ni merge; sin tiempo, hash o PR nuevos inventados.
 
 - **Cierre Cliente/Socio aprobado**
@@ -106,15 +106,15 @@
   - Las entradas previas conservan los resultados y el estado histórico anterior al cierre. No se agregan funciones ni cambios cosméticos; sin push ni integración a main.
 
 - **Cierre definitivo de la rama de integración frontend**
-  - Partió de `65e0eff7da819f68d7c0c0eb5b4ca8830be86070` en `feature/integracion-final-frontend`, con índice vacío y doce archivos de Gerencia pendientes. Cerró ese bloque en `d5bb461`: Panel actual, Sedes, Usuarios/Membresías, Reportes preparados y separación del puesto de Recepción, sin backend nuevo.
-  - Contrastó el aporte completo con la base de creación verificable `3ee92e88b2e66e4e25b43b5e5f6c597af175e201`. Preparó `docs/integracion-final-frontend.md` con decisiones, alcance por actor, trazabilidad y pendientes M3/M4/reportes, sin atribuirlos como terminados.
-  - La limpieza se limitó a documentación: README actualizado, estados de cierre y evolución posterior de navegación aclarados en informes/guía/ADR. No cambió la decisión ADR-007 ni su conciliación histórica pendiente. No encontró una necesidad objetiva de borrar código o refactorizar componentes.
-  - Ejecutó las cinco suites frontend existentes: 140 dominio/UI, 16 Planes, 14 transporte, 18 M3/M4 y 7 Gerencia; 195 aprobadas. Build frontend correcto; sin nuevos tests, dependencias o runners en este cierre.
-  - Backend `mvnw.cmd verify`: 73 tests, cero fallos/errores/omitidos; 54 PostgreSQL reales (35 membresías/M2, 8 persistencia/migraciones, 11 pagos). Empaquetado/repackage correcto. Usó JDK 22.0.1 local con target 21 y zona America/Argentina/Buenos_Aires.
-  - El primer empaquetado falló por el JAR abierto en Windows, después de pasar los tests. Detuvo únicamente el backend local, repitió verify completo y lo reinició con la misma zona horaria y seed desactivado. No hubo cambios funcionales para resolverlo.
-  - Eliminó únicamente fitzone-cierre-test y su volumen anónimo, previa comprobación de exclusividad. Identidad/montaje de fitzone-postgres y fitzone_sports_fitzone_pgdata intactos; BD normal en V9 aceptando conexiones. No ejecutó fixtures ni pruebas contra la BD normal.
+  - Partí de `65e0eff7da819f68d7c0c0eb5b4ca8830be86070` en `feature/integracion-final-frontend`, con índice vacío y doce archivos de Gerencia pendientes. Cerré ese bloque en `d5bb461`: Panel actual, Sedes, Usuarios/Membresías, Reportes preparados y separación del puesto de Recepción, sin backend nuevo.
+  - Contrasté el aporte completo con la base de creación verificable `3ee92e88b2e66e4e25b43b5e5f6c597af175e201`. Preparé `docs/integracion-final-frontend.md` con decisiones, alcance por actor, trazabilidad y pendientes M3/M4/reportes, sin atribuirlos como terminados.
+  - La limpieza se limitó a documentación: README actualizado, estados de cierre y evolución posterior de navegación aclarados en informes/guía/ADR. No cambié la decisión ADR-007 ni su conciliación histórica pendiente. No encontré una necesidad objetiva de borrar código o refactorizar componentes.
+  - Ejecuté las cinco suites frontend existentes: 140 dominio/UI, 16 Planes, 14 transporte, 18 M3/M4 y 7 Gerencia; 195 aprobadas. Build frontend correcto; sin nuevos tests, dependencias o runners en este cierre.
+  - Backend `mvnw.cmd verify`: 73 tests, cero fallos/errores/omitidos; 54 PostgreSQL reales (35 membresías/M2, 8 persistencia/migraciones, 11 pagos). Empaquetado/repackage correcto. Usé JDK 22.0.1 local con target 21 y zona America/Argentina/Buenos_Aires.
+  - El primer empaquetado falló por el JAR abierto en Windows, después de pasar los tests. Detuve únicamente el backend local, repetí verify completo y lo reinicié con la misma zona horaria y seed desactivado. No hubo cambios funcionales para resolverlo.
+  - Eliminé únicamente fitzone-cierre-test y su volumen anónimo, previa comprobación de exclusividad. Identidad/montaje de fitzone-postgres y fitzone_sports_fitzone_pgdata intactos; BD normal en V9 aceptando conexiones. No ejecuté fixtures ni pruebas contra la BD normal.
 
-  - `git diff --check` correcto. Capturas, logs y respaldos locales permanecen ignorados; no se incluyen en Git. No agregó tiempo, PR ni hashes aún inexistentes. El pedido autoriza publicar sólo esta rama sin force push; no autoriza integrar a main.
+  - `git diff --check` correcto. Capturas, logs y respaldos locales permanecen ignorados; no se incluyen en Git. No agregué tiempo, PR ni hashes aún inexistentes. El pedido autoriza publicar sólo esta rama sin force push; no autoriza integrar a main.
 
 ### 07/11/2026 — cierre local de RF-01/RF-02
 
@@ -177,7 +177,7 @@ Conservé las entradas históricas anteriores tal como estaban; no completé has
 |---|---|
 | Sprint y unidad | Numeración pendiente de confirmar con la planificación del grupo. M2 offline, pruebas e integración; no asigné un sprint ni una unidad numéricos no verificados. |
 | Actividad | Hice fetch y creé feat/m2-offline desde origin/main e0056b1 limpio. Implementé por etapas QR preemitidos RS256, terminal principal por sede, copia acotada por preparación del socio, PWA/IndexedDB, registro transaccional local y reconciliación con PostgreSQL. Conservé M1/M2 online y no trabajé en otros módulos. |
-| Decisiones | Ventana de dos horas aprobada para el MVP, reloj controlado con límite de 30 segundos sin extender exp/nbf, clave RSA persistente exclusiva del servidor, sin fotos/contraseñas en el snapshot. Elegí Dexie, jose y precaché Workbox compatibles con el stack. Descarté workbox-build por nuevas alertas en dependencias. Priorizamos admisión provisional y conflictos auditados; no prometí RN-01 global bajo partición. |
+| Decisiones | Ventana de dos horas aprobada para el MVP, reloj controlado con límite de 30 segundos sin extender exp/nbf, clave RSA persistente exclusiva del servidor, sin fotos/contraseñas en el snapshot. Elegí Dexie, jose y precaché Workbox compatibles con el stack. Descarté workbox-build por nuevas alertas en dependencias. Con el equipo, prioricé admisión provisional y conflictos auditados; no prometí RN-01 global bajo partición. |
 | Problemas y soluciones | Corregí imports de Jackson 3 y validación de DTO anidado al compilar. Las pruebas detectaron una lectura JPA que descartaba el egreso sin flush, el ID de caché sobrescrito por el lote y un guard booleano usado como ref: corregí código y mantuve expectativas. Un aborto nativo de Node 24.15.0 motivó un supervisor PowerShell que limpia incluso si Node no ejecuta finally; usé Node 24.22.1 disponible sin instalarlo globalmente. Mantuve la pérdida de respuesta de prueba hasta liberar el ACK porque Chrome podía reintentar automáticamente. |
 | Pruebas y evidencia | Backend completo Java 21/PG 18 aislada: 94 tests, cero fallos, errores u omitidos; JaCoCo 943/1083 líneas (87,07 %) y 400/570 ramas (70,18 %). npm test, ahora con script offline, y build PWA correctos. Pruebas VM/fake-indexeddb distinguidas de MockMvc/PG y E2E real. La E2E final eec4c370-3ead-4fa4-967d-d954fcbbb9e3 preparó ambos clientes, pausó Spring y cortó red 65 s, probó rotación y rechazo del anterior, ingreso persistente, reapertura de Chrome sin conexión, egreso, reinicio de Spring, ACK perdido y replay: una visita cerrada, dos eventos y cero duplicados. Sin overflow a 390 px. XML, JSON y capturas locales bajo target; informe en docs/m2-offline.md y docs/pruebas.md. |
 | Commits reales | 9439872 — credenciales QR; 84f0aab — preparación de terminal; 4a63b89 — movimientos locales; 27e2ce4 — sincronización; a35f790 — recuperación, clave persistente y controles finales. El runner reproducible y la documentación se consolidan en el commit de pruebas posterior. |
