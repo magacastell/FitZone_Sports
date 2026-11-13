@@ -1,0 +1,187 @@
+
+.admin-canchas .admin-canchas-campo {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  color: #344a3c;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.admin-canchas .admin-canchas-campo input,
+.admin-canchas .admin-canchas-campo select {
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 1px solid #cbd8ce;
+  border-radius: 9px;
+  color: #1e2d26;
+  background: #fff;
+  font: inherit;
+}
+
+.admin-canchas .admin-canchas-formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 16px;
+}
+
+.admin-canchas .admin-canchas-formulario > button {
+  justify-self: start;
+}
+
+.admin-canchas .admin-canchas-campo--ancho {
+  grid-column: 1 / -1;
+}
+
+.admin-canchas .admin-canchas-check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #344a3c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-canchas .admin-canchas-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: #2f704f;
+}
+
+.admin-canchas .admin-canchas-lista,
+.admin-canchas .admin-mantenimientos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-canchas .admin-canchas-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #e2e9e3;
+  border-radius: 10px;
+  color: #23352c;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-canchas .admin-canchas-item:hover {
+  border-color: #9ab6a0;
+}
+
+.admin-canchas .admin-canchas-item--activo {
+  border: 2px solid #2f704f;
+  background: #f4f8f1;
+}
+
+.admin-canchas .admin-canchas-item > span:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-canchas .admin-canchas-item strong {
+  font-size: 14px;
+}
+
+.admin-canchas .admin-canchas-item small {
+  color: #63776a;
+  font-size: 12px;
+}
+
+.admin-canchas .admin-mantenimiento {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px;
+  border: 1px solid #e2e9e3;
+  border-radius: 11px;
+}
+
+.admin-canchas .admin-mantenimiento__titulo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.admin-canchas .admin-mantenimiento__titulo strong {
+  color: #263b2e;
+  font-size: 13px;
+}
+
+.admin-canchas .admin-mantenimiento p {
+  margin: 7px 0 0;
+  color: #63776a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.admin-canchas .admin-canchas-ayuda {
+  margin: 12px 0 0;
+  color: #63776a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.admin-canchas .admin-canchas-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-canchas .admin-canchas-aviso--ok {
+  border-color: #d5e8d5;
+  color: #2d7048;
+  background: #edf7ec;
+}
+
+.admin-canchas .admin-canchas-aviso--error {
+  border-color: #f1d5d1;
+  color: #a54840;
+  background: #fff0ee;
+}
+
+.admin-canchas :where(button, input, select):focus-visible {
+  outline: 3px solid #2f704f;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .admin-canchas .admin-canchas-formulario {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-canchas .admin-canchas-campo--ancho {
+    grid-column: auto;
+  }
+
+  .admin-canchas .admin-canchas-formulario > button {
+    width: 100%;
+  }
+
+  .admin-canchas .admin-mantenimiento {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-canchas * {
+    scroll-behavior: auto;
+  }
+}

@@ -1,0 +1,32 @@
+
+.m5-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.m5-paginacion span {
+  color: #63776a;
+  font-size: 12px;
+}
+
+.m5-enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.m5-enlaces a {
+  color: #2f704f;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.m5-enlaces a:hover {
+  text-decoration: underline;
+}
