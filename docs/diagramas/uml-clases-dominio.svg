@@ -1,0 +1,977 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2900" height="4132" viewBox="0 0 2900 4132" role="img" aria-labelledby="titulo descripcion">
+  <title id="titulo">FitZone Sports · UML de clases del dominio</title>
+  <desc id="descripcion">Siete láminas de clases UML con vistas del dominio M1–M5 y las implementaciones de Strategy, Observer y Repository.</desc>
+  <defs>
+    <marker id="flecha-405D76" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L10 6 L1 11" fill="none" stroke="#405D76" stroke-width="1.7" />
+    </marker>
+    <marker id="triangulo-405D76" viewBox="0 0 17 18" refX="15" refY="9" markerWidth="17" markerHeight="18" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L15 9 L1 17 Z" fill="#FFFFFF" stroke="#405D76" stroke-width="1.6" />
+    </marker>
+    <marker id="flecha-172B3C" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L10 6 L1 11" fill="none" stroke="#172B3C" stroke-width="1.7" />
+    </marker>
+    <marker id="triangulo-172B3C" viewBox="0 0 17 18" refX="15" refY="9" markerWidth="17" markerHeight="18" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L15 9 L1 17 Z" fill="#FFFFFF" stroke="#172B3C" stroke-width="1.6" />
+    </marker>
+    <marker id="flecha-684B84" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L10 6 L1 11" fill="none" stroke="#684B84" stroke-width="1.7" />
+    </marker>
+    <marker id="triangulo-684B84" viewBox="0 0 17 18" refX="15" refY="9" markerWidth="17" markerHeight="18" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L15 9 L1 17 Z" fill="#FFFFFF" stroke="#684B84" stroke-width="1.6" />
+    </marker>
+    <marker id="flecha-527591" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L10 6 L1 11" fill="none" stroke="#527591" stroke-width="1.7" />
+    </marker>
+    <marker id="triangulo-527591" viewBox="0 0 17 18" refX="15" refY="9" markerWidth="17" markerHeight="18" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M1 1 L15 9 L1 17 Z" fill="#FFFFFF" stroke="#527591" stroke-width="1.6" />
+    </marker>
+    <clipPath id="clip-general">
+      <rect x="0" y="0" width="1440" height="1018" />
+    </clipPath>
+    <clipPath id="clip-m1-m2">
+      <rect x="1460" y="0" width="1440" height="1018" />
+    </clipPath>
+    <clipPath id="clip-m3">
+      <rect x="0" y="1038" width="1440" height="1018" />
+    </clipPath>
+    <clipPath id="clip-m4-m5">
+      <rect x="1460" y="1038" width="1440" height="1018" />
+    </clipPath>
+    <clipPath id="clip-strategy">
+      <rect x="0" y="2076" width="1440" height="1018" />
+    </clipPath>
+    <clipPath id="clip-observer">
+      <rect x="1460" y="2076" width="1440" height="1018" />
+    </clipPath>
+    <clipPath id="clip-repository">
+      <rect x="0" y="3114" width="1440" height="1018" />
+    </clipPath>
+  </defs>
+  <style>:root:has(view:target){width:100vw;height:100vh;} @page{size:A4 landscape;margin:4mm;} @media print{:root:has(view:target){width:288.5mm;height:201.5mm;}}:root:has(#area-general:target) #canvas{clip-path:url(#clip-general);}:root:has(#area-m1-m2:target) #canvas{clip-path:url(#clip-m1-m2);}:root:has(#area-m3:target) #canvas{clip-path:url(#clip-m3);}:root:has(#area-m4-m5:target) #canvas{clip-path:url(#clip-m4-m5);}:root:has(#area-strategy:target) #canvas{clip-path:url(#clip-strategy);}:root:has(#area-observer:target) #canvas{clip-path:url(#clip-observer);}:root:has(#area-repository:target) #canvas{clip-path:url(#clip-repository);}</style>
+  <g id="canvas">
+    <rect width="2900" height="4132" fill="#DEE8EE" />
+    <g id="general" transform="translate(0 0)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#E8F0F7" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="396" y="835" width="528" height="115" rx="8" fill="#E8F0F7" stroke="none" />
+      <path id="general-usuario-sede" data-src="Usuario" data-dst="Sede" data-kind="jpa" d="M363 252 L577 252" stroke="#172B3C" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#flecha-172B3C)">
+        <title>sede · JPA</title>
+      </path>
+      <path id="general-membresia-usuario" data-src="Membresia" data-dst="Usuario" data-kind="id" d="M220 435 L220 314" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="general-cancha-sede" data-src="Cancha" data-dst="Sede" data-kind="id" d="M1057 252 L862 252" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="general-clase-sede" data-src="ClaseGrupal" data-dst="Sede" data-kind="id" d="M719 435 L719 314" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="general-reserva-clase" data-src="ReservaClase" data-dst="ClaseGrupal" data-kind="id" d="M719 697 L719 557" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="general-visita-usuario" data-src="RegistroAcceso" data-dst="Usuario" data-kind="id" d="M78 752 L22 752 L22 272 L78 272" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="general-turno-cancha" data-src="TurnoResponse" data-dst="Cancha" data-kind="id" d="M1206 401 L1206 314" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="general-reserva-turno" data-src="ReservaResponse" data-dst="TurnoResponse" data-kind="id" d="M1206 605 L1206 523" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="general-pago-reserva" data-src="PagoResponse" data-dst="ReservaResponse" data-kind="logic" d="M1206 809 L1206 727" stroke="#684B84" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4">
+        <title>concepto de cancha</title>
+      </path>
+      <g id="general-Usuario" data-classifier="Usuario" data-stereotype="entidad JPA">
+        <rect x="78" y="192" width="285" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="79" y="193" width="283" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="220.5" y="209.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="86 198 269 22">«entidad JPA»</text>
+        <text x="220.5" y="237.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="85 221 271 32">Usuario</text>
+        <text x="86" y="272.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="86 262 269 21">− id: Integer</text>
+        <text x="86" y="294.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="86 284 269 21">− activo: boolean</text>
+      </g>
+      <g id="general-Sede" data-classifier="Sede" data-stereotype="entidad JPA">
+        <rect x="577" y="192" width="285" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="578" y="193" width="283" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="719.5" y="209.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="585 198 269 22">«entidad JPA»</text>
+        <text x="719.5" y="237.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="584 221 271 32">Sede</text>
+        <text x="585" y="272.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="585 262 269 21">− id: Integer</text>
+        <text x="585" y="294.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="585 284 269 21">− nombre: String</text>
+      </g>
+      <g id="general-Membresia" data-classifier="Membresia" data-stereotype="entidad JPA">
+        <rect x="78" y="435" width="285" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="79" y="436" width="283" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="220.5" y="452.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="86 441 269 22">«entidad JPA»</text>
+        <text x="220.5" y="480.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="85 464 271 32">Membresia</text>
+        <text x="86" y="515.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="86 505 269 21">− usuarioId: Integer</text>
+        <text x="86" y="537.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="86 527 269 21">− estado: String</text>
+      </g>
+      <g id="general-RegistroAcceso" data-classifier="RegistroAcceso" data-stereotype="entidad JPA">
+        <rect x="78" y="697" width="285" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="79" y="698" width="283" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="220.5" y="714.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="86 703 269 22">«entidad JPA»</text>
+        <text x="220.5" y="742.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="85 726 271 32">RegistroAcceso</text>
+        <text x="86" y="777.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="86 767 269 21">− usuarioId: Integer</text>
+        <text x="86" y="799.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="86 789 269 21">− sedeId: Integer</text>
+      </g>
+      <g id="general-ClaseGrupal" data-classifier="ClaseGrupal" data-stereotype="entidad JPA">
+        <rect x="577" y="435" width="285" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="578" y="436" width="283" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="719.5" y="452.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="585 441 269 22">«entidad JPA»</text>
+        <text x="719.5" y="480.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="584 464 271 32">ClaseGrupal</text>
+        <text x="585" y="515.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="585 505 269 21">− sedeId: Integer</text>
+        <text x="585" y="537.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="585 527 269 21">− inicio: LocalDateTime</text>
+      </g>
+      <g id="general-ReservaClase" data-classifier="ReservaClase" data-stereotype="entidad JPA">
+        <rect x="577" y="697" width="285" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="578" y="698" width="283" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="719.5" y="714.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="585 703 269 22">«entidad JPA»</text>
+        <text x="719.5" y="742.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="584 726 271 32">ReservaClase</text>
+        <text x="585" y="777.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="585 767 269 21">− claseId: Integer</text>
+        <text x="585" y="799.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="585 789 269 21">− estadoReserva: EstadoReserva</text>
+      </g>
+      <g id="general-Cancha" data-classifier="Cancha" data-stereotype="entidad JPA">
+        <rect x="1057" y="192" width="298" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1058" y="193" width="296" height="66" rx="0" fill="#E8F0F7" stroke="none" />
+        <text x="1206.0" y="209.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="1065 198 282 22">«entidad JPA»</text>
+        <text x="1206.0" y="237.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1064 221 284 32">Cancha</text>
+        <text x="1065" y="272.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 262 282 21">− sedeId: Integer</text>
+        <text x="1065" y="294.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 284 282 21">− activa: short</text>
+      </g>
+      <g id="general-TurnoResponse" data-classifier="TurnoResponse" data-stereotype="record · proyección JDBC">
+        <rect x="1057" y="401" width="298" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1058" y="402" width="296" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1206.0" y="418.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="1065 407 282 22">«record · proyección JDBC»</text>
+        <text x="1206.0" y="446.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1064 430 284 32">TurnoResponse</text>
+        <text x="1065" y="481.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 471 282 21">canchaId: Integer</text>
+        <text x="1065" y="503.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 493 282 21">inicio: OffsetDateTime</text>
+      </g>
+      <g id="general-ReservaResponse" data-classifier="ReservaResponse" data-stereotype="record · proyección JDBC">
+        <rect x="1057" y="605" width="298" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1058" y="606" width="296" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1206.0" y="622.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="1065 611 282 22">«record · proyección JDBC»</text>
+        <text x="1206.0" y="650.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1064 634 284 32">ReservaResponse</text>
+        <text x="1065" y="685.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 675 282 21">turnoId: Integer</text>
+        <text x="1065" y="707.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 697 282 21">estado: String</text>
+      </g>
+      <g id="general-PagoResponse" data-classifier="PagoResponse" data-stereotype="record · proyección JDBC">
+        <rect x="1057" y="809" width="298" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1058" y="810" width="296" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1206.0" y="826.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="1065 815 282 22">«record · proyección JDBC»</text>
+        <text x="1206.0" y="854.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1064 838 284 32">PagoResponse</text>
+        <text x="1065" y="889.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 879 282 21">recursoId: Integer</text>
+        <text x="1065" y="911.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1065 901 282 21">monto: BigDecimal</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#254E70" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  VISTA GENERAL</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Clases del dominio</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">Vista general de M1 a M5 · Entidades JPA y representaciones Java de operaciones JDBC</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#254E70" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Flecha sólida: asociación JPA. Línea sólida sin flecha: vínculo por ID. Las multiplicidades físicas provienen del esquema.</text>
+      <text x="470.5" y="268.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="398 258 145 21">sede · JPA</text>
+      <text x="368" y="239.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="368 229 44 20">0..*</text>
+      <text x="529" y="239.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="529 229 44 20">0..1</text>
+      <text x="152.5" y="373.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="94 363 117 21">«por ID»</text>
+      <text x="228" y="421.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="228 411 44 20">0..1</text>
+      <text x="228" y="327.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="228 317 44 20">1</text>
+      <text x="960.5" y="268.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="902 258 117 21">«por ID»</text>
+      <text x="1009" y="239.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1009 229 44 20">0..*</text>
+      <text x="867" y="239.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="867 229 44 20">1</text>
+      <text x="651.5" y="373.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="593 363 117 21">«por ID»</text>
+      <text x="727" y="421.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="727 411 44 20">0..*</text>
+      <text x="727" y="327.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="727 317 44 20">1</text>
+      <text x="651.5" y="618.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="593 608 117 21">«por ID»</text>
+      <text x="727" y="683.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="727 673 44 20">0..*</text>
+      <text x="727" y="570.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="727 560 44 20">1</text>
+      <text x="30" y="739.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="30 729 44 20">0..*</text>
+      <text x="30" y="259.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="30 249 44 20">1</text>
+      <text x="1139.5" y="354.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1081 344 117 21">«por ID»</text>
+      <text x="1214" y="387.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1214 377 44 20">0..*</text>
+      <text x="1214" y="327.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1214 317 44 20">1</text>
+      <text x="1139.5" y="564.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1081 554 117 21">«por ID»</text>
+      <text x="1214" y="591.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1214 581 44 20">0..*</text>
+      <text x="1214" y="536.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1214 526 44 20">1</text>
+      <text x="1120.5" y="768.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1038 758 165 21">concepto de cancha</text>
+      <text x="1214" y="795.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1214 785 44 20">0..1</text>
+      <text x="1214" y="740.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1214 730 44 20">1</text>
+      <text x="409" y="855.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#254E70" data-box="409 842 502 26">Vistas del dossier</text>
+      <text x="409" y="882.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="409 871 502 22">Dominio: M1–M2, M3 y M4–M5.</text>
+      <text x="409" y="905.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="409 894 502 22">Patrones: Strategy, Observer y Repository.</text>
+      <text x="92" y="170.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#42596D" data-box="92 158 260 24">M1 · Identidad y membresías</text>
+      <text x="752" y="662.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#42596D" data-box="752 651 199 23">M3 · Clases y reservas</text>
+      <text x="1068" y="169.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#42596D" data-box="1068 158 285 23">M4 · Canchas y turnos</text>
+      <text x="1348" y="789.5" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#42596D" data-box="1219 778 129 23">M5 · Pago</text>
+      <text x="89" y="676.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#42596D" data-box="89 665 250 23">M2 · Registro de acceso</text>
+    </g>
+    <g id="m1-m2" transform="translate(1460 0)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#E7F0F6" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="74" y="869" width="1286" height="81" rx="8" fill="#E7F0F6" stroke="none" />
+      <path id="m1-m2-rol" data-src="Usuario" data-dst="Rol" data-kind="jpa" d="M526 364 L455 364 L455 224 L392 224" stroke="#172B3C" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#flecha-172B3C)">
+        <title>rol · JPA</title>
+      </path>
+      <path id="m1-m2-sede-usuario" data-src="Usuario" data-dst="Sede" data-kind="jpa" d="M864 361 L948 361 L948 275 L1038 275" stroke="#172B3C" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#flecha-172B3C)">
+        <title>sede · JPA</title>
+      </path>
+      <path id="m1-m2-membresia-titular" data-src="Membresia" data-dst="Usuario" data-kind="id" d="M404 460 L526 460" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m1-m2-plan-contratado" data-src="Membresia" data-dst="PlanMembresia" data-kind="id" d="M237 590 L237 700" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m1-m2-periodos" data-src="PeriodoMembresia" data-dst="Membresia" data-kind="id" d="M526 727 L473 727 L473 530 L404 530" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m1-m2-periodo-plan" data-src="PeriodoMembresia" data-dst="PlanMembresia" data-kind="id" d="M526 784 L404 784" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m1-m2-qr-titular" data-src="CodigoQr" data-dst="Usuario" data-kind="id" d="M1038 447 L864 447" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m1-m2-acceso-titular" data-src="RegistroAcceso" data-dst="Usuario" data-kind="id" d="M1038 710 L945 710 L945 502 L864 502" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m1-m2-acceso-sede" data-src="RegistroAcceso" data-dst="Sede" data-kind="id" d="M1360 719 L1393 719 L1393 221 L1360 221" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m1-m2-membresia-sede" data-src="Membresia" data-dst="Sede" data-kind="id" d="M74 431 L20 431 L20 153 L1171 153 L1171 170" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>sede contratada · por ID</title>
+      </path>
+      <g id="m1-m2-Rol" data-classifier="Rol" data-stereotype="entidad JPA">
+        <rect x="74" y="170" width="318" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="75" y="171" width="316" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="233.0" y="187.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="82 176 302 22">«entidad JPA»</text>
+        <text x="233.0" y="215.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="81 199 304 32">Rol</text>
+        <text x="82" y="250.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 240 302 21">− id: Integer</text>
+        <text x="82" y="272.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 262 302 21">− nombre: String</text>
+      </g>
+      <g id="m1-m2-Sede" data-classifier="Sede" data-stereotype="entidad JPA">
+        <rect x="1038" y="170" width="322" height="144" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1039" y="171" width="320" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="1199.0" y="187.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="1046 176 306 22">«entidad JPA»</text>
+        <text x="1199.0" y="215.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1045 199 308 32">Sede</text>
+        <text x="1046" y="250.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 240 306 21">− id: Integer</text>
+        <text x="1046" y="272.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 262 306 21">− nombre: String</text>
+        <text x="1046" y="294.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 284 306 21">− capacidadMaxima: Integer</text>
+      </g>
+      <g id="m1-m2-Usuario" data-classifier="Usuario" data-stereotype="entidad JPA">
+        <rect x="526" y="326" width="338" height="210" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="527" y="327" width="336" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="695.0" y="343.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="534 332 322 22">«entidad JPA»</text>
+        <text x="695.0" y="371.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="533 355 324 32">Usuario</text>
+        <text x="534" y="406.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 396 322 21">− id: Integer</text>
+        <text x="534" y="428.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 418 322 21">− nombre: String</text>
+        <text x="534" y="450.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 440 322 21">− apellido: String</text>
+        <text x="534" y="472.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 462 322 21">− activo: boolean</text>
+        <text x="534" y="494.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 484 322 21">− rol: Rol</text>
+        <text x="534" y="516.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 506 322 21">− sede: Sede</text>
+      </g>
+      <g id="m1-m2-Membresia" data-classifier="Membresia" data-stereotype="entidad JPA">
+        <rect x="74" y="402" width="330" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="75" y="403" width="328" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="239.0" y="419.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="82 408 314 22">«entidad JPA»</text>
+        <text x="239.0" y="447.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="81 431 316 32">Membresia</text>
+        <text x="82" y="482.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 472 314 21">− usuarioId: Integer</text>
+        <text x="82" y="504.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 494 314 21">− sedeId: Integer</text>
+        <text x="82" y="526.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 516 314 21">− planId: Integer</text>
+        <text x="82" y="548.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 538 314 21">− estado: String</text>
+        <text x="82" y="570.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 560 314 21">− suspendida: boolean</text>
+      </g>
+      <g id="m1-m2-PlanMembresia" data-classifier="PlanMembresia" data-stereotype="entidad JPA">
+        <rect x="74" y="700" width="330" height="144" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="75" y="701" width="328" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="239.0" y="717.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="82 706 314 22">«entidad JPA»</text>
+        <text x="239.0" y="745.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="81 729 316 32">PlanMembresia</text>
+        <text x="82" y="780.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 770 314 21">− id: Integer</text>
+        <text x="82" y="802.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 792 314 21">− duracionMeses: Integer</text>
+        <text x="82" y="824.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="82 814 314 21">− precio: BigDecimal</text>
+      </g>
+      <g id="m1-m2-PeriodoMembresia" data-classifier="PeriodoMembresia" data-stereotype="entidad JPA">
+        <rect x="526" y="668" width="338" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="527" y="669" width="336" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="695.0" y="685.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="534 674 322 22">«entidad JPA»</text>
+        <text x="695.0" y="713.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="533 697 324 32">PeriodoMembresia</text>
+        <text x="534" y="748.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 738 322 21">− membresiaId: Integer</text>
+        <text x="534" y="770.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 760 322 21">− planId: Integer</text>
+        <text x="534" y="792.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 782 322 21">− pagoId: Integer</text>
+        <text x="534" y="814.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 804 322 21">− inicio: LocalDateTime</text>
+        <text x="534" y="836.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="534 826 322 21">− fin: LocalDateTime</text>
+      </g>
+      <g id="m1-m2-CodigoQr" data-classifier="CodigoQr" data-stereotype="entidad JPA">
+        <rect x="1038" y="399" width="322" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1039" y="400" width="320" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="1199.0" y="416.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="1046 405 306 22">«entidad JPA»</text>
+        <text x="1199.0" y="444.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1045 428 308 32">CodigoQr</text>
+        <text x="1046" y="479.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 469 306 21">− usuarioId: Integer</text>
+        <text x="1046" y="501.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 491 306 21">− expiraEn: LocalDateTime</text>
+      </g>
+      <g id="m1-m2-RegistroAcceso" data-classifier="RegistroAcceso" data-stereotype="entidad JPA">
+        <rect x="1038" y="665" width="322" height="166" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1039" y="666" width="320" height="66" rx="0" fill="#E7F0F6" stroke="none" />
+        <text x="1199.0" y="682.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#215876" data-box="1046 671 306 22">«entidad JPA»</text>
+        <text x="1199.0" y="710.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1045 694 308 32">RegistroAcceso</text>
+        <text x="1046" y="745.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 735 306 21">− usuarioId: Integer</text>
+        <text x="1046" y="767.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 757 306 21">− sedeId: Integer</text>
+        <text x="1046" y="789.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 779 306 21">− fechaHoraIngreso: LocalDateTime</text>
+        <text x="1046" y="811.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1046 801 306 21">− fechaHoraSalida: LocalDateTime</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#215876" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  DOMINIO M1–M2</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Usuarios, membresías y acceso</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">M1 y M2 · Asociaciones navegables y vínculos por ID</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#215876" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Flecha sólida: asociación JPA. Línea sólida sin flecha: vínculo por ID. Las multiplicidades físicas provienen del esquema.</text>
+      <text x="511.5" y="279.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="462 269 99 21">rol · JPA</text>
+      <text x="478" y="351.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="478 341 44 20">0..*</text>
+      <text x="397" y="211.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="397 201 44 20">1</text>
+      <text x="1006.5" y="324.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="956 314 101 21">sede · JPA</text>
+      <text x="869" y="348.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="869 338 44 20">0..*</text>
+      <text x="990" y="262.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="990 252 44 20">0..1</text>
+      <text x="463.0" y="476.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="408 466 110 21">«por ID»</text>
+      <text x="409" y="447.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="409 437 44 20">0..1</text>
+      <text x="478" y="447.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="478 437 44 20">1</text>
+      <text x="152.5" y="638.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="82 628 141 21">«por ID»</text>
+      <text x="245" y="603.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="245 593 44 20">0..*</text>
+      <text x="245" y="686.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="245 676 44 20">1</text>
+      <text x="478" y="714.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="478 704 44 20">0..*</text>
+      <text x="409" y="517.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="409 507 44 20">1</text>
+      <text x="464.0" y="800.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="410 790 108 21">«por ID»</text>
+      <text x="478" y="771.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="478 761 44 20">0..*</text>
+      <text x="409" y="771.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="409 761 44 20">1</text>
+      <text x="950.5" y="464.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="895 454 111 21">«por ID»</text>
+      <text x="990" y="434.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="990 424 44 20">0..1</text>
+      <text x="869" y="434.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="869 424 44 20">1</text>
+      <text x="990" y="697.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="990 687 44 20">0..*</text>
+      <text x="869" y="489.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="869 479 44 20">1</text>
+      <text x="1365" y="706.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1365 696 44 20">0..*</text>
+      <text x="1365" y="208.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1365 198 44 20">1</text>
+      <text x="87" y="889.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#215876" data-box="87 876 1260 26">Límites del modelo Java</text>
+      <text x="87" y="916.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="87 905 1260 22">Rol y sede son objetos en Usuario. Los demás conectores de esta lámina son vínculos por ID. El período conserva un plan y puede referenciar un pago.</text>
+      <text x="762.0" y="165.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="670 155 184 21">sede contratada · por ID</text>
+      <text x="26" y="418.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="26 408 44 20">0..*</text>
+      <text x="1179" y="156.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1179 146 44 20">1</text>
+    </g>
+    <g id="m3" transform="translate(0 1038)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#F1EBF8" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="995" y="730" width="377" height="196" rx="8" fill="#F1EBF8" stroke="none" />
+      <path id="m3-titular" data-src="ReservaClase" data-dst="Usuario" data-kind="id" d="M231 367 L231 280" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m3-reserva-clase" data-src="ReservaClase" data-dst="ClaseGrupal" data-kind="id" d="M390 439 L549 439" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m3-clase-tipo" data-src="ClaseGrupal" data-dst="TipoClase" data-kind="id" d="M897 395 L978 395 L978 231 L1053 231" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m3-clase-instructor" data-src="ClaseGrupal" data-dst="Instructor" data-kind="id" d="M897 463 L1053 463" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m3-clase-sede" data-src="ClaseGrupal" data-dst="Sede" data-kind="id" d="M897 525 L984 525 L984 608 L1053 608" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m3-inscripcion-clase" data-src="InscripcionEspera" data-dst="ClaseGrupal" data-kind="id" d="M390 710 L462 710 L462 504 L549 504" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m3-oferta-clase" data-src="OfertaClase" data-dst="ClaseGrupal" data-kind="id" d="M722 668 L722 560" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m3-oferta-inscripcion" data-src="OfertaClase" data-dst="InscripcionEspera" data-kind="id" d="M549 752 L390 752" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round" />
+      <path id="m3-oferta-reserva" data-src="OfertaClase" data-dst="ReservaClase" data-kind="id" d="M718 856 L718 913 L33 913 L33 483 L68 483" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID» · reserva vinculada si se acepta la oferta</title>
+      </path>
+      <g id="m3-Usuario" data-classifier="Usuario" data-stereotype="entidad JPA">
+        <rect x="68" y="158" width="322" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="69" y="159" width="320" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="229.0" y="175.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="76 164 306 22">«entidad JPA»</text>
+        <text x="229.0" y="203.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="75 187 308 32">Usuario</text>
+        <text x="76" y="238.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 228 306 21">− id: Integer</text>
+        <text x="76" y="260.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 250 306 21">− nombre: String</text>
+      </g>
+      <g id="m3-ReservaClase" data-classifier="ReservaClase" data-stereotype="entidad JPA">
+        <rect x="68" y="367" width="322" height="166" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="69" y="368" width="320" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="229.0" y="384.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="76 373 306 22">«entidad JPA»</text>
+        <text x="229.0" y="412.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="75 396 308 32">ReservaClase</text>
+        <text x="76" y="447.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 437 306 21">− claseId: Integer</text>
+        <text x="76" y="469.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 459 306 21">− usuarioId: Integer</text>
+        <text x="76" y="491.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 481 306 21">− estadoReserva: EstadoReserva</text>
+        <text x="76" y="513.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 503 306 21">− estadoAsistencia: EstadoAsistencia</text>
+      </g>
+      <g id="m3-ClaseGrupal" data-classifier="ClaseGrupal" data-stereotype="entidad JPA">
+        <rect x="549" y="350" width="348" height="210" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="550" y="351" width="346" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="723.0" y="367.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="557 356 332 22">«entidad JPA»</text>
+        <text x="723.0" y="395.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="556 379 334 32">ClaseGrupal</text>
+        <text x="557" y="430.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 420 332 21">− sedeId: Integer</text>
+        <text x="557" y="452.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 442 332 21">− tipoClaseId: Integer</text>
+        <text x="557" y="474.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 464 332 21">− instructorId: Integer</text>
+        <text x="557" y="496.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 486 332 21">− capacidadMaxima: Integer</text>
+        <text x="557" y="518.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 508 332 21">− inicio: LocalDateTime</text>
+        <text x="557" y="540.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 530 332 21">− estado: EstadoClase</text>
+      </g>
+      <g id="m3-TipoClase" data-classifier="TipoClase" data-stereotype="entidad JPA">
+        <rect x="1053" y="160" width="319" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1054" y="161" width="317" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="1212.5" y="177.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1061 166 303 22">«entidad JPA»</text>
+        <text x="1212.5" y="205.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1060 189 305 32">TipoClase</text>
+        <text x="1061" y="240.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 230 303 21">− id: Integer</text>
+        <text x="1061" y="262.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 252 303 21">− nombre: String</text>
+      </g>
+      <g id="m3-Instructor" data-classifier="Instructor" data-stereotype="entidad JPA">
+        <rect x="1053" y="367" width="319" height="144" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1054" y="368" width="317" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="1212.5" y="384.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1061 373 303 22">«entidad JPA»</text>
+        <text x="1212.5" y="412.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1060 396 305 32">Instructor</text>
+        <text x="1061" y="447.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 437 303 21">− id: Integer</text>
+        <text x="1061" y="469.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 459 303 21">− nombre: String</text>
+        <text x="1061" y="491.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 481 303 21">− apellido: String</text>
+      </g>
+      <g id="m3-Sede" data-classifier="Sede" data-stereotype="entidad JPA">
+        <rect x="1053" y="553" width="319" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1054" y="554" width="317" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="1212.5" y="570.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1061 559 303 22">«entidad JPA»</text>
+        <text x="1212.5" y="598.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1060 582 305 32">Sede</text>
+        <text x="1061" y="633.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 623 303 21">− id: Integer</text>
+        <text x="1061" y="655.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1061 645 303 21">− nombre: String</text>
+      </g>
+      <g id="m3-InscripcionEspera" data-classifier="InscripcionEspera" data-stereotype="entidad JPA">
+        <rect x="68" y="668" width="322" height="166" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="69" y="669" width="320" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="229.0" y="685.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="76 674 306 22">«entidad JPA»</text>
+        <text x="229.0" y="713.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="75 697 308 32">InscripcionEspera</text>
+        <text x="76" y="748.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 738 306 21">− claseId: Integer</text>
+        <text x="76" y="770.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 760 306 21">− usuarioId: Integer</text>
+        <text x="76" y="792.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 782 306 21">− posicion: Integer</text>
+        <text x="76" y="814.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="76 804 306 21">− estado: EstadoInscripcion</text>
+      </g>
+      <g id="m3-OfertaClase" data-classifier="OfertaClase" data-stereotype="entidad JPA">
+        <rect x="549" y="668" width="348" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="550" y="669" width="346" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="723.0" y="685.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="557 674 332 22">«entidad JPA»</text>
+        <text x="723.0" y="713.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="556 697 334 32">OfertaClase</text>
+        <text x="557" y="748.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 738 332 21">− claseId: Integer</text>
+        <text x="557" y="770.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 760 332 21">− inscripcionId: Integer</text>
+        <text x="557" y="792.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 782 332 21">− venceEn: LocalDateTime</text>
+        <text x="557" y="814.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 804 332 21">− estado: EstadoOferta</text>
+        <text x="557" y="836.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="557 826 332 21">− reservaId: Integer</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#6C4A84" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  DOMINIO M3</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Clases, reservas y lista de espera</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">M3 · Identidad, cupos, reservas y ofertas</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#6C4A84" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Flecha sólida: asociación JPA. Línea sólida sin flecha: vínculo por ID. Las multiplicidades físicas provienen del esquema.</text>
+      <text x="156.0" y="317.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="91 307 130 21">«por ID»</text>
+      <text x="239" y="353.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="239 343 44 20">0..*</text>
+      <text x="239" y="293.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="239 283 44 20">1</text>
+      <text x="466.0" y="456.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="408 446 116 21">«por ID»</text>
+      <text x="395" y="426.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="395 416 44 20">0..*</text>
+      <text x="501" y="426.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="501 416 44 20">1</text>
+      <text x="902" y="382.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="902 372 44 20">0..*</text>
+      <text x="1005" y="218.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1005 208 44 20">1</text>
+      <text x="902" y="450.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="902 440 44 20">0..*</text>
+      <text x="1005" y="450.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1005 440 44 20">1</text>
+      <text x="902" y="512.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="902 502 44 20">0..*</text>
+      <text x="1005" y="595.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1005 585 44 20">1</text>
+      <text x="395" y="697.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="395 687 44 20">0..*</text>
+      <text x="501" y="491.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="501 481 44 20">1</text>
+      <text x="792.0" y="607.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="735 597 114 21">«por ID»</text>
+      <text x="730" y="654.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="730 644 44 20">0..*</text>
+      <text x="730" y="573.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="730 563 44 20">1</text>
+      <text x="501" y="739.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="501 729 44 20">0..*</text>
+      <text x="395" y="739.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="395 729 44 20">1</text>
+      <text x="427.0" y="930.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="199 920 456 21">«por ID» · reserva vinculada si se acepta la oferta</text>
+      <text x="726" y="869.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="726 859 44 20">0..*</text>
+      <text x="20" y="470.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="20 460 44 20">0..1</text>
+      <text x="1008" y="750.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#6C4A84" data-box="1008 737 351 26">Cupo y espera</text>
+      <text x="1008" y="777.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1008 766 351 22">Todos los vínculos de M3 son por ID.</text>
+      <text x="1008" y="800.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1008 789 351 22">Sólo una reserva CONFIRMADA</text>
+      <text x="1008" y="823.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1008 812 351 22">por clase y titular.</text>
+      <text x="1008" y="846.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1008 835 351 22">Una inscripción admite histórico</text>
+      <text x="1008" y="869.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1008 858 351 22">y hasta una oferta PENDIENTE.</text>
+    </g>
+    <g id="m4-m5" transform="translate(1460 1038)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#E2F2EB" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="1051" y="702" width="333" height="174" rx="8" fill="#E2F2EB" stroke="none" />
+      <rect x="59" y="910" width="1317" height="44" rx="8" fill="#E2F2EB" stroke="none" />
+      <path id="m4-m5-cancha-sede" data-src="Cancha" data-dst="Sede" data-kind="id" d="M213 369 L213 479" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m4-m5-turno-cancha" data-src="TurnoResponse" data-dst="Cancha" data-kind="id" d="M563 267 L370 267" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m4-m5-reserva-turno" data-src="ReservaResponse" data-dst="TurnoResponse" data-kind="id" d="M1061 267 L883 267" stroke="#527591" fill="none" stroke-width="2" stroke-linejoin="round">
+        <title>«por ID»</title>
+      </path>
+      <path id="m4-m5-pago-reserva" data-src="PagoResponse" data-dst="ReservaResponse" data-kind="logic" d="M1218 481 L1218 369" stroke="#684B84" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4">
+        <title>concepto de cancha</title>
+      </path>
+      <path id="m4-m5-devuelve-pdf" data-src="ComprobanteService" data-dst="ComprobantePdf" data-kind="dep" d="M559 543 L448 543 L448 762 L370 762" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>devuelve</title>
+      </path>
+      <path id="m4-m5-arma-datos" data-src="ComprobanteService" data-dst="DatosComprobante" data-kind="dep" d="M729 606 L729 709" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>construye</title>
+      </path>
+      <g id="m4-m5-Cancha" data-classifier="Cancha" data-stereotype="entidad JPA">
+        <rect x="61" y="181" width="309" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="62" y="182" width="307" height="66" rx="0" fill="#E2F2EB" stroke="none" />
+        <text x="215.5" y="198.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="69 187 293 22">«entidad JPA»</text>
+        <text x="215.5" y="226.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="68 210 295 32">Cancha</text>
+        <text x="69" y="261.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 251 293 21">− id: Integer</text>
+        <text x="69" y="283.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 273 293 21">− sedeId: Integer</text>
+        <text x="69" y="305.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 295 293 21">− tipoId: Integer</text>
+        <text x="69" y="327.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 317 293 21">− costoBaseHora: BigDecimal</text>
+        <text x="69" y="349.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 339 293 21">− activa: short</text>
+      </g>
+      <g id="m4-m5-TurnoResponse" data-classifier="TurnoResponse" data-stereotype="record · proyección JDBC">
+        <rect x="563" y="181" width="320" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="564" y="182" width="318" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="723.0" y="198.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="571 187 304 22">«record · proyección JDBC»</text>
+        <text x="723.0" y="226.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="570 210 306 32">TurnoResponse</text>
+        <text x="571" y="261.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="571 251 304 21">id: Integer</text>
+        <text x="571" y="283.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="571 273 304 21">canchaId: Integer</text>
+        <text x="571" y="305.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="571 295 304 21">inicio: OffsetDateTime</text>
+        <text x="571" y="327.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="571 317 304 21">fin: OffsetDateTime</text>
+        <text x="571" y="349.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="571 339 304 21">precio: Precio</text>
+      </g>
+      <g id="m4-m5-ReservaResponse" data-classifier="ReservaResponse" data-stereotype="record · proyección JDBC">
+        <rect x="1061" y="181" width="314" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1062" y="182" width="312" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1218.0" y="198.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="1069 187 298 22">«record · proyección JDBC»</text>
+        <text x="1218.0" y="226.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1068 210 300 32">ReservaResponse</text>
+        <text x="1069" y="261.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 251 298 21">id: Integer</text>
+        <text x="1069" y="283.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 273 298 21">turnoId: Integer</text>
+        <text x="1069" y="305.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 295 298 21">usuarioId: Integer</text>
+        <text x="1069" y="327.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 317 298 21">estado: String</text>
+        <text x="1069" y="349.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 339 298 21">pagoId: Integer</text>
+      </g>
+      <g id="m4-m5-Sede" data-classifier="Sede" data-stereotype="entidad JPA">
+        <rect x="61" y="479" width="309" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="62" y="480" width="307" height="66" rx="0" fill="#E2F2EB" stroke="none" />
+        <text x="215.5" y="496.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="69 485 293 22">«entidad JPA»</text>
+        <text x="215.5" y="524.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="68 508 295 32">Sede</text>
+        <text x="69" y="559.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 549 293 21">− id: Integer</text>
+        <text x="69" y="581.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 571 293 21">− nombre: String</text>
+      </g>
+      <g id="m4-m5-ComprobanteService" data-classifier="ComprobanteService" data-stereotype="servicio Spring">
+        <rect x="559" y="484" width="356" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="560" y="485" width="354" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="737.0" y="501.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="567 490 340 22">«servicio Spring»</text>
+        <text x="737.0" y="529.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="566 513 342 32">ComprobanteService</text>
+        <text x="567" y="564.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="567 554 340 21">+ emitir(pagoId): ComprobantePdf</text>
+        <text x="567" y="586.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="567 576 340 21">+ descargar(email, pagoId): ComprobantePdf</text>
+      </g>
+      <g id="m4-m5-PagoResponse" data-classifier="PagoResponse" data-stereotype="record · proyección JDBC">
+        <rect x="1061" y="481" width="314" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1062" y="482" width="312" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1218.0" y="498.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="1069 487 298 22">«record · proyección JDBC»</text>
+        <text x="1218.0" y="526.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1068 510 300 32">PagoResponse</text>
+        <text x="1069" y="561.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 551 298 21">id: Integer</text>
+        <text x="1069" y="583.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 573 298 21">concepto: String</text>
+        <text x="1069" y="605.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 595 298 21">recursoId: Integer</text>
+        <text x="1069" y="627.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 617 298 21">monto: BigDecimal</text>
+        <text x="1069" y="649.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1069 639 298 21">estado: String</text>
+      </g>
+      <g id="m4-m5-ComprobantePdf" data-classifier="ComprobantePdf" data-stereotype="record · DTO">
+        <rect x="61" y="709" width="309" height="122" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="62" y="710" width="307" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="215.5" y="726.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="69 715 293 22">«record · DTO»</text>
+        <text x="215.5" y="754.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="68 738 295 32">ComprobantePdf</text>
+        <text x="69" y="789.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 779 293 21">numero: String</text>
+        <text x="69" y="811.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="69 801 293 21">contenido: byte[]</text>
+      </g>
+      <g id="m4-m5-DatosComprobante" data-classifier="DatosComprobante" data-stereotype="record · DTO">
+        <rect x="559" y="709" width="338" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="560" y="710" width="336" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="728.0" y="726.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="567 715 322 22">«record · DTO»</text>
+        <text x="728.0" y="754.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="566 738 324 32">DatosComprobante</text>
+        <text x="567" y="789.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="567 779 322 21">numero: String</text>
+        <text x="567" y="811.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="567 801 322 21">pagoId: Integer</text>
+        <text x="567" y="833.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="567 823 322 21">emision: LocalDateTime</text>
+        <text x="567" y="855.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="567 845 322 21">total: BigDecimal</text>
+        <text x="567" y="877.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="567 867 322 21">rubro: String</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#0A5B52" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  DOMINIO M4–M5</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Canchas, reservas, pagos y PDF</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">M4 y M5 · Entidad Cancha, proyecciones JDBC y servicio de comprobantes</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#0A5B52" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Las multiplicidades en proyecciones describen el vínculo entre recursos. El alcance del pago está condicionado por concepto.</text>
+      <text x="142.0" y="419.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="84 409 116 21">«por ID»</text>
+      <text x="221" y="382.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="221 372 44 20">0..*</text>
+      <text x="221" y="465.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="221 455 44 20">1</text>
+      <text x="465.0" y="285.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="402 275 126 21">«por ID»</text>
+      <text x="515" y="254.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="515 244 44 20">0..*</text>
+      <text x="375" y="254.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="375 244 44 20">1</text>
+      <text x="971.0" y="286.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="909 276 124 21">«por ID»</text>
+      <text x="1013" y="254.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1013 244 44 20">0..*</text>
+      <text x="888" y="254.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="888 244 44 20">1</text>
+      <text x="1130.0" y="422.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1050 412 160 21">concepto de cancha</text>
+      <text x="1226" y="467.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1226 457 44 20">0..1</text>
+      <text x="1226" y="382.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="1226 372 44 20">1</text>
+      <text x="506.0" y="713.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="459 703 94 21">devuelve</text>
+      <text x="666.0" y="656.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="610 646 112 21">construye</text>
+      <text x="1064" y="722.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#0A5B52" data-box="1064 709 307 26">Pago y comprobante</text>
+      <text x="1064" y="749.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1064 738 307 22">V16 limita el pago de una reserva</text>
+      <text x="1064" y="772.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1064 761 307 22">por concepto y recurso.</text>
+      <text x="1064" y="795.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1064 784 307 22">V6 limita a un comprobante por</text>
+      <text x="1064" y="818.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1064 807 307 22">pago. El PDF es un DTO.</text>
+      <text x="72" y="930.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#0A5B52" data-box="72 917 1291 26">Vínculo sin FK · PagoResponse.recursoId se interpreta según concepto.</text>
+    </g>
+    <g id="strategy" transform="translate(0 2076)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#E2F2EB" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="55" y="859" width="1328" height="87" rx="8" fill="#E2F2EB" stroke="none" />
+      <path id="strategy-cotiza" data-src="ReservaCanchaService" data-dst="CanchaService" data-kind="dep" d="M388 220 L511 220" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>cotiza</title>
+      </path>
+      <path id="strategy-vigencia" data-src="CanchaService" data-dst="MembresiaService" data-kind="dep" d="M925 224 L1041 224" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>consulta</title>
+      </path>
+      <path id="strategy-seleccion" data-src="CanchaService" data-dst="PricingStrategy" data-kind="dep" d="M704 336 L704 433" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>selecciona y ejecuta</title>
+      </path>
+      <path id="strategy-tipo-resultado" data-src="PricingStrategy" data-dst="PricingStrategy.Precio" data-kind="dep" d="M962 479 L1041 479" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>retorna</title>
+      </path>
+      <path id="strategy-usa-estandar" data-src="CanchaService" data-dst="PrecioEstandarStrategy" data-kind="dep" d="M511 313 L251 313 L251 698" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta estándar</title>
+      </path>
+      <path id="strategy-usa-socio" data-src="CanchaService" data-dst="PrecioSocioStrategy" data-kind="dep" d="M925 312 L1400 312 L1400 651 L1211 651 L1211 698" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta socio</title>
+      </path>
+      <path id="strategy-implementa-estandar" data-src="PrecioEstandarStrategy" data-dst="PricingStrategy" data-kind="real" d="M542 698 L542 645 L590 645 L590 533" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#triangulo-405D76)" />
+      <path id="strategy-implementa-socio" data-src="PrecioSocioStrategy" data-dst="PricingStrategy" data-kind="real" d="M810 698 L810 533" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#triangulo-405D76)" />
+      <path id="strategy-reusa-base" data-src="PrecioSocioStrategy" data-dst="PrecioEstandarStrategy" data-kind="dep" d="M780 775 L562 775" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>delega el precio base</title>
+      </path>
+      <g id="strategy-ReservaCanchaService" data-classifier="ReservaCanchaService" data-stereotype="servicio Spring">
+        <rect x="56" y="165" width="332" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="57" y="166" width="330" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="222.0" y="182.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="64 171 316 22">«servicio Spring»</text>
+        <text x="222.0" y="210.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="63 194 318 32">ReservaCanchaService</text>
+        <text x="64" y="245.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="64 235 316 21">+ reservar(email, canchaId, req, clave)</text>
+      </g>
+      <g id="strategy-CanchaService" data-classifier="CanchaService" data-stereotype="servicio Spring">
+        <rect x="511" y="165" width="414" height="171" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="512" y="166" width="412" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="718.0" y="182.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="519 171 398 22">«servicio Spring»</text>
+        <text x="718.0" y="210.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="518 194 400 32">CanchaService</text>
+        <text x="519" y="245.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="519 235 398 21">− estandar: PrecioEstandarStrategy</text>
+        <text x="519" y="267.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="519 257 398 21">− socio: PrecioSocioStrategy</text>
+        <text x="519" y="289.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="519 279 398 21">− membresias: MembresiaService</text>
+        <rect x="512" y="301" width="412" height="1" rx="0" fill="#C7D4DE" stroke="none" />
+        <text x="519" y="316.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="519 306 398 21">+ precio(usuarioId, c, inicio, fin): Precio</text>
+      </g>
+      <g id="strategy-MembresiaService" data-classifier="MembresiaService" data-stereotype="servicio Spring">
+        <rect x="1041" y="165" width="342" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1042" y="166" width="340" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1212.0" y="182.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="1049 171 326 22">«servicio Spring»</text>
+        <text x="1212.0" y="210.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1048 194 328 32">MembresiaService</text>
+        <text x="1049" y="245.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="1049 235 326 21">+ tieneMembresiaVigente(usuarioId): boolean</text>
+      </g>
+      <g id="strategy-PricingStrategy" data-classifier="PricingStrategy" data-stereotype="interface">
+        <rect x="473" y="433" width="489" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="474" y="434" width="487" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="717.5" y="450.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="481 439 473 22">«interface»</text>
+        <text x="717.5" y="478.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="480 462 475 32">PricingStrategy</text>
+        <text x="481" y="513.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="481 503 473 21">+ calcular(tarifaHora, recargoPorcentaje, inicio, fin): Precio</text>
+      </g>
+      <g id="strategy-PricingStrategy.Precio" data-classifier="PricingStrategy.Precio" data-stereotype="record anidado">
+        <rect x="1041" y="433" width="342" height="188" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1042" y="434" width="340" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1212.0" y="450.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="1049 439 326 22">«record anidado»</text>
+        <text x="1212.0" y="478.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1048 462 328 32">PricingStrategy.Precio</text>
+        <text x="1049" y="513.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1049 503 326 21">base: BigDecimal</text>
+        <text x="1049" y="535.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1049 525 326 21">recargo: BigDecimal</text>
+        <text x="1049" y="557.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1049 547 326 21">descuento: BigDecimal</text>
+        <text x="1049" y="579.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1049 569 326 21">total: BigDecimal</text>
+        <text x="1049" y="601.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="1049 591 326 21">estrategia: String</text>
+      </g>
+      <g id="strategy-PrecioEstandarStrategy" data-classifier="PrecioEstandarStrategy" data-stereotype="componente Spring">
+        <rect x="104" y="698" width="458" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="105" y="699" width="456" height="66" rx="0" fill="#E2F2EB" stroke="none" />
+        <text x="333.0" y="715.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="112 704 442 22">«componente Spring»</text>
+        <text x="333.0" y="743.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="111 727 444 32">PrecioEstandarStrategy</text>
+        <text x="112" y="778.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="112 768 442 21">+ calcular(tarifaHora, porcentaje, inicio, fin): Precio</text>
+      </g>
+      <g id="strategy-PrecioSocioStrategy" data-classifier="PrecioSocioStrategy" data-stereotype="componente Spring">
+        <rect x="780" y="698" width="489" height="127" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="781" y="699" width="487" height="66" rx="0" fill="#E2F2EB" stroke="none" />
+        <text x="1024.5" y="715.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#0A5B52" data-box="788 704 473 22">«componente Spring»</text>
+        <text x="1024.5" y="743.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="787 727 475 32">PrecioSocioStrategy</text>
+        <text x="788" y="778.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="788 768 473 21">− estandar: PrecioEstandarStrategy</text>
+        <rect x="781" y="790" width="487" height="1" rx="0" fill="#C7D4DE" stroke="none" />
+        <text x="788" y="805.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="788 795 473 21">+ calcular(tarifaHora, porcentaje, inicio, fin): Precio</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#0A5B52" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  PATRÓN STRATEGY</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Strategy · Precio de canchas</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">M4 · Selección de la estrategia con la membresía vigente en el servidor</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#0A5B52" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Línea sólida: asociación. Línea discontinua: dependencia. Triángulo hueco: generalización o realización según el trazo.</text>
+      <text x="448.5" y="236.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="390 226 117 21">cotiza</text>
+      <text x="983.0" y="240.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="928 230 110 21">consulta</text>
+      <text x="812.5" y="380.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="720 370 185 21">selecciona y ejecuta</text>
+      <text x="1001.5" y="498.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="963 488 77 21">retorna</text>
+      <text x="344.0" y="330.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="259 320 170 21">inyecta estándar</text>
+      <text x="1300.5" y="666.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1225 656 151 21">inyecta socio</text>
+      <text x="670.0" y="756.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="576 746 188 21">delega el precio base</text>
+      <text x="68" y="879.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#0A5B52" data-box="68 866 1302 26">Regla de selección</text>
+      <text x="68" y="906.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="68 895 1302 22">La variante estándar aplica base y pico de 19:00 a 21:00. La variante socio delega ese cálculo y descuenta el 15 % del total.</text>
+      <text x="68" y="929.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="68 918 1302 22">La elección parte de la vigencia de membresía. El record Precio conserva el desglose que devuelve la estrategia.</text>
+    </g>
+    <g id="observer" transform="translate(1460 2076)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#F1EBF8" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="52" y="386" width="389" height="143" rx="8" fill="#F1EBF8" stroke="none" />
+      <rect x="1022" y="452" width="365" height="169" rx="8" fill="#F1EBF8" stroke="none" />
+      <path id="observer-libera-cupo" data-src="ReservaClaseService" data-dst="PublicadorClase" data-kind="dep" d="M234 263 L234 292 L555 292 L555 329" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>CupoLiberado</title>
+      </path>
+      <path id="observer-publica-clase" data-src="ClaseService" data-dst="PublicadorClase" data-kind="dep" d="M722 263 L722 329" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>cambio / cancelación</title>
+      </path>
+      <path id="observer-publica-oferta" data-src="ListaEsperaService" data-dst="PublicadorClase" data-kind="dep" d="M1200 263 L1200 302 L871 302 L871 329" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>CupoLiberado</title>
+      </path>
+      <path id="observer-tipo-evento" data-src="PublicadorClase" data-dst="EventoClase" data-kind="dep" d="M910 388 L1022 388" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>publica</title>
+      </path>
+      <path id="observer-registra-observadores" data-src="PublicadorClase" data-dst="ObservadorClase" data-kind="jpa" d="M719 500 L719 585" stroke="#172B3C" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#flecha-172B3C)">
+        <title>actualizar(evento)</title>
+      </path>
+      <path id="observer-gestor-observa" data-src="GestorListaEspera" data-dst="ObservadorClase" data-kind="real" d="M245 751 L245 633 L529 633" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#triangulo-405D76)">
+        <title>atiende CupoLiberado</title>
+      </path>
+      <path id="observer-notificador-observa" data-src="NotificadorClase" data-dst="ObservadorClase" data-kind="real" d="M719 751 L719 685" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#triangulo-405D76)" />
+      <path id="observer-notifica" data-src="NotificadorClase" data-dst="Notificador" data-kind="dep" d="M910 808 L979 808 L979 727 L1051 727" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>delega aviso</title>
+      </path>
+      <path id="observer-log-realiza" data-src="NotificadorLog" data-dst="Notificador" data-kind="real" d="M1219 827 L1219 771" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#triangulo-405D76)" />
+      <path id="observer-genera-oferta" data-src="GestorListaEspera" data-dst="PublicadorClase" data-kind="dep" d="M54 802 L30 802 L30 350 L529 350" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>publica OfertaGenerada</title>
+      </path>
+      <g id="observer-ReservaClaseService" data-classifier="ReservaClaseService" data-stereotype="servicio Spring">
+        <rect x="52" y="163" width="365" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="53" y="164" width="363" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="234.5" y="180.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="60 169 349 22">«servicio Spring»</text>
+        <text x="234.5" y="208.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="59 192 351 32">ReservaClaseService</text>
+        <text x="60" y="243.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="60 233 349 21">+ cancelar(email, claseId, reservaId)</text>
+      </g>
+      <g id="observer-ClaseService" data-classifier="ClaseService" data-stereotype="servicio Spring">
+        <rect x="537" y="163" width="365" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="538" y="164" width="363" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="719.5" y="180.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="545 169 349 22">«servicio Spring»</text>
+        <text x="719.5" y="208.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="544 192 351 32">ClaseService</text>
+        <text x="545" y="243.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="545 233 349 21">+ cancelar(email, claseId, request)</text>
+      </g>
+      <g id="observer-ListaEsperaService" data-classifier="ListaEsperaService" data-stereotype="servicio Spring">
+        <rect x="1022" y="163" width="365" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1023" y="164" width="363" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1204.5" y="180.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1030 169 349 22">«servicio Spring»</text>
+        <text x="1204.5" y="208.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1029 192 351 32">ListaEsperaService</text>
+        <text x="1030" y="243.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="1030 233 349 21">+ responder(email, claseId, ofertaId, respuesta)</text>
+      </g>
+      <g id="observer-PublicadorClase" data-classifier="PublicadorClase" data-stereotype="componente Spring">
+        <rect x="529" y="329" width="381" height="171" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="530" y="330" width="379" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="719.5" y="346.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="537 335 365 22">«componente Spring»</text>
+        <text x="719.5" y="374.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="536 358 367 32">PublicadorClase</text>
+        <text x="537" y="409.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="537 399 365 21">− observadores: List&lt;ObservadorClase&gt;</text>
+        <rect x="530" y="421" width="379" height="1" rx="0" fill="#C7D4DE" stroke="none" />
+        <text x="537" y="436.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="537 426 365 21">+ suscribir(observador): void</text>
+        <text x="537" y="458.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="537 448 365 21">+ desuscribir(observador): void</text>
+        <text x="537" y="480.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="537 470 365 21">+ publicar(evento): void</text>
+      </g>
+      <g id="observer-EventoClase" data-classifier="EventoClase" data-stereotype="interface sealed">
+        <rect x="1022" y="358" width="365" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1023" y="359" width="363" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1204.5" y="375.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1030 364 349 22">«interface sealed»</text>
+        <text x="1204.5" y="403.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1029 387 351 32">EventoClase</text>
+      </g>
+      <g id="observer-ObservadorClase" data-classifier="ObservadorClase" data-stereotype="interface">
+        <rect x="529" y="585" width="381" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="530" y="586" width="379" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="719.5" y="602.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="537 591 365 22">«interface»</text>
+        <text x="719.5" y="630.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="536 614 367 32">ObservadorClase</text>
+        <text x="537" y="665.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="537 655 365 21">+ actualizar(evento: EventoClase): void</text>
+      </g>
+      <g id="observer-GestorListaEspera" data-classifier="GestorListaEspera" data-stereotype="componente Spring">
+        <rect x="54" y="751" width="379" height="127" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="55" y="752" width="377" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="243.5" y="768.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="62 757 363 22">«componente Spring»</text>
+        <text x="243.5" y="796.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="61 780 365 32">GestorListaEspera</text>
+        <text x="62" y="831.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="62 821 363 21">− publicador: PublicadorClase</text>
+        <rect x="55" y="843" width="377" height="1" rx="0" fill="#C7D4DE" stroke="none" />
+        <text x="62" y="858.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="62 848 363 21">+ actualizar(evento: EventoClase): void</text>
+      </g>
+      <g id="observer-NotificadorClase" data-classifier="NotificadorClase" data-stereotype="componente Spring">
+        <rect x="529" y="751" width="381" height="127" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="530" y="752" width="379" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="719.5" y="768.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="537 757 365 22">«componente Spring»</text>
+        <text x="719.5" y="796.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="536 780 367 32">NotificadorClase</text>
+        <text x="537" y="831.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#172B3C" data-box="537 821 365 21">− notificador: Notificador</text>
+        <rect x="530" y="843" width="379" height="1" rx="0" fill="#C7D4DE" stroke="none" />
+        <text x="537" y="858.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="537 848 365 21">+ actualizar(evento: EventoClase): void</text>
+      </g>
+      <g id="observer-Notificador" data-classifier="Notificador" data-stereotype="interface">
+        <rect x="1051" y="671" width="337" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1052" y="672" width="335" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1219.5" y="688.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1059 677 321 22">«interface»</text>
+        <text x="1219.5" y="716.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1058 700 323 32">Notificador</text>
+        <text x="1059" y="751.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="1059 741 321 21">+ enviar(notificacion): void</text>
+      </g>
+      <g id="observer-NotificadorLog" data-classifier="NotificadorLog" data-stereotype="componente Spring">
+        <rect x="1051" y="827" width="337" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1052" y="828" width="335" height="66" rx="0" fill="#F1EBF8" stroke="none" />
+        <text x="1219.5" y="844.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#6C4A84" data-box="1059 833 321 22">«componente Spring»</text>
+        <text x="1219.5" y="872.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1058 856 323 32">NotificadorLog</text>
+        <text x="1059" y="907.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="1059 897 321 21">+ enviar(notificacion): void</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#6C4A84" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  PATRÓN OBSERVER</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Observer · Lista de espera</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">M3 · Suscripción explícita y entrega a observadores registrados</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#6C4A84" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Línea sólida: asociación. Línea discontinua: dependencia. Triángulo hueco: generalización o realización según el trazo.</text>
+      <text x="334.0" y="280.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="248 270 172 21">CupoLiberado</text>
+      <text x="833.0" y="281.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="728 271 210 21">cambio / cancelación</text>
+      <text x="1050.0" y="284.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="932 274 236 21">CupoLiberado</text>
+      <text x="966.5" y="404.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="913 394 107 21">publica</text>
+      <text x="819.0" y="540.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="730 530 178 21">actualizar(evento)</text>
+      <text x="727" y="571.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="700" fill="#405D76" data-box="727 561 44 20">0..*</text>
+      <text x="373.5" y="610.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="257 600 233 21">atiende CupoLiberado</text>
+      <text x="980.0" y="825.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="925 815 110 21">delega aviso</text>
+      <text x="65" y="406.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#6C4A84" data-box="65 393 363 26">Suscripción real</text>
+      <text x="65" y="433.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="65 422 363 22">Las dos clases se registran en @PostConstruct.</text>
+      <text x="65" y="456.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="65 445 363 22">El publicador llama en el mismo hilo.</text>
+      <text x="65" y="479.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="65 468 363 22">El aviso se programa para el afterCommit</text>
+      <text x="65" y="502.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="65 491 363 22">cuando hay sincronización transaccional.</text>
+      <text x="1035" y="472.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#6C4A84" data-box="1035 459 339 26">Eventos implementados</text>
+      <text x="1035" y="499.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1035 488 339 22">CupoLiberado · OfertaGenerada</text>
+      <text x="1035" y="522.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1035 511 339 22">ClaseModificada · ClaseCancelada</text>
+      <text x="1035" y="545.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1035 534 339 22">NotificadorLog escribe en el log.</text>
+      <text x="235.0" y="330.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="115 320 240 21">publica OfertaGenerada</text>
+      <text x="55" y="917.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="55 905 380 24">Selecciona por orden de posición.</text>
+      <text x="531" y="917.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="531 905 424 24">Prepara avisos para los usuarios afectados.</text>
+    </g>
+    <g id="repository" transform="translate(0 3114)">
+      <rect x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect x="38" y="26" width="1364" height="110" rx="11" fill="#E8F0F7" stroke="none" />
+      <rect x="39" y="973" width="1362" height="1" rx="0" fill="#C1CFDA" stroke="none" />
+      <rect x="38" y="809" width="653" height="126" rx="8" fill="#E8F0F7" stroke="none" />
+      <rect x="716" y="809" width="683" height="126" rx="8" fill="#E8F0F7" stroke="none" />
+      <path id="repository-consume-UsuarioRepository" data-src="UsuarioService" data-dst="UsuarioRepository" data-kind="dep" d="M164 237 L164 354" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta</title>
+      </path>
+      <path id="repository-consume-MembresiaRepository" data-src="MembresiaService" data-dst="MembresiaRepository" data-kind="dep" d="M441 237 L441 354" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta</title>
+      </path>
+      <path id="repository-consume-RegistroAccesoRepository" data-src="AccesoService" data-dst="RegistroAccesoRepository" data-kind="dep" d="M718 237 L718 354" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta</title>
+      </path>
+      <path id="repository-consume-ReservaClaseRepository" data-src="ReservaClaseService" data-dst="ReservaClaseRepository" data-kind="dep" d="M995 237 L995 354" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta</title>
+      </path>
+      <path id="repository-consume-CanchaRepository" data-src="CanchaService" data-dst="CanchaRepository" data-kind="dep" d="M1272 237 L1272 354" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flecha-405D76)">
+        <title>inyecta</title>
+      </path>
+      <path id="repository-extiende-UsuarioRepository" data-src="UsuarioRepository" data-dst="JpaRepository" data-kind="gen" d="M164 454 L164 565 L548 565 L548 649" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#triangulo-405D76)" />
+      <path id="repository-extiende-MembresiaRepository" data-src="MembresiaRepository" data-dst="JpaRepository" data-kind="gen" d="M441 454 L441 519 L621 519 L621 649" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#triangulo-405D76)" />
+      <path id="repository-extiende-RegistroAccesoRepository" data-src="RegistroAccesoRepository" data-dst="JpaRepository" data-kind="gen" d="M718 422 L718 649" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#triangulo-405D76)" />
+      <path id="repository-extiende-ReservaClaseRepository" data-src="ReservaClaseRepository" data-dst="JpaRepository" data-kind="gen" d="M995 454 L995 608 L819 608 L819 649" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#triangulo-405D76)" />
+      <path id="repository-extiende-CanchaRepository" data-src="CanchaRepository" data-dst="JpaRepository" data-kind="gen" d="M1272 454 L1272 625 L892 625 L892 649" stroke="#405D76" fill="none" stroke-width="2" stroke-linejoin="round" marker-end="url(#triangulo-405D76)" />
+      <g id="repository-UsuarioService" data-classifier="UsuarioService" data-stereotype="servicio Spring">
+        <rect x="37" y="169" width="254" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="38" y="170" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="164.0" y="186.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="45 175 238 22">«servicio Spring»</text>
+        <text x="164.0" y="214.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="44 198 240 32">UsuarioService</text>
+      </g>
+      <g id="repository-UsuarioRepository" data-classifier="UsuarioRepository" data-stereotype="interface Spring Data">
+        <rect x="37" y="354" width="254" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="38" y="355" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="164.0" y="371.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="45 360 238 22">«interface Spring Data»</text>
+        <text x="164.0" y="399.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="44 383 240 32">UsuarioRepository</text>
+        <text x="45" y="434.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="45 424 238 21">+ findByEmail(email)</text>
+      </g>
+      <g id="repository-MembresiaService" data-classifier="MembresiaService" data-stereotype="servicio Spring">
+        <rect x="314" y="169" width="254" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="315" y="170" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="441.0" y="186.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="322 175 238 22">«servicio Spring»</text>
+        <text x="441.0" y="214.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="321 198 240 32">MembresiaService</text>
+      </g>
+      <g id="repository-MembresiaRepository" data-classifier="MembresiaRepository" data-stereotype="interface Spring Data">
+        <rect x="314" y="354" width="254" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="315" y="355" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="441.0" y="371.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="322 360 238 22">«interface Spring Data»</text>
+        <text x="441.0" y="399.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="321 383 240 32">MembresiaRepository</text>
+        <text x="322" y="434.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="322 424 238 21">+ findByUsuarioId(usuarioId)</text>
+      </g>
+      <g id="repository-AccesoService" data-classifier="AccesoService" data-stereotype="servicio Spring">
+        <rect x="591" y="169" width="254" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="592" y="170" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="718.0" y="186.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="599 175 238 22">«servicio Spring»</text>
+        <text x="718.0" y="214.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="598 198 240 32">AccesoService</text>
+      </g>
+      <g id="repository-RegistroAccesoRepository" data-classifier="RegistroAccesoRepository" data-stereotype="interface Spring Data">
+        <rect x="591" y="354" width="254" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="592" y="355" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="718.0" y="371.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="599 360 238 22">«interface Spring Data»</text>
+        <text x="718.0" y="399.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#172B3C" data-box="598 383 240 32">RegistroAccesoRepository</text>
+      </g>
+      <g id="repository-ReservaClaseService" data-classifier="ReservaClaseService" data-stereotype="servicio Spring">
+        <rect x="868" y="169" width="254" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="869" y="170" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="995.0" y="186.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="876 175 238 22">«servicio Spring»</text>
+        <text x="995.0" y="214.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="875 198 240 32">ReservaClaseService</text>
+      </g>
+      <g id="repository-ReservaClaseRepository" data-classifier="ReservaClaseRepository" data-stereotype="interface Spring Data">
+        <rect x="868" y="354" width="254" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="869" y="355" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="995.0" y="371.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="876 360 238 22">«interface Spring Data»</text>
+        <text x="995.0" y="399.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="875 383 240 32">ReservaClaseRepository</text>
+        <text x="876" y="434.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="876 424 238 21">+ findByIdAndClaseId(id, claseId)</text>
+      </g>
+      <g id="repository-CanchaService" data-classifier="CanchaService" data-stereotype="servicio Spring">
+        <rect x="1145" y="169" width="254" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1146" y="170" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1272.0" y="186.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="1153 175 238 22">«servicio Spring»</text>
+        <text x="1272.0" y="214.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1152 198 240 32">CanchaService</text>
+      </g>
+      <g id="repository-CanchaRepository" data-classifier="CanchaRepository" data-stereotype="interface Spring Data">
+        <rect x="1145" y="354" width="254" height="100" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="1146" y="355" width="252" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="1272.0" y="371.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="1153 360 238 22">«interface Spring Data»</text>
+        <text x="1272.0" y="399.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="1152 383 240 32">CanchaRepository</text>
+        <text x="1153" y="434.5" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#172B3C" data-box="1153 424 238 21">+ bloquear(id)</text>
+      </g>
+      <g id="repository-JpaRepository" data-classifier="JpaRepository" data-stereotype="interface Spring Data">
+        <rect x="493" y="649" width="454" height="68" rx="0" fill="#FFFFFF" stroke="#92A9BA" />
+        <rect x="494" y="650" width="452" height="66" rx="0" fill="#EFF4F7" stroke="none" />
+        <text x="720.0" y="666.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="15" font-weight="400" fill="#254E70" data-box="501 655 438 22">«interface Spring Data»</text>
+        <text x="720.0" y="694.0" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="20" font-weight="700" fill="#172B3C" data-box="500 678 440 32">JpaRepository</text>
+      </g>
+      <text x="57" y="46.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="700" fill="#254E70" data-box="57 35 905 22">FITZONE SPORTS  /  UML DE CLASES  /  PATRÓN REPOSITORY</text>
+      <text x="56" y="87.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="36" font-weight="700" fill="#172B3C" data-box="56 64 1000 46">Repository · Persistencia Spring Data</text>
+      <text x="58" y="120.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="58 110 1110 20">Interfaces específicas, extensión genérica y servicios que las consumen</text>
+      <text x="1384" y="57.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="18" font-weight="700" fill="#254E70" data-box="1080 45 304 24">Versión 1.0  ·  18/11/2026</text>
+      <text x="1384" y="89.0" text-anchor="end" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="1030 78 354 22">Autor pendiente de confirmación</text>
+      <text x="39" y="992.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="39 980 1362 24">Línea sólida: asociación. Línea discontinua: dependencia. Triángulo hueco: generalización o realización según el trazo.</text>
+      <text x="226.5" y="293.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="174 283 105 21">inyecta</text>
+      <text x="503.5" y="293.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="451 283 105 21">inyecta</text>
+      <text x="780.5" y="293.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="728 283 105 21">inyecta</text>
+      <text x="1057.5" y="293.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1005 283 105 21">inyecta</text>
+      <text x="1334.5" y="293.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="16" font-weight="400" fill="#42596D" data-box="1282 283 105 21">inyecta</text>
+      <text x="720.0" y="743.5" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="493 732 454 23">JpaRepository&lt;T, ID&gt; · entidad y tipo de clave</text>
+      <text x="51" y="829.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#254E70" data-box="51 816 627 26">Bloqueos de dominio</text>
+      <text x="51" y="856.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="51 845 627 22">CanchaRepository.bloquear usa PESSIMISTIC_WRITE.</text>
+      <text x="51" y="879.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="51 868 627 22">ReservaClaseService también usa ClaseGrupalRepository.</text>
+      <text x="51" y="902.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="51 891 627 22">El bloqueo de la clase protege el cómputo del cupo.</text>
+      <text x="729" y="829.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="19" font-weight="700" fill="#254E70" data-box="729 816 657 26">Persistencia híbrida</text>
+      <text x="729" y="856.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="729 845 657 22">Reservas de cancha y pagos también usan SQL con JdbcTemplate.</text>
+      <text x="729" y="879.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="729 868 657 22">Los comprobantes se guardan con SQL desde ComprobanteService.</text>
+      <text x="729" y="902.0" text-anchor="start" dominant-baseline="central" font-family="Arial" font-size="17" font-weight="400" fill="#42596D" data-box="729 891 657 22">Spring Data aporta las implementaciones en tiempo de ejecución.</text>
+    </g>
+  </g>
+  <view id="area-general" viewBox="0 0 1440 1018" />
+  <view id="area-m1-m2" viewBox="1460 0 1440 1018" />
+  <view id="area-m3" viewBox="0 1038 1440 1018" />
+  <view id="area-m4-m5" viewBox="1460 1038 1440 1018" />
+  <view id="area-strategy" viewBox="0 2076 1440 1018" />
+  <view id="area-observer" viewBox="1460 2076 1440 1018" />
+  <view id="area-repository" viewBox="0 3114 1440 1018" />
+</svg>
