@@ -12,7 +12,7 @@ import { AppButton, DataCard, EmptyState, PageHeading, StatusBadge } from '../..
 import TarjetaClase from './TarjetaClase';
 import FormularioClase from './FormularioClase';
 import AsistentesClase from './AsistentesClase';
-import { formatearFechaHora, rangoDelDia, situacionEnClase } from './claseUtils';
+import { aValorLocal, formatearFechaHora, inscripcionAbierta, rangoDelDia, situacionEnClase } from './claseUtils';
 import './AgendaClases.css';
 
 const ACTIVIDAD_VACIA = { reservas: [], listaEspera: [], ofertas: [] };
@@ -33,9 +33,10 @@ function VistaAgenda() {
 
   const [contexto, setContexto] = useState({ estado: 'cargando', sedes: [] });
   const [sedeId, setSedeId] = useState('');
-  const [fecha, setFecha] = useState('');
+  const [fecha, setFecha] = useState(() => aValorLocal(new Date()).slice(0, 10));
   const [pagina, setPagina] = useState(0);
   const [agenda, setAgenda] = useState({ estado: 'inicial' });
+  const [busqueda, setBusqueda] = useState('inicial');
   const [actividad, setActividad] = useState(ACTIVIDAD_VACIA);
   const [aviso, setAviso] = useState(null);
   const [accion, setAccion] = useState(null);
@@ -59,8 +60,8 @@ function VistaAgenda() {
   useEffect(() => {
     if (!permitido || !sedeId) { setAgenda({ estado: 'inicial' }); return; }
     let activo = true;
-    setAgenda((a) => (a.estado === 'cargado' ? { ...a, recargando: true } : { estado: 'cargando' }));
-    listarAgenda({ sedeId, page: pagina, ...(fecha ? rangoDelDia(fecha) : {}) }).then((datos) => {
+    setAgenda({ estado: 'cargando' });
+    listarAgenda({ sedeId, page: pagina, ...rangoDelDia(fecha) }).then((datos) => {
       if (!activo) return;
       if (!Array.isArray(datos?.items)) { setAgenda({ estado: 'error', mensaje: 'La respuesta no corresponde a la agenda esperada.' }); return; }
       setAgenda({ estado: 'cargado', items: datos.items, totalPages: datos.totalPages, total: datos.totalElements });
@@ -69,6 +70,40 @@ function VistaAgenda() {
     });
     return () => { activo = false; };
   }, [permitido, sedeId, fecha, pagina, refresco]);
+
+  useEffect(() => {
+    if (!permitido || !sedeId || busqueda !== 'cargando') return;
+    let activo = true;
+    const buscar = async () => {
+      const ahora = Date.now();
+      const desde = new Date(ahora + 48 * 3600000).toISOString();
+      const hasta = new Date(ahora + 14 * 86400000).toISOString();
+      try {
+        for (let page = 0; page < 2; page++) {
+          const datos = await listarAgenda({ sedeId, desde, hasta, page, size: 100 });
+          if (!activo) return;
+          if (!Array.isArray(datos?.items) || !Number.isInteger(datos.totalPages)) throw new Error('Agenda inválida');
+          const proxima = datos.items.find((clase) => clase.estado === 'PROGRAMADA'
+            && clase.lugaresDisponibles > 0 && inscripcionAbierta(clase, Date.now()));
+          if (proxima) {
+            setFecha(aValorLocal(proxima.inicio).slice(0, 10));
+            setPagina(0);
+            setBusqueda('encontrada');
+            return;
+          }
+          if (page + 1 >= datos.totalPages) {
+            setBusqueda('sin-disponibilidad');
+            return;
+          }
+        }
+        setBusqueda('limite');
+      } catch {
+        if (activo) setBusqueda('error');
+      }
+    };
+    buscar();
+    return () => { activo = false; };
+  }, [permitido, sedeId, busqueda]);
 
   useEffect(() => {
     if (!permitido || !puedeReservar) return;
@@ -102,7 +137,7 @@ function VistaAgenda() {
     respuesta === 'ACEPTAR' ? `Aceptaste el lugar: ${clase.nombre} quedó reservada.` : 'Rechazaste el lugar.');
   const cancelarLaClase = (clase, motivo) => ejecutar(clase.id, () => cancelarClase(clase.id, motivo), `Cancelaste la clase ${clase.nombre}.`);
 
-  const cambiarSede = (valor) => { setSedeId(valor); setPagina(0); setFormulario(null); setAsistentes(null); };
+  const cambiarSede = (valor) => { setSedeId(valor); setPagina(0); setBusqueda('inicial'); setFormulario(null); setAsistentes(null); };
   const formularioGuardado = (clase, editando) => {
     setFormulario(null);
     setAviso({ tipo: 'ok', texto: editando ? 'La clase se actualizó.' : `Creaste la clase ${clase.nombre}.` });
@@ -124,6 +159,7 @@ function VistaAgenda() {
 
   const hayActividad = actividad.reservas.length + actividad.listaEspera.length + actividad.ofertas.length > 0;
   const items = agenda.items ?? [];
+  const hoy = aValorLocal(new Date()).slice(0, 10);
 
   return (
     <div className="fitzone-ui agenda-clases"><div className="page-stack">
@@ -172,7 +208,11 @@ function VistaAgenda() {
               </select>
             </label>
             <label><span><CalendarDays aria-hidden="true" />Día</span>
-              <input type="date" value={fecha} onChange={(e) => { setFecha(e.target.value); setPagina(0); }} />
+              <input type="date" min={esStaff ? undefined : hoy} value={fecha} onChange={(e) => {
+                const dia = e.target.value;
+                if (!dia || (!esStaff && dia < hoy)) return;
+                setFecha(dia); setPagina(0); setBusqueda('inicial');
+              }} />
             </label>
           </div>
         )}
@@ -183,12 +223,12 @@ function VistaAgenda() {
         sedes={contexto.sedes} sedeInicial={sedeId} onGuardada={formularioGuardado} onCancelar={() => setFormulario(null)} />}
       {asistentes && <AsistentesClase clase={asistentes} refresco={refresco} onCerrar={() => setAsistentes(null)} />}
 
-      <DataCard title="Agenda de clases" description={agenda.estado === 'cargado' ? `${agenda.total} ${agenda.total === 1 ? 'clase' : 'clases'} desde hoy` : undefined}>
+      <DataCard title="Agenda de clases" description={agenda.estado === 'cargado' ? `${agenda.total} ${agenda.total === 1 ? 'clase' : 'clases'} para el día elegido` : undefined}>
         {!sedeId && <EmptyState icon={MapPin} title="Primero, la sede" description="Elegí una sede para ver su agenda." />}
         {sedeId && agenda.estado === 'cargando' && <p role="status">Consultando la agenda...</p>}
         {sedeId && agenda.estado === 'error' && <p role="alert">{agenda.mensaje}</p>}
         {sedeId && agenda.estado === 'cargado' && (items.length === 0
-          ? <EmptyState icon={CalendarDays} title="Sin clases" description={fecha ? 'No hay clases ese día en esta sede.' : 'Todavía no hay clases programadas en esta sede.'} />
+          ? <EmptyState icon={CalendarDays} title="Sin clases" description="No hay clases ese día en esta sede." />
           : <>
             <div className="agenda-grid">
               {items.map((clase) => (
@@ -208,6 +248,18 @@ function VistaAgenda() {
               </nav>
             )}
           </>)}
+        {puedeReservar && sedeId && agenda.estado === 'cargado' && (
+          <div>
+            <AppButton type="button" variant="secondary" disabled={busqueda === 'cargando'} onClick={() => setBusqueda('cargando')}>
+              Buscar próxima clase con lugar
+            </AppButton>
+            {busqueda === 'cargando' && <p role="status">Buscando clases reservables en esta sede…</p>}
+            {busqueda === 'encontrada' && <p role="status">Mostrando la próxima fecha con una clase reservable.</p>}
+            {busqueda === 'sin-disponibilidad' && <p role="status">No encontramos clases con lugar e inscripción abierta en los próximos 14 días.</p>}
+            {busqueda === 'limite' && <p role="status">La búsqueda revisó las primeras 200 clases. Podés consultar otra fecha.</p>}
+            {busqueda === 'error' && <p role="alert">No pudimos buscar la próxima clase. Reintentá la búsqueda.</p>}
+          </div>
+        )}
       </DataCard>
       <p className="agenda-nota">Las reservas y la lista de espera cierran 48 horas antes de cada clase. Cancelando con 2 horas o más de anticipación no hay penalidad.</p>
     </div></div>
