@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" pages="2">
+  <diagram id="m4" name="M4 · Canchas deportivas">
+    <mxGraphModel dx="1700" dy="1240" grid="0" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1.232" pageWidth="1169" pageHeight="827" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="item-0" value="" style="fillColor=#FFFFFF;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1440" height="1018" as="geometry" />
+        </mxCell>
+        <mxCell id="item-1" value="" style="rounded=1;absoluteArcSize=1;arcSize=22;fillColor=#E1F1ED;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="38" y="27" width="1364" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="item-2" value="FITZONE SPORTS  /  UML DE ESTADOS  /  M4  ·  RF-10" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#075A55;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="57" y="37" width="930" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="item-3" value="Reserva de cancha" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=40;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="56" y="62" width="930" height="47" as="geometry" />
+        </mxCell>
+        <mxCell id="item-4" value="Estado persistido en reserva_cancha.estado · Cobro y devolución a cargo de M5" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="58" y="110" width="950" height="19" as="geometry" />
+        </mxCell>
+        <mxCell id="item-5" value="Versión 1.0  ·  18/11/2026" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#075A55;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="46" width="333" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-6" value="Autor pendiente de confirmación" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1029" y="78" width="354" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-7" value="" style="fillColor=#C2CDD7;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="39" y="975" width="1362" height="1" as="geometry" />
+        </mxCell>
+        <mxCell id="item-8" value="● inicio   ◉ fin   ·   evento [guarda] / efecto   ·   El fin UML cierra el ciclo representado y conserva el registro." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=16;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="984" width="1360" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="start" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="58" y="287" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="pendiente" value="PENDIENTE_PAGO" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#E1F1ED;strokeColor=#075A55;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="202" y="263" width="246" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="confirmada" value="CONFIRMADA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#E1F1ED;strokeColor=#075A55;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="690" y="263" width="208" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="cumplida" value="CUMPLIDA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#E1F1ED;strokeColor=#075A55;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1178" y="263" width="170" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="expirada" value="EXPIRADA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#F9F0E1;strokeColor=#805220;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="274" y="515" width="169" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="rechazada" value="RECHAZADA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#FAEEF1;strokeColor=#8F3545;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="475" y="515" width="180" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="cancelada" value="CANCELADA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#F9F0E1;strokeColor=#805220;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="682" width="210" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-cumplida" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="1376" y="286" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-cumplida-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-cumplida">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-expirada" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="347" y="611" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-expirada-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-expirada">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-rechazada" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="555" y="611" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-rechazada-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-rechazada">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-cancelada" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="705" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-cancelada-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-cancelada">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="crear" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#354A61;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="start" target="pendiente">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aprobar" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#075A55;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="pendiente" target="confirmada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cumplir" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#075A55;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="confirmada" target="cumplida">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="vencer" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.38617886;exitY=1.00000000;exitPerimeter=0;entryX=0.13609467;entryY=0.00000000;entryPerimeter=0;" edge="1" parent="1" source="pendiente" target="expirada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rechazar" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#8F3545;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.77642276;exitY=1.00000000;exitPerimeter=0;entryX=0.41111111;entryY=0.00000000;entryPerimeter=0;" edge="1" parent="1" source="pendiente" target="rechazada">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="393" y="473" />
+              <mxPoint x="549" y="473" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cancelar-pendiente" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.00000000;exitY=0.80303030;exitPerimeter=0;entryX=0.00000000;entryY=0.70769231;entryPerimeter=0;" edge="1" parent="1" source="pendiente" target="cancelada">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="48" y="316" />
+              <mxPoint x="48" y="728" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cancelar-total" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.68269231;exitY=1.00000000;exitPerimeter=0;entryX=0.74285714;entryY=0.00000000;entryPerimeter=0;" edge="1" parent="1" source="confirmada" target="cancelada">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="832" y="481" />
+              <mxPoint x="1236" y="481" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cancelar-parcial" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.26923077;exitY=1.00000000;exitPerimeter=0;entryX=0.12857143;entryY=0.00000000;entryPerimeter=0;" edge="1" parent="1" source="confirmada" target="cancelada">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="746" y="591" />
+              <mxPoint x="1107" y="591" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="terminar-cumplida" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#075A55;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="cumplida" target="fin-cumplida">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="terminar-expirada" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.49112426;exitY=1.00000000;exitPerimeter=0;entryX=0.50000000;entryY=0.00000000;entryPerimeter=0;" edge="1" parent="1" source="expirada" target="fin-expirada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="terminar-rechazada" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#8F3545;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=0.50000000;exitY=1.00000000;exitPerimeter=0;entryX=0.50000000;entryY=0.00000000;entryPerimeter=0;" edge="1" parent="1" source="rechazada" target="fin-rechazada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="terminar-cancelada" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50769231;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="cancelada" target="fin-cancelada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="item-32" value="/ crear" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="81" y="229" width="110" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-33" value="retención" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="81" y="252" width="110" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-34" value="pagar [retención vigente," style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="445" y="182" width="245" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-35" value="cancha activa y APROBADO]" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="445" y="207" width="245" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-36" value="/ emitir comprobante" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="445" y="232" width="245" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-37" value="vencer() [fin ≤ ahora]" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="909" y="211" width="257" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-38" value="/ marcar como cumplida" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="909" y="236" width="257" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-39" value="expirar()" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="82" y="386" width="201" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-40" value="[venceEn ≤ ahora]" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="82" y="411" width="201" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-41" value="/ liberar turno" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="82" y="436" width="201" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-42" value="pagar [retención vigente," style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="408" y="368" width="318" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-43" value="cancha activa y RECHAZADO]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="408" y="393" width="318" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-44" value="/ liberar turno, sin PDF" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="408" y="418" width="318" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-45" value="cancelar [sin pago o reembolso = 100 %]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="852" y="391" width="529" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-46" value="/ sin cobro o devolución íntegra" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="852" y="416" width="529" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-47" value="cancelar [pago y reembolso = 50 %]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="763" y="527" width="445" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-48" value="/ devolución parcial" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="763" y="552" width="445" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-49" value="cancelar [retención vigente y turno sin iniciar]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="120" y="659" width="909" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-50" value="/ cancelar sin cobro ni reembolso" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="120" y="684" width="909" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-51" value="" style="rounded=1;absoluteArcSize=1;arcSize=16;fillColor=#E1F1ED;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="38" y="790" width="669" height="157" as="geometry" />
+        </mxCell>
+        <mxCell id="item-52" value="Retención y vencimiento" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=20;fontColor=#075A55;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="53" y="798" width="639" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-53" value="Alta con Idempotency-Key, cancha activa, turno futuro y disponible." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="53" y="827" width="639" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-54" value="venceEn = mín(ahora + retención configurada, inicio). Por defecto, 10 min." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="53" y="850" width="639" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-55" value="En venceEn, la lectura muestra EXPIRADA y el pago devuelve 409." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="53" y="873" width="639" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-56" value="El job o una operación que llama expirar() persiste el cambio bajo bloqueo." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="53" y="896" width="639" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-57" value="" style="rounded=1;absoluteArcSize=1;arcSize=16;fillColor=#F9F0E1;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="727" y="790" width="675" height="157" as="geometry" />
+        </mxCell>
+        <mxCell id="item-58" value="Condiciones de cancelación" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=20;fontColor=#805220;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="742" y="798" width="645" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-59" value="Titular, Recepción de su sede o Gerencia. El turno aún no empezó." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="742" y="827" width="645" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-60" value="Por defecto, devuelve 100 % si restan ≥ 2 h y 50 % si restan &lt; 2 h." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="742" y="850" width="645" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-61" value="Sólo Gerencia puede elegir explícitamente el 50 % o el 100 %." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="742" y="873" width="645" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-62" value="Con pago previo, la devolución debe quedar confirmada." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="742" y="896" width="645" height="22" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="m3" name="M3 · Clases grupales">
+    <mxGraphModel dx="1700" dy="1240" grid="0" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1.232" pageWidth="1169" pageHeight="827" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="item-0" value="" style="fillColor=#FFFFFF;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1440" height="1018" as="geometry" />
+        </mxCell>
+        <mxCell id="item-1" value="" style="rounded=1;absoluteArcSize=1;arcSize=22;fillColor=#E9EDF8;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="38" y="27" width="1364" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="item-2" value="FITZONE SPORTS  /  UML DE ESTADOS  /  M3  ·  RF-07" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#3C5080;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="57" y="37" width="930" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="item-3" value="Reserva de clase" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=40;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="56" y="62" width="930" height="47" as="geometry" />
+        </mxCell>
+        <mxCell id="item-4" value="Estado persistido en reserva_clase.estado_reserva · Asistencia registrada en un campo separado" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="58" y="110" width="950" height="19" as="geometry" />
+        </mxCell>
+        <mxCell id="item-5" value="Versión 1.0  ·  18/11/2026" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#3C5080;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="46" width="333" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-6" value="Autor pendiente de confirmación" style="text;html=0;align=right;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1029" y="78" width="354" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-7" value="" style="fillColor=#C2CDD7;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="39" y="975" width="1362" height="1" as="geometry" />
+        </mxCell>
+        <mxCell id="item-8" value="● inicio   ◉ fin   ·   evento [guarda] / efecto   ·   El fin UML cierra el ciclo representado y conserva el registro." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=16;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="40" y="984" width="1360" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="item-9" value="" style="rounded=1;absoluteArcSize=1;arcSize=16;fillColor=#E9EDF8;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="39" y="162" width="524" height="173" as="geometry" />
+        </mxCell>
+        <mxCell id="item-10" value="Alta directa o aceptación de oferta" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=20;fontColor=#3C5080;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="170" width="494" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-11" value="Directa: clase abierta, cupo libre y ahora &lt; inicio − 48 h." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="199" width="494" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-12" value="Oferta: vigente y pendiente, clase sin cancelar y por iniciar." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="222" width="494" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-13" value="Ambos caminos verifican elegibilidad y evitan solapamientos." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="245" width="494" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-14" value="Alta exitosa: asistencia PENDIENTE." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="268" width="494" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="start" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="59" y="415" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="confirmada" value="CONFIRMADA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#E9EDF8;strokeColor=#3C5080;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="238" y="389" width="244" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="cancelada" value="CANCELADA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#E9EDF8;strokeColor=#3C5080;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="227" width="328" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="tardia" value="CANCELADA_TARDIA" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#F9F0E1;strokeColor=#805220;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="391" width="328" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" value="CANCELADA_POR_ADMIN" style="rounded=1;absoluteArcSize=1;arcSize=22;html=0;foldable=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontStyle=1;fontSize=23;fontFamily=Arial;fontColor=#162738;fillColor=#F9F0E1;strokeColor=#805220;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="559" width="328" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-cancelada" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="1372" y="250" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-cancelada-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-cancelada">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-tardia" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="1372" y="414" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-tardia-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-tardia">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-admin" value="" style="ellipse;aspect=fixed;html=0;fillColor=#FFFFFF;strokeColor=#162738;strokeWidth=1.8;" vertex="1" parent="1">
+          <mxGeometry x="1372" y="582" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fin-admin-centro" value="" style="ellipse;aspect=fixed;html=0;fillColor=#162738;strokeColor=none;pointerEvents=0;" vertex="1" parent="fin-admin">
+          <mxGeometry x="4.4" y="4.4" width="11.2" height="11.2" as="geometry" />
+        </mxCell>
+        <mxCell id="crear" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#354A61;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="start" target="confirmada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cancelar-a-tiempo" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#3C5080;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.22857143;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="confirmada" target="cancelada">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="582" y="405" />
+              <mxPoint x="582" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cancelar-tardia" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="confirmada" target="tardia">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cancelar-clase" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.81428571;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="confirmada" target="admin">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="582" y="446" />
+              <mxPoint x="582" y="592" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="terminar-a-tiempo" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#3C5080;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="cancelada" target="fin-cancelada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="terminar-tardia" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="tardia" target="fin-tardia">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="terminar-admin" style="noEdgeStyle=1;rounded=0;html=0;strokeColor=#805220;strokeWidth=2.3;endArrow=open;endFill=0;endSize=8;exitX=1.00000000;exitY=0.50000000;exitPerimeter=0;entryX=0.00000000;entryY=0.50000000;entryPerimeter=0;" edge="1" parent="1" source="admin" target="fin-admin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="item-30" value="/ crear reserva" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="88" y="381" width="143" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-31" value="cancelar reserva [restan ≥ 2 h]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="603" y="191" width="391" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-32" value="/ liberar cupo, sin penalidad" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="603" y="216" width="391" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-33" value="cancelar reserva [0 &lt; tiempo restante &lt; 2 h]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="603" y="355" width="400" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-34" value="/ liberar cupo y marcar la falta en la API" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="603" y="380" width="400" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-35" value="cancelar clase [personal y ahora &lt; fin]" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=19;fontColor=#162738;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="603" y="523" width="392" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-36" value="/ cancelar reservas confirmadas, sin marcar falta" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=18;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="603" y="548" width="392" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="item-37" value="" style="rounded=1;absoluteArcSize=1;arcSize=16;fillColor=#E9EDF8;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="39" y="680" width="670" height="197" as="geometry" />
+        </mxCell>
+        <mxCell id="item-38" value="Cancelación y respuesta de la API" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=20;fontColor=#3C5080;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="688" width="640" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-39" value="Cancelación individual: titular, Recepción de su sede o Gerencia." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="717" width="640" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-40" value="Al llegar al inicio, la cancelación individual devuelve 409." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="740" width="640" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-41" value="Cualquier cancelación deja asistencia en NO_APLICA." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="763" width="640" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-42" value="La API devuelve CANCELADA y distingue A_TIEMPO o TARDIA." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="786" width="640" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-43" value="En la cancelación de la clase, tipoCancelacion es NO_APLICA." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="809" width="640" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-44" value="La marca de falta tardía no aplica una sanción." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="54" y="832" width="640" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-45" value="" style="rounded=1;absoluteArcSize=1;arcSize=16;fillColor=#F0F4F7;strokeColor=none;html=0;pointerEvents=0;" vertex="1" parent="1">
+          <mxGeometry x="728" y="680" width="674" height="197" as="geometry" />
+        </mxCell>
+        <mxCell id="item-46" value="Asistencia y cierre" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=20;fontColor=#3C5080;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="743" y="688" width="644" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="item-47" value="PENDIENTE, ASISTIO, AUSENTE y NO_APLICA pertenecen a asistencia." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="743" y="717" width="644" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-48" value="ASISTIDA y AUSENTE son proyecciones previstas por la API." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="743" y="740" width="644" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-49" value="El endpoint de asistencia responde 501." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="743" y="763" width="644" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="item-50" value="Al finalizar la clase la reserva no cambia automáticamente de estado." style="text;html=0;align=left;verticalAlign=middle;whiteSpace=nowrap;spacing=0;fontSize=17;fontColor=#405469;fontStyle=0;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="743" y="786" width="644" height="22" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

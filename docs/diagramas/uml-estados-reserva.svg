@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="2062" viewBox="0 0 1440 2062" role="img" aria-labelledby="doc-title doc-desc">
+  <title id="doc-title">FitZone Sports · Máquinas de estados de reserva</title>
+  <desc id="doc-desc">Dos máquinas de estados. M4 cubre retención, pago, vencimiento, cancelación y cumplimiento. M3 cubre alta confirmada, cancelación individual y cancelación administrativa de la clase.</desc>
+  <defs>
+    <marker id="arr354A61" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" overflow="visible">
+      <path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#354A61" stroke-width="1.7" stroke-linejoin="round" />
+    </marker>
+    <marker id="arr075A55" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" overflow="visible">
+      <path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#075A55" stroke-width="1.7" stroke-linejoin="round" />
+    </marker>
+    <marker id="arr3C5080" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" overflow="visible">
+      <path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#3C5080" stroke-width="1.7" stroke-linejoin="round" />
+    </marker>
+    <marker id="arr8F3545" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" overflow="visible">
+      <path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#8F3545" stroke-width="1.7" stroke-linejoin="round" />
+    </marker>
+    <marker id="arr805220" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto" overflow="visible">
+      <path d="M 1 1 L 10 6 L 1 11" fill="none" stroke="#805220" stroke-width="1.7" stroke-linejoin="round" />
+    </marker>
+    <clipPath id="clip-m4">
+      <rect width="1440" height="1018" y="0" />
+    </clipPath>
+    <clipPath id="clip-m3">
+      <rect width="1440" height="1018" y="1044" />
+    </clipPath>
+  </defs>
+  <style>:root:has(view:target){width:100vw;height:100vh;} @page{size:A4 landscape;margin:4mm;} @media print{:root:has(view:target){width:288.5mm;height:201.5mm;}}:root:has(#area-m4:target) #canvas{clip-path:url(#clip-m4);}:root:has(#area-m3:target) #canvas{clip-path:url(#clip-m3);}</style>
+  <g id="canvas">
+    <rect width="1440" height="2062" fill="#E3EBEF" />
+    <g id="m4" transform="translate(0 0)">
+      <rect id="item-0-m4" x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect id="item-1-m4" x="38" y="27" width="1364" height="110" rx="11" fill="#E1F1ED" stroke="none" />
+      <text x="57" y="47.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="700" fill="#075A55" data-box="57 37 930 20">FITZONE SPORTS  /  UML DE ESTADOS  /  M4  ·  RF-10</text>
+      <text x="56" y="85.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="40" font-weight="700" fill="#162738" data-box="56 62 930 47">Reserva de cancha</text>
+      <text x="58" y="119.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="58 110 950 19">Estado persistido en reserva_cancha.estado · Cobro y devolución a cargo de M5</text>
+      <text x="1383" y="58.5" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="19" font-weight="700" fill="#075A55" data-box="1050 46 333 25">Versión 1.0  ·  18/11/2026</text>
+      <text x="1383" y="89.0" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="1029 78 354 22">Autor pendiente de confirmación</text>
+      <rect id="item-7-m4" x="39" y="975" width="1362" height="1" rx="0" fill="#C2CDD7" stroke="none" />
+      <text x="40" y="996.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="16" font-weight="400" fill="#405469" data-box="40 984 1360 24">● inicio   ◉ fin   ·   evento [guarda] / efecto   ·   El fin UML cierra el ciclo representado y conserva el registro.</text>
+      <g id="m4-start" data-pseudo="inicio">
+        <circle cx="67" cy="296" r="9" fill="#162738" stroke="#162738" stroke-width="0" />
+      </g>
+      <g id="m4-pendiente" data-state="PENDIENTE_PAGO">
+        <rect x="202" y="263" width="246" height="66" rx="11" fill="#E1F1ED" stroke="#075A55" stroke-width="2" />
+        <text x="325.0" y="296.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="205 267 240 58">PENDIENTE_PAGO</text>
+      </g>
+      <g id="m4-confirmada" data-state="CONFIRMADA">
+        <rect x="690" y="263" width="208" height="66" rx="11" fill="#E1F1ED" stroke="#075A55" stroke-width="2" />
+        <text x="794.0" y="296.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="693 267 202 58">CONFIRMADA</text>
+      </g>
+      <g id="m4-cumplida" data-state="CUMPLIDA">
+        <rect x="1178" y="263" width="170" height="66" rx="11" fill="#E1F1ED" stroke="#075A55" stroke-width="2" />
+        <text x="1263.0" y="296.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="1181 267 164 58">CUMPLIDA</text>
+      </g>
+      <g id="m4-expirada" data-state="EXPIRADA">
+        <rect x="274" y="515" width="169" height="64" rx="11" fill="#F9F0E1" stroke="#805220" stroke-width="2" />
+        <text x="358.5" y="547.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="277 519 163 56">EXPIRADA</text>
+      </g>
+      <g id="m4-rechazada" data-state="RECHAZADA">
+        <rect x="475" y="515" width="180" height="64" rx="11" fill="#FAEEF1" stroke="#8F3545" stroke-width="2" />
+        <text x="565.0" y="547.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="478 519 174 56">RECHAZADA</text>
+      </g>
+      <g id="m4-cancelada" data-state="CANCELADA">
+        <rect x="1080" y="682" width="210" height="65" rx="11" fill="#F9F0E1" stroke="#805220" stroke-width="2" />
+        <text x="1185.0" y="714.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="1083 686 204 57">CANCELADA</text>
+      </g>
+      <g id="m4-fin-cumplida" data-pseudo="fin">
+        <circle cx="1386" cy="296" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="1386" cy="296" r="5.6" fill="#162738" />
+      </g>
+      <g id="m4-fin-expirada" data-pseudo="fin">
+        <circle cx="357" cy="621" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="357" cy="621" r="5.6" fill="#162738" />
+      </g>
+      <g id="m4-fin-rechazada" data-pseudo="fin">
+        <circle cx="565" cy="621" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="565" cy="621" r="5.6" fill="#162738" />
+      </g>
+      <g id="m4-fin-cancelada" data-pseudo="fin">
+        <circle cx="1370" cy="715" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="1370" cy="715" r="5.6" fill="#162738" />
+      </g>
+      <path id="m4-crear" data-src="start" data-dst="pendiente" d="M76 296 L202 296" fill="none" stroke="#354A61" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr354A61)" />
+      <path id="m4-aprobar" data-src="pendiente" data-dst="confirmada" d="M448 296 L690 296" fill="none" stroke="#075A55" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr075A55)" />
+      <path id="m4-cumplir" data-src="confirmada" data-dst="cumplida" d="M898 296 L1178 296" fill="none" stroke="#075A55" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr075A55)" />
+      <path id="m4-vencer" data-src="pendiente" data-dst="expirada" d="M297 329 L297 515" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m4-rechazar" data-src="pendiente" data-dst="rechazada" d="M393 329 L393 473 L549 473 L549 515" fill="none" stroke="#8F3545" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr8F3545)" />
+      <path id="m4-cancelar-pendiente" data-src="pendiente" data-dst="cancelada" d="M202 316 L48 316 L48 728 L1080 728" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m4-cancelar-total" data-src="confirmada" data-dst="cancelada" d="M832 329 L832 481 L1236 481 L1236 682" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m4-cancelar-parcial" data-src="confirmada" data-dst="cancelada" d="M746 329 L746 591 L1107 591 L1107 682" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m4-terminar-cumplida" data-src="cumplida" data-dst="fin-cumplida" d="M1348 296 L1376 296" fill="none" stroke="#075A55" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr075A55)" />
+      <path id="m4-terminar-expirada" data-src="expirada" data-dst="fin-expirada" d="M357 579 L357 611" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m4-terminar-rechazada" data-src="rechazada" data-dst="fin-rechazada" d="M565 579 L565 611" fill="none" stroke="#8F3545" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr8F3545)" />
+      <path id="m4-terminar-cancelada" data-src="cancelada" data-dst="fin-cancelada" d="M1290 715 L1360 715" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <text x="136.0" y="240.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="81 229 110 23">/ crear</text>
+      <text x="136.0" y="263.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="81 252 110 23">retención</text>
+      <text x="567.5" y="194.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="445 182 245 25">pagar [retención vigente,</text>
+      <text x="567.5" y="219.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="445 207 245 25">cancha activa y APROBADO]</text>
+      <text x="567.5" y="244.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="445 232 245 25">/ emitir comprobante</text>
+      <text x="1037.5" y="223.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="909 211 257 25">vencer() [fin ≤ ahora]</text>
+      <text x="1037.5" y="248.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="909 236 257 25">/ marcar como cumplida</text>
+      <text x="283" y="398.5" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="82 386 201 25">expirar()</text>
+      <text x="283" y="423.5" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="82 411 201 25">[venceEn ≤ ahora]</text>
+      <text x="283" y="448.5" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="82 436 201 25">/ liberar turno</text>
+      <text x="408" y="380.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="408 368 318 25">pagar [retención vigente,</text>
+      <text x="408" y="405.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="408 393 318 25">cancha activa y RECHAZADO]</text>
+      <text x="408" y="430.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="408 418 318 25">/ liberar turno, sin PDF</text>
+      <text x="852" y="403.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="852 391 529 25">cancelar [sin pago o reembolso = 100 %]</text>
+      <text x="852" y="428.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="852 416 529 25">/ sin cobro o devolución íntegra</text>
+      <text x="763" y="539.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="763 527 445 25">cancelar [pago y reembolso = 50 %]</text>
+      <text x="763" y="564.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="763 552 445 25">/ devolución parcial</text>
+      <text x="120" y="671.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="120 659 909 25">cancelar [retención vigente y turno sin iniciar]</text>
+      <text x="120" y="696.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="120 684 909 25">/ cancelar sin cobro ni reembolso</text>
+      <rect id="item-51-m4" x="38" y="790" width="669" height="157" rx="8" fill="#E1F1ED" stroke="none" />
+      <text x="53" y="809.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="20" font-weight="700" fill="#075A55" data-box="53 798 639 23">Retención y vencimiento</text>
+      <text x="53" y="838.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="53 827 639 22">Alta con Idempotency-Key, cancha activa, turno futuro y disponible.</text>
+      <text x="53" y="861.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="53 850 639 22">venceEn = mín(ahora + retención configurada, inicio). Por defecto, 10 min.</text>
+      <text x="53" y="884.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="53 873 639 22">En venceEn, la lectura muestra EXPIRADA y el pago devuelve 409.</text>
+      <text x="53" y="907.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="53 896 639 22">El job o una operación que llama expirar() persiste el cambio bajo bloqueo.</text>
+      <rect id="item-57-m4" x="727" y="790" width="675" height="157" rx="8" fill="#F9F0E1" stroke="none" />
+      <text x="742" y="809.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="20" font-weight="700" fill="#805220" data-box="742 798 645 23">Condiciones de cancelación</text>
+      <text x="742" y="838.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="742 827 645 22">Titular, Recepción de su sede o Gerencia. El turno aún no empezó.</text>
+      <text x="742" y="861.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="742 850 645 22">Por defecto, devuelve 100 % si restan ≥ 2 h y 50 % si restan &lt; 2 h.</text>
+      <text x="742" y="884.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="742 873 645 22">Sólo Gerencia puede elegir explícitamente el 50 % o el 100 %.</text>
+      <text x="742" y="907.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="742 896 645 22">Con pago previo, la devolución debe quedar confirmada.</text>
+    </g>
+    <g id="m3" transform="translate(0 1044)">
+      <rect id="item-0-m3" x="0" y="0" width="1440" height="1018" rx="0" fill="#FFFFFF" stroke="none" />
+      <rect id="item-1-m3" x="38" y="27" width="1364" height="110" rx="11" fill="#E9EDF8" stroke="none" />
+      <text x="57" y="47.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="700" fill="#3C5080" data-box="57 37 930 20">FITZONE SPORTS  /  UML DE ESTADOS  /  M3  ·  RF-07</text>
+      <text x="56" y="85.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="40" font-weight="700" fill="#162738" data-box="56 62 930 47">Reserva de clase</text>
+      <text x="58" y="119.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="58 110 950 19">Estado persistido en reserva_clase.estado_reserva · Asistencia registrada en un campo separado</text>
+      <text x="1383" y="58.5" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="19" font-weight="700" fill="#3C5080" data-box="1050 46 333 25">Versión 1.0  ·  18/11/2026</text>
+      <text x="1383" y="89.0" dominant-baseline="central" text-anchor="end" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="1029 78 354 22">Autor pendiente de confirmación</text>
+      <rect id="item-7-m3" x="39" y="975" width="1362" height="1" rx="0" fill="#C2CDD7" stroke="none" />
+      <text x="40" y="996.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="16" font-weight="400" fill="#405469" data-box="40 984 1360 24">● inicio   ◉ fin   ·   evento [guarda] / efecto   ·   El fin UML cierra el ciclo representado y conserva el registro.</text>
+      <rect id="item-9-m3" x="39" y="162" width="524" height="173" rx="8" fill="#E9EDF8" stroke="none" />
+      <text x="54" y="181.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="20" font-weight="700" fill="#3C5080" data-box="54 170 494 23">Alta directa o aceptación de oferta</text>
+      <text x="54" y="210.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 199 494 22">Directa: clase abierta, cupo libre y ahora &lt; inicio − 48 h.</text>
+      <text x="54" y="233.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 222 494 22">Oferta: vigente y pendiente, clase sin cancelar y por iniciar.</text>
+      <text x="54" y="256.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 245 494 22">Ambos caminos verifican elegibilidad y evitan solapamientos.</text>
+      <text x="54" y="279.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 268 494 22">Alta exitosa: asistencia PENDIENTE.</text>
+      <g id="m3-start" data-pseudo="inicio">
+        <circle cx="68" cy="424" r="9" fill="#162738" stroke="#162738" stroke-width="0" />
+      </g>
+      <g id="m3-confirmada" data-state="CONFIRMADA">
+        <rect x="238" y="389" width="244" height="70" rx="11" fill="#E9EDF8" stroke="#3C5080" stroke-width="2" />
+        <text x="360.0" y="424.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="241 393 238 62">CONFIRMADA</text>
+      </g>
+      <g id="m3-cancelada" data-state="CANCELADA">
+        <rect x="1010" y="227" width="328" height="66" rx="11" fill="#E9EDF8" stroke="#3C5080" stroke-width="2" />
+        <text x="1174.0" y="260.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="1013 231 322 58">CANCELADA</text>
+      </g>
+      <g id="m3-tardia" data-state="CANCELADA_TARDIA">
+        <rect x="1010" y="391" width="328" height="66" rx="11" fill="#F9F0E1" stroke="#805220" stroke-width="2" />
+        <text x="1174.0" y="424.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="1013 395 322 58">CANCELADA_TARDIA</text>
+      </g>
+      <g id="m3-admin" data-state="CANCELADA_POR_ADMIN">
+        <rect x="1010" y="559" width="328" height="66" rx="11" fill="#F9F0E1" stroke="#805220" stroke-width="2" />
+        <text x="1174.0" y="592.0" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="23" font-weight="700" fill="#162738" data-box="1013 563 322 58">CANCELADA_POR_ADMIN</text>
+      </g>
+      <g id="m3-fin-cancelada" data-pseudo="fin">
+        <circle cx="1382" cy="260" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="1382" cy="260" r="5.6" fill="#162738" />
+      </g>
+      <g id="m3-fin-tardia" data-pseudo="fin">
+        <circle cx="1382" cy="424" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="1382" cy="424" r="5.6" fill="#162738" />
+      </g>
+      <g id="m3-fin-admin" data-pseudo="fin">
+        <circle cx="1382" cy="592" r="10" fill="#FFFFFF" stroke="#162738" stroke-width="1.8" />
+        <circle cx="1382" cy="592" r="5.6" fill="#162738" />
+      </g>
+      <path id="m3-crear" data-src="start" data-dst="confirmada" d="M77 424 L238 424" fill="none" stroke="#354A61" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr354A61)" />
+      <path id="m3-cancelar-a-tiempo" data-src="confirmada" data-dst="cancelada" d="M482 405 L582 405 L582 260 L1010 260" fill="none" stroke="#3C5080" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr3C5080)" />
+      <path id="m3-cancelar-tardia" data-src="confirmada" data-dst="tardia" d="M482 424 L1010 424" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m3-cancelar-clase" data-src="confirmada" data-dst="admin" d="M482 446 L582 446 L582 592 L1010 592" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m3-terminar-a-tiempo" data-src="cancelada" data-dst="fin-cancelada" d="M1338 260 L1372 260" fill="none" stroke="#3C5080" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr3C5080)" />
+      <path id="m3-terminar-tardia" data-src="tardia" data-dst="fin-tardia" d="M1338 424 L1372 424" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <path id="m3-terminar-admin" data-src="admin" data-dst="fin-admin" d="M1338 592 L1372 592" fill="none" stroke="#805220" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arr805220)" />
+      <text x="159.5" y="393.5" dominant-baseline="central" text-anchor="middle" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="88 381 143 25">/ crear reserva</text>
+      <text x="603" y="203.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="603 191 391 25">cancelar reserva [restan ≥ 2 h]</text>
+      <text x="603" y="228.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="603 216 391 25">/ liberar cupo, sin penalidad</text>
+      <text x="603" y="367.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="603 355 400 25">cancelar reserva [0 &lt; tiempo restante &lt; 2 h]</text>
+      <text x="603" y="392.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="603 380 400 25">/ liberar cupo y marcar la falta en la API</text>
+      <text x="603" y="535.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="19" font-weight="700" fill="#162738" data-box="603 523 392 25">cancelar clase [personal y ahora &lt; fin]</text>
+      <text x="603" y="560.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="18" font-weight="400" fill="#405469" data-box="603 548 392 25">/ cancelar reservas confirmadas, sin marcar falta</text>
+      <rect id="item-37-m3" x="39" y="680" width="670" height="197" rx="8" fill="#E9EDF8" stroke="none" />
+      <text x="54" y="699.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="20" font-weight="700" fill="#3C5080" data-box="54 688 640 23">Cancelación y respuesta de la API</text>
+      <text x="54" y="728.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 717 640 22">Cancelación individual: titular, Recepción de su sede o Gerencia.</text>
+      <text x="54" y="751.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 740 640 22">Al llegar al inicio, la cancelación individual devuelve 409.</text>
+      <text x="54" y="774.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 763 640 22">Cualquier cancelación deja asistencia en NO_APLICA.</text>
+      <text x="54" y="797.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 786 640 22">La API devuelve CANCELADA y distingue A_TIEMPO o TARDIA.</text>
+      <text x="54" y="820.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 809 640 22">En la cancelación de la clase, tipoCancelacion es NO_APLICA.</text>
+      <text x="54" y="843.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="54 832 640 22">La marca de falta tardía no aplica una sanción.</text>
+      <rect id="item-45-m3" x="728" y="680" width="674" height="197" rx="8" fill="#F0F4F7" stroke="none" />
+      <text x="743" y="699.5" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="20" font-weight="700" fill="#3C5080" data-box="743 688 644 23">Asistencia y cierre</text>
+      <text x="743" y="728.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="743 717 644 22">PENDIENTE, ASISTIO, AUSENTE y NO_APLICA pertenecen a asistencia.</text>
+      <text x="743" y="751.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="743 740 644 22">ASISTIDA y AUSENTE son proyecciones previstas por la API.</text>
+      <text x="743" y="774.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="743 763 644 22">El endpoint de asistencia responde 501.</text>
+      <text x="743" y="797.0" dominant-baseline="central" text-anchor="start" font-family="Arial" font-size="17" font-weight="400" fill="#405469" data-box="743 786 644 22">Al finalizar la clase la reserva no cambia automáticamente de estado.</text>
+    </g>
+  </g>
+  <view id="area-m4" viewBox="0 0 1440 1018" />
+  <view id="area-m3" viewBox="0 1044 1440 1018" />
+</svg>
