@@ -180,6 +180,13 @@ await test('foco visible revalida, oculta no; consultas simultaneas comparten pr
  assert.equal(a,b);assert.equal(e.members.length,2);await setMember(e,dto('VENCIDA'));
  assert.equal(e.shared.puedeAbrirQr,false);
 });
+await test('al volver a Mi membresía se revalida el DTO compartido sin duplicar la consulta inicial',async()=>{
+ const e=env();e.pathname='/membresia';await layout(e);assert.equal(e.members.length,1);
+ await setMember(e,dto());e.pathname='/pagos';await settle(e);
+ assert.equal(e.members.length,1);
+ e.pathname='/membresia';await settle(e);assert.equal(e.members.length,2);
+ await setMember(e,dto('VENCIDA'));assert.equal(e.shared.membresia.datos.estado,'VENCIDA');
+});
 await test('GET viejo no sobrescribe DTO del POST ni borra una consulta nueva',async()=>{
  const e=env();await layout(e);const old=e.members[0];e.shared.actualizarMembresia({estado:'cargada',datos:dto()});await settle(e);
  const newer=e.shared.refrescarMembresia();old.resolve(dto('VENCIDA'));await settle(e);
@@ -624,10 +631,28 @@ await test('aviso a siete dias: continuidad confirmada evita falsa urgencia',asy
  assert.equal(visual({...periodo,fin:new Date(now+8*86400000).toISOString()},now).aviso,null);
  assert.equal(visual({...periodo,fin:new Date(now).toISOString()},now).aviso,null);
 });
-await test('vencida conserva plan historico sede comprobantes y renovacion sin onboarding',async()=>{
+await test('Mi membresía resume el pago vigente y el próximo pagado con el DTO compartido',async()=>{
+ const e=env();await layout(e);
+ const vigente={...cercana().periodoVigente,id:3,estado:'ACTIVA',pagoId:13,precio:12500.75};
+ const proximo={id:4,nombrePlan:'Trimestral próximo',estado:'PROGRAMADA',pagoId:14,precio:34000,inicio:vigente.fin,fin:'2090-04-01T00:00:00-03:00'};
+ const posterior={...proximo,id:5,pagoId:15,nombrePlan:'Futuro más lejano',inicio:proximo.fin,fin:'2090-07-01T00:00:00-03:00'};
+ const historico={id:1,estado:'VENCIDA',pagoId:11,nombrePlan:'Pago histórico'};
+ const cancelado={id:2,estado:'CANCELADA',pagoId:12,nombrePlan:'Pago cancelado'};
+ const periodos=[historico,cancelado,vigente,posterior,proximo];
+ await setMember(e,dto('ACTIVA',{periodoVigente:vigente,periodos}));
+ const r=await runner('perfil',e);e.profiles.at(-1).resolve({id:7});await settle(e);
+ const panel=()=>nodes(r.view,n=>n.props.className?.includes('member-payments-panel'))[0];
+ for(const dato of ['Mensual actual','Vigente','12.500,75','Trimestral próximo','Próximo período','34.000,00'])assert(text(panel()).includes(dato));
+ for(const dato of ['Pago histórico','Pago cancelado','Futuro más lejano'])assert(!text(panel()).includes(dato));
+ assert.equal(nodes(panel(),n=>n.type==='a'&&n.props.href==='/pagos').length,1);
+ e.shared.actualizarMembresia({estado:'cargada',datos:dto('ACTIVA',{periodoVigente:vigente,periodos:[vigente,posterior,{...proximo,estado:'CANCELADA'}]})});
+ await settle(e);assert(!text(panel()).includes('Trimestral próximo'));assert(text(panel()).includes('Futuro más lejano'));
+ assert.equal(e.members.length,1);
+});
+await test('vencida conserva plan histórico, sede, enlace a pagos y renovación sin onboarding',async()=>{
  const e=env(),l=await layout(e);const data=dto('VENCIDA',{periodos:[{id:1,estado:'VENCIDA',nombrePlan:'Plan histórico',precio:12345.67,duracionMeses:1,inicio:'2020-01-01T12:00:00-03:00',fin:'2020-02-01T12:00:00-03:00',pagoId:44}]});
  await setMember(e,data);const r=await runner('perfil',e);e.profiles.at(-1).resolve({id:7,nombre:'Titular',apellido:'Real',sedeId:12,sedeNombre:'Sede conservada'});await settle(e);
- const t=text(r.view);for(const esperado of ['Membresía vencida','Plan histórico','Sede conservada','12.345,67','2020','Comprobantes'])assert(t.includes(esperado));
+ const t=text(r.view);for(const esperado of ['Membresía vencida','Plan histórico','Sede conservada','12.345,67','2020','Sin pagos de períodos vigentes o próximos'])assert(t.includes(esperado));
  assert.equal(e.plans.length,0);assert.equal(e.contracts.length,0);assert.equal(hasQr(l),false);assert(text(l.view).includes('Membresía vencida'));
  consultaRenovacion(e);const ren=await runner('renew',e,e.renewalProps);await settle(e);button(ren,'Renovar membresía').props.onClick();await settle(e);e.plans[0].resolve([{id:3,nombre:'Plan vigente',duracionMeses:1,precio:15000}]);await settle(e);
  const envio=button(ren,'Confirmar renovación').props.onClick();await settle(e);assert.deepEqual(e.renewals[0].args.slice(0,2),[22,3]);const key=e.renewals[0].args[2];e.renewals[0].reject(err(500));await envio;await settle(e);
@@ -807,28 +832,50 @@ await test('revalidación antes de pagar detecta automática activada o período
 });
 await test('automática habilita/deshabilita sin cambiar períodos y bloquea doble clic',async()=>{
  const data=cercana();data.periodos=[{...data.periodoVigente,id:1,estado:'ACTIVA',nombrePlan:'Mensual'}];
- const {e,r}=await flujoRenovacion(data);const activar=button(r,'Habilitar renovación automática').props.onClick;const p=activar();activar();assert.equal(e.preferences.length,1);assert.deepEqual(e.preferences[0].args,[22,true]);
+ const {e,r}=await flujoRenovacion(data);const activar=button(r,'Activar').props.onClick;const p=activar();activar();assert.equal(e.preferences.length,1);assert.deepEqual(e.preferences[0].args,[22,true]);
  e.preferences[0].resolve({...data,renovacionAutomatica:true});await p;await settle(e);assert(text(r.view).includes('habilitada'));assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);assert.equal(e.actual.periodos,data.periodos);
- const off=button(r,'Desactivar renovación automática').props.onClick();assert.deepEqual(e.preferences[1].args,[22,false]);e.preferences[1].resolve({...data,renovacionAutomatica:false});await off;await settle(e);button(r,'Renovar plan');assert.equal(e.renewals.length,0);assert.equal(e.actual.periodos,data.periodos);
+ const off=button(r,'Desactivar').props.onClick();assert.deepEqual(e.preferences[1].args,[22,false]);e.preferences[1].resolve({...data,renovacionAutomatica:false});await off;await settle(e);button(r,'Renovar plan');assert.equal(e.renewals.length,0);assert.equal(e.actual.periodos,data.periodos);
 });
 for(const status of [400,403,404,409,500,undefined])await test('automática error '+(status??'red')+' no invierte preferencia ni permite pago manual',async()=>{
  const data=cercana();data.periodos=[{...data.periodoVigente,estado:'ACTIVA'}];const {e,r}=await flujoRenovacion(data);
- const p=button(r,'Habilitar renovación automática').props.onClick();e.preferences[0].reject(err(status));await p;await settle(e);
+ const p=button(r,'Activar').props.onClick();e.preferences[0].reject(err(status));await p;await settle(e);
  assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);const retry=button(r,'Reintentar la misma preferencia').props.onClick();assert.deepEqual(e.preferences[1].args,[22,true]);e.preferences[1].resolve({...data,renovacionAutomatica:true});await retry;await settle(e);assert.equal(e.renewals.length,0);
 });
 await test('automática toma el último plan futuro al finalizar todos los períodos, sin mostrarlo vigente',async()=>{
  const data=cercana({planId:9,renovacionAutomatica:true,periodos:[{estado:'PROGRAMADA',nombrePlan:'Trimestral futuro',fin:new Date(Date.now()+95*86400000).toISOString()}]});
- const {r}=await flujoRenovacion(data);assert(text(r.view).replace(/\s+/g,' ').includes('último plan contratado: Trimestral futuro'));assert(text(r.view).includes('No reemplaza tu plan actual'));assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);
+ const {r}=await flujoRenovacion(data);
+ const zona={timeZone:'America/Argentina/Buenos_Aires',day:'numeric',month:'short',year:'numeric'};
+ const fecha=new Date(data.periodos[0].fin).toLocaleDateString('es-AR',zona);
+ assert(text(r.view).replace(/\s+/g,' ').includes('Desde '+fecha+' · Trimestral futuro'));
+ assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);
 });
-await test('automática vencida advierte próximo cobro simulado y suspendida sólo permite desactivar',async()=>{
+await test('automática vencida solicita confirmación antes de guardar la preferencia',async()=>{
  const periodos=[{estado:'VENCIDA',nombrePlan:'Mensual',fin:'2020-01-01T12:00:00-03:00'}];
- const {r}=await flujoRenovacion(dto('VENCIDA',{periodos}));assert(text(r.view).includes('próxima ejecución'));assert(text(r.view).includes('simulado'));
- const {e,r:s}=await flujoRenovacion(dto('SUSPENDIDA',{periodos,renovacionAutomatica:true}));assert(text(s.view).includes('no se realizan renovaciones automáticas'));button(s,'Desactivar renovación automática');assert.equal(nodes(s.view,n=>n.type==='button'&&text(n).includes('Habilitar')).length,0);assert.equal(e.renewals.length,0);
+ const data=dto('VENCIDA',{periodos}),{e,r}=await flujoRenovacion(data);
+ button(r,'Activar').props.onClick();await settle(e);
+ assert(text(r.view).includes('El cobro simulado puede intentarse en la próxima ejecución'));
+ assert.equal(e.preferences.length,0);
+ button(r,'Volver').props.onClick();await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);assert.equal(e.preferences.length,0);
+ button(r,'Activar').props.onClick();await settle(e);
+ const guardar=button(r,'Confirmar activación').props.onClick;
+ const p=guardar();guardar();assert.equal(e.preferences.length,1);assert.deepEqual(e.preferences[0].args,[22,true]);
+ e.preferences[0].resolve({...data,renovacionAutomatica:true});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);assert.equal(e.renewals.length,0);
+});
+await test('automática suspendida indica pausa y sólo permite desactivar',async()=>{
+ const data=dto('SUSPENDIDA',{renovacionAutomatica:true}),{e,r}=await flujoRenovacion(data);
+ assert(text(r.view).includes('Pausada'));
+ assert.equal(nodes(r.view,n=>n.props['aria-label']==='Activar renovación automática').length,0);
+ const p=button(r,'Desactivar').props.onClick();assert.deepEqual(e.preferences[0].args,[22,false]);
+ e.preferences[0].resolve({...data,renovacionAutomatica:false});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.props['aria-label']==='Activar renovación automática').length,0);
+ assert.equal(e.renewals.length,0);
 });
 await test('automática bloqueada por intención monetaria pendiente y cambio de sesión',async()=>{
- const {e,r}=await flujoRenovacion();await elegirPlanes(e,r);const p=button(r,'Confirmar renovación').props.onClick();await settle(e);e.renewals[0].reject(err(500));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='button'&&/automática/.test(text(n))).length,0);
- const data=cercana({periodos:[{estado:'ACTIVA',fin:new Date(Date.now()+5*86400000).toISOString()}]});const f=await flujoRenovacion(data);f.e.localStorage.setItem('token','sesion-B');await button(f.r,'Habilitar renovación automática').props.onClick();assert.equal(f.e.preferences.length,0);
- const g=await flujoRenovacion(data);const cambiar=button(g.r,'Habilitar renovación automática').props.onClick();g.e.localStorage.setItem('token','sesion-B');g.e.preferences[0].resolve({...data,renovacionAutomatica:true});await cambiar;await settle(g.e);assert.equal(g.e.actual,undefined);
+ const {e,r}=await flujoRenovacion();await elegirPlanes(e,r);const p=button(r,'Confirmar renovación').props.onClick();await settle(e);e.renewals[0].reject(err(500));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='button'&&/automática/.test(n.props['aria-label'])).length,0);
+ const data=cercana({periodos:[{estado:'ACTIVA',fin:new Date(Date.now()+5*86400000).toISOString()}]});const f=await flujoRenovacion(data);f.e.localStorage.setItem('token','sesion-B');await button(f.r,'Activar').props.onClick();assert.equal(f.e.preferences.length,0);
+ const g=await flujoRenovacion(data);const cambiar=button(g.r,'Activar').props.onClick();g.e.localStorage.setItem('token','sesion-B');g.e.preferences[0].resolve({...data,renovacionAutomatica:true});await cambiar;await settle(g.e);assert.equal(g.e.actual,undefined);
 });
 await test('aviso próximo con automática habilitada no invita también a renovar manualmente',async()=>{
  const e=env();await layout(e);await setMember(e,cercana({renovacionAutomatica:true}));const p=await runner('perfil',e);e.profiles[0].resolve({id:7});await settle(e);

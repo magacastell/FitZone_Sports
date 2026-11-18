@@ -6,7 +6,7 @@ import { consultarMiPerfil } from '../../services/m1Service';
 import { AppLink, PageHeading, StatusBadge } from '../../components/ui/FitZoneUI';
 import RenovacionMembresia from './RenovacionMembresia';
 import ContratacionMembresia from './ContratacionMembresia';
-import { ResumenMembresia, DatosPersonales, AccesoRapido, ResumenComprobantes } from './PortalSocioCards';
+import { ResumenMembresia, DatosPersonales, AccesoRapido, ResumenPagosMembresia } from './PortalSocioCards';
 import './PortalSocio.css';
 
 export default function MembresiaUsuario() {
@@ -45,7 +45,7 @@ function MembresiaContenido() {
       {perfil.estado === 'cargado' && (perfil.datos.id === membresia.datos.usuarioId
             ? <RenovacionMembresia key={`${perfil.datos.id}:${membresia.datos.id}`} perfil={perfil.datos} membresia={membresia.datos} onRenovada={(datos) => actualizarMembresia({ estado: 'cargada', datos })} />
             : <p role="alert">El perfil y la membresía no corresponden a la misma cuenta.</p>)}
-      <div className="member-details-grid"><DatosPersonales perfil={perfil} rol={user.rol} membresia={membresia} /><ResumenComprobantes membresia={membresia} /></div>
+      <div className="member-details-grid"><DatosPersonales perfil={perfil} rol={user.rol} membresia={membresia} /><ResumenPagosMembresia membresia={membresia} /></div>
     </>}
   </div></div>;
 }

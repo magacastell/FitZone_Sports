@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, ShieldCheck, QrCode, Mail, Fingerprint, MapPin, FileText, ArrowRight, UserRound } from 'lucide-react';
+import { CalendarDays, ShieldCheck, QrCode, Mail, Fingerprint, MapPin, ArrowRight, UserRound } from 'lucide-react';
 import { nombreActor, periodosConPago } from './estadoCuenta';
 import { AppLink, AvatarCircle, DataCard, StatusBadge } from '../../components/ui/FitZoneUI';
 
@@ -131,11 +131,32 @@ export function AccesoRapido({ puedeAbrirQr, membresia }) {
   </aside>;
 }
 
-export function ResumenComprobantes({ membresia }) {
-  const periodos = periodosConPago(membresia);
-  if (!periodos.length) return null;
-  return <DataCard className="receipts-panel" title="Comprobantes" description="Los comprobantes de tus períodos contratados.">
-    <p>{periodos.length} {periodos.length === 1 ? 'período con pago registrado' : 'períodos con pago registrado'}</p>
-    <div className="receipt-footer"><FileText aria-hidden="true" /><Link className="text-link" to="/comprobantes">Ver comprobantes <ArrowRight aria-hidden="true" /></Link></div>
-  </DataCard>;
+export function ResumenPagosMembresia({ membresia }) {
+  const vigente = membresia.datos.periodoVigente;
+  const proximo = periodosConPago(membresia)
+    .filter((periodo) => periodo.estado === 'PROGRAMADA')
+    .sort((a, b) => Date.parse(a.inicio) - Date.parse(b.inicio))[0];
+  const resumen = [
+    vigente?.estado === 'ACTIVA' && vigente.pagoId != null && { periodo: vigente, etiqueta: 'Vigente', tono: 'success' },
+    proximo && { periodo: proximo, etiqueta: 'Próximo período', tono: 'neutral' },
+  ].filter(Boolean);
+
+  return (
+    <DataCard className="member-payments-panel" title="Pagos de membresía"
+      action={<Link className="text-link" to="/pagos">Ver mis pagos <ArrowRight aria-hidden="true" /></Link>}>
+      {resumen.length ? (
+        <ul className="member-payments">
+          {resumen.map(({ periodo, etiqueta, tono }) => (
+            <li key={periodo.pagoId}>
+              <div className="member-payment__period">
+                <div><strong>{periodo.nombrePlan}</strong><StatusBadge tone={tono}>{etiqueta}</StatusBadge></div>
+                <span>{fechaPeriodo(periodo.inicio)} al {fechaPeriodo(periodo.fin)}</span>
+              </div>
+              <strong className="member-payment__amount">{moneda(periodo.precio)}</strong>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="member-payments-empty">Sin pagos de períodos vigentes o próximos.</p>}
+    </DataCard>
+  );
 }

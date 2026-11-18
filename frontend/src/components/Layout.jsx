@@ -256,6 +256,10 @@ function LayoutAutenticado() {
     refrescarMembresia,
   ]);
 
+  useEffect(() => {
+    if (pathname === '/membresia') refrescarMembresia();
+  }, [pathname, refrescarMembresia]);
+
   const puedeAbrirQr = (
     membresia.estado === 'cargada'
     && membresia.datos.estado === 'ACTIVA'
