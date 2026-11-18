@@ -77,6 +77,7 @@ const TITULO_POR_RUTA = {
   '/mi-qr': 'Mi QR',
   '/comprobantes': 'Comprobantes de membresía',
   '/pagos': 'Mis pagos',
+  '/mis-reservas': 'Mis reservas',
   '/canchas': 'Canchas',
   '/admin/canchas': 'Administrar canchas',
   '/admin/canchas/mantenimiento': 'Administrar canchas',
@@ -373,12 +374,10 @@ function LayoutAutenticado() {
               </NavigationLink>
 
               {esCliente && (
-                <NavigationLink
-                  to="/pagos"
-                  icon={ReceiptText}
-                >
-                  Mis pagos
-                </NavigationLink>
+                <>
+                  <NavigationLink to="/mis-reservas" icon={List}>Mis reservas</NavigationLink>
+                  <NavigationLink to="/pagos" icon={ReceiptText}>Mis pagos</NavigationLink>
+                </>
               )}
             </ul>
           </div>

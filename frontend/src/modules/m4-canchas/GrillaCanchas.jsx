@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   CalendarDays,
   Clock3,
@@ -18,8 +17,6 @@ import {
   listarCanchas,
   listarTurnos,
   reservarCancha,
-  listarMisReservas,
-  listarReservas,
   consultarReserva,
   cancelarReservaCancha,
 } from '../../services/m4Service';
@@ -31,12 +28,15 @@ import {
 
 import {
   AppButton,
+  AppLink,
   DataCard,
   EmptyState,
   PageHeading,
   StatusBadge,
 } from '../../components/ui/FitZoneUI';
 
+import { ListadoReservasCancha, useReservasCancha } from './ReservasCanchas';
+import { cancelarConDetalle, claveReserva, estadoReservaTexto, formatoFechaHora, formatoPrecio, limpiarClaveReserva, mensajeError, tiempoRestante } from './reservasCanchaUtils';
 import './GrillaCanchas.css';
 
 // ============================================
@@ -63,16 +63,6 @@ function sumarDias(fecha, dias) {
   return dia.toISOString().slice(0, 10);
 }
 
-function formatoFechaHora(valor) {
-  if (!valor) return 'Fecha no disponible';
-
-  return new Date(valor).toLocaleString('es-AR', {
-    timeZone: 'America/Argentina/Buenos_Aires',
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
-}
-
 function formatoHora(valor) {
   if (!valor) return '--:--';
 
@@ -83,50 +73,9 @@ function formatoHora(valor) {
   });
 }
 
-function formatoPrecio(valor) {
-  if (valor == null || !Number.isFinite(Number(valor))) {
-    return 'No disponible';
-  }
-
-  return Number(valor).toLocaleString('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-  });
-}
-
-function mensajeError(error, operacion) {
-  if (error.status === 400) {
-    return 'Los datos enviados no son válidos. Revisá la información e intentá nuevamente.';
-  }
-
-  if (error.status === 401) {
-    return 'Tu sesión venció. Volvé a iniciar sesión.';
-  }
-
-  if (error.status === 403) {
-    return 'Tu cuenta no tiene autorización para realizar esta operación.';
-  }
-
-  if (error.status === 404) {
-    return 'El recurso solicitado ya no existe o no está disponible.';
-  }
-
-  if (error.status === 409) {
-    return operacion === 'reserva'
-      ? 'Ese horario acaba de cambiar o fue reservado por otra persona. Actualizamos la disponibilidad.'
-      : 'La operación ya no puede realizarse porque cambió el estado de la reserva.';
-  }
-
-  return 'No pudimos completar la operación. Revisá tu conexión e intentá nuevamente.';
-}
-
 // ============================================
 // IDEMPOTENCIA DE RESERVAS
 // ============================================
-
-function claveReserva(email, canchaId, turnoId) {
-  return `fitzone:m4:intencion:${email}:${canchaId}:${turnoId}`;
-}
 
 function obtenerClaveIdempotencia(email, canchaId, turnoId) {
   const almacenamiento = claveReserva(email, canchaId, turnoId);
@@ -147,16 +96,6 @@ function obtenerClaveIdempotencia(email, canchaId, turnoId) {
   return clave;
 }
 
-function limpiarClaveReserva(email, reserva) {
-  if (!email || !reserva?.canchaId || !reserva?.turnoId) {
-    return;
-  }
-
-  localStorage.removeItem(
-    claveReserva(email, reserva.canchaId, reserva.turnoId),
-  );
-}
-
 // ============================================
 // ESTADOS DE RESERVA
 // ============================================
@@ -169,49 +108,6 @@ function esEstadoFinal(estado) {
     'CANCELADA',
     'CUMPLIDA',
   ].includes(estado);
-}
-
-function estadoReservaTexto(estado) {
-  const nombres = {
-    PENDIENTE_PAGO: 'Pendiente de pago',
-    CONFIRMADA: 'Confirmada',
-    RECHAZADA: 'Pago rechazado',
-    EXPIRADA: 'Retención vencida',
-    CANCELADA: 'Cancelada',
-    CUMPLIDA: 'Cumplida',
-  };
-
-  return nombres[estado] || estado || 'Estado desconocido';
-}
-
-function tonoReserva(estado) {
-  if (['CONFIRMADA', 'CUMPLIDA'].includes(estado)) {
-    return 'success';
-  }
-
-  if (estado === 'PENDIENTE_PAGO') {
-    return 'warning';
-  }
-
-  if (['RECHAZADA', 'EXPIRADA'].includes(estado)) {
-    return 'danger';
-  }
-
-  return 'neutral';
-}
-
-function tiempoRestante(venceEn, ahora) {
-  if (!venceEn) return null;
-
-  const segundos = Math.max(
-    0,
-    Math.floor((Date.parse(venceEn) - ahora) / 1000),
-  );
-
-  const minutos = Math.floor(segundos / 60);
-  const resto = segundos % 60;
-
-  return `${minutos}:${String(resto).padStart(2, '0')}`;
 }
 
 // ============================================
@@ -251,11 +147,6 @@ function GrillaCuenta() {
     items: [],
   });
 
-  const [reservas, setReservas] = useState({
-    estado: 'inicial',
-    items: [],
-  });
-
   const [aviso, setAviso] = useState(null);
   const [accion, setAccion] = useState(null);
   const [pagoModal, setPagoModal] = useState(null);
@@ -269,6 +160,11 @@ function GrillaCuenta() {
   const [refrescoCatalogo, setRefrescoCatalogo] = useState(0);
   const [refrescoTurnos, setRefrescoTurnos] = useState(0);
   const [refrescoReservas, setRefrescoReservas] = useState(0);
+  const personal = user?.rol === 'USUARIO';
+  const reservas = useReservasCancha({
+    habilitada: Boolean(token) && (!esRecepcion || Boolean(sedeId)),
+    personal, sedeId, pagina: paginaReservas, refresco: refrescoReservas,
+  });
 
   const [ahora, setAhora] = useState(Date.now());
   const hoy = fechaArgentina(new Date(ahora));
@@ -517,88 +413,11 @@ function GrillaCuenta() {
   }, [token, canchaId, fechaManual, hoy, claveTurnos]);
 
   // ==========================================
-  // CONSULTAR RESERVAS
-  // ==========================================
-
-  useEffect(() => {
-    if (!token) return;
-
-    if (esRecepcion && !sedeId) {
-      setReservas({
-        estado: 'inicial',
-        items: [],
-      });
-
-      return;
-    }
-
-    let activo = true;
-
-    setReservas({
-      estado: 'cargando',
-      items: [],
-    });
-
-    const consulta = user?.rol === 'USUARIO'
-      ? listarMisReservas(paginaReservas, 20)
-      : listarReservas(
-          esRecepcion
-            ? sedeId
-            : esGerente
-              ? sedeId || null
-              : null,
-          paginaReservas,
-          20,
-        );
-
-    consulta
-      .then((datos) => {
-        if (!activo) return;
-
-        if (!Array.isArray(datos)) {
-          setReservas({
-            estado: 'error',
-            items: [],
-            mensaje: 'La respuesta de reservas no es válida.',
-          });
-
-          return;
-        }
-
-        setReservas({
-          estado: 'cargado',
-          items: datos,
-        });
-      })
-      .catch((error) => {
-        if (activo) {
-          setReservas({
-            estado: 'error',
-            items: [],
-            mensaje: mensajeError(error, 'reservas'),
-          });
-        }
-      });
-
-    return () => {
-      activo = false;
-    };
-  }, [
-    token,
-    sedeId,
-    user?.rol,
-    user?.email,
-    esRecepcion,
-    esGerente,
-    refrescoReservas,
-    paginaReservas,
-  ]);
-
-  // ==========================================
   // ACTUALIZACIÓN DE CONSULTAS
   // ==========================================
 
   const actualizarTodo = () => {
+    if (enviando.current) return;
     if (contexto.estado === 'error') setRecargaContexto((valor) => valor + 1);
     setRefrescoCatalogo((valor) => valor + 1);
     setRefrescoTurnos((valor) => valor + 1);
@@ -756,47 +575,8 @@ function GrillaCuenta() {
     setAviso(null);
 
     try {
-      const respuesta = await cancelarReservaCancha(
-        reserva.canchaId,
-        reserva.id,
-      );
-
-      limpiarClaveReserva(user.email, reserva);
-
-      let texto = 'La reserva fue cancelada correctamente.';
-
-      if (reserva.pagoId != null) {
-        if (user.rol === 'RECEPCIONISTA') {
-          texto += ` Estado del pago: ${respuesta.estadoPago || 'consultar con Gerencia'}.`;
-        } else {
-          try {
-            const pagoActualizado = await consultarPago(reserva.pagoId);
-
-            const importeDevuelto = Number(
-              pagoActualizado.montoReembolsado || 0,
-            );
-
-            if (importeDevuelto > 0) {
-              texto += ` Devolución registrada: ${formatoPrecio(importeDevuelto)}.`;
-            } else {
-              texto += ' No se informó un importe devuelto.';
-            }
-
-            if (pagoActualizado.estado) {
-              texto += ` Estado financiero: ${pagoActualizado.estado}.`;
-            }
-          } catch {
-            texto += ' La cancelación se realizó, pero no pudimos consultar el detalle financiero de la devolución.';
-          }
-        }
-      } else {
-        texto += ' La reserva no tenía un pago asociado, por lo que no correspondía procesar una devolución.';
-      }
-
-      setAviso({
-        tipo: 'ok',
-        texto,
-      });
+      const texto = await cancelarConDetalle(reserva, user);
+      setAviso({ tipo: 'ok', texto });
     } catch (error) {
       setAviso({
         tipo: 'error',
@@ -812,10 +592,6 @@ function GrillaCuenta() {
   // ==========================================
   // INTERFAZ
   // ==========================================
-
-  const reservasVisibles = reservas.items.filter((reserva) =>
-    user?.rol !== 'USUARIO' || reserva.pagoId != null
-  );
 
   return (
     <div className="fitzone-ui grilla-canchas">
@@ -835,15 +611,9 @@ function GrillaCuenta() {
               ? 'Elegí una cancha, consultá sus horarios y reservá tu turno.'
               : 'Consultá las canchas y las reservas registradas en tu sede.'
           }
-          actions={
-            <StatusBadge tone="neutral">
-              {esRecepcion
-                ? 'Sede operativa'
-                : esGerente
-                  ? 'Gerencia'
-                  : 'Reservas online'}
-            </StatusBadge>
-          }
+          actions={personal ? <AppLink to="/mis-reservas#canchas">Mis reservas</AppLink> : (
+            <StatusBadge tone="neutral">{esRecepcion ? 'Sede operativa' : 'Gerencia'}</StatusBadge>
+          )}
         />
 
         {aviso && (
@@ -873,6 +643,7 @@ function GrillaCuenta() {
               type="button"
               variant="secondary"
               size="sm"
+              disabled={Boolean(accion)}
               onClick={actualizarTodo}
             >
               <RefreshCw size={15} />
@@ -971,9 +742,10 @@ function GrillaCuenta() {
                         ? ' m4-cancha-card--activa'
                         : ''
                     }`}
-                    disabled={!cancha.activa}
+                    disabled={!cancha.activa || Boolean(accion)}
                     aria-pressed={String(cancha.id) === String(canchaId)}
                     onClick={() => {
+                      if (enviando.current) return;
                       if (String(cancha.id) !== canchaId) setFechaManual('');
                       setCanchaId(String(cancha.id));
                       setAviso(null);
@@ -1031,7 +803,9 @@ function GrillaCuenta() {
                   type="date"
                   min={hoy}
                   value={fechaMostrada}
+                  disabled={Boolean(accion)}
                   onChange={(evento) => {
+                    if (enviando.current) return;
                     const dia = evento.target.value;
                     if (dia && dia >= hoy) setFechaManual(dia);
                   }}
@@ -1043,6 +817,10 @@ function GrillaCuenta() {
                 <strong>{canchaSeleccionada.nombre}</strong>
               </p>
             </div>
+          )}
+
+          {accion?.startsWith('reserva-') && canchaSeleccionada && (
+            <p role="status">Reteniendo el turno de {canchaSeleccionada.nombre}…</p>
           )}
 
           {canchaId && turnos.estado === 'cargando' && (
@@ -1117,135 +895,16 @@ function GrillaCuenta() {
           )}
         </DataCard>
 
-        {/* RESERVAS */}
-
-        <DataCard
-          title={
-            user?.rol === 'USUARIO'
-              ? 'Mis reservas'
-              : esRecepcion
-                ? 'Reservas de tu sede'
-                : 'Reservas registradas'
-          }
-          description={user?.rol === 'USUARIO' ? 'Consultá tus turnos y cancelá cuando corresponda.' : 'Consultá los turnos de la sede.'}
-          action={
-            <AppButton
-              size="sm"
-              variant="secondary"
-              onClick={actualizarTodo}
-            >
-              <RefreshCw size={15} />
-              Actualizar
-            </AppButton>
-          }
-        >
-          {reservas.estado === 'cargando' && (
-            <p role="status">Consultando reservas...</p>
-          )}
-
-          {reservas.estado === 'error' && (
-            <p role="alert">{reservas.mensaje}</p>
-          )}
-
-          {reservas.estado === 'cargado' &&
-            reservasVisibles.length === 0 && (
-              <EmptyState
-                icon={CalendarDays}
-                title="Todavía no hay reservas para mostrar"
-              />
-            )}
-
-          {reservas.estado === 'cargado' &&
-            reservasVisibles.length > 0 && (
-              <div className="m4-reservas-lista">
-                {reservasVisibles.map((reserva) => {
-                  const vencida =
-                    reserva.estado === 'PENDIENTE_PAGO' &&
-                    reserva.venceEn &&
-                    Date.parse(reserva.venceEn) <= ahora;
-
-                  const estadoVisual = vencida
-                    ? 'EXPIRADA'
-                    : reserva.estado;
-
-                  const puedeCancelar =
-                    ['USUARIO', 'RECEPCIONISTA', 'GERENTE'].includes(user?.rol) &&
-                    ['PENDIENTE_PAGO', 'CONFIRMADA'].includes(reserva.estado) &&
-                    Date.parse(reserva.inicio) > ahora;
-
-                  return (
-                    <article
-                      className="m4-reserva"
-                      key={reserva.id}
-                    >
-                      <div className="m4-reserva__datos">
-                        <div className="m4-reserva__titulo">
-                          <strong>{reserva.cancha}</strong>
-
-                          <StatusBadge tone={tonoReserva(estadoVisual)}>
-                            {estadoReservaTexto(estadoVisual)}
-                          </StatusBadge>
-                        </div>
-
-                        <p>
-                          {reserva.sede} · {reserva.tipo}
-                        </p>
-
-                        <p>
-                          {formatoFechaHora(reserva.inicio)}
-                          {' – '}
-                          {formatoFechaHora(reserva.fin)}
-                        </p>
-
-                        <p>
-                          Reserva #{reserva.id}
-                          {' · '}
-                          {formatoPrecio(reserva.precioAplicado)}
-                        </p>
-
-                        {reserva.estado === 'PENDIENTE_PAGO' &&
-                          reserva.venceEn &&
-                          !vencida && (
-                            <p className="m4-vencimiento">
-                              <Clock3 size={15} />
-                              Vence en {tiempoRestante(reserva.venceEn, ahora)}
-                            </p>
-                          )}
-
-                        {reserva.estadoPago && (
-                          <p>
-                            Estado del pago:{' '}
-                            <strong>{reserva.estadoPago}</strong>
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="m4-reserva__acciones">
-                        {puedeCancelar && (
-                          <AppButton
-                            size="sm"
-                            variant="secondary"
-                            disabled={Boolean(accion)}
-                            onClick={() => cancelar(reserva)}
-                          >
-                            {accion === `cancelar-${reserva.id}`
-                              ? 'Cancelando...'
-                              : 'Cancelar'}
-                          </AppButton>
-                        )}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-        </DataCard>
-
-        <nav aria-label="Páginas de reservas">
-          <AppButton disabled={paginaReservas === 0 || reservas.estado === 'cargando' || Boolean(accion)} onClick={() => setPaginaReservas((valor) => valor - 1)}>Reservas anteriores</AppButton>
-          <span> Página {paginaReservas + 1} · hasta 20 reservas por página </span>
-          <AppButton disabled={reservas.estado !== 'cargado' || reservas.items.length < 20 || Boolean(accion)} onClick={() => setPaginaReservas((valor) => valor + 1)}>Más reservas</AppButton>
-        </nav>
+        {!personal && (
+          <DataCard title={esRecepcion ? 'Reservas de tu sede' : 'Reservas registradas'}
+            description="Consultá los turnos de la sede."
+            action={<AppButton size="sm" variant="secondary" onClick={actualizarTodo}>
+              <RefreshCw size={15} aria-hidden="true" /> Actualizar
+            </AppButton>}>
+            <ListadoReservasCancha reservas={reservas} pagina={paginaReservas} setPagina={setPaginaReservas}
+              cancelar={cancelar} ocupado={Boolean(accion)} ahora={ahora} />
+          </DataCard>
+        )}
         {pagoModal && (
           <dialog ref={dialogoPago} className="m4-dialogo-pago" aria-labelledby="m4-pago-titulo"
             onCancel={(evento) => {
@@ -1285,7 +944,10 @@ function GrillaCuenta() {
                 <AppButton type="button" onClick={() => pagar(pagoModal.reserva)}>Confirmar pago</AppButton>
               )}
               {user?.rol === 'USUARIO' && ['aprobado', 'rechazado', 'consultado', 'sin-confirmar'].includes(pagoModal.estado) && (
-                <Link className="fit-button fit-button--md fit-button--primary" to="/pagos">Ir a Mis pagos</Link>
+                <AppLink variant={pagoModal.estado === 'aprobado' ? 'secondary' : 'primary'} to="/pagos">Ir a Mis pagos</AppLink>
+              )}
+              {personal && pagoModal.estado === 'aprobado' && (
+                <AppLink variant="primary" to="/mis-reservas#canchas">Ir a mis reservas</AppLink>
               )}
             </div>
           </dialog>

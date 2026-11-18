@@ -4,18 +4,14 @@ import { CalendarDays, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { consultarMiPerfil } from '../../services/m1Service';
 import { listarSedes } from '../../services/sedesService';
-import {
-  cancelarClase, cancelarReservaClase, consultarMiActividadClases, entrarEnEspera, listarAgenda, reservarClase,
-  responderOferta, salirDeEspera,
-} from '../../services/m3Service';
-import { AppButton, DataCard, EmptyState, PageHeading, StatusBadge } from '../../components/ui/FitZoneUI';
+import { cancelarClase, listarAgenda } from '../../services/m3Service';
+import { AppButton, AppLink, DataCard, EmptyState, PageHeading } from '../../components/ui/FitZoneUI';
+import { ActividadClasesPanel, AvisoReservaClase, DialogoReservaClase, useActividadClases, useGestionReservasClase } from './ReservasClases';
 import TarjetaClase from './TarjetaClase';
 import FormularioClase from './FormularioClase';
 import AsistentesClase from './AsistentesClase';
-import { aValorLocal, formatearFechaHora, inscripcionAbierta, rangoDelDia, situacionEnClase } from './claseUtils';
+import { aValorLocal, rangoDelDia, situacionEnClase } from './claseUtils';
 import './AgendaClases.css';
-
-const ACTIVIDAD_VACIA = { reservas: [], listaEspera: [], ofertas: [] };
 
 export default function AgendaClases() {
   const { token } = useAuth();
@@ -33,16 +29,17 @@ function VistaAgenda() {
 
   const [contexto, setContexto] = useState({ estado: 'cargando', sedes: [] });
   const [sedeId, setSedeId] = useState('');
-  const [fecha, setFecha] = useState(() => aValorLocal(new Date()).slice(0, 10));
+  const [fecha, setFecha] = useState('');
+  const [desdeProximas, setDesdeProximas] = useState(() => new Date().toISOString());
   const [pagina, setPagina] = useState(0);
   const [agenda, setAgenda] = useState({ estado: 'inicial' });
-  const [busqueda, setBusqueda] = useState('inicial');
-  const [actividad, setActividad] = useState(ACTIVIDAD_VACIA);
-  const [aviso, setAviso] = useState(null);
-  const [accion, setAccion] = useState(null);
   const [refresco, setRefresco] = useState(0);
   const [formulario, setFormulario] = useState(null);
   const [asistentes, setAsistentes] = useState(null);
+  const [verReservas, setVerReservas] = useState(false);
+  const actividad = useActividadClases(permitido && puedeReservar, refresco);
+  const gestion = useGestionReservasClase(() => setRefresco((v) => v + 1));
+  const { aviso, setAviso, ocupada, modal, ejecutar, reservar, anotarse, salirDeLaEspera, cancelarReserva, responder, cerrarModal } = gestion;
 
   // Recepción administra solo la sede de su perfil; el resto elige entre todas, empezando por la habitual.
   useEffect(() => {
@@ -61,7 +58,8 @@ function VistaAgenda() {
     if (!permitido || !sedeId) { setAgenda({ estado: 'inicial' }); return; }
     let activo = true;
     setAgenda({ estado: 'cargando' });
-    listarAgenda({ sedeId, page: pagina, ...rangoDelDia(fecha) }).then((datos) => {
+    const rango = fecha ? rangoDelDia(fecha) : { desde: desdeProximas };
+    listarAgenda({ sedeId, page: pagina, ...rango }).then((datos) => {
       if (!activo) return;
       if (!Array.isArray(datos?.items)) { setAgenda({ estado: 'error', mensaje: 'La respuesta no corresponde a la agenda esperada.' }); return; }
       setAgenda({ estado: 'cargado', items: datos.items, totalPages: datos.totalPages, total: datos.totalElements });
@@ -69,75 +67,23 @@ function VistaAgenda() {
       if (activo) setAgenda({ estado: 'error', mensaje: error.status === 403 ? 'No tenés autorización para consultar esta sede.' : error.message });
     });
     return () => { activo = false; };
-  }, [permitido, sedeId, fecha, pagina, refresco]);
+  }, [permitido, sedeId, fecha, desdeProximas, pagina, refresco]);
 
-  useEffect(() => {
-    if (!permitido || !sedeId || busqueda !== 'cargando') return;
-    let activo = true;
-    const buscar = async () => {
-      const ahora = Date.now();
-      const desde = new Date(ahora + 48 * 3600000).toISOString();
-      const hasta = new Date(ahora + 14 * 86400000).toISOString();
-      try {
-        for (let page = 0; page < 2; page++) {
-          const datos = await listarAgenda({ sedeId, desde, hasta, page, size: 100 });
-          if (!activo) return;
-          if (!Array.isArray(datos?.items) || !Number.isInteger(datos.totalPages)) throw new Error('Agenda inválida');
-          const proxima = datos.items.find((clase) => clase.estado === 'PROGRAMADA'
-            && clase.lugaresDisponibles > 0 && inscripcionAbierta(clase, Date.now()));
-          if (proxima) {
-            setFecha(aValorLocal(proxima.inicio).slice(0, 10));
-            setPagina(0);
-            setBusqueda('encontrada');
-            return;
-          }
-          if (page + 1 >= datos.totalPages) {
-            setBusqueda('sin-disponibilidad');
-            return;
-          }
-        }
-        setBusqueda('limite');
-      } catch {
-        if (activo) setBusqueda('error');
-      }
-    };
-    buscar();
-    return () => { activo = false; };
-  }, [permitido, sedeId, busqueda]);
+  const cancelarLaClase = (clase, motivo) => ejecutar(() => cancelarClase(clase.id, motivo), `Cancelaste la clase ${clase.nombre}.`);
 
-  useEffect(() => {
-    if (!permitido || !puedeReservar) return;
-    let activo = true;
-    consultarMiActividadClases().then((datos) => { if (activo) setActividad(datos); }, () => { /* sin actividad propia, la agenda igual se muestra */ });
-    return () => { activo = false; };
-  }, [permitido, puedeReservar, refresco]);
-
-  const ejecutar = async (clave, accionAsync, textoExito) => {
-    setAccion(clave);
-    setAviso(null);
-    try {
-      await accionAsync();
-      setAviso({ tipo: 'ok', texto: textoExito });
-    } catch (error) {
-      setAviso({ tipo: 'error', texto: error.message || 'No se pudo completar la acción.' });
-    } finally {
-      setAccion(null);
-      setRefresco((v) => v + 1);
+  const cambiarSede = (valor) => { setSedeId(valor); setPagina(0); setFormulario(null); setAsistentes(null); };
+  const cambiarFecha = (dia) => {
+    setFecha(dia);
+    setPagina(0);
+    if (!dia) setDesdeProximas(new Date().toISOString());
+  };
+  const actualizar = () => {
+    if (!fecha) {
+      setDesdeProximas(new Date().toISOString());
+      setPagina(0);
     }
+    setRefresco((v) => v + 1);
   };
-
-  const reservar = (clase) => ejecutar(clase.id, () => reservarClase(clase.id), `Reservaste ${clase.nombre}.`);
-  const anotarse = (clase) => ejecutar(clase.id, () => entrarEnEspera(clase.id), `Te anotaste en la lista de espera de ${clase.nombre}.`);
-  const salirDeLaEspera = (clase) => ejecutar(clase.id, () => salirDeEspera(clase.id), 'Saliste de la lista de espera.');
-  const cancelarReserva = (clase, reserva) => {
-    if (!window.confirm(`¿Cancelar tu reserva de ${clase.nombre}?`)) return;
-    ejecutar(clase.id, () => cancelarReservaClase(clase.id, reserva.id), 'Cancelaste tu reserva.');
-  };
-  const responder = (clase, oferta, respuesta) => ejecutar(clase.id, () => responderOferta(clase.id, oferta.id, respuesta),
-    respuesta === 'ACEPTAR' ? `Aceptaste el lugar: ${clase.nombre} quedó reservada.` : 'Rechazaste el lugar.');
-  const cancelarLaClase = (clase, motivo) => ejecutar(clase.id, () => cancelarClase(clase.id, motivo), `Cancelaste la clase ${clase.nombre}.`);
-
-  const cambiarSede = (valor) => { setSedeId(valor); setPagina(0); setBusqueda('inicial'); setFormulario(null); setAsistentes(null); };
   const formularioGuardado = (clase, editando) => {
     setFormulario(null);
     setAviso({ tipo: 'ok', texto: editando ? 'La clase se actualizó.' : `Creaste la clase ${clase.nombre}.` });
@@ -148,7 +94,12 @@ function VistaAgenda() {
   const encabezado = (
     <PageHeading eyebrow={esRecepcion ? 'ADMIN DE SEDE' : esGerente ? 'ADMINISTRACIÓN GLOBAL' : 'ACTIVIDADES FITZONE'} title="Clases"
       description={esStaff ? 'Administrá la agenda de clases: horarios, instructores, cupos y asistentes.' : 'Reservá tu lugar en las clases grupales de tu membresía.'}
-      actions={esStaff && permitido ? <AppButton onClick={() => { setAsistentes(null); setFormulario({}); }}>Nueva clase</AppButton> : <StatusBadge tone="neutral">Incluidas en tu membresía</StatusBadge>} />
+      actions={permitido && <>
+        {esStaff && <AppButton onClick={() => { setVerReservas(false); setAsistentes(null); setFormulario({}); }}>Nueva clase</AppButton>}
+        {esGerente && <AppButton type="button" variant="secondary" disabled={ocupada}
+          onClick={() => setVerReservas(!verReservas)}>{verReservas ? 'Volver a clases' : 'Mis reservas'}</AppButton>}
+        {!esStaff && <AppLink to="/mis-reservas#clases">Mis reservas</AppLink>}
+      </>} />
   );
 
   if (!permitido) {
@@ -157,44 +108,16 @@ function VistaAgenda() {
     </div></div>;
   }
 
-  const hayActividad = actividad.reservas.length + actividad.listaEspera.length + actividad.ofertas.length > 0;
   const items = agenda.items ?? [];
   const hoy = aValorLocal(new Date()).slice(0, 10);
 
   return (
     <div className="fitzone-ui agenda-clases"><div className="page-stack">
       {encabezado}
-      {aviso && <p className={`agenda-aviso agenda-aviso--${aviso.tipo}`} role={aviso.tipo === 'error' ? 'alert' : 'status'}>{aviso.texto}</p>}
-
-      {puedeReservar && hayActividad && (
-        <DataCard title="Mis clases" description="Tus reservas, tu lugar en las listas de espera y los lugares que se te ofrecieron.">
-          <ul className="mis-clases">
-            {actividad.ofertas.map(({ oferta, clase }) => (
-              <li key={`o${oferta.id}`} className="mis-clases__oferta">
-                <div><strong>{clase.nombre}</strong><span>{formatearFechaHora(clase.inicio)}</span>
-                  <StatusBadge tone="warning">Se liberó un lugar: aceptalo antes del {formatearFechaHora(oferta.venceEn)}</StatusBadge></div>
-                <div>
-                  <AppButton size="sm" disabled={accion === clase.id} onClick={() => responder(clase, oferta, 'ACEPTAR')}>Aceptar</AppButton>
-                  <AppButton size="sm" variant="secondary" disabled={accion === clase.id} onClick={() => responder(clase, oferta, 'RECHAZAR')}>Rechazar</AppButton>
-                </div>
-              </li>
-            ))}
-            {actividad.reservas.map(({ reserva, clase }) => (
-              <li key={`r${reserva.id}`}>
-                <div><strong>{clase.nombre}</strong><span>{formatearFechaHora(clase.inicio)}</span><StatusBadge tone="success">Reservada</StatusBadge></div>
-                <AppButton size="sm" variant="secondary" disabled={accion === clase.id} onClick={() => cancelarReserva(clase, reserva)}>Cancelar reserva</AppButton>
-              </li>
-            ))}
-            {actividad.listaEspera.filter(({ entrada }) => entrada.estado === 'EN_ESPERA').map(({ entrada, clase }) => (
-              <li key={`e${entrada.id}`}>
-                <div><strong>{clase.nombre}</strong><span>{formatearFechaHora(clase.inicio)}</span><StatusBadge tone="info">En espera, posición {entrada.posicion}</StatusBadge></div>
-                <AppButton size="sm" variant="secondary" disabled={accion === clase.id} onClick={() => salirDeLaEspera(clase)}>Salir de la lista</AppButton>
-              </li>
-            ))}
-          </ul>
-        </DataCard>
-      )}
-
+      {!modal && <AvisoReservaClase aviso={aviso} />}
+      {verReservas ? (
+        <ActividadClasesPanel actividad={actividad} gestion={gestion} actualizar={actualizar} />
+      ) : <>
       <DataCard title={esRecepcion ? 'Tu sede operativa' : 'Elegí una sede'}
         description={esRecepcion ? 'Administrás únicamente la sede asignada a tu cuenta.' : 'Podés ver y reservar clases en cualquier sede.'}>
         {contexto.estado === 'cargando' && <p role="status">Consultando sedes...</p>}
@@ -207,33 +130,38 @@ function VistaAgenda() {
                 {contexto.sedes.map((s) => <option key={s.id} value={s.id}>{s.nombre}</option>)}
               </select>
             </label>
-            <label><span><CalendarDays aria-hidden="true" />Día</span>
+            <label><span><CalendarDays aria-hidden="true" />Día (opcional)</span>
               <input type="date" min={esStaff ? undefined : hoy} value={fecha} onChange={(e) => {
                 const dia = e.target.value;
-                if (!dia || (!esStaff && dia < hoy)) return;
-                setFecha(dia); setPagina(0); setBusqueda('inicial');
+                if (dia && !esStaff && dia < hoy) return;
+                cambiarFecha(dia);
               }} />
             </label>
           </div>
         )}
-        <AppButton type="button" variant="secondary" onClick={() => setRefresco((v) => v + 1)}>Actualizar</AppButton>
+        <div className="agenda-filtros__acciones">
+          <AppButton type="button" variant="secondary" onClick={actualizar}>Actualizar</AppButton>
+          {fecha && <AppButton type="button" variant="secondary" onClick={() => cambiarFecha('')}>Quitar filtro</AppButton>}
+        </div>
       </DataCard>
 
       {formulario && <FormularioClase key={formulario.clase?.id ?? 'nueva'} claseEditando={formulario.clase} esGerente={esGerente}
         sedes={contexto.sedes} sedeInicial={sedeId} onGuardada={formularioGuardado} onCancelar={() => setFormulario(null)} />}
       {asistentes && <AsistentesClase clase={asistentes} refresco={refresco} onCerrar={() => setAsistentes(null)} />}
 
-      <DataCard title="Agenda de clases" description={agenda.estado === 'cargado' ? `${agenda.total} ${agenda.total === 1 ? 'clase' : 'clases'} para el día elegido` : undefined}>
+      <DataCard title={fecha ? 'Agenda de clases' : 'Próximas clases'}
+        description={fecha && agenda.estado === 'cargado' ? `${agenda.total} ${agenda.total === 1 ? 'clase' : 'clases'} para el día elegido` : undefined}>
         {!sedeId && <EmptyState icon={MapPin} title="Primero, la sede" description="Elegí una sede para ver su agenda." />}
         {sedeId && agenda.estado === 'cargando' && <p role="status">Consultando la agenda...</p>}
         {sedeId && agenda.estado === 'error' && <p role="alert">{agenda.mensaje}</p>}
         {sedeId && agenda.estado === 'cargado' && (items.length === 0
-          ? <EmptyState icon={CalendarDays} title="Sin clases" description="No hay clases ese día en esta sede." />
+          ? <EmptyState icon={CalendarDays} title="Sin clases"
+            description={fecha ? 'No hay clases ese día en esta sede.' : 'No hay próximas clases en esta sede.'} />
           : <>
             <div className="agenda-grid">
               {items.map((clase) => (
                 <TarjetaClase key={clase.id} clase={clase} situacion={situacionEnClase(clase.id, actividad)}
-                  puedeReservar={puedeReservar} esStaff={esStaff} ocupada={accion === clase.id}
+                  puedeReservar={puedeReservar} esStaff={esStaff} ocupada={ocupada}
                   onReservar={reservar} onCancelarReserva={cancelarReserva} onAnotarse={anotarse} onSalirEspera={salirDeLaEspera}
                   onResponder={responder} onCancelarClase={cancelarLaClase}
                   onEditar={(c) => { setAsistentes(null); setFormulario({ clase: c }); }}
@@ -248,20 +176,10 @@ function VistaAgenda() {
               </nav>
             )}
           </>)}
-        {puedeReservar && sedeId && agenda.estado === 'cargado' && (
-          <div>
-            <AppButton type="button" variant="secondary" disabled={busqueda === 'cargando'} onClick={() => setBusqueda('cargando')}>
-              Buscar próxima clase con lugar
-            </AppButton>
-            {busqueda === 'cargando' && <p role="status">Buscando clases reservables en esta sede…</p>}
-            {busqueda === 'encontrada' && <p role="status">Mostrando la próxima fecha con una clase reservable.</p>}
-            {busqueda === 'sin-disponibilidad' && <p role="status">No encontramos clases con lugar e inscripción abierta en los próximos 14 días.</p>}
-            {busqueda === 'limite' && <p role="status">La búsqueda revisó las primeras 200 clases. Podés consultar otra fecha.</p>}
-            {busqueda === 'error' && <p role="alert">No pudimos buscar la próxima clase. Reintentá la búsqueda.</p>}
-          </div>
-        )}
       </DataCard>
       <p className="agenda-nota">Las reservas y la lista de espera cierran 48 horas antes de cada clase. Cancelando con 2 horas o más de anticipación no hay penalidad.</p>
+      </>}
+      <DialogoReservaClase gestion={gestion} onVerReservas={esGerente ? () => { cerrarModal(); setVerReservas(true); } : undefined} />
     </div></div>
   );
 }

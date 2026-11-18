@@ -4,6 +4,7 @@
 .agenda-clases label svg { width: 18px; height: 18px; }
 .agenda-clases select, .agenda-clases input { min-width: 0; width: 100%; min-height: 44px; padding: 10px; border: 1px solid #bbcdbf; border-radius: 9px; background: white; color: #1e2d26; font: inherit; box-sizing: border-box; }
 .agenda-clases .agenda-filtros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 20px; }
+.agenda-clases .agenda-filtros__acciones, .agenda-clases .page-heading__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .agenda-clases .agenda-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
 .agenda-clases .clase-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-wrap: anywhere; padding: 18px; border: 1px solid #e2e9e3; border-radius: 12px; background: white; }
 .agenda-clases .clase-card__cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }

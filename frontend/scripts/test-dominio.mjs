@@ -8,6 +8,7 @@ const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { transformSync } = require('esbuild');
 const sources = {
  gridM4:'src/modules/m4-canchas/GrillaCanchas.jsx', adminM4:'src/modules/m4-canchas/AdministracionCanchas.jsx', pagosM5:'src/modules/m5-pagos/HistorialPagos.jsx',
+ reservasM4:'src/modules/m4-canchas/ReservasCanchas.jsx',
  avatar:'src/components/ui/FitZoneUI.jsx',
  servicios:'src/components/ServiciosSede.jsx',
  aforoLocal:'src/modules/m2-acceso/AforoSede.jsx',
@@ -86,6 +87,14 @@ async function runner(name,e,props={},target='default'){
   if(spec.endsWith('SelectorFoto'))return synthetic({default:p=>jsx('selector-foto',p)},context);
   if(spec.endsWith('fotoPerfil')){
    const child=new vm.SourceTextModule(fs.readFileSync('src/services/fotoPerfil.js','utf8'),{context});await child.link(linker);await child.evaluate();return child;
+  }
+  const reservasCancha = {
+   './ReservasCanchas':'src/modules/m4-canchas/ReservasCanchas.jsx',
+   './reservasCanchaUtils':'src/modules/m4-canchas/reservasCanchaUtils.js',
+  }[spec];
+  if (reservasCancha) {
+   const child=new vm.SourceTextModule(transformSync(fs.readFileSync(reservasCancha,'utf8'),{loader:'jsx',format:'esm',jsx:'automatic'}).code,{context});
+   await child.link(linker);await child.evaluate();return child;
   }
   if(spec.includes('sedesService'))return synthetic({listarSedes:e.services.listarSedes},context);
   if(spec.includes('gerenciaService'))return synthetic(Object.fromEntries(['listarSedes','listarUsuarios','consultarAforo','crearSede','actualizarSede','consultarMembresia','consultarReporte'].map(nombre=>[nombre,(...args)=>{const d=deferred();d.args=args;(e.gerencia??={})[nombre]??=[];e.gerencia[nombre].push(d);return d.promise;}])),context);
@@ -966,10 +975,116 @@ await test('M4 respuesta perdida conserva clave de reserva al reintentar',async(
  p=button(r,'Elegir turno').props.onClick();assert.equal(e.llamadasM4[0].args[2],e.llamadasM4[1].args[2]);
  e.llamadasM4[1].resolve({id:10,estado:'PENDIENTE_PAGO',venceEn:'2026-11-25T17:10:00-03:00'});await p;
 });
-await test('M4 paginación consulta página siguiente y vuelve a cero al cambiar sede',async()=>{
- const e=entornoM4(),paginas=[];e.m4.listarMisReservas=async(page,size)=>{paginas.push([page,size]);return Array.from({length:20},(_,i)=>({id:page*20+i,estado:'EXPIRADA',cancha:'Cancha',sede:'Central',inicio:'2026-11-25T18:00:00-03:00',fin:'2026-11-25T19:00:00-03:00'}));};
- const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);button(r,'Más reservas').props.onClick();await settle(e);assert.equal(paginas.at(-1)[0],1);
- nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'2'}});await settle(e);assert.equal(paginas.at(-1)[0],0);
+for (const resultado of ['éxito', 'error']) {
+ await test(`M4 retención demorada mantiene cancha y fecha y desbloquea tras ${resultado}`, async () => {
+  const e = entornoM4();
+  const fechaA = fechaM4(2);
+  const fechaB = fechaM4(4);
+  const consultas = [];
+  e.m4.listarCanchas = async () => [
+   { id: 1, sedeId: 1, nombre: 'Cancha A', activa: true },
+   { id: 2, sedeId: 1, nombre: 'Cancha B', activa: true },
+  ];
+  e.m4.listarTurnos = async (id, desde, hasta) => {
+   consultas.push([id, desde, hasta]);
+   const dia = id === '1' ? fechaA : fechaB;
+   if (dia < desde || dia > hasta) return [];
+   return ['18', '19'].map((hora, indice) => ({
+    id: Number(id) * 10 + indice,
+    disponible: true,
+    inicio: `${dia}T${hora}:00:00-03:00`,
+    fin: `${dia}T${Number(hora) + 1}:00:00-03:00`,
+   }));
+  };
+  const r = await runner('gridM4', e, {}, 'GrillaCuenta');
+  await settle(e);
+  const fecha = () => nodes(r.view, nodo => nodo.type === 'input' && nodo.props.type === 'date')[0];
+  const opciones = () => nodes(r.view, nodo => nodo.type === 'button' && text(nodo).includes('Elegir turno'));
+  const cambiarCancha = button(r, 'Cancha B').props.onClick;
+  const cambiarFecha = fecha().props.onChange;
+  const actualizar = button(r, 'Actualizar').props.onClick;
+  const [seleccionarA, seleccionarOtro] = opciones().map(opcion => opcion.props.onClick);
+  const cantidadConsultas = consultas.length;
+
+  const pendiente = seleccionarA();
+  cambiarCancha();
+  cambiarFecha({ target: { value: fechaB } });
+  actualizar();
+  await seleccionarOtro();
+  await settle(e);
+
+  assert.equal(button(r, 'Cancha B').props.disabled, true);
+  assert.equal(button(r, 'Actualizar').props.disabled, true);
+  assert.equal(fecha().props.disabled, true);
+  assert.equal(opciones()[0].props.disabled, true);
+  assert.equal(button(r, 'Reservando...').props.disabled, true);
+  assert.equal(nodes(r.view, nodo => nodo.props.role === 'status' && text(nodo).replace(/\s+/g, ' ').includes('Reteniendo el turno de Cancha A')).length, 1);
+  assert.equal(button(r, 'Cancha A').props['aria-pressed'], true);
+  assert.equal(fecha().props.value, fechaA);
+  assert.equal(consultas.length, cantidadConsultas);
+  assert.equal(e.llamadasM4.length, 1);
+  const retencion = e.llamadasM4[0];
+  assert.equal(retencion.args[0], 1);
+  assert.equal(retencion.args[1].turnoId, 10);
+
+  const reserva = {
+   id: 50, canchaId: 1, cancha: 'Cancha A', turnoId: 10, estado: 'PENDIENTE_PAGO',
+   inicio: `${fechaA}T18:00:00-03:00`, venceEn: new Date(Date.now() + 600000).toISOString(),
+  };
+  if (resultado === 'éxito') retencion.resolve(reserva);
+  else retencion.reject(err(409));
+  await pendiente;
+  await settle(e);
+
+  assert.equal(button(r, 'Cancha A').props['aria-pressed'], true);
+  assert.equal(fecha().props.value, fechaA);
+  assert.equal(consultas.slice(cantidadConsultas).every(([id]) => id === '1'), true);
+  const dialogos = nodes(r.view, nodo => nodo.type === 'dialog');
+  if (resultado === 'éxito') {
+   assert.equal(dialogos.length, 1);
+   assert.match(text(dialogos[0]), /Cancha A/);
+   assert.doesNotMatch(text(dialogos[0]), /Cancha B/);
+   const salir = button(r, 'Salir').props.onClick();
+   e.llamadasM4[1].resolve({ ...reserva, estado: 'CANCELADA' });
+   await salir;
+   await settle(e);
+  } else {
+   assert.equal(dialogos.length, 0);
+   assert.match(text(r.view), /Ese horario acaba de cambiar/);
+  }
+
+  assert.equal(fecha().props.disabled, false);
+  button(r, 'Cancha B').props.onClick();
+  await settle(e);
+  assert.equal(button(r, 'Cancha B').props['aria-pressed'], true);
+  assert.equal(fecha().props.value, fechaB);
+  assert.equal(consultas.at(-1)[0], '2');
+ });
+}
+
+await test('Mis reservas conserva la paginación personal y las retenciones quedan fuera del listado',async()=>{
+ const e=entornoM4(),paginas=[];
+ e.m4.listarMisReservas=async(page,size)=>{
+  paginas.push([page,size]);
+  return page===0 ? Array.from({length:20},(_,i)=>({id:i,estado:'EXPIRADA',cancha:'Retención sin pago'}))
+   : [{id:22,estado:'CONFIRMADA',pagoId:11,cancha:'Cancha reservada'}];
+ };
+ const r=await runner('reservasM4',e);await settle(e);
+ assert(!text(r.view).includes('Retención sin pago'));
+ button(r,'Siguiente').props.onClick();await settle(e);
+ assert.deepEqual(paginas.at(-1),[1,20]);assert(text(r.view).includes('Cancha reservada'));
+ button(r,'Anterior').props.onClick();await settle(e);assert.deepEqual(paginas.at(-1),[0,20]);
+});
+await test('M4 consulta las reservas operativas de la sede seleccionada',async()=>{
+ const e=entornoM4(),paginas=[];e.user.rol='GERENTE';
+ e.m4.listarReservas=async(sede,page,size)=>{
+  paginas.push([sede,page,size]);
+  return sede==='1' ? Array.from({length:20},(_,i)=>({id:i,estado:'CANCELADA',cancha:'Cancha'})) : [];
+ };
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ button(r,'Siguiente').props.onClick();await settle(e);assert.deepEqual(paginas.at(-1),['1',1,20]);
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'2'}});await settle(e);
+ assert.deepEqual(paginas.at(-1),['2',0,20]);
 });
 for(const admin of [false,true])await test('M4 recupera contexto inicial '+(admin?'administración':'grilla'),async()=>{
  const e=entornoM4();if(admin)e.user.rol='GERENTE';let intentos=0;e.services.consultarMiPerfil=async()=>{if(++intentos===1)throw err(500);return{sedeId:1};};

@@ -25,6 +25,7 @@ import TerminalOffline from '../modules/m2-acceso/TerminalOffline';
 import QrOffline from '../modules/m2-acceso/QrOffline';
 
 import AgendaClases from '../modules/m3-clases/AgendaClases';
+import MisReservas from '../modules/reservas/MisReservas';
 
 import GrillaCanchas from '../modules/m4-canchas/GrillaCanchas';
 import AdministracionCanchas from '../modules/m4-canchas/AdministracionCanchas';
@@ -152,6 +153,7 @@ export default function AppRoutes() {
 
             <Route path="canchas" element={<GrillaCanchas />} />
             <Route path="clases" element={<AgendaClases />} />
+            <Route path="mis-reservas" element={<MisReservas />} />
 
             <Route path="mi-qr" element={<SocioQRRoute />} />
 
