@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1035" viewBox="0 0 1500 1035" role="img" aria-labelledby="titulo">
+<title id="titulo">UML de estados — Membresía</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker></defs>
+<rect width="1500" height="1035" fill="white"/>
+<polyline points="360,180 360,274" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="505,295.06 995,295.06" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="995,332.5 505,332.5" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="215,293 105,293 105,333 215,333" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="300,352 300,676 605,676" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="1200,352 1200,676 895,676" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="690,652 690,627 420,627 420,352" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="810,652 810,627 1080,627 1080,352" fill="none" stroke="#64748b" stroke-width="2.4" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#64748b" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="45" y="36.00">FitZone Sports</tspan></text>
+<text font-family="Arial, sans-serif" font-size="36" fill="#16324f" font-weight="bold" text-anchor="start" dominant-baseline="middle"><tspan x="45" y="75.00">UML de estados — Membresía</tspan></text>
+<text font-family="Arial, sans-serif" font-size="20" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="45" y="114.50">RF-02 · Ciclo de la cuenta de membresía en M1</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#64748b" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="45" y="999.00">Autor nominal: pendiente de confirmación | Fecha de edición: 2026-11-10 | v1 | Código: a367a8d</tspan></text>
+<circle cx="360" cy="169" r="11" fill="#16324f"/>
+<rect x="215" y="274" width="290" height="78" rx="13" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="25" fill="#16324f" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan x="360" y="313.00">ACTIVA</tspan></text>
+<rect x="995" y="274" width="290" height="78" rx="13" fill="#f1f5f9" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="25" fill="#16324f" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan x="1140" y="313.00">VENCIDA</tspan></text>
+<rect x="605" y="652" width="290" height="78" rx="13" fill="#fff3da" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="25" fill="#16324f" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan x="750" y="691.00">SUSPENDIDA</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="375" y="163.86">Contratar [sin cuenta previa;</tspan><tspan x="375" y="186.00">usuario habilitado, plan activo y sede válida]</tspan><tspan x="375" y="208.14">/ cobrar y crear el primer período</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="750" y="245.93">Llega fin del período o hay arrepentimiento</tspan><tspan x="750" y="268.07">[sin otro período vigente]</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="750" y="369.93">Renovación aprobada [el nuevo período inicia ahora]</tspan><tspan x="750" y="392.07">o llega inicio de un período programado</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="45" y="376.36">Renovación manual anticipada</tspan><tspan x="45" y="398.50">[período actual vigente]</tspan><tspan x="45" y="420.64">/ programar el siguiente</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="53" y="494.93">SUSPENDER [administración]</tspan><tspan x="53" y="517.07">/ marcar y auditar</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="1215" y="494.93">SUSPENDER [administración]</tspan><tspan x="1215" y="517.07">/ marcar y auditar</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="436" y="560.93">REACTIVAR [hay período vigente]</tspan><tspan x="436" y="583.07">/ quitar suspensión y auditar</tspan></text>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="start" dominant-baseline="middle"><tspan x="769" y="560.93">REACTIVAR [sin período vigente]</tspan><tspan x="769" y="583.07">/ quitar suspensión y auditar</tspan></text>
+<rect x="45" y="786" width="450" height="158" rx="13" fill="#eff6fb" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="270" y="831.79">Vigencia</tspan><tspan x="270" y="853.93">Período sin cancelar con inicio ≤ ahora &lt; fin.</tspan><tspan x="270" y="876.07">La suspensión prevalece sobre el período</tspan><tspan x="270" y="898.21">y el reloj sigue corriendo.</tspan></text>
+<rect x="525" y="786" width="450" height="158" rx="13" fill="#eff6fb" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="750" y="831.79">Renovación automática</tspan><tspan x="750" y="853.93">Job: opción habilitada, sin suspensión,</tspan><tspan x="750" y="876.07">fechaFin ≤ ahora, titular activo, plan activo,</tspan><tspan x="750" y="898.21">token simulado y operación aún no aplicada.</tspan></text>
+<rect x="1005" y="786" width="450" height="158" rx="13" fill="#eff6fb" stroke="#16324f" stroke-width="2"/>
+<text font-family="Arial, sans-serif" font-size="18" fill="#16324f" font-weight="normal" text-anchor="middle" dominant-baseline="middle"><tspan x="1230" y="831.79">Arrepentimiento</tspan><tspan x="1230" y="853.93">Reembolso de un período pagado antes de 24 h.</tspan><tspan x="1230" y="876.07">Conserva el historial, recalcula el estado</tspan><tspan x="1230" y="898.21">y deshabilita la renovación automática.</tspan></text>
+</svg>

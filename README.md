@@ -148,7 +148,13 @@ npm run dev
 
 Abrí la URL que muestre Vite, normalmente `http://localhost:5173`. Dejá también esta terminal abierta y entrá con `socio@fitzone.com` / `socio123`, o con otro usuario de la tabla de prueba.
 
-El login y el registro llaman al backend real, por lo que debe estar en ejecución. Vite redirige las solicitudes `/api` a `http://localhost:3000`; no hace falta definir `VITE_API_URL` para este flujo. Las pantallas de negocio todavía usan datos e interacciones de ejemplo: iniciar ambos servidores no implementa reservas, pagos ni QR reales.
+El login, el registro y los flujos integrados usan la API. Vite redirige `/api` a `http://localhost:3000` con la configuración local habitual. Los siguientes recorridos están conectados al backend:
+
+- **M1.** Registro y edición del perfil y la foto, contratación y renovación con pago simulado, consulta de vigencia y descarga de comprobantes de membresía.
+- **M2.** QR dinámico para socios habilitados, ingresos, egresos y aforo. En contingencia, Recepción necesita un terminal aprovisionado. Si el socio pierde su conexión, necesita un lote de QR vigente guardado en su navegador. [Guía M2 offline](docs/m2-offline.md)
+- **M3.** Agenda por sede, reservas y cancelaciones, inscripción voluntaria en lista de espera y ofertas visibles en «Mis clases». El aviso externo se simula por log. Asistencia y aplicación de penalidades siguen pendientes.
+
+El frontend también consulta el catálogo de canchas por sede. La API de M4/M5 ya implementa turnos, reservas, mantenimiento, cobro, comprobantes y reembolsos de cancha. Queda pendiente conectar a esas pantallas el flujo completo de reserva, pago y mantenimiento. Los reportes consolidados siguen pendientes. [Guía de integración M4/M5](docs/integracion-canchas-pagos.md)
 
 Para verificar la compilación del frontend, desde `frontend/`:
 
@@ -250,31 +256,11 @@ Cada módulo de dominio nuevo (`membresia`, `clase`, `reserva`, `pago`) sigue es
 
 ## Endpoints iniciales de los módulos
 
-Borrador para organizar el trabajo. Las rutas de negocio usan el prefijo
-`/api/v1`. Usuarios, sedes, planes, membresías, clases, Canchas/Pagos y QR/ingresos/salidas/aforo tienen implementación; las rutas que aún estén pendientes devuelven
-`501 Not Implemented` sin cuerpo si el rol tiene permiso.
-Sin autenticación válida se devuelve `401`; con un rol no permitido, `403`.
-Los stubs no consultan ni modifican datos. Sus contratos de solicitud/respuesta y filtros
-están pendientes. Las anotaciones `@PreAuthorize` usan el soporte existente de
-Spring Security (`@EnableMethodSecurity`).
+Las rutas de negocio usan el prefijo `/api/v1`. La API incluye usuarios, sedes, planes, membresías, acceso, clases, canchas y pagos. La tabla es orientativa. El [contrato OpenAPI](docs/openapi/openapi.yaml) distingue operaciones implementadas de stubs mediante `x-implementation-status`. Las rutas pendientes responden `501` cuando la solicitud está autorizada. Sin autenticación válida, las rutas protegidas devuelven `401`. Si faltan permisos, devuelven `403`.
 
-Roles: **S** y **C** = USUARIO (ambos actores comerciales del TP),
-**R** = RECEPCIONISTA, **G** = GERENTE. GERENTE tiene acceso a todas las rutas.
-Socio es condición funcional derivada de membresía vigente; la autoridad USUARIO no cambia al pagar o vencer.
-Ver [ADR de actores y membresía](docs/adr/0007-actores-y-membresia.md). Los tokens legados requieren un nuevo login tras V7.
+**S** y **C** representan la autoridad `USUARIO` con distinta condición comercial, **R** representa `RECEPCIONISTA` y **G**, `GERENTE`. Los permisos dependen de cada operación. Socio es la condición derivada de una membresía vigente. Los tokens legados requieren un nuevo login tras V7. [ADR histórico de actores y membresía](docs/adr/0007-actores-y-membresia.md)
 
-Pendiente antes de implementar operaciones reales:
-
-- Validar propiedad de perfiles, membresías, reservas, ofertas y pagos.
-- Restringir recepción a su sede; permitir al gerente operar en todas.
-- Consultar vigencia de membresía y suspensión de clases, sin confiar solo en el rol.
-- Permitir cancelar reservas propias aunque la membresía haya vencido: revisar
-  la política al separar condición de membresía y rol.
-- Aplicar reglas de capacidad, horarios, precios y devoluciones también al gerente.
-- Definir pagos asistidos y acceso de recepción a pagos/reembolsos. Por ahora,
-  recepción no tiene acceso a M5; los clientes solicitan reembolsos propios.
-- Agregar actualización de tarifas por tipo de cancha cuando se acuerde su contrato;
-  la modificación de cancha no define todavía ese contrato global.
+En M3, la reserva directa, el alta en espera y la respuesta a una oferta exigen `GERENTE` o `USUARIO` con membresía vigente. El titular puede cancelar su propia reserva antes del inicio aunque su membresía haya vencido. Recepción puede cancelarla dentro de su sede y Gerencia también puede hacerlo. El servicio comprueba cupo, estado y horarios. [Controlador de clases](src/main/java/com/fitzonesports/clase/controller/ClaseController.java) · [Servicio de reservas](src/main/java/com/fitzonesports/clase/service/ReservaClaseService.java)
 
 Reglas de `usuario`: recepción solo lista, consulta y modifica usuarios de su sede, y
 solo USUARIO. Puede activar/desactivar cuentas (`activo`) con
@@ -313,38 +299,43 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 | acceso | PATCH | `/accesos/{accesoId}` | R, G | corregirAcceso |
 | clase | GET | `/clases` | S, G, R | listarClases |
 | clase | POST | `/clases/{claseId}/reservas` | S, G | reservarClase |
-| clase | DELETE | `/clases/{claseId}/reservas/{reservaId}` | S, G, R | cancelarReserva |
+| clase | DELETE | `/clases/{claseId}/reservas/{reservaId}` | S, C, G, R | cancelarReserva |
 | clase | POST | `/clases` | R, G | crearClase |
 | clase | PATCH | `/clases/{claseId}` | R, G | actualizarClase |
 | clase | POST | `/clases/{claseId}/cancelacion` | R, G | cancelarClase |
 | clase | GET | `/clases/{claseId}/reservas` | R, G | listarReservasClase |
 | clase | PUT | `/clases/{claseId}/reservas/{reservaId}/asistencia` | R, G | registrarAsistencia |
 | clase | POST | `/clases/{claseId}/lista-espera` | S, G | incorporarListaEspera |
-| clase | DELETE | `/clases/{claseId}/lista-espera/me` | S, G | salirListaEspera |
+| clase | DELETE | `/clases/{claseId}/lista-espera/me` | S, C, G | salirListaEspera |
 | clase | POST | `/clases/{claseId}/ofertas/{ofertaId}/respuesta` | S, G | responderOferta |
 | reserva | GET | `/canchas` | S, C, R, G | listarCanchas |
+| reserva | GET | `/canchas/{canchaId}` | S, C, R, G | consultar cancha |
 | reserva | GET | `/canchas/{canchaId}/turnos` | S, C, R, G | listarTurnos |
-| reserva | POST | `/canchas/{canchaId}/reservas` | S, C, G | reservarTurno |
+| reserva | POST | `/canchas/{canchaId}/reservas` | S, C, G | retener turno para el pago |
 | reserva | DELETE | `/canchas/{canchaId}/reservas/{reservaId}` | S, C, R, G | cancelarReserva |
 | reserva | POST | `/canchas` | R, G | crearCancha |
 | reserva | PATCH | `/canchas/{canchaId}` | R, G | actualizarCancha |
 | reserva | POST | `/canchas/{canchaId}/turnos` | R, G | crearTurno |
+| reserva | GET | `/canchas/{canchaId}/mantenimientos` | R, G | listar mantenimientos |
 | reserva | POST | `/canchas/{canchaId}/mantenimientos` | R, G | crearMantenimiento |
 | reserva | DELETE | `/canchas/{canchaId}/mantenimientos/{mantenimientoId}` | R, G | eliminarMantenimiento |
 | reserva | GET | `/reservas/me` | S, C, G | listarMisReservas |
 | reserva | GET | `/reservas` | R, G | listarReservas |
+| reserva | GET | `/reservas/{reservaId}` | S, C, R, G | consultar reserva |
+| reserva | GET | `/tipos-cancha` | S, C, R, G | listar tipos de cancha |
+| reserva | POST | `/tipos-cancha` | G | crear tipo de cancha |
+| reserva | PUT | `/tipos-cancha/{id}` | G | actualizar tipo y tarifa |
+| reserva | PUT | `/sedes/{sedeId}/recargo-pico` | G | configurar recargo pico |
 | pago | POST | `/pagos` | S, C, G | crearPago |
 | pago | GET | `/pagos/me` | S, C, G | listarMisPagos |
 | pago | GET | `/pagos/{pagoId}/comprobante` | S, C, G | consultarComprobante |
 | pago | GET | `/pagos/{pagoId}` | S, C, G | consultarPago |
 | pago | GET | `/pagos` | G | listarPagos |
 | pago | POST | `/pagos/{pagoId}/reembolsos` | S, C, G | solicitarReembolso |
-| reporte | GET | `/reportes/ocupacion` | G | consultarOcupacion |
-| reporte | GET | `/reportes/ingresos` | G | consultarIngresos |
+| reporte | GET | `/reportes/ocupacion` | G | Pendiente (`501`) |
+| reporte | GET | `/reportes/ingresos` | G | Pendiente (`501`) |
 
-La autenticación existente (`POST /auth/login` y `POST /auth/register`) sigue
-implementada y pública. El frontend de Clases, Canchas y Reportes consulta las rutas
-preparadas y presenta `501` como servicio pendiente; no ofrece operaciones ficticias.
+La autenticación y el registro públicos usan `POST /auth/login` y `POST /auth/register`. La vista de Clases usa la API para agenda, reservas y ofertas. La pantalla de comprobantes usa el historial de membresías. Para reservas de cancha, la API expone creación, consulta, comprobante y reembolso de pagos según la operación y el rol.
 
 ### Planes de membresía
 
@@ -450,9 +441,14 @@ reserva y pago; nunca enviar importes desde el cliente.
 
 - Contrato objetivo API v1: [OpenAPI](docs/openapi/openapi.yaml)
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
-- Diagramas C4 y ADR: `docs/`
+- [Índice de arquitectura, ADR y diagramas](docs/arquitectura-tif.md) · [Manual Técnico](docs/manuales/manual-tecnico.md) · [Instalación y Operación](docs/manuales/manual-instalacion-operacion.md) · [Planificación](docs/planificacion/planificacion-seguimiento-tif.md).
+- Los manuales y la planificación indican su corte documental. Para el alcance incorporado después de ese corte, consultá las [guías de Canchas y Pagos](#canchas-y-pagos-de-reservas-m4m5).
 - Bitácoras del equipo: `LOGs/`
 
+
+## Asistencia de IA
+
+Se utilizó Codex como asistencia para auditar y revisar la documentación de cierre del TIF. Esta declaración se limita al trabajo documental verificable de este cierre. Cualquier alcance adicional del uso de IA en el proyecto queda pendiente de confirmación por el equipo.
 
 ## Dominio Cliente/Socio y comprobantes
 

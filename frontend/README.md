@@ -1,6 +1,6 @@
 # Frontend de FitZone Sports
 
-Base inicial en React, Vite y React Router. El login y el registro usan el backend real; las pantallas de negocio todavía muestran datos e interacciones de ejemplo. Para preparar PostgreSQL, iniciar la API y probar endpoints, seguí la [guía local del README principal](../README.md#cómo-levantar-el-proyecto-localmente).
+Frontend en React, Vite y React Router. El portal y las vistas de Recepción y Gerencia consumen la API en los recorridos de identidad, membresías, acceso y clases, y en la consulta de canchas por sede. Para preparar PostgreSQL e iniciar la API, seguí la [guía local del README principal](../README.md#cómo-levantar-el-proyecto-localmente).
 
 ## Requisitos y ejecución local
 
@@ -23,34 +23,37 @@ La pantalla de ingreso muestra las credenciales de prueba `socio@fitzone.com` / 
 - `src/components/`: layout, protección de rutas y página para funciones pendientes.
 - `src/styles/base.css` y `src/components/Layout.css`: estilos compartidos y navegación adaptable; la iconografía utiliza `lucide-react`.
 - `src/context/AuthContext.jsx`: login, registro y restauración de sesión mediante JWT.
-- `src/services/api.js`: cliente HTTP usado por la autenticación.
-- `src/modules/`: pantallas organizadas según los módulos acordados: M1 Usuarios y Membresías, M2 Gimnasio y Acceso, M3 Clases Grupales, M4 Canchas Deportivas y M5 Pagos y Facturación. `auth/` contiene el ingreso de demostración.
+- `src/services/api.js`: cliente HTTP compartido por los servicios de la aplicación.
+- `src/modules/`: pantallas organizadas según los módulos acordados: M1 Usuarios y Membresías, M2 Gimnasio y Acceso, M3 Clases Grupales, M4 Canchas Deportivas y M5 Pagos y Facturación. `auth/` contiene las pantallas de ingreso y registro.
 
 ## Navegación disponible
 
 | Ruta | Pantalla actual |
 | --- | --- |
-| `/login` | Ingreso mediante la API. |
-| `/` | Redirige a `/canchas`; sin sesión, termina en `/login`. |
-| `/canchas` | Ejemplo de canchas (M4); es el destino inicial. |
-| `/clases` | Ejemplo de agenda (M3). |
-| `/mi-qr` | Modal de QR simulado (M2); «Cerrar» o Escape vuelve a `/canchas`. |
-| `/perfil` | Perfil y membresía de ejemplo (M1). |
-| `/comprobantes` | Comprobante de ejemplo (M5). |
-| `/recepcion/acceso` | Vista de acceso y aforo con datos simulados (M2). |
-| `/admin/canchas/mantenimiento` | Página informativa; mantenimiento todavía no implementado. |
-| `/admin/reportes-consolidados` | Página informativa; reportes todavía no implementados. |
+| `/login` y `/registro` | Ingreso y alta mediante la API. |
+| `/` | Con sesión, deriva a membresía para `USUARIO`, al panel de Gerencia para `GERENTE` y a control de acceso para `RECEPCIONISTA`. Sin sesión, las rutas protegidas llevan a `/login`. |
+| `/perfil` y `/membresia` | Perfil y foto, contratación y renovación con pago simulado, vigencia e historial. |
+| `/mi-qr` y `/qr-offline` | QR dinámico con membresía habilitada y consulta sin conexión si hay un lote vigente guardado. |
+| `/recepcion/acceso` y `/recepcion/aforo` | Ingresos, egresos y aforo de la sede. |
+| `/terminal-offline` | Terminal de Recepción con autorización aprovisionada, captura provisional y sincronización al volver la red. |
+| `/clases` | Agenda por sede, reserva y cancelación, lista de espera y ofertas en «Mis clases». Incluye administración de agenda según el rol. |
+| `/canchas` | Catálogo por sede conectado a la API. La pantalla todavía carece de selección de turnos, reserva y pago. |
+| `/admin/canchas/mantenimiento` | Pantalla pendiente de conectar a la API de mantenimiento. |
+| `/comprobantes` | Historial y descarga de PDF de pagos de membresía. |
+| `/gestion/reportes` y `/admin/reportes-consolidados` | Reportes consolidados pendientes. |
 
-El backend valida los permisos de las solicitudes según el rol del JWT. La navegación y los datos de ejemplo del frontend no reemplazan esos controles.
-
-SOCIO muestra canchas, clases, QR, perfil y comprobantes. EXTERNO muestra canchas, perfil y comprobantes. RECEPCION agrega acceso y mantenimiento a las opciones de EXTERNO; GERENTE agrega además reportes. Las direcciones desconocidas redirigen a `/canchas` y pasan por la misma comprobación de sesión simulada.
+Los permisos y las guardas comerciales se validan en el backend. Las rutas y la navegación se definen en [AppRoutes.jsx](src/routes/AppRoutes.jsx).
 
 Los enlaces tienen estado activo y foco visible. Se puede navegar con Tab y Enter y usar «Ir al contenido». El QR usa un diálogo nativo: recibe el foco al abrirse e impide interactuar con el menú de fondo. En pantallas angostas, el menú pasa arriba y la tabla de comprobantes se desplaza horizontalmente dentro de su contenedor, también con teclado.
 
-## Datos e integración pendientes
+## Alcance y pendientes
 
-Las pantallas M1–M5 usan datos fijos o interacciones de ejemplo. El QR no es dinámico; el contador de canchas no bloquea turnos en el servidor; y los botones de reserva, pago, renovación y validación no ejecutan esas operaciones.
+El acceso offline requiere aprovisionamiento previo y un build PWA. Los movimientos se conservan localmente y se reconcilian al recuperar conexión. El aforo desconectado es provisional. [Guía M2 offline](../docs/m2-offline.md)
 
-El layout muestra un aviso de demostración y las páginas de mantenimiento y reportes indican explícitamente que están pendientes. `node_modules/`, `dist/` y `.vite/` están excluidos de Git mediante el `.gitignore` de la raíz; `package.json` y `package-lock.json` sí se versionan.
+Las ofertas de clases aparecen en el portal. El aviso externo se simula en el log del servidor. Siguen pendientes el registro de asistencia, la aplicación de penalidades y los reportes consolidados.
 
-`src/services/api.js` lee `VITE_API_URL` y, si no se define, usa `/api/v1`. En desarrollo, `vite.config.js` configura un proxy de `/api` hacia `http://localhost:3000`, por lo que no hace falta configurar esa variable para la ejecución local habitual. El login y el registro ya usan este cliente; la conexión de las pantallas de negocio sigue pendiente.
+La API de M4/M5 ya ofrece turnos, reservas, pagos, comprobantes, reembolsos y mantenimiento. Queda pendiente conectar esos recorridos de cancha a sus pantallas. El historial de `/comprobantes` muestra los PDF de membresía. [Guía de integración M4/M5](../docs/integracion-canchas-pagos.md)
+
+`node_modules/`, `dist/` y `.vite/` están excluidos de Git mediante el `.gitignore` de la raíz. `package.json` y `package-lock.json` se versionan.
+
+`src/services/api.js` lee `VITE_API_URL` y, si no se define, usa `/api/v1`. En desarrollo, `vite.config.js` configura un proxy de `/api` hacia `http://localhost:3000`, por lo que no hace falta configurar esa variable para la ejecución local habitual.
