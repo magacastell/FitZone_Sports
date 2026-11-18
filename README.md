@@ -443,7 +443,7 @@ reserva y pago; nunca enviar importes desde el cliente.
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
 - [Índice de arquitectura, ADR y diagramas](docs/arquitectura-tif.md) · [Manual Técnico](docs/manuales/manual-tecnico.md) · [Instalación y Operación](docs/manuales/manual-instalacion-operacion.md) · [Planificación](docs/planificacion/planificacion-seguimiento-tif.md).
 - Los manuales y la planificación indican su corte documental. Para el alcance incorporado después de ese corte, consultá las [guías de Canchas y Pagos](#canchas-y-pagos-de-reservas-m4m5).
-- Bitácoras del equipo: `LOGs/`
+- Bitácoras del equipo: `docs/bitacoras/`
 
 
 ## Asistencia de IA

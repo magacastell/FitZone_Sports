@@ -163,7 +163,7 @@ remota siguen pendientes del equipo, sin inventar reglas React.
 Inventario incremental: PortalSocioCards.jsx, MembresiaUsuario.jsx, PortalSocio.css,
 RenovacionMembresia.jsx (sólo etiqueta del CTA), estadoCuenta.js (etiquetas),
 test-dominio.mjs, MembresiaIntegrationTest.java, fixture SQL, docs/membresias.md,
-docs/openapi/DECISIONES.md, LOGs/Vidoni-LOG.md y este informe.
+docs/openapi/DECISIONES.md, docs/bitacoras/Vidoni-LOG.md y este informe.
 El diff completo también contiene los 33 archivos del bloque previo; no atribuir
 esas modificaciones a este corte ni descartar sus hunks al revisar.
 

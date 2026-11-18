@@ -264,13 +264,13 @@ Probabilidad e impacto históricos quedan **PC** cuando las fuentes carecen de u
 | P3 | Kit local, `06_Plan_Periodo_3.docx`, «Tareas programadas», «Estimación de dedicación», «Semana 1», «Semana 2» y «Resultado esperado del período». |
 | P4 | Kit local, `07_Plan_Periodo_4.docx`, «Resumen del período anterior», «Tareas programadas», «Estimación de dedicación», «Semana 1», «Semana 2» y «Resultado esperado del período». |
 | P09 | Kit local, `04_Informe_Coordinacion_09-11.pdf`, §§2–7. Informe reconstruido de estado y propuesta de coordinación, con el alcance declarado en su portada. |
-| B0 | [Bitácora grupal](../../LOGs/LOG.md), Unidad I. |
-| B1 | [Bitácora de Magalí Castell Ziegler](../../LOGs/CastellZiegler-LOG.md). |
-| B2 | [Bitácora de Claudio Cejas](../../LOGs/Cejas-LOG.md). |
-| B3 | [Bitácora de Ignacio Denis](../../LOGs/Denis-LOG.md). |
-| B4 | [Bitácora de Valentina Martínez](../../LOGs/Martinez-LOG.md). |
-| B5 | [Bitácora de Bautista Orge Perilli](../../LOGs/Orge-LOG.MD). |
-| B6 | [Bitácora canónica de Augusto Vidoni](../bitacoras/LOG-vidoni.md). El [archivo histórico](../../LOGs/Vidoni-LOG.md) redirige a esta bitácora. |
+| B0 | [Bitácora grupal](../bitacoras/LOG.md), Unidad I. |
+| B1 | [Bitácora de Magalí Castell Ziegler](../bitacoras/CastellZiegler-LOG.md). |
+| B2 | [Bitácora de Claudio Cejas](../bitacoras/Cejas-LOG.md). |
+| B3 | [Bitácora de Ignacio Denis](../bitacoras/Denis-LOG.md). |
+| B4 | [Bitácora de Valentina Martínez](../bitacoras/Martinez-LOG.md). |
+| B5 | [Bitácora de Bautista Orge Perilli](../bitacoras/Orge-LOG.MD). |
+| B6 | [Bitácora canónica de Augusto Vidoni](../bitacoras/LOG-vidoni.md). El [archivo histórico](../bitacoras/Vidoni-LOG.md) redirige a esta bitácora. |
 | V1 | [Índice de arquitectura](../arquitectura-tif.md) y [Manual Técnico](../manuales/manual-tecnico.md). |
 | V2 | [Ejecución y evidencia de pruebas](../pruebas.md) y [guía M2 offline](../m2-offline.md). |
 | V3 | [OpenAPI](../openapi/openapi.yaml) y [decisiones de contrato](../openapi/DECISIONES.md). |
