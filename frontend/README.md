@@ -36,12 +36,15 @@ La pantalla de ingreso muestra las credenciales de prueba `socio@fitzone.com` / 
 | `/mi-qr` y `/qr-offline` | QR dinámico con membresía habilitada y consulta sin conexión si hay un lote vigente guardado. |
 | `/recepcion/acceso` y `/recepcion/aforo` | Ingresos, egresos y aforo de la sede. |
 | `/terminal-offline` | Terminal de Recepción con autorización aprovisionada, captura provisional y sincronización al volver la red. |
-| `/clases` | Agenda por sede, reserva y cancelación, lista de espera y ofertas en «Mis clases». Incluye administración de agenda según el rol. |
-| `/canchas` | Disponibilidad por sede, cancha y fecha; elección de turno, pago en modal, consulta y cancelación. |
+| `/clases` | Próximas clases por sede con filtro opcional por día. Permite reservar y administrar la agenda según el rol. |
+| `/canchas` | Muestra el primer día con turnos libres y permite elegir otra fecha. El modal muestra el importe y el tiempo de retención para confirmar el pago o salir. |
+| `/mis-reservas` | Turnos personales de canchas y actividad de clases en la misma pantalla, con cancelaciones y ofertas de lista de espera. |
 | `/admin/canchas` | Administración de canchas, turnos, tarifas y mantenimiento según permisos. |
 | `/pagos` | Historial de canchas y membresías, estados, reembolsos y descarga de comprobantes. |
 | `/comprobantes` | Enlace anterior de comprobantes que redirige a Mis pagos para Cliente/Socio. |
 | `/gestion/reportes` y `/admin/reportes-consolidados` | Reportes consolidados pendientes. |
+
+Para Cliente/Socio, **Mis reservas** reúne los turnos de cancha con pago y la actividad de clases. Desde ahí se puede cancelar cuando corresponde y gestionar la lista de espera y sus ofertas. **Mis pagos** conserva el historial financiero y los comprobantes descargables. En **Mi membresía** se muestran el período vigente y el próximo período pagado, cuando existen.
 
 Los permisos y las guardas comerciales se validan en el backend. Las rutas y la navegación se definen en [AppRoutes.jsx](src/routes/AppRoutes.jsx).
 

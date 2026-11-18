@@ -399,8 +399,22 @@ node scripts/e2e-m4-m5.mjs
 ```
 
 El E2E usa la imagen `fitzone-tests:local` construida por el runner de backend y
-el bundle de `frontend/dist`. La ejecución final usó Node 24.22.3 y guardó
+el bundle de `frontend/dist`. Esa ejecución usó Node 24.22.3 y guardó
 `resultado.json`, capturas y PDF en
 `target/e2e-m4-m5/95facd19-8dc5-4f25-8abd-9d0b9fb5a6c2`. La evidencia local queda
 ignorada por Git. El runner elimina sus contenedores descartables. Esta verificación
 cubre la reserva y el pago simulado, con el ingreso por reserva en M2 aún pendiente.
+
+En el cierre de Cliente/Socio pasaron las seis suites frontend con 204 casos de
+dominio y el build PWA. La prueba de retención demorada comprueba que una única
+solicitud conserva la cancha y la fecha, tanto si el servidor acepta como si
+responde con un conflicto.
+
+El E2E ampliado agregó login desde el formulario, contratación y renovación con
+cambio de plan sin alterar el período vigente, acceso al historial desde el enlace
+anterior de comprobantes y consulta de clases por Gerencia y Recepción. Se comprobó
+por HTTP que Recepción no puede consultar otra sede y que un cliente sin membresía
+no puede reservar una clase. La ejecución previa a integrar `main` quedó en
+`target/e2e-m4-m5/92f0e1b7-a092-4be0-9923-6e7b86d91564`, con Spring y PostgreSQL
+descartables, pago recuperado tras perder la respuesta y cero duplicados. Incluye
+capturas de Mis reservas en escritorio y móvil, resumen de membresía y pagos.
