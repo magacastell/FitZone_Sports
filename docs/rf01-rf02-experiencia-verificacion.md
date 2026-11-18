@@ -79,7 +79,7 @@ mantener compilación y contrato, pero esa suite completa no se ejecutó.
   No se instaló JDK global ni se agregaron dependencias de aplicación.
 - Se crearon cuentas ficticias para las pruebas, incluidas variantes del fixture
   de ciclo con sufijos cierre-rf01 y cierre-ui. Se preservaron los fixtures originales.
-- Bitácora única: docs/bitacoras/LOG-vidoni.md. LOGs/Vidoni-LOG.md es sólo un enlace
+- Bitácora única: docs/bitacoras/LOG-vidoni.md. docs/bitacoras/Vidoni-LOG.md es sólo un enlace
   de compatibilidad. No se reescribió el historial ni el trabajo de compañeros.
 
 ## Archivos del alcance

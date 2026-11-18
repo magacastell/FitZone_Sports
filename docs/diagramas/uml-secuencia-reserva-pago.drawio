@@ -1,0 +1,806 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" version="24.7.17">
+  <diagram id="uml-secuencia-reserva-pago" name="FitZone Sports · UML de secuencia — Reserva de cancha y pago">
+    <mxGraphModel dx="2390" dy="4100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="2390" pageHeight="4100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="alt-retencion" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f9fbfd;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="55" y="1594" width="2280" height="395" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-vigencia" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f9fbfd;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="55" y="2575" width="2280" height="1059" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-resultado" vertex="1" parent="1" value="" style="rounded=0;fillColor=#fcfcff;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="79" y="3130" width="2232" height="487" as="geometry" />
+        </mxCell>
+        <mxCell id="opt-descarga" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f9fbfd;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="55" y="3768" width="2280" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="life-0" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="253" as="sourcePoint" />
+            <mxPoint x="180" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-1" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="253" as="sourcePoint" />
+            <mxPoint x="403" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-2" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="253" as="sourcePoint" />
+            <mxPoint x="633" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-3" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="253" as="sourcePoint" />
+            <mxPoint x="854" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-4" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1061" y="253" as="sourcePoint" />
+            <mxPoint x="1061" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-5" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1262" y="253" as="sourcePoint" />
+            <mxPoint x="1262" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-6" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1463" y="253" as="sourcePoint" />
+            <mxPoint x="1463" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-7" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1660" y="253" as="sourcePoint" />
+            <mxPoint x="1660" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-8" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1851" y="253" as="sourcePoint" />
+            <mxPoint x="1851" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-9" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2046" y="253" as="sourcePoint" />
+            <mxPoint x="2046" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="life-10" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#8fa4b7;strokeWidth=1.5;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2224" y="253" as="sourcePoint" />
+            <mxPoint x="2224" y="4036" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="title" vertex="1" parent="1" value="FitZone Sports · UML de secuencia — Reserva de cancha y pago" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=37;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="53" y="37" width="2250" height="47" as="geometry" />
+        </mxCell>
+        <mxCell id="scope" vertex="1" parent="1" value="API Spring Boot (M4, M1 y M5) · Cliente HTTP autenticado · Rutas relativas a /api/v1" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=21;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="54" y="91" width="2260" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="key" vertex="1" parent="1" value="Azul: HTTP · verde: SQL · ocre: fin de transacción · flecha discontinua: respuesta" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#3e576e;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="54" y="126" width="2260" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-0" vertex="1" parent="1" value="" style="rounded=0;fillColor=#eaf2fb;strokeColor=#4875a1;strokeWidth=1.6;">
+          <mxGeometry x="81.0" y="169" width="198" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-0" vertex="1" parent="1" value="Usuario" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="83.0" y="183" width="194" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-0" vertex="1" parent="1" value="Cliente HTTP" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="83.0" y="214" width="194" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-1" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=#537d9f;strokeWidth=1.6;">
+          <mxGeometry x="296.0" y="169" width="214" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-1" vertex="1" parent="1" value="API REST" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="298.0" y="183" width="210" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-1" vertex="1" parent="1" value="CanchaController / PagoController" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="298.0" y="214" width="210" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-2" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=#537d9f;strokeWidth=1.6;">
+          <mxGeometry x="522.0" y="169" width="222" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-2" vertex="1" parent="1" value="ReservaCanchaService" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="524.0" y="183" width="218" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-2" vertex="1" parent="1" value="M4 · transacciones" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="524.0" y="214" width="218" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-3" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=#537d9f;strokeWidth=1.6;">
+          <mxGeometry x="755.0" y="169" width="198" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-3" vertex="1" parent="1" value="CanchaService" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="757.0" y="183" width="194" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-3" vertex="1" parent="1" value="M4 · disponibilidad y precio" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="757.0" y="214" width="194" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-4" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f4effa;strokeColor=#8466a6;strokeWidth=1.6;">
+          <mxGeometry x="966.5" y="169" width="189" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-4" vertex="1" parent="1" value="MembresiaService" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="968.5" y="183" width="185" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-4" vertex="1" parent="1" value="M1 · vigencia" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="968.5" y="214" width="185" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-5" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=#537d9f;strokeWidth=1.6;">
+          <mxGeometry x="1177.5" y="169" width="169" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-5" vertex="1" parent="1" value="PricingStrategy" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1179.5" y="183" width="165" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-5" vertex="1" parent="1" value="Estándar / Socio" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1179.5" y="214" width="165" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-6" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=#537d9f;strokeWidth=1.6;">
+          <mxGeometry x="1361.5" y="169" width="203" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-6" vertex="1" parent="1" value="CanchaRepository" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1363.5" y="183" width="199" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-6" vertex="1" parent="1" value="Spring Data JPA" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1363.5" y="214" width="199" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-7" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f4effa;strokeColor=#8466a6;strokeWidth=1.6;">
+          <mxGeometry x="1567.5" y="169" width="185" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-7" vertex="1" parent="1" value="PagoCanchaService" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1569.5" y="183" width="181" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-7" vertex="1" parent="1" value="M5 · cobro" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1569.5" y="214" width="181" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-8" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f4effa;strokeColor=#8466a6;strokeWidth=1.6;">
+          <mxGeometry x="1760.0" y="169" width="182" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-8" vertex="1" parent="1" value="PasarelaPagoFake" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1762.0" y="183" width="178" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-8" vertex="1" parent="1" value="M5 · local y síncrona" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1762.0" y="214" width="178" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-9" vertex="1" parent="1" value="" style="rounded=0;fillColor=#f4effa;strokeColor=#8466a6;strokeWidth=1.6;">
+          <mxGeometry x="1949.0" y="169" width="194" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-9" vertex="1" parent="1" value="ComprobanteService" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1951.0" y="183" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-9" vertex="1" parent="1" value="M5 · PDFBox" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="1951.0" y="214" width="190" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-10" vertex="1" parent="1" value="" style="rounded=0;fillColor=#eef7f1;strokeColor=#548070;strokeWidth=1.6;">
+          <mxGeometry x="2149.5" y="169" width="149" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-name-10" vertex="1" parent="1" value="PostgreSQL" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="2151.5" y="183" width="145" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-desc-10" vertex="1" parent="1" value="Flyway V16" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=13;fontColor=#19364d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="2151.5" y="214" width="145" height="23" as="geometry" />
+        </mxCell>
+        <mxCell id="consulta" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7f0fa;strokeColor=#8baac8;strokeWidth=1.6;">
+          <mxGeometry x="54" y="280" width="2282" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="label-consulta" vertex="1" parent="1" value="1 · Consultar disponibilidad y precio" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=22;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="72" y="284" width="2240" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="get-turnos" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="383" as="sourcePoint" />
+            <mxPoint x="403" y="383" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-get-turnos" vertex="1" parent="1" value="GET /canchas/{canchaId}/turnos&#10;?desde=…&amp;hasta=…" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="136.5" y="335" width="310.0" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="turnos" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="446" as="sourcePoint" />
+            <mxPoint x="854" y="446" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-turnos" vertex="1" parent="1" value="turnos(email, canchaId, desde, hasta)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="439.2" y="420" width="378.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="vigencia-consulta" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="492" as="sourcePoint" />
+            <mxPoint x="1061" y="492" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-vigencia-consulta" vertex="1" parent="1" value="tieneMembresiaVigente(usuarioId)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="792.7" y="466" width="329.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="vigencia-result" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1061" y="538" as="sourcePoint" />
+            <mxPoint x="854" y="538" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-vigencia-result" vertex="1" parent="1" value="Vigencia del titular" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="851.5" y="512" width="212.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="horarios" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="584" as="sourcePoint" />
+            <mxPoint x="2224" y="584" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-horarios" vertex="1" parent="1" value="SELECT turnos y disponibilidad: reservas ocupantes y bloqueos activos" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1192.9" y="558" width="692.2" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="horarios-result" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2224" y="630" as="sourcePoint" />
+            <mxPoint x="854" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-horarios-result" vertex="1" parent="1" value="Horarios y disponibilidad" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1408.5" y="604" width="261.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="calculo-listado" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="676" as="sourcePoint" />
+            <mxPoint x="1262" y="676" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-calculo-listado" vertex="1" parent="1" value="calcular(…) por turno con Strategy estándar o socio" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="800.1" y="650" width="515.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="precio-listado" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1262" y="722" as="sourcePoint" />
+            <mxPoint x="854" y="722" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-precio-listado" vertex="1" parent="1" value="Precio desglosado" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="966.7" y="696" width="182.60000000000002" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="turnos-result" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="768" as="sourcePoint" />
+            <mxPoint x="403" y="768" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-turnos-result" vertex="1" parent="1" value="Disponibilidad y precio por turno" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="458.79999999999995" y="742" width="339.40000000000003" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http200-turnos" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="814" as="sourcePoint" />
+            <mxPoint x="180" y="814" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http200-turnos" vertex="1" parent="1" value="200 · turnos y precios" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="175.7" y="788" width="231.60000000000002" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="retener" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7f0fa;strokeColor=#8baac8;strokeWidth=1.6;">
+          <mxGeometry x="54" y="868" width="2282" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="label-retener" vertex="1" parent="1" value="2 · Elegir turno y solicitar la retención" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=22;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="72" y="872" width="2240" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="post-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="971" as="sourcePoint" />
+            <mxPoint x="403" y="971" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-post-reserva" vertex="1" parent="1" value="POST /canchas/{canchaId}/reservas&#10;turnoId · Idempotency-Key (UUID)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="121.79999999999998" y="923" width="339.40000000000003" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="reservar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="1034" as="sourcePoint" />
+            <mxPoint x="633" y="1034" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-reservar" vertex="1" parent="1" value="reservar(email, canchaId, request, clave)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="309.1" y="1008" width="417.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="t1" vertex="1" parent="1" value="" style="rounded=0;fillColor=#fff4e5;strokeColor=none;strokeWidth=1.6;">
+          <mxGeometry x="599" y="1068" width="1498" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="label-t1" vertex="1" parent="1" value="T1 · Spring abre la transacción de reservar(…). Se muestra una solicitud nueva." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#69451f;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="614" y="1069" width="1475" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="bloqueo-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1134" as="sourcePoint" />
+            <mxPoint x="854" y="1134" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-bloqueo-reserva" vertex="1" parent="1" value="bloquear(canchaId)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="647.3" y="1108" width="192.4" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="repo-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="1180" as="sourcePoint" />
+            <mxPoint x="1463" y="1180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-repo-reserva" vertex="1" parent="1" value="bloquear(id) · PESSIMISTIC_WRITE" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="993.7" y="1154" width="329.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-lock-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1463" y="1226" as="sourcePoint" />
+            <mxPoint x="2224" y="1226" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-lock-reserva" vertex="1" parent="1" value="Bloquea la fila de cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1713.0" y="1200" width="261.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="expirar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1272" as="sourcePoint" />
+            <mxPoint x="854" y="1272" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-expirar" vertex="1" parent="1" value="expirar(canchaId)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="652.2" y="1246" width="182.60000000000002" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-expirar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="1318" as="sourcePoint" />
+            <mxPoint x="2224" y="1318" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-expirar" vertex="1" parent="1" value="Marca EXPIRADA las retenciones vencidas de la cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1276.2" y="1292" width="525.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-check-turno" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1364" as="sourcePoint" />
+            <mxPoint x="2224" y="1364" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-check-turno" vertex="1" parent="1" value="Busca clave de operación y consulta turno y cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1175.5" y="1338" width="506.00000000000006" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="precio-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1410" as="sourcePoint" />
+            <mxPoint x="854" y="1410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-precio-reserva" vertex="1" parent="1" value="precio(usuarioId, cancha, inicio, fin)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="549.3" y="1384" width="388.40000000000003" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="vigencia-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="1456" as="sourcePoint" />
+            <mxPoint x="1061" y="1456" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-vigencia-reserva" vertex="1" parent="1" value="tieneMembresiaVigente(usuarioId)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="792.7" y="1430" width="329.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="calculo-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="1502" as="sourcePoint" />
+            <mxPoint x="1262" y="1502" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-calculo-reserva" vertex="1" parent="1" value="calcular(…) · recalcula el precio definitivo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="834.4" y="1476" width="447.20000000000005" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-retencion" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1548" as="sourcePoint" />
+            <mxPoint x="2224" y="1548" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-retencion" vertex="1" parent="1" value="INSERT PENDIENTE_PAGO · importe fijo y venceEn · V16 valida la ocupación" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1067.7" y="1522" width="721.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tab-alt-retencion" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7eef6;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="55" y="1594" width="64" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="label-alt-retencion" vertex="1" parent="1" value="alt" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="57" y="1596" width="60" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-alt-retencion" vertex="1" parent="1" value="[V16 permite la ocupación del turno]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="132" y="1598" width="2140" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="commit-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#7a4f1e;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1664" as="sourcePoint" />
+            <mxPoint x="2224" y="1664" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-commit-reserva" vertex="1" parent="1" value="COMMIT · Spring libera el bloqueo de la cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#7a4f1e;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1195.1" y="1638" width="466.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="recurso-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1710" as="sourcePoint" />
+            <mxPoint x="403" y="1710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-recurso-reserva" vertex="1" parent="1" value="ReservaResponse" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="436.5" y="1684" width="163.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http201-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="1756" as="sourcePoint" />
+            <mxPoint x="180" y="1756" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http201-reserva" vertex="1" parent="1" value="201 · PENDIENTE_PAGO + id + venceEn" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="112.0" y="1730" width="359.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-retencion-else" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#71889f;strokeWidth=1.8;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="1802" as="sourcePoint" />
+            <mxPoint x="2335" y="1802" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="guard-alt-retencion-else" vertex="1" parent="1" value="[Turno ocupado o mantenimiento incompatible]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="132" y="1807" width="2140" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="conflicto-db" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#912945;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2224" y="1865" as="sourcePoint" />
+            <mxPoint x="633" y="1865" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-conflicto-db" vertex="1" parent="1" value="Conflicto de integridad de V16" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#912945;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1273.5" y="1839" width="310.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="rollback-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#7a4f1e;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="1911" as="sourcePoint" />
+            <mxPoint x="2224" y="1911" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-rollback-reserva" vertex="1" parent="1" value="ROLLBACK · Spring libera el bloqueo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#7a4f1e;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1249.0" y="1885" width="359.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http409-reserva" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#912945;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="1957" as="sourcePoint" />
+            <mxPoint x="180" y="1957" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http409-reserva" vertex="1" parent="1" value="409 · conflicto de reserva" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#912945;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="156.1" y="1931" width="270.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="entre" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=none;strokeWidth=1.6;">
+          <mxGeometry x="599" y="2008" width="1498" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="label-entre" vertex="1" parent="1" value="Entre solicitudes queda la reserva persistida. La transacción T1 ya terminó." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#355670;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="614" y="2009" width="1475" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="pagar" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7f0fa;strokeColor=#8baac8;strokeWidth=1.6;">
+          <mxGeometry x="54" y="2079" width="2282" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="label-pagar" vertex="1" parent="1" value="3 · Solicitar el pago de la reserva retenida" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=22;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="72" y="2083" width="2240" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="post-pago" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="2182" as="sourcePoint" />
+            <mxPoint x="403" y="2182" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-post-pago" vertex="1" parent="1" value="POST /pagos&#10;concepto=RESERVA_CANCHA · recursoId=id de reserva" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="65" y="2134" width="496.20000000000005" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="pagar-service" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="2245" as="sourcePoint" />
+            <mxPoint x="633" y="2245" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-pagar-service" vertex="1" parent="1" value="pagar(email, recursoId)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="397.3" y="2219" width="241.4" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="t2" vertex="1" parent="1" value="" style="rounded=0;fillColor=#fff4e5;strokeColor=none;strokeWidth=1.6;">
+          <mxGeometry x="599" y="2279" width="1498" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="label-t2" vertex="1" parent="1" value="T2 · Spring abre otra transacción. Si la reserva ya tiene pago, el servicio devuelve ese pago." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#69451f;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="614" y="2280" width="1475" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="localizar-cancha" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="2345" as="sourcePoint" />
+            <mxPoint x="2224" y="2345" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-localizar-cancha" vertex="1" parent="1" value="Consulta la reserva para identificar la cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1195.1" y="2319" width="466.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="bloqueo-pago" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="2391" as="sourcePoint" />
+            <mxPoint x="854" y="2391" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-bloqueo-pago" vertex="1" parent="1" value="bloquear(canchaId)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="647.3" y="2365" width="192.4" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="repo-pago" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="854" y="2437" as="sourcePoint" />
+            <mxPoint x="1463" y="2437" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-repo-pago" vertex="1" parent="1" value="bloquear(id) · PESSIMISTIC_WRITE" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="993.7" y="2411" width="329.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-lock-pago" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1463" y="2483" as="sourcePoint" />
+            <mxPoint x="2224" y="2483" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-lock-pago" vertex="1" parent="1" value="Bloquea nuevamente la fila de cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1659.1" y="2457" width="368.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-releer" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="2529" as="sourcePoint" />
+            <mxPoint x="2224" y="2529" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-releer" vertex="1" parent="1" value="Relee la reserva y su pago bajo el bloqueo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1214.7" y="2503" width="427.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tab-alt-vigencia" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7eef6;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="55" y="2575" width="64" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="label-alt-vigencia" vertex="1" parent="1" value="alt" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="57" y="2577" width="60" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-alt-vigencia" vertex="1" parent="1" value="[Sin pago previo y retención vencida]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="132" y="2579" width="2140" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="rollback-vencimiento" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#7a4f1e;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="2645" as="sourcePoint" />
+            <mxPoint x="2224" y="2645" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-rollback-vencimiento" vertex="1" parent="1" value="ROLLBACK · Spring libera el bloqueo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#7a4f1e;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1249.0" y="2619" width="359.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http409-vencimiento" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#912945;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="2691" as="sourcePoint" />
+            <mxPoint x="180" y="2691" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http409-vencimiento" vertex="1" parent="1" value="409 · la retención no está vigente" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#912945;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="116.89999999999998" y="2665" width="349.20000000000005" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="estado-vencido" vertex="1" parent="1" value="" style="rounded=0;fillColor=#edf4fb;strokeColor=none;strokeWidth=1.6;">
+          <mxGeometry x="599" y="2725" width="1498" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="label-estado-vencido" vertex="1" parent="1" value="La lectura expone EXPIRADA al vencer. El job u otra operación persiste la expiración bajo bloqueo." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#355670;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="614" y="2726" width="1475" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-vigencia-else" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#71889f;strokeWidth=1.8;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="55" y="2791" as="sourcePoint" />
+            <mxPoint x="2335" y="2791" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="guard-alt-vigencia-else" vertex="1" parent="1" value="[Sin pago previo, PENDIENTE_PAGO vigente y cancha activa]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="132" y="2796" width="2140" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="cobrar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="2854" as="sourcePoint" />
+            <mxPoint x="1660" y="2854" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-cobrar" vertex="1" parent="1" value="cobrar(reservaId) · usa T2" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1011.1" y="2828" width="270.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-precio-pago" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1660" y="2900" as="sourcePoint" />
+            <mxPoint x="2224" y="2900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-precio-pago" vertex="1" parent="1" value="Lee importe persistido y DNI del titular" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1738.0" y="2874" width="408.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="fake-cobrar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1660" y="2946" as="sourcePoint" />
+            <mxPoint x="1851" y="2946" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-fake-cobrar" vertex="1" parent="1" value="cobrar(SolicitudCobro)" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1639.7" y="2920" width="231.60000000000002" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="fake-result" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1851" y="2992" as="sourcePoint" />
+            <mxPoint x="1660" y="2992" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-fake-result" vertex="1" parent="1" value="APROBADO o RECHAZADO" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1633.5" y="2966" width="244" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-pago" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1660" y="3038" as="sourcePoint" />
+            <mxPoint x="2224" y="3038" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-pago" vertex="1" parent="1" value="INSERT pago · estado y referencia FAKE" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1747.8" y="3012" width="388.40000000000003" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="pago-result" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#405b70;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1660" y="3084" as="sourcePoint" />
+            <mxPoint x="633" y="3084" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-pago-result" vertex="1" parent="1" value="PagoResponse" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#405b70;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1079.7" y="3058" width="133.60000000000002" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tab-alt-resultado" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7eef6;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="79" y="3130" width="64" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="label-alt-resultado" vertex="1" parent="1" value="alt" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="81" y="3132" width="60" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-alt-resultado" vertex="1" parent="1" value="[Pago APROBADO]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="156" y="3134" width="2116" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-confirmar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="3200" as="sourcePoint" />
+            <mxPoint x="2224" y="3200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-confirmar" vertex="1" parent="1" value="UPDATE reserva a CONFIRMADA" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1288.2" y="3174" width="280.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="emitir" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="3246" as="sourcePoint" />
+            <mxPoint x="2046" y="3246" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-emitir" vertex="1" parent="1" value="emitir(pagoId) · genera comprobante con PDFBox" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1106.1" y="3220" width="466.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-guardar-pdf" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2046" y="3292" as="sourcePoint" />
+            <mxPoint x="2224" y="3292" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-guardar-pdf" vertex="1" parent="1" value="Persiste PDF y detalle con cancha, horario e importe" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1799.4" y="3266" width="525.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="commit-aprobado" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#7a4f1e;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="3338" as="sourcePoint" />
+            <mxPoint x="2224" y="3338" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-commit-aprobado" vertex="1" parent="1" value="COMMIT · confirma y libera el bloqueo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#7a4f1e;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1239.2" y="3312" width="378.6" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http201-aprobado" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="3384" as="sourcePoint" />
+            <mxPoint x="180" y="3384" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http201-aprobado" vertex="1" parent="1" value="201 · pago APROBADO" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="190.39999999999998" y="3358" width="202.20000000000002" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-resultado-else" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#71889f;strokeWidth=1.8;endArrow=none;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="79" y="3430" as="sourcePoint" />
+            <mxPoint x="2311" y="3430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="guard-alt-resultado-else" vertex="1" parent="1" value="[Pago RECHAZADO]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="156" y="3435" width="2116" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-rechazar" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="3493" as="sourcePoint" />
+            <mxPoint x="2224" y="3493" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-rechazar" vertex="1" parent="1" value="UPDATE reserva a RECHAZADA · el turno deja de estar ocupado" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1131.4" y="3467" width="594.2" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="commit-rechazo" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#7a4f1e;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="633" y="3539" as="sourcePoint" />
+            <mxPoint x="2224" y="3539" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-commit-rechazo" vertex="1" parent="1" value="COMMIT · conserva el rechazo y libera el bloqueo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#7a4f1e;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="1185.3" y="3513" width="486.40000000000003" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http201-rechazo" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#912945;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="3585" as="sourcePoint" />
+            <mxPoint x="180" y="3585" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http201-rechazo" vertex="1" parent="1" value="201 · pago RECHAZADO · sin PDF" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#912945;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="136.5" y="3559" width="310.0" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="descargar" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7f0fa;strokeColor=#8baac8;strokeWidth=1.6;">
+          <mxGeometry x="54" y="3665" width="2282" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="label-descargar" vertex="1" parent="1" value="4 · Descargar el comprobante después de la aprobación" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=22;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="72" y="3669" width="2240" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="tab-opt-descarga" vertex="1" parent="1" value="" style="rounded=0;fillColor=#e7eef6;strokeColor=#71889f;strokeWidth=1.6;">
+          <mxGeometry x="55" y="3768" width="64" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="label-opt-descarga" vertex="1" parent="1" value="opt" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="57" y="3770" width="60" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-opt-descarga" vertex="1" parent="1" value="[Pago aprobado y descarga solicitada]" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#19364d;fontStyle=1;fillColor=none;strokeColor=none;">
+          <mxGeometry x="132" y="3772" width="2140" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="get-pdf" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="3838" as="sourcePoint" />
+            <mxPoint x="403" y="3838" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-get-pdf" vertex="1" parent="1" value="GET /pagos/{pagoId}/comprobante" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="131.6" y="3812" width="319.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="descargar-service" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#284961;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="3884" as="sourcePoint" />
+            <mxPoint x="2046" y="3884" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-descargar-service" vertex="1" parent="1" value="descargar(email, pagoId) · verifica titular o rol" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#284961;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="976.4" y="3858" width="496.20000000000005" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="sql-pdf" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#226658;strokeWidth=2;endArrow=block;endFill=1;endSize=9;dashed=0;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2046" y="3930" as="sourcePoint" />
+            <mxPoint x="2224" y="3930" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-sql-pdf" vertex="1" parent="1" value="Lee el PDF persistido" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#226658;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="2024.1" y="3904" width="221.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="http200-pdf" edge="1" parent="1" value="" style="edgeStyle=none;rounded=0;html=0;strokeColor=#20558c;strokeWidth=2;endArrow=open;endFill=0;endSize=9;dashed=1;dashPattern=6 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="403" y="3976" as="sourcePoint" />
+            <mxPoint x="180" y="3976" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label-http200-pdf" vertex="1" parent="1" value="200 · application/pdf" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#20558c;fontStyle=0;fillColor=#ffffff;strokeColor=none;">
+          <mxGeometry x="180.6" y="3950" width="221.8" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" vertex="1" parent="1" value="Autor nominal pendiente de confirmación · 18/11/2026 · v1.0 · Base de código 2493668" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=18;fontColor=#40566d;fontStyle=0;fillColor=none;strokeColor=none;">
+          <mxGeometry x="54" y="4063" width="2240" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

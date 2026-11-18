@@ -1,0 +1,483 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2390" height="4100" viewBox="0 0 2390 4100" role="img" aria-labelledby="diagram-title diagram-desc">
+  <title id="diagram-title">FitZone Sports · UML de secuencia — Reserva de cancha y pago</title>
+  <desc id="diagram-desc">Secuencia UML del recorrido por API: disponibilidad y Strategy, retención transaccional, pago simulado, comprobante, conflicto y vencimiento.</desc>
+  <defs>
+    <marker id="arrow-call" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#284961" stroke="#284961" stroke-width="1.25" />
+    </marker>
+    <marker id="arrow-sql" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#226658" stroke="#226658" stroke-width="1.25" />
+    </marker>
+    <marker id="arrow-http" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#20558c" stroke="#20558c" stroke-width="1.25" />
+    </marker>
+    <marker id="arrow-http-return" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#20558c" stroke-width="1.25" />
+    </marker>
+    <marker id="arrow-return" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#405b70" stroke-width="1.25" />
+    </marker>
+    <marker id="arrow-error-return" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#912945" stroke-width="1.25" />
+    </marker>
+    <marker id="arrow-tx" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#7a4f1e" stroke="#7a4f1e" stroke-width="1.25" />
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="2390" height="4100" fill="white" />
+  <rect id="alt-retencion" x="55" y="1594" width="2280" height="395" fill="#f9fbfd" stroke="#71889f" stroke-width="1.6" />
+  <rect id="alt-vigencia" x="55" y="2575" width="2280" height="1059" fill="#f9fbfd" stroke="#71889f" stroke-width="1.6" />
+  <rect id="alt-resultado" x="79" y="3130" width="2232" height="487" fill="#fcfcff" stroke="#71889f" stroke-width="1.6" />
+  <rect id="opt-descarga" x="55" y="3768" width="2280" height="240" fill="#f9fbfd" stroke="#71889f" stroke-width="1.6" />
+  <line id="life-0" x1="180" y1="253" x2="180" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-1" x1="403" y1="253" x2="403" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-2" x1="633" y1="253" x2="633" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-3" x1="854" y1="253" x2="854" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-4" x1="1061" y1="253" x2="1061" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-5" x1="1262" y1="253" x2="1262" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-6" x1="1463" y1="253" x2="1463" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-7" x1="1660" y1="253" x2="1660" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-8" x1="1851" y1="253" x2="1851" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-9" x1="2046" y1="253" x2="2046" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <line id="life-10" x1="2224" y1="253" x2="2224" y2="4036" stroke="#8fa4b7" stroke-width="1.5" stroke-dasharray="6 4" />
+  <g id="title">
+    <text x="53" y="60.5" font-family="Arial, sans-serif" font-size="37" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">FitZone Sports · UML de secuencia — Reserva de cancha y pago</text>
+  </g>
+  <g id="scope">
+    <text x="54" y="103.5" font-family="Arial, sans-serif" font-size="21" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="400">API Spring Boot (M4, M1 y M5) · Cliente HTTP autenticado · Rutas relativas a /api/v1</text>
+  </g>
+  <g id="key">
+    <text x="54" y="140.0" font-family="Arial, sans-serif" font-size="17" fill="#3e576e" text-anchor="start" dominant-baseline="middle" font-weight="400">Azul: HTTP · verde: SQL · ocre: fin de transacción · flecha discontinua: respuesta</text>
+  </g>
+  <rect id="actor-0" x="81.0" y="169" width="198" height="84" fill="#eaf2fb" stroke="#4875a1" stroke-width="1.6" />
+  <g id="actor-name-0">
+    <text x="180.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">Usuario</text>
+  </g>
+  <g id="actor-desc-0">
+    <text x="180.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">Cliente HTTP</text>
+  </g>
+  <rect id="actor-1" x="296.0" y="169" width="214" height="84" fill="#edf4fb" stroke="#537d9f" stroke-width="1.6" />
+  <g id="actor-name-1">
+    <text x="403.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">API REST</text>
+  </g>
+  <g id="actor-desc-1">
+    <text x="403.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">CanchaController / PagoController</text>
+  </g>
+  <rect id="actor-2" x="522.0" y="169" width="222" height="84" fill="#edf4fb" stroke="#537d9f" stroke-width="1.6" />
+  <g id="actor-name-2">
+    <text x="633.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">ReservaCanchaService</text>
+  </g>
+  <g id="actor-desc-2">
+    <text x="633.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">M4 · transacciones</text>
+  </g>
+  <rect id="actor-3" x="755.0" y="169" width="198" height="84" fill="#edf4fb" stroke="#537d9f" stroke-width="1.6" />
+  <g id="actor-name-3">
+    <text x="854.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">CanchaService</text>
+  </g>
+  <g id="actor-desc-3">
+    <text x="854.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">M4 · disponibilidad y precio</text>
+  </g>
+  <rect id="actor-4" x="966.5" y="169" width="189" height="84" fill="#f4effa" stroke="#8466a6" stroke-width="1.6" />
+  <g id="actor-name-4">
+    <text x="1061.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">MembresiaService</text>
+  </g>
+  <g id="actor-desc-4">
+    <text x="1061.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">M1 · vigencia</text>
+  </g>
+  <rect id="actor-5" x="1177.5" y="169" width="169" height="84" fill="#edf4fb" stroke="#537d9f" stroke-width="1.6" />
+  <g id="actor-name-5">
+    <text x="1262.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">PricingStrategy</text>
+  </g>
+  <g id="actor-desc-5">
+    <text x="1262.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">Estándar / Socio</text>
+  </g>
+  <rect id="actor-6" x="1361.5" y="169" width="203" height="84" fill="#edf4fb" stroke="#537d9f" stroke-width="1.6" />
+  <g id="actor-name-6">
+    <text x="1463.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">CanchaRepository</text>
+  </g>
+  <g id="actor-desc-6">
+    <text x="1463.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">Spring Data JPA</text>
+  </g>
+  <rect id="actor-7" x="1567.5" y="169" width="185" height="84" fill="#f4effa" stroke="#8466a6" stroke-width="1.6" />
+  <g id="actor-name-7">
+    <text x="1660.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">PagoCanchaService</text>
+  </g>
+  <g id="actor-desc-7">
+    <text x="1660.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">M5 · cobro</text>
+  </g>
+  <rect id="actor-8" x="1760.0" y="169" width="182" height="84" fill="#f4effa" stroke="#8466a6" stroke-width="1.6" />
+  <g id="actor-name-8">
+    <text x="1851.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">PasarelaPagoFake</text>
+  </g>
+  <g id="actor-desc-8">
+    <text x="1851.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">M5 · local y síncrona</text>
+  </g>
+  <rect id="actor-9" x="1949.0" y="169" width="194" height="84" fill="#f4effa" stroke="#8466a6" stroke-width="1.6" />
+  <g id="actor-name-9">
+    <text x="2046.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">ComprobanteService</text>
+  </g>
+  <g id="actor-desc-9">
+    <text x="2046.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">M5 · PDFBox</text>
+  </g>
+  <rect id="actor-10" x="2149.5" y="169" width="149" height="84" fill="#eef7f1" stroke="#548070" stroke-width="1.6" />
+  <g id="actor-name-10">
+    <text x="2224.0" y="196.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">PostgreSQL</text>
+  </g>
+  <g id="actor-desc-10">
+    <text x="2224.0" y="225.5" font-family="Arial, sans-serif" font-size="13" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="400">Flyway V16</text>
+  </g>
+  <rect id="consulta" x="54" y="280" width="2282" height="42" fill="#e7f0fa" stroke="#8baac8" stroke-width="1.6" />
+  <g id="label-consulta">
+    <text x="72" y="301.0" font-family="Arial, sans-serif" font-size="22" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">1 · Consultar disponibilidad y precio</text>
+  </g>
+  <line id="get-turnos" x1="180" y1="383" x2="403" y2="383" stroke="#20558c" stroke-width="2" marker-end="url(#arrow-http)" />
+  <g id="label-get-turnos">
+    <rect x="136.5" y="335" width="310.0" height="44" fill="#ffffff" />
+    <text x="291.5" y="346.97" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">GET /canchas/{canchaId}/turnos</text>
+    <text x="291.5" y="367.03" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">?desde=…&amp;hasta=…</text>
+  </g>
+  <line id="turnos" x1="403" y1="446" x2="854" y2="446" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-turnos">
+    <rect x="439.2" y="420" width="378.6" height="22" fill="#ffffff" />
+    <text x="628.5" y="431.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">turnos(email, canchaId, desde, hasta)</text>
+  </g>
+  <line id="vigencia-consulta" x1="854" y1="492" x2="1061" y2="492" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-vigencia-consulta">
+    <rect x="792.7" y="466" width="329.6" height="22" fill="#ffffff" />
+    <text x="957.5" y="477.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">tieneMembresiaVigente(usuarioId)</text>
+  </g>
+  <line id="vigencia-result" x1="1061" y1="538" x2="854" y2="538" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-vigencia-result">
+    <rect x="851.5" y="512" width="212.0" height="22" fill="#ffffff" />
+    <text x="957.5" y="523.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">Vigencia del titular</text>
+  </g>
+  <line id="horarios" x1="854" y1="584" x2="2224" y2="584" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-horarios">
+    <rect x="1192.9" y="558" width="692.2" height="22" fill="#ffffff" />
+    <text x="1539.0" y="569.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">SELECT turnos y disponibilidad: reservas ocupantes y bloqueos activos</text>
+  </g>
+  <line id="horarios-result" x1="2224" y1="630" x2="854" y2="630" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-horarios-result">
+    <rect x="1408.5" y="604" width="261.0" height="22" fill="#ffffff" />
+    <text x="1539.0" y="615.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">Horarios y disponibilidad</text>
+  </g>
+  <line id="calculo-listado" x1="854" y1="676" x2="1262" y2="676" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-calculo-listado">
+    <rect x="800.1" y="650" width="515.8" height="22" fill="#ffffff" />
+    <text x="1058.0" y="661.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">calcular(…) por turno con Strategy estándar o socio</text>
+  </g>
+  <line id="precio-listado" x1="1262" y1="722" x2="854" y2="722" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-precio-listado">
+    <rect x="966.7" y="696" width="182.60000000000002" height="22" fill="#ffffff" />
+    <text x="1058.0" y="707.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">Precio desglosado</text>
+  </g>
+  <line id="turnos-result" x1="854" y1="768" x2="403" y2="768" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-turnos-result">
+    <rect x="458.79999999999995" y="742" width="339.40000000000003" height="22" fill="#ffffff" />
+    <text x="628.5" y="753.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">Disponibilidad y precio por turno</text>
+  </g>
+  <line id="http200-turnos" x1="403" y1="814" x2="180" y2="814" stroke="#20558c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-http-return)" />
+  <g id="label-http200-turnos">
+    <rect x="175.7" y="788" width="231.60000000000002" height="22" fill="#ffffff" />
+    <text x="291.5" y="799.0" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">200 · turnos y precios</text>
+  </g>
+  <rect id="retener" x="54" y="868" width="2282" height="42" fill="#e7f0fa" stroke="#8baac8" stroke-width="1.6" />
+  <g id="label-retener">
+    <text x="72" y="889.0" font-family="Arial, sans-serif" font-size="22" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">2 · Elegir turno y solicitar la retención</text>
+  </g>
+  <line id="post-reserva" x1="180" y1="971" x2="403" y2="971" stroke="#20558c" stroke-width="2" marker-end="url(#arrow-http)" />
+  <g id="label-post-reserva">
+    <rect x="121.79999999999998" y="923" width="339.40000000000003" height="44" fill="#ffffff" />
+    <text x="291.5" y="934.97" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">POST /canchas/{canchaId}/reservas</text>
+    <text x="291.5" y="955.03" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">turnoId · Idempotency-Key (UUID)</text>
+  </g>
+  <line id="reservar" x1="403" y1="1034" x2="633" y2="1034" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-reservar">
+    <rect x="309.1" y="1008" width="417.8" height="22" fill="#ffffff" />
+    <text x="518.0" y="1019.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">reservar(email, canchaId, request, clave)</text>
+  </g>
+  <rect id="t1" x="599" y="1068" width="1498" height="33" fill="#fff4e5" stroke="none" stroke-width="1.6" />
+  <g id="label-t1">
+    <text x="614" y="1084.5" font-family="Arial, sans-serif" font-size="17" fill="#69451f" text-anchor="start" dominant-baseline="middle" font-weight="400">T1 · Spring abre la transacción de reservar(…). Se muestra una solicitud nueva.</text>
+  </g>
+  <line id="bloqueo-reserva" x1="633" y1="1134" x2="854" y2="1134" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-bloqueo-reserva">
+    <rect x="647.3" y="1108" width="192.4" height="22" fill="#ffffff" />
+    <text x="743.5" y="1119.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">bloquear(canchaId)</text>
+  </g>
+  <line id="repo-reserva" x1="854" y1="1180" x2="1463" y2="1180" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-repo-reserva">
+    <rect x="993.7" y="1154" width="329.6" height="22" fill="#ffffff" />
+    <text x="1158.5" y="1165.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">bloquear(id) · PESSIMISTIC_WRITE</text>
+  </g>
+  <line id="sql-lock-reserva" x1="1463" y1="1226" x2="2224" y2="1226" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-lock-reserva">
+    <rect x="1713.0" y="1200" width="261.0" height="22" fill="#ffffff" />
+    <text x="1843.5" y="1211.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Bloquea la fila de cancha</text>
+  </g>
+  <line id="expirar" x1="633" y1="1272" x2="854" y2="1272" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-expirar">
+    <rect x="652.2" y="1246" width="182.60000000000002" height="22" fill="#ffffff" />
+    <text x="743.5" y="1257.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">expirar(canchaId)</text>
+  </g>
+  <line id="sql-expirar" x1="854" y1="1318" x2="2224" y2="1318" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-expirar">
+    <rect x="1276.2" y="1292" width="525.6" height="22" fill="#ffffff" />
+    <text x="1539.0" y="1303.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Marca EXPIRADA las retenciones vencidas de la cancha</text>
+  </g>
+  <line id="sql-check-turno" x1="633" y1="1364" x2="2224" y2="1364" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-check-turno">
+    <rect x="1175.5" y="1338" width="506.00000000000006" height="22" fill="#ffffff" />
+    <text x="1428.5" y="1349.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Busca clave de operación y consulta turno y cancha</text>
+  </g>
+  <line id="precio-reserva" x1="633" y1="1410" x2="854" y2="1410" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-precio-reserva">
+    <rect x="549.3" y="1384" width="388.40000000000003" height="22" fill="#ffffff" />
+    <text x="743.5" y="1395.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">precio(usuarioId, cancha, inicio, fin)</text>
+  </g>
+  <line id="vigencia-reserva" x1="854" y1="1456" x2="1061" y2="1456" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-vigencia-reserva">
+    <rect x="792.7" y="1430" width="329.6" height="22" fill="#ffffff" />
+    <text x="957.5" y="1441.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">tieneMembresiaVigente(usuarioId)</text>
+  </g>
+  <line id="calculo-reserva" x1="854" y1="1502" x2="1262" y2="1502" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-calculo-reserva">
+    <rect x="834.4" y="1476" width="447.20000000000005" height="22" fill="#ffffff" />
+    <text x="1058.0" y="1487.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">calcular(…) · recalcula el precio definitivo</text>
+  </g>
+  <line id="sql-retencion" x1="633" y1="1548" x2="2224" y2="1548" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-retencion">
+    <rect x="1067.7" y="1522" width="721.6" height="22" fill="#ffffff" />
+    <text x="1428.5" y="1533.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">INSERT PENDIENTE_PAGO · importe fijo y venceEn · V16 valida la ocupación</text>
+  </g>
+  <rect id="tab-alt-retencion" x="55" y="1594" width="64" height="32" fill="#e7eef6" stroke="#71889f" stroke-width="1.6" />
+  <g id="label-alt-retencion">
+    <text x="87.0" y="1609.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">alt</text>
+  </g>
+  <g id="guard-alt-retencion">
+    <text x="132" y="1611.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[V16 permite la ocupación del turno]</text>
+  </g>
+  <line id="commit-reserva" x1="633" y1="1664" x2="2224" y2="1664" stroke="#7a4f1e" stroke-width="2" marker-end="url(#arrow-tx)" />
+  <g id="label-commit-reserva">
+    <rect x="1195.1" y="1638" width="466.8" height="22" fill="#ffffff" />
+    <text x="1428.5" y="1649.0" font-family="Arial, sans-serif" font-size="17" fill="#7a4f1e" text-anchor="middle" dominant-baseline="middle" font-weight="400">COMMIT · Spring libera el bloqueo de la cancha</text>
+  </g>
+  <line id="recurso-reserva" x1="633" y1="1710" x2="403" y2="1710" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-recurso-reserva">
+    <rect x="436.5" y="1684" width="163.0" height="22" fill="#ffffff" />
+    <text x="518.0" y="1695.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">ReservaResponse</text>
+  </g>
+  <line id="http201-reserva" x1="403" y1="1756" x2="180" y2="1756" stroke="#20558c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-http-return)" />
+  <g id="label-http201-reserva">
+    <rect x="112.0" y="1730" width="359.0" height="22" fill="#ffffff" />
+    <text x="291.5" y="1741.0" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">201 · PENDIENTE_PAGO + id + venceEn</text>
+  </g>
+  <line id="alt-retencion-else" x1="55" y1="1802" x2="2335" y2="1802" stroke="#71889f" stroke-width="1.8" stroke-dasharray="6 4" />
+  <g id="guard-alt-retencion-else">
+    <text x="132" y="1821.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[Turno ocupado o mantenimiento incompatible]</text>
+  </g>
+  <line id="conflicto-db" x1="2224" y1="1865" x2="633" y2="1865" stroke="#912945" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-error-return)" />
+  <g id="label-conflicto-db">
+    <rect x="1273.5" y="1839" width="310.0" height="22" fill="#ffffff" />
+    <text x="1428.5" y="1850.0" font-family="Arial, sans-serif" font-size="17" fill="#912945" text-anchor="middle" dominant-baseline="middle" font-weight="400">Conflicto de integridad de V16</text>
+  </g>
+  <line id="rollback-reserva" x1="633" y1="1911" x2="2224" y2="1911" stroke="#7a4f1e" stroke-width="2" marker-end="url(#arrow-tx)" />
+  <g id="label-rollback-reserva">
+    <rect x="1249.0" y="1885" width="359.0" height="22" fill="#ffffff" />
+    <text x="1428.5" y="1896.0" font-family="Arial, sans-serif" font-size="17" fill="#7a4f1e" text-anchor="middle" dominant-baseline="middle" font-weight="400">ROLLBACK · Spring libera el bloqueo</text>
+  </g>
+  <line id="http409-reserva" x1="403" y1="1957" x2="180" y2="1957" stroke="#912945" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-error-return)" />
+  <g id="label-http409-reserva">
+    <rect x="156.1" y="1931" width="270.8" height="22" fill="#ffffff" />
+    <text x="291.5" y="1942.0" font-family="Arial, sans-serif" font-size="17" fill="#912945" text-anchor="middle" dominant-baseline="middle" font-weight="400">409 · conflicto de reserva</text>
+  </g>
+  <rect id="entre" x="599" y="2008" width="1498" height="33" fill="#edf4fb" stroke="none" stroke-width="1.6" />
+  <g id="label-entre">
+    <text x="614" y="2024.5" font-family="Arial, sans-serif" font-size="17" fill="#355670" text-anchor="start" dominant-baseline="middle" font-weight="400">Entre solicitudes queda la reserva persistida. La transacción T1 ya terminó.</text>
+  </g>
+  <rect id="pagar" x="54" y="2079" width="2282" height="42" fill="#e7f0fa" stroke="#8baac8" stroke-width="1.6" />
+  <g id="label-pagar">
+    <text x="72" y="2100.0" font-family="Arial, sans-serif" font-size="22" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">3 · Solicitar el pago de la reserva retenida</text>
+  </g>
+  <line id="post-pago" x1="180" y1="2182" x2="403" y2="2182" stroke="#20558c" stroke-width="2" marker-end="url(#arrow-http)" />
+  <g id="label-post-pago">
+    <rect x="65" y="2134" width="496.20000000000005" height="44" fill="#ffffff" />
+    <text x="313.1" y="2145.97" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">POST /pagos</text>
+    <text x="313.1" y="2166.03" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">concepto=RESERVA_CANCHA · recursoId=id de reserva</text>
+  </g>
+  <line id="pagar-service" x1="403" y1="2245" x2="633" y2="2245" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-pagar-service">
+    <rect x="397.3" y="2219" width="241.4" height="22" fill="#ffffff" />
+    <text x="518.0" y="2230.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">pagar(email, recursoId)</text>
+  </g>
+  <rect id="t2" x="599" y="2279" width="1498" height="33" fill="#fff4e5" stroke="none" stroke-width="1.6" />
+  <g id="label-t2">
+    <text x="614" y="2295.5" font-family="Arial, sans-serif" font-size="17" fill="#69451f" text-anchor="start" dominant-baseline="middle" font-weight="400">T2 · Spring abre otra transacción. Si la reserva ya tiene pago, el servicio devuelve ese pago.</text>
+  </g>
+  <line id="localizar-cancha" x1="633" y1="2345" x2="2224" y2="2345" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-localizar-cancha">
+    <rect x="1195.1" y="2319" width="466.8" height="22" fill="#ffffff" />
+    <text x="1428.5" y="2330.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Consulta la reserva para identificar la cancha</text>
+  </g>
+  <line id="bloqueo-pago" x1="633" y1="2391" x2="854" y2="2391" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-bloqueo-pago">
+    <rect x="647.3" y="2365" width="192.4" height="22" fill="#ffffff" />
+    <text x="743.5" y="2376.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">bloquear(canchaId)</text>
+  </g>
+  <line id="repo-pago" x1="854" y1="2437" x2="1463" y2="2437" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-repo-pago">
+    <rect x="993.7" y="2411" width="329.6" height="22" fill="#ffffff" />
+    <text x="1158.5" y="2422.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">bloquear(id) · PESSIMISTIC_WRITE</text>
+  </g>
+  <line id="sql-lock-pago" x1="1463" y1="2483" x2="2224" y2="2483" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-lock-pago">
+    <rect x="1659.1" y="2457" width="368.8" height="22" fill="#ffffff" />
+    <text x="1843.5" y="2468.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Bloquea nuevamente la fila de cancha</text>
+  </g>
+  <line id="sql-releer" x1="633" y1="2529" x2="2224" y2="2529" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-releer">
+    <rect x="1214.7" y="2503" width="427.6" height="22" fill="#ffffff" />
+    <text x="1428.5" y="2514.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Relee la reserva y su pago bajo el bloqueo</text>
+  </g>
+  <rect id="tab-alt-vigencia" x="55" y="2575" width="64" height="32" fill="#e7eef6" stroke="#71889f" stroke-width="1.6" />
+  <g id="label-alt-vigencia">
+    <text x="87.0" y="2590.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">alt</text>
+  </g>
+  <g id="guard-alt-vigencia">
+    <text x="132" y="2592.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[Sin pago previo y retención vencida]</text>
+  </g>
+  <line id="rollback-vencimiento" x1="633" y1="2645" x2="2224" y2="2645" stroke="#7a4f1e" stroke-width="2" marker-end="url(#arrow-tx)" />
+  <g id="label-rollback-vencimiento">
+    <rect x="1249.0" y="2619" width="359.0" height="22" fill="#ffffff" />
+    <text x="1428.5" y="2630.0" font-family="Arial, sans-serif" font-size="17" fill="#7a4f1e" text-anchor="middle" dominant-baseline="middle" font-weight="400">ROLLBACK · Spring libera el bloqueo</text>
+  </g>
+  <line id="http409-vencimiento" x1="403" y1="2691" x2="180" y2="2691" stroke="#912945" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-error-return)" />
+  <g id="label-http409-vencimiento">
+    <rect x="116.89999999999998" y="2665" width="349.20000000000005" height="22" fill="#ffffff" />
+    <text x="291.5" y="2676.0" font-family="Arial, sans-serif" font-size="17" fill="#912945" text-anchor="middle" dominant-baseline="middle" font-weight="400">409 · la retención no está vigente</text>
+  </g>
+  <rect id="estado-vencido" x="599" y="2725" width="1498" height="33" fill="#edf4fb" stroke="none" stroke-width="1.6" />
+  <g id="label-estado-vencido">
+    <text x="614" y="2741.5" font-family="Arial, sans-serif" font-size="17" fill="#355670" text-anchor="start" dominant-baseline="middle" font-weight="400">La lectura expone EXPIRADA al vencer. El job u otra operación persiste la expiración bajo bloqueo.</text>
+  </g>
+  <line id="alt-vigencia-else" x1="55" y1="2791" x2="2335" y2="2791" stroke="#71889f" stroke-width="1.8" stroke-dasharray="6 4" />
+  <g id="guard-alt-vigencia-else">
+    <text x="132" y="2810.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[Sin pago previo, PENDIENTE_PAGO vigente y cancha activa]</text>
+  </g>
+  <line id="cobrar" x1="633" y1="2854" x2="1660" y2="2854" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-cobrar">
+    <rect x="1011.1" y="2828" width="270.8" height="22" fill="#ffffff" />
+    <text x="1146.5" y="2839.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">cobrar(reservaId) · usa T2</text>
+  </g>
+  <line id="sql-precio-pago" x1="1660" y1="2900" x2="2224" y2="2900" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-precio-pago">
+    <rect x="1738.0" y="2874" width="408.0" height="22" fill="#ffffff" />
+    <text x="1942.0" y="2885.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Lee importe persistido y DNI del titular</text>
+  </g>
+  <line id="fake-cobrar" x1="1660" y1="2946" x2="1851" y2="2946" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-fake-cobrar">
+    <rect x="1639.7" y="2920" width="231.60000000000002" height="22" fill="#ffffff" />
+    <text x="1755.5" y="2931.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">cobrar(SolicitudCobro)</text>
+  </g>
+  <line id="fake-result" x1="1851" y1="2992" x2="1660" y2="2992" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-fake-result">
+    <rect x="1633.5" y="2966" width="244" height="22" fill="#ffffff" />
+    <text x="1755.5" y="2977.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">APROBADO o RECHAZADO</text>
+  </g>
+  <line id="sql-pago" x1="1660" y1="3038" x2="2224" y2="3038" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-pago">
+    <rect x="1747.8" y="3012" width="388.40000000000003" height="22" fill="#ffffff" />
+    <text x="1942.0" y="3023.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">INSERT pago · estado y referencia FAKE</text>
+  </g>
+  <line id="pago-result" x1="1660" y1="3084" x2="633" y2="3084" stroke="#405b70" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-return)" />
+  <g id="label-pago-result">
+    <rect x="1079.7" y="3058" width="133.60000000000002" height="22" fill="#ffffff" />
+    <text x="1146.5" y="3069.0" font-family="Arial, sans-serif" font-size="17" fill="#405b70" text-anchor="middle" dominant-baseline="middle" font-weight="400">PagoResponse</text>
+  </g>
+  <rect id="tab-alt-resultado" x="79" y="3130" width="64" height="32" fill="#e7eef6" stroke="#71889f" stroke-width="1.6" />
+  <g id="label-alt-resultado">
+    <text x="111.0" y="3145.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">alt</text>
+  </g>
+  <g id="guard-alt-resultado">
+    <text x="156" y="3147.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[Pago APROBADO]</text>
+  </g>
+  <line id="sql-confirmar" x1="633" y1="3200" x2="2224" y2="3200" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-confirmar">
+    <rect x="1288.2" y="3174" width="280.6" height="22" fill="#ffffff" />
+    <text x="1428.5" y="3185.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">UPDATE reserva a CONFIRMADA</text>
+  </g>
+  <line id="emitir" x1="633" y1="3246" x2="2046" y2="3246" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-emitir">
+    <rect x="1106.1" y="3220" width="466.8" height="22" fill="#ffffff" />
+    <text x="1339.5" y="3231.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">emitir(pagoId) · genera comprobante con PDFBox</text>
+  </g>
+  <line id="sql-guardar-pdf" x1="2046" y1="3292" x2="2224" y2="3292" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-guardar-pdf">
+    <rect x="1799.4" y="3266" width="525.6" height="22" fill="#ffffff" />
+    <text x="2062.2000000000003" y="3277.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Persiste PDF y detalle con cancha, horario e importe</text>
+  </g>
+  <line id="commit-aprobado" x1="633" y1="3338" x2="2224" y2="3338" stroke="#7a4f1e" stroke-width="2" marker-end="url(#arrow-tx)" />
+  <g id="label-commit-aprobado">
+    <rect x="1239.2" y="3312" width="378.6" height="22" fill="#ffffff" />
+    <text x="1428.5" y="3323.0" font-family="Arial, sans-serif" font-size="17" fill="#7a4f1e" text-anchor="middle" dominant-baseline="middle" font-weight="400">COMMIT · confirma y libera el bloqueo</text>
+  </g>
+  <line id="http201-aprobado" x1="403" y1="3384" x2="180" y2="3384" stroke="#20558c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-http-return)" />
+  <g id="label-http201-aprobado">
+    <rect x="190.39999999999998" y="3358" width="202.20000000000002" height="22" fill="#ffffff" />
+    <text x="291.5" y="3369.0" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">201 · pago APROBADO</text>
+  </g>
+  <line id="alt-resultado-else" x1="79" y1="3430" x2="2311" y2="3430" stroke="#71889f" stroke-width="1.8" stroke-dasharray="6 4" />
+  <g id="guard-alt-resultado-else">
+    <text x="156" y="3449.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[Pago RECHAZADO]</text>
+  </g>
+  <line id="sql-rechazar" x1="633" y1="3493" x2="2224" y2="3493" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-rechazar">
+    <rect x="1131.4" y="3467" width="594.2" height="22" fill="#ffffff" />
+    <text x="1428.5" y="3478.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">UPDATE reserva a RECHAZADA · el turno deja de estar ocupado</text>
+  </g>
+  <line id="commit-rechazo" x1="633" y1="3539" x2="2224" y2="3539" stroke="#7a4f1e" stroke-width="2" marker-end="url(#arrow-tx)" />
+  <g id="label-commit-rechazo">
+    <rect x="1185.3" y="3513" width="486.40000000000003" height="22" fill="#ffffff" />
+    <text x="1428.5" y="3524.0" font-family="Arial, sans-serif" font-size="17" fill="#7a4f1e" text-anchor="middle" dominant-baseline="middle" font-weight="400">COMMIT · conserva el rechazo y libera el bloqueo</text>
+  </g>
+  <line id="http201-rechazo" x1="403" y1="3585" x2="180" y2="3585" stroke="#912945" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-error-return)" />
+  <g id="label-http201-rechazo">
+    <rect x="136.5" y="3559" width="310.0" height="22" fill="#ffffff" />
+    <text x="291.5" y="3570.0" font-family="Arial, sans-serif" font-size="17" fill="#912945" text-anchor="middle" dominant-baseline="middle" font-weight="400">201 · pago RECHAZADO · sin PDF</text>
+  </g>
+  <rect id="descargar" x="54" y="3665" width="2282" height="42" fill="#e7f0fa" stroke="#8baac8" stroke-width="1.6" />
+  <g id="label-descargar">
+    <text x="72" y="3686.0" font-family="Arial, sans-serif" font-size="22" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">4 · Descargar el comprobante después de la aprobación</text>
+  </g>
+  <rect id="tab-opt-descarga" x="55" y="3768" width="64" height="32" fill="#e7eef6" stroke="#71889f" stroke-width="1.6" />
+  <g id="label-opt-descarga">
+    <text x="87.0" y="3783.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="middle" dominant-baseline="middle" font-weight="700">opt</text>
+  </g>
+  <g id="guard-opt-descarga">
+    <text x="132" y="3785.0" font-family="Arial, sans-serif" font-size="17" fill="#19364d" text-anchor="start" dominant-baseline="middle" font-weight="700">[Pago aprobado y descarga solicitada]</text>
+  </g>
+  <line id="get-pdf" x1="180" y1="3838" x2="403" y2="3838" stroke="#20558c" stroke-width="2" marker-end="url(#arrow-http)" />
+  <g id="label-get-pdf">
+    <rect x="131.6" y="3812" width="319.8" height="22" fill="#ffffff" />
+    <text x="291.5" y="3823.0" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">GET /pagos/{pagoId}/comprobante</text>
+  </g>
+  <line id="descargar-service" x1="403" y1="3884" x2="2046" y2="3884" stroke="#284961" stroke-width="2" marker-end="url(#arrow-call)" />
+  <g id="label-descargar-service">
+    <rect x="976.4" y="3858" width="496.20000000000005" height="22" fill="#ffffff" />
+    <text x="1224.5" y="3869.0" font-family="Arial, sans-serif" font-size="17" fill="#284961" text-anchor="middle" dominant-baseline="middle" font-weight="400">descargar(email, pagoId) · verifica titular o rol</text>
+  </g>
+  <line id="sql-pdf" x1="2046" y1="3930" x2="2224" y2="3930" stroke="#226658" stroke-width="2" marker-end="url(#arrow-sql)" />
+  <g id="label-sql-pdf">
+    <rect x="2024.1" y="3904" width="221.8" height="22" fill="#ffffff" />
+    <text x="2135.0" y="3915.0" font-family="Arial, sans-serif" font-size="17" fill="#226658" text-anchor="middle" dominant-baseline="middle" font-weight="400">Lee el PDF persistido</text>
+  </g>
+  <line id="http200-pdf" x1="403" y1="3976" x2="180" y2="3976" stroke="#20558c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-http-return)" />
+  <g id="label-http200-pdf">
+    <rect x="180.6" y="3950" width="221.8" height="22" fill="#ffffff" />
+    <text x="291.5" y="3961.0" font-family="Arial, sans-serif" font-size="17" fill="#20558c" text-anchor="middle" dominant-baseline="middle" font-weight="400">200 · application/pdf</text>
+  </g>
+  <g id="footer">
+    <text x="54" y="4078.0" font-family="Arial, sans-serif" font-size="18" fill="#40566d" text-anchor="start" dominant-baseline="middle" font-weight="400">Autor nominal pendiente de confirmación · 18/11/2026 · v1.0 · Base de código 2493668</text>
+  </g>
+</svg>

@@ -1,0 +1,32 @@
+# UML de secuencia de reserva concurrente de cancha
+
+**Versión:** 1.0 · **Fecha:** 18/11/2026 · **Autor:** pendiente de confirmación  
+**Base verificada:** `main`, commit `2493668`.  
+**Requisito:** RN-02, prevención de reservas simultáneas incompatibles.
+
+[Fuente editable](uml-secuencia-reserva-concurrente.drawio) · [Exportación SVG](uml-secuencia-reserva-concurrente.svg) · [Secuencia de reserva y pago](uml-secuencia-reserva-pago.md)
+
+## Escenario
+
+Dos usuarios autenticados envían solicitudes concurrentes para la misma cancha y el mismo `turnoId`, que corresponde a la fecha y franja elegidas. El diagrama muestra una intercalación posible en la que A obtiene primero el bloqueo y su retención permanece vigente hasta el intento de B. A y B son dos invocaciones del mismo servicio en transacciones independientes. Puede ganar cualquiera de los clientes. El `201` corresponde a una retención `PENDIENTE_PAGO`. La transición a `CONFIRMADA` ocurre en la transacción posterior de pago aprobado.
+
+## Lectura de la secuencia
+
+| Tramo | Correspondencia con el código |
+|---|---|
+| **Solicitudes y validación** | Ambos clientes envían `POST /api/v1/canchas/{canchaId}/reservas` con `turnoId` e `Idempotency-Key` UUID. [`CanchaController.reservarTurno`](../../src/main/java/com/fitzonesports/reserva/controller/CanchaController.java#L32-L36) limita los roles a `USUARIO` y `GERENTE`, y aplica Bean Validation al DTO [`CanchaDtos.Reservar`](../../src/main/java/com/fitzonesports/reserva/dto/CanchaDtos.java#L19). [OpenAPI, retención](../openapi/openapi.yaml#L2341-L2373) |
+| **Inicio y bloqueo** | Spring abre una transacción para cada invocación de [`ReservaCanchaService.reservar`](../../src/main/java/com/fitzonesports/reserva/service/ReservaCanchaService.java#L30-L55). Tras verificar al actor, el servicio llama a [`CanchaService.bloquear`](../../src/main/java/com/fitzonesports/reserva/service/CanchaService.java#L155), que delega en [`CanchaRepository.bloquear`](../../src/main/java/com/fitzonesports/reserva/repository/CanchaRepository.java#L9-L12). `PESSIMISTIC_WRITE` bloquea la fila de la cancha en PostgreSQL. En esta intercalación B espera en esa llamada mientras A tiene el lock. |
+| **Idempotencia y control de disponibilidad** | Bajo bloqueo se procesan retenciones vencidas y se consulta la clave persistida `cancha:{usuarioId}:{UUID}`. Repetir la misma operación del mismo usuario devuelve su reserva. Usar esa clave para otro turno devuelve `409`. A y B tienen claves de operación independientes y continúan como solicitudes nuevas. El servicio verifica existencia y pertenencia del turno, cancha habilitada y horario futuro, y recalcula el precio. La grilla es informativa. El control decisivo de ocupación ocurre en PostgreSQL al insertar. [Servicio de reserva](../../src/main/java/com/fitzonesports/reserva/service/ReservaCanchaService.java#L35-L54) · [Expiración](../../src/main/java/com/fitzonesports/reserva/service/CanchaService.java#L155-L158) |
+| **A registra la retención** | El primer `INSERT` persiste `PENDIENTE_PAGO`, la cotización y `venceEn`. El commit de T_A libera la fila y deja la retención ocupando el turno. El controlador responde `201 Created` con la representación de la reserva y `Location`. La flecha de commit representa el cierre transaccional de Spring. [Persistencia y retorno](../../src/main/java/com/fitzonesports/reserva/service/ReservaCanchaService.java#L48-L55) · [Respuesta HTTP](../../src/main/java/com/fitzonesports/reserva/controller/CanchaController.java#L32-L36) |
+| **B reanuda y recibe conflicto** | Al liberarse el lock, B entra a la sección serializada. Su intento de insertar otra reserva ocupante viola `uk_reserva_cancha_ocupante` si la retención de A sigue vigente. Spring revierte T_B y libera el lock. [`CanchaErrores.conflicto`](../../src/main/java/com/fitzonesports/reserva/controller/CanchaErrores.java#L10-L19) traduce `DataIntegrityViolationException` a `409 Conflict` con `ProblemDetail`. El mismo advice cubre fallos de bloqueo pesimista. [Índice de ocupación](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql#L39-L42) |
+
+## Dos niveles de garantía
+
+- **Servicio y JPA.** El bloqueo por fila de cancha serializa altas y cambios de ocupación de la misma cancha. Abarca también operaciones sobre distintos turnos de esa cancha. El commit o rollback de cada transacción termina su bloqueo. Entre retención y pago, el estado persistido conserva la ocupación. [ADR-004](../adr/ADR-004-tif-concurrencia-canchas.md#L22-L34)
+- **PostgreSQL V16.** El índice único parcial `uk_reserva_cancha_ocupante` impide que un turno tenga dos reservas `PENDIENTE_PAGO` o `CONFIRMADA`. La exclusión GiST `ex_turnos_superpuestos` impide intervalos de turno solapados de la misma cancha en `turno_cancha` y permite intervalos contiguos mediante `[)`. En la carrera mostrada, ambas solicitudes referencian el mismo turno existente y la restricción que rechaza el segundo `INSERT` es el índice de ocupación. Los triggers coordinan las escrituras de reserva y mantenimiento con `FOR UPDATE` sobre esa cancha. [Exclusión GiST](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql#L13-L15) · [Índice parcial y triggers](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql#L41-L79)
+
+## Pruebas de referencia
+
+- [`dosUsuariosSimultaneosSoloUnoRetieneYCobra`](../../src/test/java/com/fitzonesports/reserva/CanchasIntegrationTest.java#L187-L199) libera dos tareas mediante un mismo latch. Cada tarea llama al servicio de reserva y, si logra retener, intenta pagar. El test convierte la violación de integridad en `409` para comprobar los resultados `[201, 409]` y exige una única reserva `CONFIRMADA` tras el pago. La comprobación del código HTTP real corresponde al caso de MockMvc.
+- [`rutasHttpAutenticadasYErroresNoExponenSql`](../../src/test/java/com/fitzonesports/reserva/CanchasIntegrationTest.java#L173-L181) exige `201` en el primer POST y `409` con `application/problem+json` en el segundo para el mismo turno. [`sqlDirectoNoPermiteDobleOcupacion`](../../src/test/java/com/fitzonesports/reserva/CanchasIntegrationTest.java#L183-L185) comprueba el respaldo SQL ante un segundo ocupante insertado de forma directa.
+- La clase requiere [`PLAN_TEST_DB_URL`](../../src/test/java/com/fitzonesports/reserva/CanchasIntegrationTest.java#L27-L31). La revisión de esta entrega fue estática sobre el código y las aserciones. No se ejecutaron las pruebas PostgreSQL para producir este diagrama.

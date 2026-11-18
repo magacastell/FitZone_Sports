@@ -301,7 +301,7 @@ Búsqueda global `rg -n 'CLIENTE_EXTERNO|SOCIO_ACTIVO'` excluyendo artefactos ig
 | docs/adr/0007-actores-y-membresia.md | Antecedente y decisión |
 | docs/frontend-ui-guidelines.md | Auditoría anterior identificada como histórica |
 | docs/openapi/DECISIONES.md | Antecedentes expresamente sustituidos por ADR-007 |
-| LOGs/Cejas-LOG.md, LOGs/Orge-LOG.MD | Bitácoras históricas no modificadas |
+| docs/bitacoras/Cejas-LOG.md, docs/bitacoras/Orge-LOG.MD | Bitácoras históricas no modificadas |
 | Este informe | Registro de búsqueda y clasificación |
 
 Ningún uso activo en src/main/java o frontend/src como permiso/modelo vigente.
@@ -364,7 +364,7 @@ Hunks compartidos que pertenecen al dominio:
 
 Archivos completos:
 
-- `LOGs/Vidoni-LOG.md`
+- `docs/bitacoras/Vidoni-LOG.md`
 - `docs/frontend-ui-guidelines.md`
 - `frontend/src/components/Layout.jsx`
 - `frontend/src/modules/m1-usuarios/MembresiaUsuario.jsx`
@@ -434,14 +434,14 @@ Hay **6 ADR anteriores con número explícito**, acreditados por README/bitácor
 
 | ID | Decisión | Evidencia en checkout |
 |---|---|---|
-| ADR-001 | Monolito Modular | README.md, LOGs/LOG.md |
-| ADR-002 | PostgreSQL | LOGs/LOG.md, LOGs/Orge-LOG.MD |
-| ADR-003 | Spring Boot + Spring Data JPA | LOGs/LOG.md, LOGs/Martinez-LOG.md |
-| ADR-004 | React | LOGs/LOG.md, LOGs/CastellZiegler-LOG.md |
-| ADR-005 | Flyway | LOGs/Denis-LOG.md, LOGs/Vidoni-LOG.md, LOGs/Orge-LOG.MD |
-| ADR-006 | JWT + Spring Security | LOGs/Denis-LOG.md, LOGs/Vidoni-LOG.md |
+| ADR-001 | Monolito Modular | README.md, docs/bitacoras/LOG.md |
+| ADR-002 | PostgreSQL | docs/bitacoras/LOG.md, docs/bitacoras/Orge-LOG.MD |
+| ADR-003 | Spring Boot + Spring Data JPA | docs/bitacoras/LOG.md, docs/bitacoras/Martinez-LOG.md |
+| ADR-004 | React | docs/bitacoras/LOG.md, docs/bitacoras/CastellZiegler-LOG.md |
+| ADR-005 | Flyway | docs/bitacoras/Denis-LOG.md, docs/bitacoras/Vidoni-LOG.md, docs/bitacoras/Orge-LOG.MD |
+| ADR-006 | JWT + Spring Security | docs/bitacoras/Denis-LOG.md, docs/bitacoras/Vidoni-LOG.md |
 
-Además, LOGs/Martinez-LOG.md (28/09/2026) registra **2 redacciones adicionales**,
+Además, docs/bitacoras/Martinez-LOG.md (28/09/2026) registra **2 redacciones adicionales**,
 concurrencia y versionado/colaboración Git/GitHub, sin ID ni texto completo visible.
 No se les inventan ADR-007/008 ni estado de aprobación. El siguiente número explícito
 verificable en el repositorio después de 006 es 007; si el registro externo del equipo

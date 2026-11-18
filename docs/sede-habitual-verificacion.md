@@ -139,7 +139,7 @@ reportes deberán diferenciar habitual, origen del alta y sede de operación.
 el constructor de alta para mantener sus fixtures con sede existente. La exportación
 de M2 pasa a sedesService sin cambiar ruta, permisos ni flujo de acceso.
 
-- `LOGs/Vidoni-LOG.md`
+- `docs/bitacoras/Vidoni-LOG.md`
 - `README.md`
 - `docs/m2-recepcion.md`
 - `docs/membresias.md`
