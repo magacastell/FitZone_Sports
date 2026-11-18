@@ -1,102 +1,187 @@
 import React, { useCallback, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useOutletContext } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+  useNavigate,
+  useOutletContext,
+} from 'react-router-dom';
+
 import Layout from '../components/Layout';
 import FeaturePlaceholder from '../components/FeaturePlaceholder';
+
 import PerfilUsuario from '../modules/m1-usuarios/PerfilUsuario';
 import MembresiaUsuario from '../modules/m1-usuarios/MembresiaUsuario';
 import GestionPlanes from '../modules/m1-usuarios/GestionPlanes';
+
 import Gerencia from '../modules/gerencia/Gerencia';
+
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
 import AforoSede from '../modules/m2-acceso/AforoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
 import TerminalOffline from '../modules/m2-acceso/TerminalOffline';
 import QrOffline from '../modules/m2-acceso/QrOffline';
+
 import AgendaClases from '../modules/m3-clases/AgendaClases';
+
 import GrillaCanchas from '../modules/m4-canchas/GrillaCanchas';
+import AdministracionCanchas from '../modules/m4-canchas/AdministracionCanchas';
+
 import HistorialComprobante from '../modules/m5-pagos/HistorialComprobante';
+import HistorialPagos from '../modules/m5-pagos/HistorialPagos';
 
 import LoginPage from '../modules/auth/LoginPage';
 import RegisterPage from '../modules/auth/RegisterPage';
+
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 
 function InicioPorRol() {
   const { user, loading } = useAuth();
-  if (loading || !user) return <p role="status">Cargando sesión de FitZone...</p>;
-  if (user.rol === 'GERENTE') return <Navigate to="/gestion/panel" replace />;
-  if (user.rol === 'USUARIO') return <Navigate to="/membresia" replace />;
-  return <Navigate to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'} replace />;
+
+  if (loading || !user) {
+    return <p role="status">Cargando sesión de FitZone...</p>;
+  }
+
+  if (user.rol === 'GERENTE') {
+    return <Navigate to="/gestion/panel" replace />;
+  }
+
+  if (user.rol === 'USUARIO') {
+    return <Navigate to="/membresia" replace />;
+  }
+
+  return (
+    <Navigate
+      to={user.rol === 'RECEPCIONISTA' ? '/recepcion/acceso' : '/perfil'}
+      replace
+    />
+  );
 }
 
 function SocioQRRoute() {
   const navigate = useNavigate();
-  const { membresia, refrescarMembresia, puedeAbrirQr } = useOutletContext();
+  const {
+    membresia,
+    refrescarMembresia,
+    puedeAbrirQr,
+  } = useOutletContext();
+
   const [errorQr, setErrorQr] = useState('');
+
   const alDenegarAcceso = useCallback((error) => {
     setErrorQr(error.message || 'El backend denegó la generación del QR.');
     refrescarMembresia();
   }, [refrescarMembresia]);
 
-  if (membresia.estado === 'cargando') return <p role="status">Consultando membresía para abrir Mi QR...</p>;
-  if (!puedeAbrirQr) return (
-    <div>
-      {errorQr && <p role="alert">{errorQr}</p>}
-      {membresia.estado === 'error' ? (
-        <>
-          <p role="alert">No pudimos consultar tu membresía. {membresia.mensaje}</p>
-          <button type="button" onClick={refrescarMembresia}>Reintentar consulta de membresía</button>
-        </>
-      ) : <p>Mi QR no está disponible con el estado actual de tu membresía.</p>}
-      <Link to="/membresia">Ver mi membresía</Link>
-    </div>
+  if (membresia.estado === 'cargando') {
+    return (
+      <p role="status">
+        Consultando membresía para abrir Mi QR...
+      </p>
+    );
+  }
+
+  if (!puedeAbrirQr) {
+    return (
+      <div>
+        {errorQr && <p role="alert">{errorQr}</p>}
+
+        {membresia.estado === 'error' ? (
+          <>
+            <p role="alert">
+              No pudimos consultar tu membresía. {membresia.mensaje}
+            </p>
+            <button
+              type="button"
+              onClick={refrescarMembresia}
+            >
+              Reintentar consulta de membresía
+            </button>
+          </>
+        ) : (
+          <p>
+            Mi QR no está disponible con el estado actual de tu membresía.
+          </p>
+        )}
+
+        <Link to="/membresia">Ver mi membresía</Link>
+      </div>
+    );
+  }
+
+  return (
+    <SocioQRModal
+      isOpen={true}
+      onClose={() => navigate('/')}
+      onAccesoDenegado={alDenegarAcceso}
+    />
   );
-  return <SocioQRModal isOpen={true} onClose={() => navigate('/')} onAccesoDenegado={alDenegarAcceso} />;
 }
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/registro" element={<RegisterPage />} />
-          {/* Permiso offline firmado y acotado, verificado dentro del terminal; no usa el Layout remoto. */}
-          <Route path="/terminal-offline" element={<main className="fitzone-ui"><TerminalOffline autonomo /></main>} />
-          <Route path="/qr-offline" element={<QrOffline />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegisterPage />} />
 
-          {/* Todas las rutas del Layout ahora están protegidas */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<InicioPorRol />} />
-              <Route path="canchas" element={<GrillaCanchas />} />
-              <Route path="clases" element={<AgendaClases />} />
-              <Route path="mi-qr" element={<SocioQRRoute />} />
-              <Route path="perfil" element={<PerfilUsuario />} />
-              <Route path="membresia" element={<MembresiaUsuario />} />
-              <Route path="gestion/planes" element={<GestionPlanes />} />
-              <Route path="gestion/panel" element={<Gerencia />} />
-              <Route path="gestion/sedes" element={<Gerencia vista="sedes" />} />
-              <Route path="gestion/usuarios" element={<Gerencia vista="usuarios" />} />
-              <Route path="gestion/reportes" element={<Gerencia vista="reportes" />} />
-              <Route path="comprobantes" element={<HistorialComprobante />} />
-              
-              <Route path="recepcion/acceso" element={<ControlAccesoSede />} />
-              <Route path="recepcion/aforo" element={<AforoSede />} />
-              <Route path="admin/canchas/mantenimiento" element={
-                <FeaturePlaceholder
-                  title="Mantenimiento de canchas (M4)"
-                  description="La gestión de mantenimiento de canchas está pendiente."
-                />
-              } />
-              <Route path="admin/reportes-consolidados" element={
+        {/* El flujo offline no depende del Layout remoto. */}
+        <Route
+          path="/terminal-offline"
+          element={
+            <main className="fitzone-ui">
+              <TerminalOffline autonomo />
+            </main>
+          }
+        />
+        <Route path="/qr-offline" element={<QrOffline />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<InicioPorRol />} />
+
+            <Route path="canchas" element={<GrillaCanchas />} />
+            <Route path="clases" element={<AgendaClases />} />
+
+            <Route path="mi-qr" element={<SocioQRRoute />} />
+
+            <Route path="perfil" element={<PerfilUsuario />} />
+            <Route path="membresia" element={<MembresiaUsuario />} />
+
+            <Route path="gestion/planes" element={<GestionPlanes />} />
+            <Route path="gestion/panel" element={<Gerencia />} />
+            <Route path="gestion/sedes" element={<Gerencia vista="sedes" />} />
+            <Route path="gestion/usuarios" element={<Gerencia vista="usuarios" />} />
+            <Route path="gestion/reportes" element={<Gerencia vista="reportes" />} />
+
+            <Route path="comprobantes" element={<HistorialComprobante />} />
+            <Route path="pagos" element={<HistorialPagos />} />
+
+            <Route path="recepcion/acceso" element={<ControlAccesoSede />} />
+            <Route path="recepcion/aforo" element={<AforoSede />} />
+
+            <Route path="admin/canchas" element={<AdministracionCanchas />} />
+            <Route
+              path="admin/canchas/mantenimiento"
+              element={<AdministracionCanchas />}
+            />
+
+            <Route
+              path="admin/reportes-consolidados"
+              element={
                 <FeaturePlaceholder
                   title="Reportes consolidados"
                   description="Los reportes de gestión todavía no están disponibles."
                 />
-              } />
-            </Route>
+              }
+            />
           </Route>
-          
-          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

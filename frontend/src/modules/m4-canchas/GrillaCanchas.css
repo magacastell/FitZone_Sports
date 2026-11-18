@@ -1,0 +1,270 @@
+
+.grilla-canchas .m4-filtros {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.grilla-canchas .m4-filtros label {
+  display: grid;
+  flex: 1 1 240px;
+  gap: 8px;
+  color: #344a3c;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.grilla-canchas .m4-filtros label span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.grilla-canchas .m4-filtros select,
+.grilla-canchas .m4-filtros input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cbd8ce;
+  border-radius: 9px;
+  color: #1e2d26;
+  background: #fff;
+  font: inherit;
+}
+
+.grilla-canchas .m4-filtros--fecha {
+  margin-bottom: 18px;
+}
+
+.grilla-canchas .m4-filtros--fecha p {
+  margin: 0 0 11px;
+  color: #52665a;
+  font-size: 13px;
+}
+
+.grilla-canchas .m4-canchas-grid,
+.grilla-canchas .m4-turnos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 14px;
+}
+
+.grilla-canchas .m4-cancha-card {
+  display: flex;
+  min-width: 0;
+  min-height: 145px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 17px;
+  border: 1px solid #e2e9e3;
+  border-radius: 12px;
+  color: #23352c;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.grilla-canchas .m4-cancha-card:hover:not(:disabled) {
+  border-color: #78a386;
+  background: #f9fbf8;
+}
+
+.grilla-canchas .m4-cancha-card--activa {
+  border: 2px solid #2f704f;
+  background: #f4f8f1;
+}
+
+.grilla-canchas .m4-cancha-card:disabled {
+  opacity: .58;
+  cursor: not-allowed;
+}
+
+.grilla-canchas .m4-cancha-card__tipo {
+  color: #64816d;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .06em;
+}
+
+.grilla-canchas .m4-cancha-card strong {
+  font-size: 16px;
+}
+
+.grilla-canchas .m4-cancha-card > span:not(.m4-cancha-card__tipo) {
+  color: #63776a;
+  font-size: 12px;
+}
+
+.grilla-canchas .m4-cancha-card .m4-cancha-card__precio {
+  margin-top: auto;
+  color: #2f704f;
+  font-weight: 700;
+}
+
+.grilla-canchas .m4-turno {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #e2e9e3;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.grilla-canchas .m4-turno--ocupado {
+  background: #f7f8f7;
+}
+
+.grilla-canchas .m4-turno__encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.grilla-canchas .m4-turno__encabezado strong {
+  color: #253a2e;
+  font-size: 14px;
+}
+
+.grilla-canchas .m4-precio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.grilla-canchas .m4-precio span {
+  color: #63776a;
+  font-size: 12px;
+}
+
+.grilla-canchas .m4-precio strong {
+  color: #2f704f;
+  font-size: 20px;
+}
+
+.grilla-canchas .m4-precio small {
+  color: #718078;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.grilla-canchas .m4-reservas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grilla-canchas .m4-reserva {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid #e2e9e3;
+  border-radius: 12px;
+}
+
+.grilla-canchas .m4-reserva__datos {
+  min-width: 0;
+}
+
+.grilla-canchas .m4-reserva__titulo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.grilla-canchas .m4-reserva__titulo strong {
+  color: #253a2e;
+  font-size: 14px;
+}
+
+.grilla-canchas .m4-reserva__datos p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 7px 0 0;
+  color: #63776a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.grilla-canchas .m4-reserva__datos .m4-vencimiento {
+  color: #946315;
+  font-weight: 700;
+}
+
+.grilla-canchas .m4-reserva__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.grilla-canchas .m4-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.grilla-canchas .m4-aviso--ok {
+  border-color: #d5e8d5;
+  color: #2d7048;
+  background: #edf7ec;
+}
+
+.grilla-canchas .m4-aviso--error {
+  border-color: #f1d5d1;
+  color: #a54840;
+  background: #fff0ee;
+}
+
+.grilla-canchas .m4-nota {
+  margin: 0;
+  color: #63776a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.grilla-canchas .m4-nota a {
+  color: #2f704f;
+  font-weight: 700;
+}
+
+.grilla-canchas :where(button, select, input, a):focus-visible {
+  outline: 3px solid #2f704f;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .grilla-canchas .m4-reserva {
+    flex-direction: column;
+  }
+
+  .grilla-canchas .m4-reserva__acciones {
+    width: 100%;
+  }
+
+  .grilla-canchas .m4-reserva__acciones button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grilla-canchas .m4-cancha-card {
+    transition: none;
+  }
+}
