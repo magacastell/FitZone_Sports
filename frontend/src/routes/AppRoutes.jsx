@@ -121,6 +121,13 @@ function SocioQRRoute() {
   );
 }
 
+function ComprobantesRoute() {
+  const { user } = useAuth();
+  return user?.rol === 'USUARIO'
+    ? <Navigate to="/pagos" replace />
+    : <HistorialComprobante />;
+}
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -157,7 +164,7 @@ export default function AppRoutes() {
             <Route path="gestion/usuarios" element={<Gerencia vista="usuarios" />} />
             <Route path="gestion/reportes" element={<Gerencia vista="reportes" />} />
 
-            <Route path="comprobantes" element={<HistorialComprobante />} />
+            <Route path="comprobantes" element={<ComprobantesRoute />} />
             <Route path="pagos" element={<HistorialPagos />} />
 
             <Route path="recepcion/acceso" element={<ControlAccesoSede />} />

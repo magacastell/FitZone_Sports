@@ -61,12 +61,10 @@ export const listarReservas = (sedeId, page = 0, size = 20) => {
   return fetchAPI(`/reservas?${parametros}`);
 };
 
-export const cancelarReservaCancha = (id, reservaId, porcentajeReembolso) =>
+export const cancelarReservaCancha = (id, reservaId, opciones) =>
   fetchAPI(`/canchas/${id}/reservas/${reservaId}`, {
     method: 'DELETE',
-    ...(porcentajeReembolso == null
-      ? {}
-      : { body: JSON.stringify({ porcentajeReembolso }) }),
+    ...(opciones == null ? {} : { body: JSON.stringify(opciones) }),
   });
 
 // ============================================

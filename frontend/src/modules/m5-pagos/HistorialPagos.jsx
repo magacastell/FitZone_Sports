@@ -306,6 +306,9 @@ export default function HistorialPagos() {
                         <StatusBadge tone={tonoPago(pago.estado)}>
                           {textoEstado(pago.estado)}
                         </StatusBadge>
+                        {periodo?.estado === 'CANCELADA' && (
+                          <StatusBadge tone="neutral">Período cancelado</StatusBadge>
+                        )}
 
                         <div className="receipt-card__body">
                           <dl className="receipt-card__details">
@@ -379,7 +382,9 @@ export default function HistorialPagos() {
                             </AppButton>
                           ) : (
                             <p className="receipts-note">
-                              El pago rechazado no tiene comprobante disponible.
+                              {pago.estado === 'RECHAZADO'
+                                ? 'El pago rechazado no tiene comprobante disponible.'
+                                : 'Este pago todavía no tiene un comprobante disponible.'}
                             </p>
                           )}
                         </div>
@@ -415,7 +420,6 @@ export default function HistorialPagos() {
         <div className="m5-enlaces">
           <Link to="/membresia">Mi membresía</Link>
           <Link to="/canchas">Reservar una cancha</Link>
-          <Link to="/comprobantes">Comprobantes de membresía</Link>
         </div>
       </div>
     </div>

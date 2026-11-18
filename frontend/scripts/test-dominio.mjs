@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { transformSync } = require('esbuild');
 const sources = {
+ gridM4:'src/modules/m4-canchas/GrillaCanchas.jsx', adminM4:'src/modules/m4-canchas/AdministracionCanchas.jsx', pagosM5:'src/modules/m5-pagos/HistorialPagos.jsx',
  avatar:'src/components/ui/FitZoneUI.jsx',
  servicios:'src/components/ServiciosSede.jsx',
  aforoLocal:'src/modules/m2-acceso/AforoSede.jsx',
@@ -58,7 +59,7 @@ async function runner(name,e,props={},target='default'){
   localStorage:e.localStorage,sessionStorage:e.sessionStorage,
   document:{get visibilityState(){return e.visibilityState;},createElement:()=>({click(){e.downloads.push(this.download);}})},
   URL:{createObjectURL:()=> 'blob:pdf-real',revokeObjectURL:url=>e.revoked.push(url)},
-  window:{addEventListener:(k,f)=>{if(!e.listeners.has(k))e.listeners.set(k,new Set);e.listeners.get(k).add(f);},removeEventListener:(k,f)=>e.listeners.get(k)?.delete(f),confirm:()=>true},
+  window:{setInterval:fn=>{e.relojM4=fn;return 31;},clearInterval:()=>{},addEventListener:(k,f)=>{if(!e.listeners.has(k))e.listeners.set(k,new Set);e.listeners.get(k).add(f);},removeEventListener:(k,f)=>e.listeners.get(k)?.delete(f),confirm:()=>true},
   crypto:{randomUUID:()=>{e.uuids++;return '00000000-0000-4000-8000-'+String(e.uuids).padStart(12,'0');}},
   setTimeout:(fn,ms)=>{const id=++e.timerId;e.timers.set(id,{fn,ms});return id;},clearTimeout:id=>e.timers.delete(id),setInterval:(fn)=>{e.intervals=(e.intervals||0)+1;e.poll=fn;return 2;},clearInterval:()=>{e.clearedIntervals=(e.clearedIntervals||0)+1;},
   atob:s=>Buffer.from(s,'base64').toString()
@@ -80,6 +81,8 @@ async function runner(name,e,props={},target='default'){
   if(spec==='react-router-dom')return synthetic(router,context);
   if(spec.includes('AuthContext'))return synthetic({useAuth:()=>({token:e.token,user:e.user,loading:!!e.loading,login:e.login,register:e.register,isAuthenticated:!!e.token,logout:()=>{e.loggedOut=true;e.token=null;}})},context);
   if(spec.includes('m1Service'))return synthetic(e.services,context);
+  if(spec.includes('m4Service')&&e.m4)return synthetic(e.m4,context);
+  if(spec.includes('pagosService')&&e.pagosM5)return synthetic(e.pagosM5,context);
   if(spec.endsWith('SelectorFoto'))return synthetic({default:p=>jsx('selector-foto',p)},context);
   if(spec.endsWith('fotoPerfil')){
    const child=new vm.SourceTextModule(fs.readFileSync('src/services/fotoPerfil.js','utf8'),{context});await child.link(linker);await child.evaluate();return child;
@@ -93,7 +96,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('services/offline/api'))return synthetic({obtenerQrAutomatico:()=>{const d=deferred();d.args=['/accesos/offline/credenciales/automaticas',{method:'POST'}];e.qrs.push(d);return d.promise;}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
-  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check','Plus','Wallet','AlertCircle'].map(k=>[k,()=>jsx('svg',{})])),context);
   if(spec.endsWith('LectorAcceso'))return synthetic({default:p=>{e.lectorProps=p;return jsx('lector',p);}},context);
   if(spec.endsWith('useAforoSede')||spec.endsWith('TarjetaAforo')){
    const file=spec.endsWith('useAforoSede')?'src/modules/m2-acceso/useAforoSede.js':'src/modules/m2-acceso/TarjetaAforo.jsx';
@@ -363,9 +366,10 @@ await test('cliente sin membresia ve catalogo real y no capacidades de socio',as
  assert(text(r.view).includes('Elegí tu plan'));assert(text(r.view).includes('Plan del servidor'));assert(!text(r.view).includes('Tu ingreso'));
  assert(!nodes(l.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!hasQr(r));
 });
-await test('comprobantes solo para periodos con pago real, tambien tras vencimiento',async()=>{
+await test('la membresía vencida conserva Mis pagos y un único enlace financiero',async()=>{
  const e=env();const l=await layout(e);await setMember(e,dto('VENCIDA',{periodos:[{id:9,pagoId:99,estado:'VENCIDA'}]}));
- assert(nodes(l.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!hasQr(l));
+ assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/pagos').length,1);
+ assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length,0);assert(!hasQr(l));
 });
 await test('sesion: claims legados o desconocidos se descartan, USUARIO no expira por membresia',async()=>{
  const source=fs.readFileSync('src/context/AuthContext.jsx','utf8');const code=source.slice(source.indexOf('const isExpired'),source.indexOf('const getStoredToken'))+'\nisExpired';
@@ -636,7 +640,7 @@ await test('suspendida muestra bloqueo sin QR ni una nueva renovacion',async()=>
 });
 await test('reload consulta estado real y conserva historial sin convertir vencida a cliente nuevo',async()=>{
  const e=env(),primero=await layout(e);await setMember(e,dto());primero.unmount();const recargado=await layout(e);await setMember(e,dto('VENCIDA',{periodos:[{id:1,pagoId:44,estado:'VENCIDA'}]}));
- assert.equal(hasQr(recargado),false);assert.equal(e.shared.membresia.estado,'cargada');assert(nodes(recargado.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!text(recargado.view).includes('Elegí tu plan'));
+ assert.equal(hasQr(recargado),false);assert.equal(e.shared.membresia.estado,'cargada');assert(nodes(recargado.view,n=>n.type==='a'&&n.props.href==='/pagos').length);assert(!text(recargado.view).includes('Elegí tu plan'));
 });
 for(const clases of [true,false])await test('Actividades '+clases+': habitual inicial, multisede y 501 honesto',async()=>{
  const e=env();e.shared={puedeAbrirQr:true,membresia:{estado:'cargada',datos:dto()}};
@@ -883,5 +887,161 @@ await test('Salida por número de ingreso usa contrato existente y valida el ide
  nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'id'}});await settle(e);
  for(const codigo of ['abc','0','2147483648']){const p=escanear(r,codigo)({preventDefault(){}});await p;await settle(e);assert.equal(e.salidas.length,0);assert(text(r.view).includes('número de ingreso válido'));}
  const p=escanear(r,'88')({preventDefault(){}});assert.deepEqual(e.salidas[0].args,[null,88]);e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).replace(/\s/g,'').includes('Ingreso#88'));assert(text(r.view).includes('Salida registrada'));
+});
+function entornoM4() {
+ const e=env();e.user={rol:'USUARIO',email:'socio@test.invalid'};e.llamadasM4=[];
+ e.services.consultarMiPerfil=async()=>({sedeId:1,sedeNombre:'Central'});
+ e.services.listarSedes=async()=>[{id:1,nombre:'Central'},{id:2,nombre:'Sin canchas'}];
+ e.m4=Object.fromEntries(['listarCanchas','listarTurnos','reservarCancha','listarMisReservas','listarReservas','consultarReserva','cancelarReservaCancha','listarTiposCancha','crearCancha','actualizarCancha','crearTurno','crearMantenimiento','listarMantenimientos','eliminarMantenimiento','crearTipoCancha','actualizarTipoCancha','actualizarRecargoPico'].map(nombre=>[nombre,(...args)=>{const d=deferred();d.nombre=nombre;d.args=args;e.llamadasM4.push(d);return d.promise;}]));
+ e.m4.listarCanchas=async id=>String(id)==='1'?[{id:1,sedeId:1,nombre:'Cancha real',tipo:'Tenis',activa:true,precioHora:100,recargoPico:20}]:[];
+ e.m4.listarTiposCancha=async()=>[{id:1,nombre:'Tenis',precioHora:100}];
+ e.m4.listarMantenimientos=async()=>[];
+ e.m4.listarMisReservas=async()=>[];e.m4.listarReservas=async()=>[];
+ const fecha=fechaM4(2);
+ e.m4.listarTurnos=async()=>[{id:3,disponible:true,inicio:fecha+'T18:00:00-03:00',fin:fecha+'T19:00:00-03:00',precio:{total:10200,base:10000,recargo:2000,descuento:1800,estrategia:'SOCIO'}}];
+ e.pagosM5={pagarReservaCancha:(...args)=>{const d=deferred();d.nombre='pago';d.args=args;e.llamadasM4.push(d);return d.promise;},consultarPago:async()=>({estado:'APROBADO',monto:10200})};
+ return e;
+}
+function fechaM4(dias) {
+ return new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Argentina/Buenos_Aires'}).format(new Date(Date.now()+dias*86400000));
+}
+await test('M4 reintento confirmado no anuncia otra retención ni abre un nuevo pago',async()=>{
+ const e=entornoM4(),r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ const enviar=button(r,'Elegir turno').props.onClick;const p=enviar();enviar();
+ assert.equal(e.llamadasM4.length,1);const llamada=e.llamadasM4[0];assert.equal(llamada.nombre,'reservarCancha');assert(llamada.args[2]);
+ llamada.resolve({id:10,estado:'CONFIRMADA'});await p;await settle(e);
+ assert(text(r.view).includes('No se creó una nueva retención'));assert(!text(r.view).includes('Tenés hasta'));
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);
+});
+await test('M4 respuesta perdida conserva clave de reserva al reintentar',async()=>{
+ const e=entornoM4(),r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ let p=button(r,'Elegir turno').props.onClick();e.llamadasM4[0].reject(err(null,'Sin respuesta'));await p;await settle(e);
+ p=button(r,'Elegir turno').props.onClick();assert.equal(e.llamadasM4[0].args[2],e.llamadasM4[1].args[2]);
+ e.llamadasM4[1].resolve({id:10,estado:'PENDIENTE_PAGO',venceEn:'2026-11-25T17:10:00-03:00'});await p;
+});
+await test('M4 paginación consulta página siguiente y vuelve a cero al cambiar sede',async()=>{
+ const e=entornoM4(),paginas=[];e.m4.listarMisReservas=async(page,size)=>{paginas.push([page,size]);return Array.from({length:20},(_,i)=>({id:page*20+i,estado:'EXPIRADA',cancha:'Cancha',sede:'Central',inicio:'2026-11-25T18:00:00-03:00',fin:'2026-11-25T19:00:00-03:00'}));};
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);button(r,'Más reservas').props.onClick();await settle(e);assert.equal(paginas.at(-1)[0],1);
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'2'}});await settle(e);assert.equal(paginas.at(-1)[0],0);
+});
+for(const admin of [false,true])await test('M4 recupera contexto inicial '+(admin?'administración':'grilla'),async()=>{
+ const e=entornoM4();if(admin)e.user.rol='GERENTE';let intentos=0;e.services.consultarMiPerfil=async()=>{if(++intentos===1)throw err(500);return{sedeId:1};};
+ const r=await runner(admin?'adminM4':'gridM4',e,{},admin?'AdministracionCuenta':'GrillaCuenta');await settle(e);
+ const actualizar=nodes(r.view,n=>n.type==='button'&&text(n).includes('Actualizar'))[0];assert(actualizar);actualizar.props.onClick();await settle(e);assert.equal(intentos,2);assert(text(r.view).includes('Cancha real'));
+});
+await test('M4 administración conserva formulario fallido y bloquea doble envío',async()=>{
+ const e=entornoM4();e.user.rol='GERENTE';const r=await runner('adminM4',e,{},'AdministracionCuenta');await settle(e);
+ let f=nodes(r.view,n=>n.type==='form')[0];nodes(f,n=>n.type==='input')[0].props.onChange({target:{value:'Nueva cancha'}});r.render();
+ f=nodes(r.view,n=>n.type==='form')[0];nodes(f,n=>n.type==='select')[0].props.onChange({target:{value:'Tenis'}});r.render();
+ const enviar=nodes(r.view,n=>n.type==='form')[0].props.onSubmit;enviar({preventDefault(){}});enviar({preventDefault(){}});assert.equal(e.llamadasM4.length,1);
+ e.llamadasM4[0].reject(err(409,'Cancha duplicada'));await settle(e);assert.equal(nodes(nodes(r.view,n=>n.type==='form')[0],n=>n.type==='input')[0].props.value,'Nueva cancha');
+ enviar({preventDefault(){}});e.llamadasM4[1].resolve({id:8});await settle(e);assert.equal(nodes(nodes(r.view,n=>n.type==='form')[0],n=>n.type==='input')[0].props.value,'');
+});
+await test('M4 administración limpia recargo al pasar a sede vacía',async()=>{
+ const e=entornoM4();e.user.rol='GERENTE';const r=await runner('adminM4',e,{},'AdministracionCuenta');await settle(e);
+ const recargo=()=>nodes(r.view,n=>n.type==='input'&&Number(n.props.max)===100)[0];assert.equal(recargo().props.value,'20');
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'2'}});await settle(e);assert.equal(recargo().props.value,'');
+});
+await test('M4 usuario comercial no accede a administración ni consulta sedes ajenas',async()=>{
+ const e=entornoM4();let consultas=0;e.services.consultarMiPerfil=async()=>{consultas++;};const r=await runner('adminM4',e,{},'AdministracionCuenta');await settle(e);assert.equal(consultas,0);assert(text(r.view).includes('No tenés permisos'));
+});
+await test('M4 pago con respuesta perdida se recupera sin otro cobro ni cancelación simultánea',async()=>{
+ const e=entornoM4(),fecha=fechaM4(2);
+ const reserva={id:10,canchaId:1,turnoId:3,estado:'PENDIENTE_PAGO',cancha:'Cancha real',inicio:fecha+'T19:00:00-03:00',fin:fecha+'T20:00:00-03:00',venceEn:fecha+'T18:00:00-03:00'};
+ e.m4.listarMisReservas=async()=>[reserva];e.m4.reservarCancha=async()=>reserva;
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ await button(r,'Elegir turno').props.onClick();await settle(e);
+ assert.equal(e.llamadasM4.length,0);
+ assert(!text(r.view).includes('Pagar reserva'));
+ assert(!text(r.view).includes('Pendiente de pago'));
+ const confirmar=button(r,'Confirmar pago').props.onClick;
+ const salir=button(r,'Salir').props.onClick;
+ const p=confirmar();confirmar();salir();assert.equal(e.llamadasM4.length,1);e.llamadasM4[0].reject(err(null,'Respuesta perdida'));await settle(e);
+ assert.equal(e.llamadasM4[1].nombre,'consultarReserva');e.llamadasM4[1].resolve({id:10,pagoId:7,estado:'CONFIRMADA'});await p;await settle(e);
+ assert.equal(e.llamadasM4.filter(x=>x.nombre==='pago').length,1);assert(text(r.view).includes('Pago aprobado'));
+ assert(text(r.view).includes('Recuperamos el resultado del pago'));
+ assert(nodes(r.view,n=>n.type==='a'&&n.props.href==='/pagos').length);
+ button(r,'Cerrar').props.onClick();await settle(e);assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);
+});
+await test('M4 salir libera solo la retención sin iniciar un pago',async()=>{
+ const e=entornoM4(),fecha=fechaM4(2);
+ const reserva={id:10,canchaId:1,turnoId:3,estado:'PENDIENTE_PAGO',inicio:fecha+'T19:00:00-03:00',venceEn:fecha+'T18:00:00-03:00'};
+ e.m4.reservarCancha=async()=>reserva;
+ e.m4.listarMisReservas=async()=>[{...reserva,id:9,estado:'CANCELADA'}];
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ await button(r,'Elegir turno').props.onClick();await settle(e);
+ assert(text(r.view).includes('Tiempo para pagar'));
+ const clave='fitzone:m4:intencion:'+e.user.email+':1:3';
+ assert(e.localStorage.getItem(clave),'una cancelación histórica no elimina la intención actual');
+ const salir=button(r,'Salir').props.onClick();
+ const [canchaId,reservaId,opciones]=e.llamadasM4[0].args;
+ assert.equal(canchaId,1);assert.equal(reservaId,10);assert.equal(opciones.soloRetencion,true);
+ assert.equal(e.llamadasM4[0].nombre,'cancelarReservaCancha');
+ e.llamadasM4[0].resolve({...reserva,estado:'CANCELADA'});await salir;await settle(e);
+ assert.equal(e.localStorage.getItem(clave),null);
+ assert.equal(e.llamadasM4.length,1);
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);
+});
+await test('M4 abre el primer día con turno libre y mantiene la fecha manual', async () => {
+ const e=entornoM4(), consultas=[];
+ e.m4.listarTurnos=async(id,desde,hasta)=>{
+  consultas.push({id,desde,hasta});
+  if(desde===hasta)return [];
+  return [
+   {id:1,inicio:fechaM4(1)+'T18:00:00-03:00',disponible:false},
+   {id:2,inicio:fechaM4(2)+'T18:00:00-03:00',fin:fechaM4(2)+'T19:00:00-03:00',disponible:true,precio:{total:9600,descuento:1440,recargo:0}},
+  ];
+ };
+ const r=await runner('gridM4',e,{},'GrillaCuenta');
+ await settle(e);
+ assert.equal(consultas.length,1);
+ assert.equal((Date.parse(consultas[0].hasta)-Date.parse(consultas[0].desde))/86400000,13);
+ const obtenerFecha=()=>nodes(r.view,n=>n.type==='input'&&n.props.type==='date')[0];
+ assert.equal(obtenerFecha().props.value,fechaM4(2));
+ assert(!text(r.view).includes('Ver próxima fecha disponible'));
+ assert(text(r.view).includes('Descuento de socio aplicado'));
+ const manual=fechaM4(4);
+ obtenerFecha().props.onChange({target:{value:manual}});await settle(e);
+ assert.deepEqual(consultas[1],{id:'1',desde:manual,hasta:manual});
+ assert.equal(obtenerFecha().props.value,manual);
+ assert(text(r.view).includes('Sin horarios para esta fecha'));
+});
+
+await test('M4 cambiar cancha descarta una búsqueda anterior y distingue un error', async () => {
+ const e=entornoM4(), anterior=deferred();
+ e.m4.listarCanchas=async()=>[
+  {id:1,sedeId:1,nombre:'Cancha uno',activa:true},
+  {id:2,sedeId:1,nombre:'Cancha dos',activa:true},
+ ];
+ e.m4.listarTurnos=async(id,desde,hasta)=>{
+  if(id==='2')throw err(500);
+  return desde===hasta ? [] : anterior.promise;
+ };
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ button(r,'Cancha dos').props.onClick();await settle(e);
+ anterior.resolve([{disponible:true,inicio:new Date(Date.now()+86400000).toISOString()}]);await settle(e);
+ assert(nodes(r.view,n=>n.props.role==='alert').length);
+ assert(!text(r.view).includes('Ver próxima fecha disponible'));
+ assert(!text(r.view).includes('Sin horarios para esta fecha'));
+});
+
+await test('Mis pagos presenta comprobantes por pago, reembolso e historial de período', async () => {
+ const e=paidEnv();
+ e.shared.membresia.datos.periodos[0].estado='CANCELADA';
+ e.pagosM5={
+  listarMisPagos:async()=>[
+   {id:e.shared.membresia.datos.periodos[0].pagoId,concepto:'MEMBRESIA',estado:'REEMBOLSADO',monto:100,fecha:'2026-11-01T10:00:00-03:00'},
+   {id:55,concepto:'RESERVA_CANCHA',estado:'APROBADO',monto:1000,fecha:'2026-11-02T10:00:00-03:00',recursoId:12},
+  ],
+  descargarComprobante:async id=>{e.pdfs.push(id);return {};},
+ };
+ const r=await runner('pagosM5',e);await settle(e);
+ assert(text(r.view).includes('Período cancelado'));
+ assert(text(r.view).includes('Reembolsado'));assert(text(r.view).includes('Reserva #12'));
+ const descargas=nodes(r.view,n=>n.type==='button'&&text(n).includes('Descargar PDF'));
+ assert.equal(descargas.length,2);
+ for (const descarga of descargas) await descarga.props.onClick();
+ assert.deepEqual(e.pdfs,[55,e.shared.membresia.datos.periodos[0].pagoId]);
+ assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length,0);
 });
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, Plus, RefreshCw, Wrench } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
@@ -131,6 +131,11 @@ const FORM_MANTENIMIENTO_VACIO = {
 // ============================================
 
 export default function AdministracionCanchas() {
+  const { token } = useAuth();
+  return <AdministracionCuenta key={token} />;
+}
+
+function AdministracionCuenta() {
   const { user, token } = useAuth();
 
   const esRecepcion = user?.rol === 'RECEPCIONISTA';
@@ -176,6 +181,8 @@ export default function AdministracionCanchas() {
   const [aviso, setAviso] = useState(null);
   const [accion, setAccion] = useState(null);
   const [refresco, setRefresco] = useState(0);
+  const [recargaContexto, setRecargaContexto] = useState(0);
+  const enviando = useRef(false);
 
   const canchaSeleccionada = canchas.items.find(
     (cancha) => String(cancha.id) === String(canchaId),
@@ -240,7 +247,7 @@ export default function AdministracionCanchas() {
     return () => {
       activo = false;
     };
-  }, [token, autorizado, esRecepcion]);
+  }, [token, autorizado, esRecepcion, recargaContexto]);
 
   // ==========================================
   // CARGAR CANCHAS DE LA SEDE
@@ -256,6 +263,7 @@ export default function AdministracionCanchas() {
     let activo = true;
 
     setCanchas({ estado: 'cargando', items: [] });
+    setRecargoPico('');
 
     listarCanchas(sedeId)
       .then((datos) => {
@@ -294,9 +302,7 @@ export default function AdministracionCanchas() {
 
         const tarifa = datos.find((cancha) => cancha.recargoPico != null);
 
-        if (tarifa && esGerente) {
-          setRecargoPico(String(tarifa.recargoPico));
-        }
+        if (esGerente) setRecargoPico(tarifa ? String(tarifa.recargoPico) : '');
       })
       .catch((error) => {
         if (activo) {
@@ -374,9 +380,14 @@ export default function AdministracionCanchas() {
   // AVISOS Y ACTUALIZACIÓN
   // ==========================================
 
-  const actualizar = () => setRefresco((valor) => valor + 1);
+  const actualizar = () => {
+    if (contexto.estado === 'error') setRecargaContexto((valor) => valor + 1);
+    setRefresco((valor) => valor + 1);
+  };
 
   const ejecutar = async (clave, operacion, mensajeExito) => {
+    if (enviando.current) return false;
+    enviando.current = true;
     setAccion(clave);
     setAviso(null);
 
@@ -389,12 +400,15 @@ export default function AdministracionCanchas() {
       });
 
       actualizar();
+      return true;
     } catch (error) {
       setAviso({
         tipo: 'error',
         texto: mensajeError(error),
       });
+      return false;
     } finally {
+      enviando.current = false;
       setAccion(null);
     }
   };
@@ -423,7 +437,7 @@ export default function AdministracionCanchas() {
         activa: true,
       }),
       'La cancha se creó correctamente.',
-    ).then(() => setFormNuevaCancha(FORM_CANCHA_VACIO));
+    ).then((guardada) => { if (guardada) setFormNuevaCancha(FORM_CANCHA_VACIO); });
   };
 
   // ==========================================
@@ -523,7 +537,7 @@ export default function AdministracionCanchas() {
         motivo: formMantenimiento.motivo.trim(),
       }),
       'El mantenimiento se registró correctamente.',
-    ).then(() => setFormMantenimiento(FORM_MANTENIMIENTO_VACIO));
+    ).then((guardado) => { if (guardado) setFormMantenimiento(FORM_MANTENIMIENTO_VACIO); });
   };
 
   // ==========================================
@@ -707,7 +721,7 @@ export default function AdministracionCanchas() {
 
               <select
                 value={sedeId}
-                disabled={esRecepcion}
+                disabled={esRecepcion || Boolean(accion)}
                 onChange={(evento) => {
                   setSedeId(evento.target.value);
                   setCanchaId('');
@@ -837,7 +851,7 @@ export default function AdministracionCanchas() {
                 <AppButton
                   type="submit"
                   disabled={
-                    accion === 'crear-cancha' ||
+                    Boolean(accion) ||
                     tipos.estado !== 'cargado' ||
                     tipos.items.length === 0
                   }
@@ -900,7 +914,7 @@ export default function AdministracionCanchas() {
 
                     <AppButton
                       type="submit"
-                      disabled={accion === 'editar-cancha'}
+                      disabled={Boolean(accion)}
                     >
                       {accion === 'editar-cancha' ? 'Guardando...' : 'Guardar cambios'}
                     </AppButton>
@@ -946,7 +960,7 @@ export default function AdministracionCanchas() {
 
                     <AppButton
                       type="submit"
-                      disabled={accion === 'crear-turno'}
+                      disabled={Boolean(accion)}
                     >
                       {accion === 'crear-turno' ? 'Creando...' : 'Crear turno de 60 minutos'}
                     </AppButton>
@@ -1005,7 +1019,7 @@ export default function AdministracionCanchas() {
 
                     <AppButton
                       type="submit"
-                      disabled={accion === 'crear-mantenimiento'}
+                      disabled={Boolean(accion)}
                     >
                       {accion === 'crear-mantenimiento' ? 'Registrando...' : 'Registrar mantenimiento'}
                     </AppButton>
@@ -1052,7 +1066,7 @@ export default function AdministracionCanchas() {
                               <AppButton
                                 size="sm"
                                 variant="secondary"
-                                disabled={accion === `mantenimiento-${item.id}`}
+                                disabled={Boolean(accion)}
                                 onClick={() => desactivarMantenimiento(item)}
                               >
                                 {accion === `mantenimiento-${item.id}` ? 'Desactivando...' : 'Desactivar'}
@@ -1128,7 +1142,7 @@ export default function AdministracionCanchas() {
 
                     <AppButton
                       type="submit"
-                      disabled={accion === 'guardar-tipo'}
+                      disabled={Boolean(accion)}
                     >
                       {accion === 'guardar-tipo'
                         ? 'Guardando...'
@@ -1163,7 +1177,7 @@ export default function AdministracionCanchas() {
 
                 <AppButton
                   type="submit"
-                  disabled={!sedeId || recargoPico === '' || accion === 'guardar-recargo'}
+                  disabled={!sedeId || recargoPico === '' || Boolean(accion)}
                 >
                   {accion === 'guardar-recargo' ? 'Guardando...' : 'Guardar recargo de la sede'}
                 </AppButton>

@@ -151,6 +151,20 @@ class CanchasIntegrationTest {
         assertEquals(p.monto(),pagos.consultar(email,p.id()).montoReembolsado());
         assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM reembolso_pago WHERE pago_id=?",Integer.class,p.id()));
     }
+    @Test void salirDelPagoLiberaLaRetencionSinCancelarUnTurnoPagado() {
+        var turno=turno(14,0);
+        var pendiente=reservar(email,turno.id());
+        var soloRetencion=new CancelarRequest(null,true);
+        assertEstado(403,()->reservas.cancelar(mailOtro,cancha,pendiente.id(),soloRetencion));
+        var cancelada=reservas.cancelar(email,cancha,pendiente.id(),soloRetencion);
+        assertEquals("CANCELADA",cancelada.estado());
+        assertNull(cancelada.pagoId());
+        assertEquals(cancelada,reservas.cancelar(email,cancha,pendiente.id(),soloRetencion));
+        var confirmada=confirmar(mailOtro,turno.id());
+        assertEstado(409,()->reservas.cancelar(mailOtro,cancha,confirmada.id(),soloRetencion));
+        assertEquals("CONFIRMADA",reservas.consultar(mailOtro,confirmada.id()).estado());
+        assertEquals("APROBADO",pagos.datos(confirmada.pagoId()).estado());
+    }
     @Test void cancelacionTardiaDevuelveMitadYConservaComprobanteOriginal() {
         var r=confirmar(email,turno(11,0).id());byte[] pdf=comprobantes.descargar(email,r.pagoId()).contenido();
         var reembolso=reembolsos.solicitar(email,r.pagoId());

@@ -232,16 +232,51 @@
   background: #fff0ee;
 }
 
-.grilla-canchas .m4-nota {
-  margin: 0;
-  color: #63776a;
-  font-size: 12px;
-  line-height: 1.6;
+.grilla-canchas .m4-precio .m4-descuento {
+  color: #2d7048;
+  font-weight: 700;
 }
 
-.grilla-canchas .m4-nota a {
+.grilla-canchas .m4-dialogo-pago {
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: clamp(18px, 4vw, 28px);
+  border: 1px solid #dce5dd;
+  border-radius: 16px;
+  color: #253a2e;
+  background: #fff;
+  box-shadow: 0 20px 56px rgb(20 48 35 / 24%);
+}
+
+.grilla-canchas .m4-dialogo-pago::backdrop {
+  background: rgb(20 48 35 / 54%);
+}
+
+.grilla-canchas .m4-dialogo-pago h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.grilla-canchas .m4-dialogo-pago p {
+  margin: 8px 0;
+}
+
+.grilla-canchas .m4-dialogo-pago__total {
   color: #2f704f;
+  font-size: 22px;
   font-weight: 700;
+}
+
+.grilla-canchas .m4-dialogo-pago__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.grilla-canchas .m4-dialogo-pago__acciones .fit-button {
+  min-height: 44px;
 }
 
 .grilla-canchas :where(button, select, input, a):focus-visible {
@@ -250,6 +285,10 @@
 }
 
 @media (max-width: 640px) {
+  .grilla-canchas .m4-dialogo-pago__acciones .fit-button {
+    flex: 1;
+  }
+
   .grilla-canchas .m4-reserva {
     flex-direction: column;
   }

@@ -30,7 +30,6 @@ import {
 } from '../services/m1Service';
 import {
   nombreActor,
-  periodosConPago,
 } from '../modules/m1-usuarios/estadoCuenta';
 
 import { AvatarCircle } from './ui/FitZoneUI';
@@ -262,11 +261,6 @@ function LayoutAutenticado() {
     && membresia.datos.estado === 'ACTIVA'
   );
 
-  const periodosDeMembresia = esCliente
-    ? periodosConPago(membresia)
-    : [];
-
-  const tieneComprobantesMembresia = periodosDeMembresia.length > 0;
   const clienteSinMembresia = esCliente && membresia.estado === 'sin-membresia';
 
   const navigate = useNavigate();
@@ -385,7 +379,7 @@ function LayoutAutenticado() {
             </ul>
           </div>
 
-          {esCliente && (puedeAbrirQr || tieneComprobantesMembresia) && (
+          {esCliente && puedeAbrirQr && (
             <div className="app-nav__group">
               <p
                 className="app-nav__heading"
@@ -398,23 +392,12 @@ function LayoutAutenticado() {
                 className="app-nav__list"
                 aria-labelledby="nav-servicios"
               >
-                {puedeAbrirQr && (
-                  <NavigationLink
-                    to="/mi-qr"
-                    icon={QrCode}
-                  >
-                    Mi QR
-                  </NavigationLink>
-                )}
-
-                {tieneComprobantesMembresia && (
-                  <NavigationLink
-                    to="/comprobantes"
-                    icon={ReceiptText}
-                  >
-                    Comprobantes
-                  </NavigationLink>
-                )}
+                <NavigationLink
+                  to="/mi-qr"
+                  icon={QrCode}
+                >
+                  Mi QR
+                </NavigationLink>
               </ul>
             </div>
           )}

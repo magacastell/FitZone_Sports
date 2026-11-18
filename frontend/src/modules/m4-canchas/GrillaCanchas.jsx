@@ -6,7 +6,6 @@ import {
   Clock3,
   MapPin,
   RefreshCw,
-  Wallet,
   CheckCircle2,
   AlertCircle,
 } from 'lucide-react';
@@ -44,18 +43,24 @@ import './GrillaCanchas.css';
 // UTILIDADES
 // ============================================
 
-function fechaLocalHoy() {
+function fechaArgentina(instante = new Date()) {
   const partes = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Argentina/Buenos_Aires',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).formatToParts(new Date());
+  }).formatToParts(instante);
 
   const obtener = (tipo) =>
     partes.find((parte) => parte.type === tipo)?.value;
 
   return `${obtener('year')}-${obtener('month')}-${obtener('day')}`;
+}
+
+function sumarDias(fecha, dias) {
+  const dia = new Date(`${fecha}T00:00:00Z`);
+  dia.setUTCDate(dia.getUTCDate() + dias);
+  return dia.toISOString().slice(0, 10);
 }
 
 function formatoFechaHora(valor) {
@@ -214,6 +219,11 @@ function tiempoRestante(venceEn, ahora) {
 // ============================================
 
 export default function GrillaCanchas() {
+  const { token } = useAuth();
+  return <GrillaCuenta key={token} />;
+}
+
+function GrillaCuenta() {
   const { user, token } = useAuth();
 
   const esRecepcion = user?.rol === 'RECEPCIONISTA';
@@ -229,14 +239,14 @@ export default function GrillaCanchas() {
 
   const [sedeId, setSedeId] = useState('');
   const [canchaId, setCanchaId] = useState('');
-  const [fecha, setFecha] = useState(fechaLocalHoy());
+  const [fechaManual, setFechaManual] = useState('');
 
   const [catalogo, setCatalogo] = useState({
     estado: 'inicial',
     items: [],
   });
 
-  const [turnos, setTurnos] = useState({
+  const [resultadoTurnos, setTurnos] = useState({
     estado: 'inicial',
     items: [],
   });
@@ -248,6 +258,11 @@ export default function GrillaCanchas() {
 
   const [aviso, setAviso] = useState(null);
   const [accion, setAccion] = useState(null);
+  const [pagoModal, setPagoModal] = useState(null);
+  const dialogoPago = useRef(null);
+  const enviando = useRef(false);
+  const [recargaContexto, setRecargaContexto] = useState(0);
+  const [paginaReservas, setPaginaReservas] = useState(0);
 
   // Refrescos independientes: una operación no reinicia
   // consultas que no necesitan actualizarse.
@@ -256,6 +271,19 @@ export default function GrillaCanchas() {
   const [refrescoReservas, setRefrescoReservas] = useState(0);
 
   const [ahora, setAhora] = useState(Date.now());
+  const hoy = fechaArgentina(new Date(ahora));
+  const claveTurnos = `${canchaId}:${fechaManual}:${hoy}:${refrescoTurnos}`;
+  const turnos = resultadoTurnos.clave === claveTurnos
+    ? resultadoTurnos
+    : { estado: canchaId ? 'cargando' : 'inicial', items: [] };
+  const fechaMostrada = fechaManual || turnos.fecha || hoy;
+  const mostrarPago = pagoModal !== null;
+  const pagoEnCurso = ['procesando', 'saliendo'].includes(pagoModal?.estado);
+  const pagoVencido = pagoModal?.estado === 'listo' && Date.parse(pagoModal.reserva.venceEn) <= ahora;
+
+  useEffect(() => {
+    if (mostrarPago) dialogoPago.current?.showModal();
+  }, [mostrarPago]);
 
   // Evita procesar reiteradamente la misma retención vencida.
   const expiracionesAtendidas = useRef(new Set());
@@ -276,8 +304,7 @@ export default function GrillaCanchas() {
     return () => window.clearInterval(intervalo);
   }, []);
 
-  // Limpia la clave local cuando una retención vence,
-  // incluso si el usuario no recarga la página.
+  // Refresca la disponibilidad al vencer una retención mostrada.
   useEffect(() => {
     if (!['USUARIO', 'GERENTE'].includes(user?.rol)) {
       return;
@@ -294,7 +321,6 @@ export default function GrillaCanchas() {
 
     vencidas.forEach((reserva) => {
       expiracionesAtendidas.current.add(reserva.id);
-      limpiarClaveReserva(user.email, reserva);
     });
 
     // Actualizamos disponibilidad y reservas para que el turno
@@ -359,7 +385,7 @@ export default function GrillaCanchas() {
     return () => {
       activo = false;
     };
-  }, [token, esRecepcion]);
+  }, [token, esRecepcion, recargaContexto]);
 
   // ==========================================
   // CATÁLOGO DE CANCHAS
@@ -455,7 +481,7 @@ export default function GrillaCanchas() {
   // ==========================================
 
   useEffect(() => {
-    if (!token || !canchaId || !fecha) {
+    if (!token || !canchaId) {
       setTurnos({
         estado: 'inicial',
         items: [],
@@ -465,45 +491,30 @@ export default function GrillaCanchas() {
     }
 
     let activo = true;
-
-    setTurnos({
-      estado: 'cargando',
-      items: [],
-    });
-
-    listarTurnos(canchaId, fecha, fecha)
-      .then((datos) => {
+    setTurnos({ clave: claveTurnos, estado: 'cargando', items: [] });
+    const cargar = async () => {
+      try {
+        const desde = fechaManual || hoy;
+        const hasta = fechaManual || sumarDias(hoy, 13);
+        const items = await listarTurnos(canchaId, desde, hasta);
+        if (!Array.isArray(items)) throw new Error('La respuesta de horarios no es válida.');
         if (!activo) return;
-
-        if (!Array.isArray(datos)) {
-          setTurnos({
-            estado: 'error',
-            items: [],
-            mensaje: 'La respuesta de horarios no es válida.',
-          });
-
-          return;
-        }
-
-        setTurnos({
-          estado: 'cargado',
-          items: datos,
-        });
-      })
-      .catch((error) => {
-        if (activo) {
-          setTurnos({
-            estado: 'error',
-            items: [],
-            mensaje: mensajeError(error, 'turnos'),
-          });
-        }
-      });
+        const fechasLibres = items
+          .filter((turno) => turno.disponible === true && Date.parse(turno.inicio) > Date.now())
+          .map((turno) => fechaArgentina(new Date(turno.inicio)));
+        const fecha = fechaManual || fechasLibres.sort()[0];
+        const turnosDelDia = fecha ? items.filter((turno) => fechaArgentina(new Date(turno.inicio)) === fecha) : [];
+        setTurnos({ clave: claveTurnos, estado: 'cargado', fecha, items: turnosDelDia });
+      } catch (error) {
+        if (activo) setTurnos({ clave: claveTurnos, estado: 'error', items: [], mensaje: error.status ? mensajeError(error, 'turnos') : error.message });
+      }
+    };
+    cargar();
 
     return () => {
       activo = false;
     };
-  }, [token, canchaId, fecha, refrescoTurnos]);
+  }, [token, canchaId, fechaManual, hoy, claveTurnos]);
 
   // ==========================================
   // CONSULTAR RESERVAS
@@ -529,14 +540,14 @@ export default function GrillaCanchas() {
     });
 
     const consulta = user?.rol === 'USUARIO'
-      ? listarMisReservas(0, 20)
+      ? listarMisReservas(paginaReservas, 20)
       : listarReservas(
           esRecepcion
             ? sedeId
             : esGerente
               ? sedeId || null
               : null,
-          0,
+          paginaReservas,
           20,
         );
 
@@ -552,16 +563,6 @@ export default function GrillaCanchas() {
           });
 
           return;
-        }
-
-        // Liberamos claves de reservas que ya finalizaron.
-        if (['USUARIO', 'GERENTE'].includes(user?.rol)) {
-          datos
-            .filter((reserva) => esEstadoFinal(reserva.estado))
-            .forEach((reserva) => {
-              limpiarClaveReserva(user.email, reserva);
-              expiracionesAtendidas.current.add(reserva.id);
-            });
         }
 
         setReservas({
@@ -590,6 +591,7 @@ export default function GrillaCanchas() {
     esRecepcion,
     esGerente,
     refrescoReservas,
+    paginaReservas,
   ]);
 
   // ==========================================
@@ -597,14 +599,18 @@ export default function GrillaCanchas() {
   // ==========================================
 
   const actualizarTodo = () => {
+    if (contexto.estado === 'error') setRecargaContexto((valor) => valor + 1);
     setRefrescoCatalogo((valor) => valor + 1);
     setRefrescoTurnos((valor) => valor + 1);
     setRefrescoReservas((valor) => valor + 1);
   };
 
   const cambiarSede = (valor) => {
+    if (enviando.current) return;
+    setPaginaReservas(0);
     setSedeId(valor);
     setCanchaId('');
+    setFechaManual('');
     setAviso(null);
   };
 
@@ -613,7 +619,8 @@ export default function GrillaCanchas() {
   // ==========================================
 
   const reservar = async (turno) => {
-    if (!canchaSeleccionada || !puedeReservar) return;
+    if (!canchaSeleccionada || !puedeReservar || enviando.current) return;
+    enviando.current = true;
 
     setAccion(`reserva-${turno.id}`);
     setAviso(null);
@@ -631,10 +638,16 @@ export default function GrillaCanchas() {
         clave,
       );
 
-      setAviso({
-        tipo: 'ok',
-        texto: `Turno retenido. Tenés hasta ${formatoFechaHora(reserva.venceEn)} para completar el pago.`,
-      });
+      if (reserva.estado === 'PENDIENTE_PAGO') {
+        setFechaManual(fechaMostrada);
+        setPagoModal({ estado: 'listo', reserva });
+      } else {
+        if (esEstadoFinal(reserva.estado)) limpiarClaveReserva(user.email, reserva);
+        setAviso({
+          tipo: 'ok',
+          texto: `Reserva ${reserva.id} recuperada: ${estadoReservaTexto(reserva.estado)}. No se creó una nueva retención.`,
+        });
+      }
 
       setRefrescoTurnos((valor) => valor + 1);
       setRefrescoReservas((valor) => valor + 1);
@@ -651,7 +664,35 @@ export default function GrillaCanchas() {
         setRefrescoReservas((valor) => valor + 1);
       }
     } finally {
+      enviando.current = false;
       setAccion(null);
+    }
+  };
+
+  const salirDelPago = async () => {
+    if (enviando.current) return;
+    if (pagoModal.estado !== 'listo') {
+      setPagoModal(null);
+      return;
+    }
+    const { reserva } = pagoModal;
+    enviando.current = true;
+    setAccion(`salida-${reserva.id}`);
+    setPagoModal({ estado: 'saliendo', reserva });
+
+    try {
+      const actualizada = await cancelarReservaCancha(reserva.canchaId, reserva.id, { soloRetencion: true });
+      limpiarClaveReserva(user.email, actualizada);
+    } catch {
+      setAviso({
+        tipo: 'error',
+        texto: 'No pudimos confirmar que el turno se liberó. Si sigue pendiente, la retención vence automáticamente.',
+      });
+    } finally {
+      setPagoModal(null);
+      enviando.current = false;
+      setAccion(null);
+      actualizarTodo();
     }
   };
 
@@ -660,79 +701,39 @@ export default function GrillaCanchas() {
   // ==========================================
 
   const pagar = async (reserva) => {
+    if (enviando.current || Date.parse(reserva.venceEn) <= Date.now()) return;
+    enviando.current = true;
     setAccion(`pago-${reserva.id}`);
     setAviso(null);
 
+    setPagoModal({ estado: 'procesando', reserva });
+    const presentar = (pago, actualizada, recuperado = false) => {
+      if (esEstadoFinal(actualizada.estado)) limpiarClaveReserva(user.email, reserva);
+      if (pago.estado === 'APROBADO' && actualizada.estado === 'CONFIRMADA') {
+        setPagoModal({ estado: 'aprobado', reserva: actualizada, pago, recuperado });
+      } else if (pago.estado === 'RECHAZADO' && actualizada.estado === 'RECHAZADA') {
+        setPagoModal({ estado: 'rechazado', reserva: actualizada, pago });
+      } else {
+        setPagoModal({ estado: 'consultado', reserva: actualizada, pago });
+      }
+    };
+
     try {
       const pago = await pagarReservaCancha(reserva.id);
-      const reservaActualizada = await consultarReserva(reserva.id);
-
-      if (
-        pago.estado === 'APROBADO' &&
-        reservaActualizada.estado === 'CONFIRMADA'
-      ) {
-        limpiarClaveReserva(user.email, reserva);
-
-        setAviso({
-          tipo: 'ok',
-          texto: `Pago aprobado. Tu reserva ${reserva.id} quedó confirmada. Ya podés descargar el comprobante desde Comprobantes.`,
-        });
-      } else if (pago.estado === 'RECHAZADO') {
-        limpiarClaveReserva(user.email, reserva);
-
-        setAviso({
-          tipo: 'error',
-          texto: 'El pago fue rechazado. La reserva quedó rechazada y el turno fue liberado.',
-        });
-      } else {
-        setAviso({
-          tipo: 'error',
-          texto: `El pago respondió con estado ${pago.estado || 'desconocido'}. Consultá el estado de la reserva antes de volver a operar.`,
-        });
-      }
-    } catch (error) {
-      // Recuperación ante una respuesta de pago perdida.
+      presentar(pago, await consultarReserva(reserva.id));
+    } catch {
       try {
         const recuperada = await consultarReserva(reserva.id);
-
         if (recuperada.pagoId != null) {
-          const pagoRecuperado = await consultarPago(recuperada.pagoId);
-
-          if (pagoRecuperado.estado === 'APROBADO') {
-            limpiarClaveReserva(user.email, reserva);
-
-            setAviso({
-              tipo: 'ok',
-              texto: 'El pago fue aprobado. Recuperamos el resultado consultando el backend.',
-            });
-          } else if (pagoRecuperado.estado === 'RECHAZADO') {
-            limpiarClaveReserva(user.email, reserva);
-
-            setAviso({
-              tipo: 'error',
-              texto: 'El pago fue rechazado. El horario quedó liberado.',
-            });
-          } else {
-            setAviso({
-              tipo: 'error',
-              texto: `El pago existe, pero su estado es ${pagoRecuperado.estado}.`,
-            });
-          }
+          presentar(await consultarPago(recuperada.pagoId), recuperada, true);
         } else {
-          setAviso({
-            tipo: 'error',
-            texto: error.status
-              ? mensajeError(error, 'pago')
-              : 'No pudimos confirmar si el pago llegó al servidor. Consultá la reserva antes de volver a intentar.',
-          });
+          setPagoModal({ estado: 'sin-confirmar', reserva: recuperada });
         }
       } catch {
-        setAviso({
-          tipo: 'error',
-          texto: 'No pudimos recuperar el resultado del pago. Consultá la reserva y su estado antes de volver a operar.',
-        });
+        setPagoModal({ estado: 'sin-confirmar', reserva });
       }
     } finally {
+      enviando.current = false;
       setAccion(null);
       actualizarTodo();
     }
@@ -743,11 +744,13 @@ export default function GrillaCanchas() {
   // ==========================================
 
   const cancelar = async (reserva) => {
+    if (enviando.current) return;
     const confirmar = window.confirm(
       `¿Querés cancelar la reserva ${reserva.id} de ${reserva.cancha}? El backend calculará la devolución que corresponda.`,
     );
 
     if (!confirmar) return;
+    enviando.current = true;
 
     setAccion(`cancelar-${reserva.id}`);
     setAviso(null);
@@ -800,6 +803,7 @@ export default function GrillaCanchas() {
         texto: mensajeError(error, 'cancelacion'),
       });
     } finally {
+      enviando.current = false;
       setAccion(null);
       actualizarTodo();
     }
@@ -809,7 +813,9 @@ export default function GrillaCanchas() {
   // INTERFAZ
   // ==========================================
 
-  const reservasVisibles = reservas.items || [];
+  const reservasVisibles = reservas.items.filter((reserva) =>
+    user?.rol !== 'USUARIO' || reserva.pagoId != null
+  );
 
   return (
     <div className="fitzone-ui grilla-canchas">
@@ -895,7 +901,7 @@ export default function GrillaCanchas() {
 
                 <select
                   value={sedeId}
-                  disabled={esRecepcion}
+                  disabled={esRecepcion || Boolean(accion)}
                   onChange={(evento) => cambiarSede(evento.target.value)}
                 >
                   {esGerente && (
@@ -968,6 +974,7 @@ export default function GrillaCanchas() {
                     disabled={!cancha.activa}
                     aria-pressed={String(cancha.id) === String(canchaId)}
                     onClick={() => {
+                      if (String(cancha.id) !== canchaId) setFechaManual('');
                       setCanchaId(String(cancha.id));
                       setAviso(null);
                     }}
@@ -1022,9 +1029,12 @@ export default function GrillaCanchas() {
 
                 <input
                   type="date"
-                  min={fechaLocalHoy()}
-                  value={fecha}
-                  onChange={(evento) => setFecha(evento.target.value)}
+                  min={hoy}
+                  value={fechaMostrada}
+                  onChange={(evento) => {
+                    const dia = evento.target.value;
+                    if (dia && dia >= hoy) setFechaManual(dia);
+                  }}
                 />
               </label>
 
@@ -1047,8 +1057,8 @@ export default function GrillaCanchas() {
             turnos.items.length === 0 ? (
               <EmptyState
                 icon={Clock3}
-                title="Sin horarios para esta fecha"
-                description="No hay turnos registrados para la cancha y fecha elegidas."
+                title={fechaManual ? 'Sin horarios para esta fecha' : 'No hay turnos libres en los próximos 14 días'}
+                description="Podés elegir otra fecha o cancha para consultar."
               />
             ) : (
               <div className="m4-turnos-grid">
@@ -1075,15 +1085,12 @@ export default function GrillaCanchas() {
 
                     {turno.precio && (
                       <div className="m4-precio">
-                        <span>Precio total</span>
-
-                        <strong>
-                          {formatoPrecio(turno.precio.total)}
-                        </strong>
-
-                        <small>
-                          Importe informativo hasta retener el turno.
-                        </small>
+                        <span>{Number(turno.precio.descuento) > 0 ? 'Precio socio' : 'Tarifa general'}</span>
+                        <strong>{formatoPrecio(turno.precio.total)}</strong>
+                        {Number(turno.precio.descuento) > 0 && (
+                          <small className="m4-descuento">Descuento de socio aplicado · Ahorrás {formatoPrecio(turno.precio.descuento)}</small>
+                        )}
+                        {Number(turno.precio.recargo) > 0 && <small>Incluye recargo de hora pico</small>}
                       </div>
                     )}
 
@@ -1093,7 +1100,7 @@ export default function GrillaCanchas() {
                       disabled={
                         !puedeReservar ||
                         !turno.disponible ||
-                        accion === `reserva-${turno.id}`
+                        Boolean(accion)
                       }
                       onClick={() => reservar(turno)}
                     >
@@ -1101,7 +1108,7 @@ export default function GrillaCanchas() {
                         ? 'Solo consulta'
                         : accion === `reserva-${turno.id}`
                           ? 'Reservando...'
-                          : 'Retener turno'}
+                          : 'Elegir turno'}
                     </AppButton>
                   </article>
                 ))}
@@ -1120,7 +1127,7 @@ export default function GrillaCanchas() {
                 ? 'Reservas de tu sede'
                 : 'Reservas registradas'
           }
-          description="El estado y los importes de cada reserva provienen del backend."
+          description={user?.rol === 'USUARIO' ? 'Consultá tus turnos y cancelá cuando corresponda.' : 'Consultá los turnos de la sede.'}
           action={
             <AppButton
               size="sm"
@@ -1144,8 +1151,7 @@ export default function GrillaCanchas() {
             reservasVisibles.length === 0 && (
               <EmptyState
                 icon={CalendarDays}
-                title="Todavía no hay reservas"
-                description="Cuando se registren reservas, aparecerán en esta sección."
+                title="Todavía no hay reservas para mostrar"
               />
             )}
 
@@ -1161,13 +1167,6 @@ export default function GrillaCanchas() {
                   const estadoVisual = vencida
                     ? 'EXPIRADA'
                     : reserva.estado;
-
-                  const puedePagar =
-                    puedeReservar &&
-                    !vencida &&
-                    reserva.estado === 'PENDIENTE_PAGO' &&
-                    reserva.venceEn &&
-                    Date.parse(reserva.venceEn) > ahora;
 
                   const puedeCancelar =
                     ['USUARIO', 'RECEPCIONISTA', 'GERENTE'].includes(user?.rol) &&
@@ -1222,25 +1221,11 @@ export default function GrillaCanchas() {
                       </div>
 
                       <div className="m4-reserva__acciones">
-                        {puedePagar && (
-                          <AppButton
-                            size="sm"
-                            disabled={accion === `pago-${reserva.id}`}
-                            onClick={() => pagar(reserva)}
-                          >
-                            <Wallet size={15} />
-
-                            {accion === `pago-${reserva.id}`
-                              ? 'Procesando...'
-                              : 'Pagar reserva'}
-                          </AppButton>
-                        )}
-
                         {puedeCancelar && (
                           <AppButton
                             size="sm"
                             variant="secondary"
-                            disabled={accion === `cancelar-${reserva.id}`}
+                            disabled={Boolean(accion)}
                             onClick={() => cancelar(reserva)}
                           >
                             {accion === `cancelar-${reserva.id}`
@@ -1256,13 +1241,54 @@ export default function GrillaCanchas() {
             )}
         </DataCard>
 
-        {puedeReservar && (
-          <p className="m4-nota">
-            La reserva queda pendiente hasta que el pago sea aprobado.
-            El importe definitivo se fija al retener el turno.
-            Consultá tus comprobantes en{' '}
-            <Link to="/comprobantes">Comprobantes</Link>.
-          </p>
+        <nav aria-label="Páginas de reservas">
+          <AppButton disabled={paginaReservas === 0 || reservas.estado === 'cargando' || Boolean(accion)} onClick={() => setPaginaReservas((valor) => valor - 1)}>Reservas anteriores</AppButton>
+          <span> Página {paginaReservas + 1} · hasta 20 reservas por página </span>
+          <AppButton disabled={reservas.estado !== 'cargado' || reservas.items.length < 20 || Boolean(accion)} onClick={() => setPaginaReservas((valor) => valor + 1)}>Más reservas</AppButton>
+        </nav>
+        {pagoModal && (
+          <dialog ref={dialogoPago} className="m4-dialogo-pago" aria-labelledby="m4-pago-titulo"
+            onCancel={(evento) => {
+              evento.preventDefault();
+              if (!pagoEnCurso) salirDelPago();
+            }}>
+            <h2 id="m4-pago-titulo">{{
+              listo: 'Confirmá tu turno',
+              procesando: 'Procesando pago',
+              saliendo: 'Liberando el turno',
+              aprobado: 'Pago aprobado',
+              rechazado: 'Pago rechazado',
+              consultado: 'Estado del pago',
+              'sin-confirmar': 'Pago sin confirmar',
+            }[pagoModal.estado]}</h2>
+            <p className="m4-dialogo-pago__turno">{pagoModal.reserva.cancha} · {formatoFechaHora(pagoModal.reserva.inicio)}</p>
+            <p className="m4-dialogo-pago__total">{formatoPrecio(pagoModal.pago?.monto ?? pagoModal.reserva.precioAplicado)}</p>
+            <p role="status">{{
+              listo: pagoVencido ? 'Se terminó el tiempo para confirmar. Volvé a elegir un turno.' : 'Confirmá el pago para reservar el horario.',
+              procesando: 'Estamos esperando la confirmación del servidor.',
+              saliendo: 'Estamos devolviendo el turno a la grilla.',
+              aprobado: 'Reserva #' + pagoModal.reserva.id + ' confirmada.' + (pagoModal.recuperado ? ' Recuperamos el resultado del pago después del corte de conexión.' : ''),
+              rechazado: 'El pago fue rechazado y el horario volvió a estar disponible.',
+              consultado: 'Pago: ' + pagoModal.pago?.estado + '. Reserva: ' + estadoReservaTexto(pagoModal.reserva.estado) + '.',
+              'sin-confirmar': 'No pudimos verificar el resultado. Consultá Mis pagos antes de volver a pagar.',
+            }[pagoModal.estado]}</p>
+            {pagoModal.estado === 'listo' && !pagoVencido && (
+              <p className="m4-dialogo-pago__turno">
+                Tiempo para pagar <strong>{tiempoRestante(pagoModal.reserva.venceEn, ahora)}</strong>
+              </p>
+            )}
+            <div className="m4-dialogo-pago__acciones">
+              <AppButton type="button" variant="secondary" disabled={pagoEnCurso} onClick={salirDelPago}>
+                {pagoModal.estado === 'listo' ? 'Salir' : 'Cerrar'}
+              </AppButton>
+              {pagoModal.estado === 'listo' && !pagoVencido && (
+                <AppButton type="button" onClick={() => pagar(pagoModal.reserva)}>Confirmar pago</AppButton>
+              )}
+              {user?.rol === 'USUARIO' && ['aprobado', 'rechazado', 'consultado', 'sin-confirmar'].includes(pagoModal.estado) && (
+                <Link className="fit-button fit-button--md fit-button--primary" to="/pagos">Ir a Mis pagos</Link>
+              )}
+            </div>
+          </dialog>
         )}
 
       </div>

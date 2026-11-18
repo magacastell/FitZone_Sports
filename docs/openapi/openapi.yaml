@@ -2375,7 +2375,7 @@ paths:
     "delete":
       "tags": ["M4 · Canchas"]
       "summary": "Cancelar reserva y reembolsar si corresponde"
-      "description": "Titular, recepcion de su sede o gerente. No permite turno iniciado. >=2h devuelve 100%, menos devuelve 50%. Repetir no duplica devolucion; una cancelacion sin cobro no genera pago."
+      "description": "Titular, recepcion de su sede o gerente. No permite turno iniciado. >=2h devuelve 100%, menos devuelve 50%. Repetir no duplica devolucion; una cancelacion sin cobro no genera pago. Con soloRetencion=true, permite salir del pago liberando una retencion sin cobro. Una reserva cancelada o expirada se devuelve sin cambios y una reserva con pago se rechaza con 409."
       "operationId": "cancelarReserva"
       "x-implementation-status": "implemented"
       "x-contract-status": "stable"
@@ -3094,6 +3094,10 @@ components:
           "enum": [50, 100]
           "nullable": true
           "description": "Opcional, exclusivo del gerente. Sin valor: 100% con >=2 h; 50% con menos de 2 h."
+        "soloRetencion":
+          "type": "boolean"
+          "default": false
+          "description": "Libera el turno únicamente si sigue retenido y sin pago. Nunca inicia una devolución."
     "M5CrearPagoCancha":
       "type": "object"
       "required": ["concepto", "recursoId"]
