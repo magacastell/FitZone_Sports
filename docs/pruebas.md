@@ -372,3 +372,35 @@ generador del fixture, conservando la expectativa de rechazo, y volvió a pasar.
 
 No se midió SLA, cobertura frontend, resistencia a manipulación de un equipo robado
 ni revocación instantánea durante partición. La rotación en caliente sigue fuera del MVP.
+
+## 18/11/2026 — integración de Canchas y Mis pagos
+
+Pasaron las seis suites de `npm test` (198 casos de dominio), el build PWA y 74
+pruebas focalizadas de backend en Java 21 y PostgreSQL 18 aislado, con cero fallos,
+errores u omitidas. Las suites de backend cubren reservas y precio de cancha,
+pasarela, pagos y regresiones de membresías. La advertencia de Vite por un bundle
+mayor de 500 kB no impidió la compilación.
+
+En Chrome con Spring y PostgreSQL reales se verificó la fecha automática y manual,
+tarifa general y descuento, salir del modal sin cobrar, volver a elegir el turno,
+recuperar una respuesta perdida y descargar el PDF desde Mis pagos. El replay
+devolvió la misma reserva y en PostgreSQL quedó un solo pago. Se verificó también
+el rechazo en móvil, la liberación del turno, la conservación del PDF tras
+reembolso y el manejo de un mantenimiento incompatible.
+
+```powershell
+# Desde la raíz. Docker activo y Chrome instalado.
+./scripts/pruebas-backend.ps1 -Tests "CanchasIntegrationTest,PrecioCanchaTest,PasarelaPagoFakeTest,PagosIntegrationTest,MembresiaIntegrationTest"
+cd frontend
+npm ci
+npm test
+npm run build
+node scripts/e2e-m4-m5.mjs
+```
+
+El E2E usa la imagen `fitzone-tests:local` construida por el runner de backend y
+el bundle de `frontend/dist`. La ejecución final usó Node 24.22.3 y guardó
+`resultado.json`, capturas y PDF en
+`target/e2e-m4-m5/95facd19-8dc5-4f25-8abd-9d0b9fb5a6c2`. La evidencia local queda
+ignorada por Git. El runner elimina sus contenedores descartables. Esta verificación
+cubre la reserva y el pago simulado, con el ingreso por reserva en M2 aún pendiente.

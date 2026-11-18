@@ -215,3 +215,16 @@ local; mantuve la fecha local de esta actividad y los timestamps originales del 
 | Commits | 4da0a00 — autorizaciones verificables y V14; 769cafc — QR automático y actualización del terminal. Pruebas E2E y documentación acompañan esta entrada en el commit de cierre. |
 | Pendientes | Revisión antes de integrar/publicar. Reaprovisionar terminales a versión 2; mantener clave persistente y aplicar el procedimiento de rotación con pendientes conciliados. ADR-003/007 pendientes de preparación grupal, sin renumeración unilateral. |
 | Horas efectivas | Pendientes de confirmación. |
+
+### 18/11/2026 — integración frontend de Canchas y Mis pagos
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Integración M4/M5. Numeración pendiente de confirmar con la planificación del equipo. |
+| Actividad | Incorporé el trabajo de Ignacio en la rama de integración, completé el flujo de turnos y el historial de pagos y preparé las referencias para el dossier. Cargué una clase de Pilates por la API en el entorno local aislado para la revisión visual. |
+| Decisiones | Mostrar el primer día con turnos libres y permitir buscar por fecha. El servidor fija el importe, la retención y el resultado. El modal permite confirmar o salir. El historial de reservas conserva la consulta y cancelación de los turnos con pago. |
+| Problema y solución | La retención aparecía como otro flujo de pago debajo de la grilla. Dejé el contador en el modal y usé la cancelación restringida a una retención sin cobro. La prueba en Chrome detectó que una cancelación histórica podía borrar la clave de una reserva nueva en el mismo turno, así que la limpieza pasó a depender del resultado de la operación. |
+| Pruebas | Seis suites frontend, build PWA y 74 pruebas focalizadas backend aprobadas. Chrome con Spring/PostgreSQL verificó salida y liberación sin cobro, confirmación, rechazo, recuperación de respuesta perdida sin duplicados y comprobante. Detalles en [pruebas.md](../pruebas.md#18112026--integración-de-canchas-y-mis-pagos). |
+| Commits | `b2a5252` — integración original de Ignacio, incorporada por `34a265c`. `ae995c1` — flujo de Canchas/Pagos y verificaciones. `bee31c1` — consulta de clases por fecha y sede, de la revisión previa. |
+| Pendientes | Coordinar la elegibilidad de ingreso por reserva con M2 y cerrar los ADR y entregables de equipo que identifica el índice de arquitectura. |
+| Horas efectivas | Pendientes de confirmación. |

@@ -79,6 +79,10 @@ Cada archivo `.drawio` es XML editable no comprimido y cada `.svg` es su represe
 | C4-1 — Contexto completo: capacidades actuales y previstas | [c4-01-contexto.drawio](diagramas/c4-01-contexto.drawio) | [SVG](diagramas/c4-01-contexto.svg) |
 | C4-2 — Contenedores y operación desconectada | [c4-02-contenedores.drawio](diagramas/c4-02-contenedores.drawio) | [SVG](diagramas/c4-02-contenedores.svg) |
 | C4-3 — Componentes del backend M2 | [c4-03-m2.drawio](diagramas/c4-03-m2.drawio) | [SVG](diagramas/c4-03-m2.svg) |
+| C4-3 — Canchas | [c4-03-canchas.drawio](diagramas/c4-03-canchas.drawio) | [SVG](diagramas/c4-03-canchas.svg) · [Nota técnica](diagramas/c4-03-canchas.md) |
+| UML — Secuencia de reserva y pago | [uml-secuencia-reserva-pago.drawio](diagramas/uml-secuencia-reserva-pago.drawio) | [SVG](diagramas/uml-secuencia-reserva-pago.svg) · [Nota técnica](diagramas/uml-secuencia-reserva-pago.md) |
+| UML — Secuencia de reserva concurrente | [uml-secuencia-reserva-concurrente.drawio](diagramas/uml-secuencia-reserva-concurrente.drawio) | [SVG](diagramas/uml-secuencia-reserva-concurrente.svg) · [Nota técnica](diagramas/uml-secuencia-reserva-concurrente.md) |
+| DER físico | [der-fisico.drawio](diagramas/der-fisico.drawio) | [SVG](diagramas/der-fisico.svg) · [Nota técnica](diagramas/der-fisico.md) |
 | UML — Acceso offline y reconciliación | [uml-secuencia-acceso-offline.drawio](diagramas/uml-secuencia-acceso-offline.drawio) | [SVG](diagramas/uml-secuencia-acceso-offline.svg) |
 | UML — Estados de membresía (RF-02) | [uml-estados-membresia.drawio](diagramas/uml-estados-membresia.drawio) | [SVG](diagramas/uml-estados-membresia.svg) · [Nota técnica](diagramas/uml-estados-membresia.md) |
 | UML — Actividad de lista de espera (RF-08) | [uml-actividad-lista-espera.drawio](diagramas/uml-actividad-lista-espera.drawio) | [SVG](diagramas/uml-actividad-lista-espera.svg) · [Nota técnica](diagramas/uml-actividad-lista-espera.md) |
@@ -91,16 +95,12 @@ C4-2 representa un solo frontend React con instancias en distintos navegadores/d
 
 ### Inventario obligatorio restante
 
-La tabla de §5.3 enumera 14 diagramas obligatorios: cuatro C4, siete UML y tres de datos, despliegue e integración. El inventario actual contiene seis pares. Los ocho siguientes siguen pendientes. En RF-08 queda pendiente la validación integral del flujo y del canal de aviso.
+La tabla de §5.3 enumera los diagramas obligatorios. El C4 de Canchas, las secuencias de reserva y el DER se incorporaron con `146fd2d`. La tabla siguiente conserva el trabajo pendiente de este inventario. En RF-08 queda pendiente la validación integral del flujo y del canal de aviso.
 
 | Diagrama restante | Dependencias de cierre |
 |---|---|
-| C4-3 — Canchas/M4 | Servicio de reservas, PricingStrategy, repositorios y bloqueo reales; revisión M4/M5. |
 | UML — Clases del dominio | M3 ya aporta entidades y Observer; falta elaborar el diagrama conjunto con multiplicidades y Strategy/Repository y contrastar M4/M5. |
-| UML — Secuencia reserva de cancha con pago | Precio, retención, cobro y PDF de cancha implementados; M4/M5. |
-| UML — Secuencia reserva concurrente | Bloqueo y respuesta del perdedor demostrados, garantía SQL RN-02; M4. |
 | UML — Estados de reserva | Ciclo real de clases/canchas, pagos/cancelación/penalidad; M3/M4/M5. |
-| DER físico | Incluir las migraciones hasta V16, con clases y ofertas de M3 y ocupación, tarifas y pagos de cancha en M4/M5. Distinguir la unicidad del turno de la ocupación de una reserva. |
 | Despliegue | Compose completo, red, secretos, PWA y terminales; contraste con responsable de despliegue. C4-2 no lo sustituye. |
 | Pipeline CI/CD | Etapas y entorno de pruebas reales; no se encontró configuración CI versionada en el corte. |
 
@@ -143,4 +143,4 @@ Los reportes locales pueden desaparecer; el repositorio conserva pruebas, runner
 | Históricos de pruebas incompletos vs. M2 actual | Se usa la sección más reciente y se inspeccionan reportes; no se afirma que las brechas antiguas sigan todas abiertas. |
 | Comentario de perfil obligatorio sin default vs. configuración | `spring.profiles.active` realmente tiene fallback `dev`; no se afirma fallo por ausencia de perfil ni se modifica la configuración. |
 
-El inventario integrado contiene siete ADR aceptados y un ADR propuesto. Quedan dos ADR pendientes, la validación de ADR-008 y ocho diagramas por completar. Sigue pendiente identificar autores y sprints sin evidencia, completar la validación integral de M3 y revisar los diagramas afectados por M4/M5. Se mantiene el registro de la evidencia disponible sobre las comparaciones históricas de SOA/serverless y estado/UI.
+El inventario conserva siete ADR aceptados y un ADR propuesto. Quedan los ADR-009 y ADR-010, la validación de ADR-008 y los diagramas de la tabla de pendientes. Sigue pendiente identificar autores y sprints donde falta evidencia. [Referencias y pruebas de M4/M5 para el dossier](integracion-canchas-pagos.md#6-referencias-de-implementación-para-el-dossier)
