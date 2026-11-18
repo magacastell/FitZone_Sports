@@ -20,6 +20,13 @@ for(const [fn,args,ruta,metodo,body] of [
   ['crearSede',[{nombre:'Real',capacidadMaxima:20}],'/sedes','POST',{nombre:'Real',capacidadMaxima:20}],
   ['actualizarSede',[7,{direccion:''}],'/sedes/7','PATCH',{direccion:''}],
   ['consultarReporte',['ocupacion',{sedeId:'28',desde:'inicio',hasta:'fin'}],'/reportes/ocupacion?sedeId=28&desde=inicio&hasta=fin'],
+  ['consultarReporteAccesos',[{desde:'2026-11-01T00:00:00-03:00',hasta:'2026-11-08T00:00:00-03:00'}],'/reportes/ocupacion?desde=2026-11-01T00%3A00%3A00-03%3A00&hasta=2026-11-08T00%3A00%3A00-03%3A00'],
+  ['consultarReporteFinanciero',[{desde:'a',hasta:'b',sedeId:'3'}],'/reportes/ingresos?desde=a&hasta=b&sedeId=3'],
+  ['listarTiposCancha',[],'/tipos-cancha'],
+  ['crearTipoCancha',[{nombre:'Tenis',precioHora:9500}],'/tipos-cancha','POST',{nombre:'Tenis',precioHora:9500}],
+  ['actualizarTipoCancha',[4,{nombre:'Tenis',precioHora:10000}],'/tipos-cancha/4','PUT',{nombre:'Tenis',precioHora:10000}],
+  ['actualizarRecargoPico',[2,25],'/sedes/2/recargo-pico','PUT',{recargoPico:25}],
+  ['listarCanchasDeSede',[2],'/canchas?sedeId=2'],
 ]) {
   assert.equal((await mod.namespace[fn](...args)).real,true);assert.equal(llamada[0],ruta);assert.equal(llamada[1]?.method,metodo);assert.equal(llamada[1]?.body,body?JSON.stringify(body):undefined);
   error=Object.assign(new Error('original'),{status:501});assert.throws(()=>mod.namespace[fn](...args),e=>e===error);error=null;aprobadas++;
