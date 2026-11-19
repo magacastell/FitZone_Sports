@@ -834,6 +834,32 @@ paths:
           description: Recurso inexistente.
         '409':
           description: Conflicto de estado, plan inactivo o reintento incompatible.
+  /membresias/usuarios/{usuarioId}:
+    parameters:
+    - $ref: '#/components/parameters/usuarioId'
+    get:
+      tags: [M1 · Membresías]
+      summary: Consulta administrativa de la membresía de un usuario
+      operationId: consultarMembresiaPorUsuario
+      x-implementation-status: implemented
+      x-contract-status: stable
+      description: |
+        RECEPCIONISTA y GERENTE. Equivale a GET /membresias/{membresiaId} partiendo del usuario, sin conocer el ID de
+        membresía. Mismas reglas de sede: recepción solo ve usuarios de su sede (403 en otra); gerente global.
+        404 si el usuario no tiene membresía.
+      responses:
+        '200':
+          description: Membresía con estado e historial actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membresia'
+        '401':
+          description: Sin autenticación válida.
+        '403':
+          description: Sin permisos, cuenta inactiva o usuario de otra sede.
+        '404':
+          description: El usuario no existe o no tiene membresía.
   /membresias/{membresiaId}/estado:
     parameters:
     - $ref: '#/components/parameters/membresiaId'
@@ -2188,6 +2214,28 @@ paths:
         "409":
           "description": "Conflicto de negocio o concurrencia."
   "/sedes/{sedeId}/recargo-pico":
+    "get":
+      "tags": ["M4 · Canchas"]
+      "summary": "Consultar recargo porcentual de la sede"
+      "description": "Recepcion y gerente. Devuelve el recargo vigente (sede.recargo_pico, 0 a 100) aunque la sede todavia no tenga canchas. 404 si la sede no existe."
+      "operationId": "consultarRecargoPico"
+      "x-implementation-status": "implemented"
+      "x-contract-status": "stable"
+      "x-roles-actuales": ["RECEPCIONISTA", "GERENTE"]
+      "parameters": [{"name": "sedeId", "in": "path", "required": true, "schema": {"type": "integer", "format": "int32", "minimum": 1}}]
+      "responses":
+        "200":
+          "description": "Recargo vigente."
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/M4Tarifa"
+        "401":
+          "description": "Sin autenticacion."
+        "403":
+          "description": "Permiso insuficiente."
+        "404":
+          "description": "Sede inexistente."
     "put":
       "tags": ["M4 · Canchas"]
       "summary": "Configurar recargo porcentual de la sede"
@@ -2819,95 +2867,127 @@ paths:
     get:
       tags:
       - Reportes
-      summary: Consultar ocupación histórica
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P04, P11.'
+      summary: Consultar accesos históricos por período y sede
+      description: |-
+        Solo GERENTE. Accesos históricos (ingresos registrados en la base central) del período [desde, hasta): incluye desde
+        y excluye hasta. Los instantes con offset se convierten a hora argentina. sedeId es opcional: sin él se consolida
+        toda la cadena (el listado por sede incluye sedes sin ingresos, con ceros). Entrega totales, personas distintas,
+        permanencia media, pico simultáneo por sede y serie diaria. NO es el aforo actual (GET /accesos/sedes/{id}/aforo)
+        y no incluye ingresos offline aún no sincronizados. Errores: 400 (desde >= hasta, período mayor a 366 días, fecha
+        inválida o parámetro faltante), 401, 403 y 404 (sede inexistente).
       operationId: consultarReporteOcupacion
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: ReporteController, ReporteService, ReporteConsultaRepository y DTO de reporte.
+      parameters:
+      - name: desde
+        in: query
+        required: true
+        description: Inicio inclusivo del período (ISO 8601 con offset).
+        schema:
+          type: string
+          format: date-time
+          example: '2026-11-01T00:00:00-03:00'
+      - name: hasta
+        in: query
+        required: true
+        description: Fin exclusivo del período (ISO 8601 con offset); a lo sumo 366 días después de desde.
+        schema:
+          type: string
+          format: date-time
+          example: '2026-11-19T00:00:00-03:00'
+      - name: sedeId
+        in: query
+        required: false
+        description: Limita el reporte a una sede; sin él se consolida toda la cadena.
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Reporte del período.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReporteOcupacion'
+                $ref: '#/components/schemas/ReporteAccesos'
         '400':
           $ref: '#/components/responses/Validacion'
         '401':
           $ref: '#/components/responses/NoAutenticado'
         '403':
           $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      - $ref: '#/components/parameters/SedeFiltro'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
       x-roles-actuales:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/reporte/controller/ReporteController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P04
-      - P11
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Sólo Gerente. Período [desde,hasta), por sedeId o global si se omite. Devuelve indicadores
-          históricos de accesos, clases y minutos de cancha con definición en schema. No representa aforo instantáneo;
-          el informe global mantiene desglose por sede.
-      x-propuesta-permisos:
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      - src/main/java/com/fitzonesports/reporte/service/ReporteService.java
+      - src/main/java/com/fitzonesports/reporte/repository/ReporteConsultaRepository.java
   /reportes/ingresos:
     get:
       tags:
       - Reportes
-      summary: Consultar ingresos netos
-      description: 'BORRADOR PARA REVISIÓN DEL EQUIPO. La ruta y sus roles actuales están respaldados por el controller;
-        los schemas draft conservan una interfaz de trabajo para mocks, sin imponer campos, estados o políticas
-        funcionales aún no acordados. La alternativa anterior se conserva como x-propuesta-funcional y no es una
-        obligación de implementación. Ver DECISIONES.md: P02, P09, P10, P11.'
+      summary: Consultar cobros, devoluciones y neto por período y sede
+      description: |-
+        Solo GERENTE. Cobros y devoluciones en ARS del período [desde, hasta). Los cobros (pagos APROBADO, REEMBOLSADO o
+        REEMBOLSADO_PARCIAL de membresías y reservas de cancha) se ubican por la fecha del pago; las devoluciones por la
+        fecha de la devolución aunque el pago sea de otro período, por lo que neto puede ser negativo. Cada pago se atribuye
+        a la sede de la membresía contratada o de la cancha reservada; los no atribuibles van en la fila de sedeId null.
+        Los pagos RECHAZADO no suman: se informan en operacionesRechazadas. Mismos errores que /reportes/ocupacion.
       operationId: consultarReporteIngresos
-      x-implementation-status: stub
+      x-implementation-status: implemented
+      x-contract-status: stable
+      x-contract-basis: ReporteController, ReporteService, ReporteConsultaRepository y DTO de reporte.
+      parameters:
+      - name: desde
+        in: query
+        required: true
+        description: Inicio inclusivo del período (ISO 8601 con offset).
+        schema:
+          type: string
+          format: date-time
+          example: '2026-11-01T00:00:00-03:00'
+      - name: hasta
+        in: query
+        required: true
+        description: Fin exclusivo del período (ISO 8601 con offset); a lo sumo 366 días después de desde.
+        schema:
+          type: string
+          format: date-time
+          example: '2026-11-19T00:00:00-03:00'
+      - name: sedeId
+        in: query
+        required: false
+        description: Limita el reporte a una sede; sin él se consolida toda la cadena.
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
       responses:
         '200':
-          description: Resultado de la operación.
+          description: Reporte del período.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReporteIngresos'
+                $ref: '#/components/schemas/ReporteFinanciero'
         '400':
           $ref: '#/components/responses/Validacion'
         '401':
           $ref: '#/components/responses/NoAutenticado'
         '403':
           $ref: '#/components/responses/SinPermiso'
-      parameters:
-      - $ref: '#/components/parameters/Desde'
-      - $ref: '#/components/parameters/Hasta'
-      - $ref: '#/components/parameters/SedeFiltro'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
       x-roles-actuales:
       - GERENTE
       x-contract-source:
       - src/main/java/com/fitzonesports/reporte/controller/ReporteController.java
-      x-contract-status: draft
-      x-contract-pending:
-      - P02
-      - P09
-      - P10
-      - P11
-      x-propuesta-funcional:
-        estado: PENDIENTE DE VALIDACIÓN DEL EQUIPO
-        descripcion: Sólo Gerente. Período [desde,hasta), por sedeId o global si se omite. Pagos aprobados por aprobadoEn
-          menos reembolsos completados por completadoEn; agrupados por moneda. Incluye pago tardío aprobado y su
-          devolución al completarse; un reembolso pendiente no resta ingresos.
-      x-propuesta-permisos:
-      - GERENTE
-      x-implementation-note: La ruta existe; actualmente devuelve HTTP 501 sin cuerpo tras autorizar el rol. Este
-        dato describe el backend actual y no es una respuesta funcional del contrato objetivo.
+      - src/main/java/com/fitzonesports/reporte/service/ReporteService.java
+      - src/main/java/com/fitzonesports/reporte/repository/ReporteConsultaRepository.java
 components:
   securitySchemes:
     BearerAuth:
@@ -4097,6 +4177,316 @@ components:
       - estado
       - lugaresDisponibles
       x-contract-status: stable
+    ReporteAccesos:
+      type: object
+      required:
+      - generadoEn
+      - desde
+      - hasta
+      - resumen
+      - porSede
+      - porDia
+      - advertencias
+      properties:
+        generadoEn:
+          type: string
+          format: date-time
+          example: '2026-11-18T08:08:32-03:00'
+        desde:
+          type: string
+          format: date-time
+          example: '2026-11-01T00:00:00-03:00'
+        hasta:
+          type: string
+          format: date-time
+          example: '2026-11-19T00:00:00-03:00'
+        sedeId:
+          type: integer
+          format: int32
+          nullable: true
+          description: Eco del filtro; null si es toda la cadena.
+          example:
+        resumen:
+          type: object
+          required:
+          - totalIngresos
+          - usuariosUnicos
+          - ingresosOffline
+          - ingresosSinSalida
+          properties:
+            totalIngresos:
+              type: integer
+              format: int64
+              example: 129
+            usuariosUnicos:
+              type: integer
+              format: int64
+              description: Personas distintas; no es la suma de las sedes.
+              example: 12
+            ingresosOffline:
+              type: integer
+              format: int64
+              description: Ingresos reconciliados desde terminales offline.
+              example: 0
+            ingresosSinSalida:
+              type: integer
+              format: int64
+              example: 0
+            permanenciaMediaMinutos:
+              type: number
+              nullable: true
+              description: Solo ingresos con salida; null si ninguno.
+              example: 418.0
+        porSede:
+          type: array
+          description: Una fila por sede (incluye las sin ingresos, con ceros).
+          items:
+            type: object
+            required:
+            - sedeId
+            - sedeNombre
+            - capacidadMaxima
+            - totalIngresos
+            - usuariosUnicos
+            - picoSimultaneo
+            - porcentajePico
+            properties:
+              sedeId:
+                type: integer
+                format: int32
+                example: 1
+              sedeNombre:
+                type: string
+                example: Sede Central
+              capacidadMaxima:
+                type: integer
+                format: int32
+                example: 200
+              totalIngresos:
+                type: integer
+                format: int64
+                example: 31
+              usuariosUnicos:
+                type: integer
+                format: int64
+                example: 12
+              picoSimultaneo:
+                type: integer
+                format: int32
+                description: Máximo de personas dentro a la vez entre los ingresos del
+                  período.
+                example: 4
+              porcentajePico:
+                type: number
+                description: picoSimultaneo sobre capacidadMaxima
+                1 decimal.:
+                example: 2.0
+              permanenciaMediaMinutos:
+                type: number
+                nullable: true
+                example: 438.0
+        porDia:
+          type: array
+          description: Serie diaria continua en días calendario argentinos; los días sin
+            ingresos van con 0.
+          items:
+            type: object
+            required:
+            - fecha
+            - totalIngresos
+            - usuariosUnicos
+            properties:
+              fecha:
+                type: string
+                format: date
+                example: '2026-11-17'
+              totalIngresos:
+                type: integer
+                format: int64
+                example: 6
+              usuariosUnicos:
+                type: integer
+                format: int64
+                example: 5
+        advertencias:
+          type: array
+          items:
+            type: string
+          description: Aclaraciones de lectura (offline
+          aforo:
+          permanencia).:
+      x-contract-status: stable
+    ReporteFinanciero:
+      type: object
+      required:
+      - generadoEn
+      - desde
+      - hasta
+      - moneda
+      - totales
+      - porSede
+      - porConcepto
+      - porDia
+      - advertencias
+      properties:
+        generadoEn:
+          type: string
+          format: date-time
+          example: '2026-11-18T08:08:32-03:00'
+        desde:
+          type: string
+          format: date-time
+          example: '2026-11-01T00:00:00-03:00'
+        hasta:
+          type: string
+          format: date-time
+          example: '2026-11-19T00:00:00-03:00'
+        sedeId:
+          type: integer
+          format: int32
+          nullable: true
+          example:
+        moneda:
+          type: string
+          enum:
+          - ARS
+          example: ARS
+        totales:
+          type: object
+          required:
+          - cobrosBrutos
+          - devoluciones
+          - neto
+          - cantidadCobros
+          - cantidadDevoluciones
+          - operacionesRechazadas
+          properties:
+            cobrosBrutos:
+              type: number
+              example: 370000.0
+            devoluciones:
+              type: number
+              example: 59000.0
+            neto:
+              type: number
+              description: cobrosBrutos - devoluciones; puede ser negativo.
+              example: 311000.0
+            cantidadCobros:
+              type: integer
+              format: int64
+              example: 17
+            cantidadDevoluciones:
+              type: integer
+              format: int64
+              example: 3
+            operacionesRechazadas:
+              type: integer
+              format: int64
+              description: Informativo; no suma a importes.
+              example: 1
+        porSede:
+          type: array
+          description: Una fila por sede más, si corresponde, una con sedeId y sedeNombre
+            null (sin sede asignable). Orden por neto descendente.
+          items:
+            type: object
+            required:
+            - cobrosBrutos
+            - devoluciones
+            - neto
+            - cantidadCobros
+            - cantidadDevoluciones
+            properties:
+              sedeId:
+                type: integer
+                format: int32
+                nullable: true
+                example: 1
+              sedeNombre:
+                type: string
+                nullable: true
+                example: Sede Central
+              cobrosBrutos:
+                type: number
+                example: 69000.0
+              devoluciones:
+                type: number
+                example: 19000.0
+              neto:
+                type: number
+                example: 50000.0
+              cantidadCobros:
+                type: integer
+                format: int64
+                example: 6
+              cantidadDevoluciones:
+                type: integer
+                format: int64
+                example: 2
+        porConcepto:
+          type: array
+          items:
+            type: object
+            required:
+            - concepto
+            - cobrosBrutos
+            - devoluciones
+            - neto
+            - cantidadCobros
+            - cantidadDevoluciones
+            properties:
+              concepto:
+                type: string
+                enum:
+                - MEMBRESIA
+                - RESERVA_CANCHA
+                example: MEMBRESIA
+              cobrosBrutos:
+                type: number
+                example: 330000.0
+              devoluciones:
+                type: number
+                example: 55000.0
+              neto:
+                type: number
+                example: 275000.0
+              cantidadCobros:
+                type: integer
+                format: int64
+                example: 12
+              cantidadDevoluciones:
+                type: integer
+                format: int64
+                example: 2
+        porDia:
+          type: array
+          description: Serie diaria continua en días calendario argentinos.
+          items:
+            type: object
+            required:
+            - fecha
+            - cobrosBrutos
+            - devoluciones
+            - neto
+            properties:
+              fecha:
+                type: string
+                format: date
+                example: '2026-11-17'
+              cobrosBrutos:
+                type: number
+                example: 8000.0
+              devoluciones:
+                type: number
+                example: 0.0
+              neto:
+                type: number
+                example: 8000.0
+        advertencias:
+          type: array
+          items:
+            type: string
+      x-contract-status: stable
     PenalizacionClases:
       type: object
       additionalProperties: false
@@ -5087,34 +5477,6 @@ components:
       x-contract-status: draft
       description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    PeriodoReporte:
-      type: object
-      additionalProperties: false
-      properties:
-        desde:
-          type: string
-          format: date-time
-          example: '2026-10-01T00:00:00-03:00'
-        hasta:
-          type: string
-          format: date-time
-          example: '2026-11-01T00:00:00-03:00'
-        sedeId:
-          type: integer
-          format: int32
-          example: 1
-          nullable: true
-          x-propuesta-validacion:
-            minimum: 1
-      x-propuesta-required:
-      - desde
-      - hasta
-      - sedeId
-      x-propuesta-descripcion: Intervalo [desde, hasta), desde < hasta. sedeId null indica todas las sedes. Instantes
-        con zona horaria explícita.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
     IngresoPorMoneda:
       type: object
       additionalProperties: false
@@ -5149,113 +5511,6 @@ components:
       x-propuesta-descripcion: pagos por aprobadoEn y reembolsos por completadoEn dentro del período; ingresoNeto
         = pagosAprobados - reembolsosCompletados. Puede ser negativo; no cuenta pagos pendientes/rechazados ni reembolsos
         pendientes/fallidos.
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    ReporteIngresos:
-      type: object
-      additionalProperties: false
-      properties:
-        periodo:
-          $ref: '#/components/schemas/PeriodoReporte'
-        totalesPorMoneda:
-          type: array
-          items:
-            $ref: '#/components/schemas/IngresoPorMoneda'
-      x-propuesta-required:
-      - periodo
-      - totalesPorMoneda
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    OcupacionSedePeriodo:
-      type: object
-      additionalProperties: false
-      properties:
-        sedeId:
-          type: integer
-          format: int32
-          example: 1
-          x-propuesta-validacion:
-            minimum: 1
-        ingresosRegistrados:
-          type: integer
-          format: int32
-          example: 300
-          x-propuesta-validacion:
-            minimum: 0
-        ocupacionPromedio:
-          type: number
-          example: 25.5
-          x-propuesta-validacion:
-            minimum: 0
-        ocupacionMaxima:
-          type: integer
-          format: int32
-          example: 60
-          x-propuesta-validacion:
-            minimum: 0
-        plazasClaseOfrecidas:
-          type: integer
-          format: int32
-          example: 200
-          x-propuesta-validacion:
-            minimum: 0
-        asistenciasClase:
-          type: integer
-          format: int32
-          example: 150
-          x-propuesta-validacion:
-            minimum: 0
-        minutosCanchaDisponibles:
-          type: integer
-          format: int32
-          example: 12000
-          x-propuesta-validacion:
-            minimum: 0
-        minutosCanchaUtilizados:
-          type: integer
-          format: int32
-          example: 9000
-          x-propuesta-validacion:
-            minimum: 0
-      x-propuesta-required:
-      - sedeId
-      - ingresosRegistrados
-      - ocupacionPromedio
-      - ocupacionMaxima
-      - plazasClaseOfrecidas
-      - asistenciasClase
-      - minutosCanchaDisponibles
-      - minutosCanchaUtilizados
-      x-propuesta-descripcion: 'Accesos: promedio temporal y máximo de accesos abiertos, recortando intervalos al
-        período; ingresos contados por su instante. Clases: cupos no cancelados y asistencias de clases con inicio
-        en período. Canchas: minutos habilitados sin mantenimiento y minutos de reservas confirmadas/finalizadas
-        recortados al período. Eventos offline aceptados recalculan histórico. Denominador cero no se interpreta
-        como porcentaje de uso.'
-      x-contract-status: draft
-      description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
-        cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
-    ReporteOcupacion:
-      type: object
-      additionalProperties: false
-      properties:
-        periodo:
-          $ref: '#/components/schemas/PeriodoReporte'
-        sedes:
-          type: array
-          items:
-            $ref: '#/components/schemas/OcupacionSedePeriodo'
-        generadoEn:
-          type: string
-          format: date-time
-          example: '2026-10-06T18:00:00-03:00'
-      x-propuesta-required:
-      - periodo
-      - sedes
-      - generadoEn
-      x-propuesta-descripcion: Analítica histórica por período, desglosada por sede incluso en vista global. No
-        es el aforo instantáneo de M2.
       x-contract-status: draft
       description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.

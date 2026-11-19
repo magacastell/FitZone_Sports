@@ -97,8 +97,6 @@ function VistaAgenda() {
       description={esStaff ? 'Administrá la agenda de clases: horarios, instructores, cupos y asistentes.' : 'Reservá tu lugar en las clases grupales de tu membresía.'}
       actions={permitido && <>
         {esStaff && <AppButton onClick={() => { setVerReservas(false); setAsistentes(null); setFormulario({}); }}>Nueva clase</AppButton>}
-        {esGerente && <AppButton type="button" variant="secondary" disabled={ocupada}
-          onClick={() => setVerReservas(!verReservas)}>{verReservas ? 'Volver a clases' : 'Mis reservas'}</AppButton>}
         {!esStaff && <AppLink to="/mis-reservas#clases">Mis reservas</AppLink>}
       </>} />
   );

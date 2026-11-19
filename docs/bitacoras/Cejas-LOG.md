@@ -65,4 +65,9 @@
 - Frontend: nueva pantalla de Reportes con período y sede, indicadores, gráficos de barras con los datos reales y tablas por sede y por concepto; el Panel general muestra el resumen de 30 días y el aforo en una tabla con buscador. Agregó las tarifas de cancha y el recargo del horario pico dentro de Sedes.
 - Recorrió Gerencia en el navegador con una base aislada y corrigió lo que encontró: la tabla de 25 sedes tapaba el gráfico (ahora muestra primero las sedes con movimientos), el formulario de edición de una sede quedaba fuera de pantalla y el gerente veía botones de reservar en Clases.
 - Verificó las cifras contra consultas SQL propias y revisó que Recepción y Socio conservaran sus funciones. Medió el rendimiento con `EXPLAIN` (8 a 21 ms con 600 mil ingresos), por lo que no agregó índices.
-- Pruebas: suite completa del backend (131 con la prueba de reportes, sin fallos) y suites del frontend, que adaptó a los reportes reales. Dejó la documentación de Gerencia en `docs/gerencia-cierre/` (manual de usuario, extracto técnico, contrato OpenAPI, evidencia, decisiones y trazabilidad) para que Maga la consolide.
+- Pruebas: suite completa del backend (131 con la prueba de reportes, sin fallos) y suites del frontend, que adaptó a los reportes reales. Preparó la documentación de Gerencia (manual de usuario, extracto técnico, contrato OpenAPI, evidencia, decisiones y trazabilidad) y se la pasó a Maga por separado; no quedó en el repositorio.
+
+### Claudio — 19/11/2026
+
+- Revisión de Augusto sobre Gerencia: el recargo del horario pico ahora se lee desde la sede (`GET /sedes/{id}/recargo-pico`), así aparece también en una sede sin canchas; y la membresía se consulta desde el usuario (`GET /membresias/usuarios/{id}`) con un botón "Ver membresía" en cada fila, sin pedir el ID. Lo probó en el navegador.
+- Ocultó el botón "Mis reservas" del gerente en Clases (el socio lo conserva) y actualizó el contrato OpenAPI y `DECISIONES.md`: los reportes y los dos endpoints nuevos figuran como implementados.

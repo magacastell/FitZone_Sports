@@ -59,6 +59,18 @@ vencen a las 8 h o 1 h antes del inicio, lo que ocurra primero (job `Vencimiento
 (`registrarAsistenciaClase`) sigue siendo un stub 501. La migración V15 elimina `clase_grupal.fecha` (repetía el día de
 `horario`) y agrega `fin`, `estado` y las tablas/índices de ofertas.
 
+Actualización Gerencia (19/11/2026): se implementaron los reportes consolidados del Gerente Central, `GET /reportes/ocupacion`
+(accesos históricos: ingresos, personas distintas, permanencia media, pico simultáneo por sede y serie diaria) y
+`GET /reportes/ingresos` (cobros, devoluciones y neto en ARS por sede, concepto y día), ambos con período `[desde, hasta)` en
+hora argentina, `sedeId` opcional y acceso solo de GERENTE. Ya no devuelven 501: pasan a `implemented + stable`. Criterios:
+cobros por fecha de pago, devoluciones por fecha de la devolución (el neto puede ser negativo), cada pago atribuido a la sede de
+la membresía o de la cancha y los pagos rechazados fuera de los importes; los ingresos offline aparecen al sincronizar. Se agregaron
+`GET /sedes/{sedeId}/recargo-pico` (recargo vigente aunque la sede no tenga canchas) y `GET /membresias/usuarios/{usuarioId}`
+(consulta administrativa de la membresía partiendo del usuario, con las mismas reglas de sede que `GET /membresias/{id}`). Los
+schemas anteriores de reportes (`ReporteOcupacion`, `OcupacionSedePeriodo`, `ReporteIngresos`, `PeriodoReporte`) se reemplazan por
+`ReporteAccesos` y `ReporteFinanciero`. La ocupación se define como pico simultáneo y su porcentaje de la capacidad; no hay promedio
+horario. Siguen pendientes (P11): métricas de asistencia a clases y de minutos de cancha.
+
 Los D1–D20 del intercambio anterior fueron antecedentes de diseño. Esta revisión **no los presenta como acta ni aprobación inequívoca del equipo**. Sus aspectos técnicos se conservan y sus alternativas funcionales se trazan en P01–P12. No se encontraron en el checkout los textos completos de requisitos/ADR citados por las bitácoras; no se atribuye aprobación a documentos no leídos. Los prototipos frontend sólo aportan contexto.
 
 ## 1. Confirmado por el proyecto
@@ -80,7 +92,7 @@ Se considera confirmado lo verificable en estas fuentes locales, con su alcance 
 
 Operaciones stable: `iniciarSesion`, `registrarCliente`, `consultarPerfil`, `actualizarPerfil`, `listarUsuarios`, `consultarUsuario`, `actualizarUsuario`, `listarSedes`, `crearSede`, `actualizarSede`, `listarPlanes`, `crearPlan`, `actualizarPlan`, `desactivarPlan`, `obtenerQrAcceso`, `registrarIngreso`, `registrarSalida`, `consultarAforo`, `descargarComprobantePago` y, de M3, `listarClases`, `crearClase`, `actualizarClase`, `cancelarClase`, `reservarClase`, `listarReservasClase`, `cancelarReservaClase`, `incorporarListaEspera`, `salirListaEspera`, `responderOfertaClase`, `consultarMiActividadClases`, `listarInstructores`, `crearInstructor`, `listarTiposClase` y `crearTipoClase`. Las dieciocho primeras y las de M3 conservan DTO y reglas funcionales del código, con las divergencias técnicas objetivo indicadas abajo y en el YAML; `descargarComprobantePago` estabiliza ruta/representación PDF como decisión técnica, dejando emisión/elegibilidad pendientes.
 
-Las restantes 20 operaciones mantienen sus schemas útiles como draft. Su ruta y roles actuales están confirmados; sus propuestas de workflow, entradas/respuestas y alcance funcional se identifican por tema pendiente en el YAML.
+Las restantes 3 operaciones mantienen sus schemas útiles como draft. Su ruta y roles actuales están confirmados; sus propuestas de workflow, entradas/respuestas y alcance funcional se identifican por tema pendiente en el YAML.
 
 ## 2. Decisiones técnicas del contrato
 
@@ -229,7 +241,7 @@ de 500 nunca fue un contrato aprobado. El implementado admite 100 eventos.
 ### P11 — Métricas y alcance de reportes (D20)
 
 - **Tema:** definición de ingresos y ocupación.
-- **Qué está confirmado:** reportes de ingresos/ocupación existen como stubs exclusivos de GERENTE; esquema tiene fechas de pagos/accesos/reservas y relación a sedes.
+- **Qué está confirmado:** (actualizado el 19/11/2026) los reportes de accesos e ingresos están implementados, son exclusivos de GERENTE y usan período `[desde, hasta)`; ver la actualización de Gerencia arriba. Quedan por decidir las métricas de asistencia a clases y de minutos de cancha, que no se calculan.
 - **Qué falta decidir:** período y zona, evento contable tomado, política de devoluciones, monedas, vista global, métricas de ocupación, denominadores, tratamiento de mantenimiento y eventos offline/correcciones.
 - **Propuesta actual:** ingresos = pagos aprobados − reembolsos completados, por instante del movimiento y moneda; con sedeId por sede y sin filtro global. Ocupación histórica, separada del aforo, con promedio temporal/máximo de accesos, asistencia de clases y minutos de cancha. Fórmulas, campos y obligatoriedad del período son draft; se pueden sustituir por otras métricas antes del acuerdo.
 - **Motivo de la propuesta:** lectura comprensible y trazabilidad de cifras.
