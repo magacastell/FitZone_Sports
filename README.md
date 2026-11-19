@@ -1,6 +1,6 @@
-# FitZone_Sports
+# FitZone Sports
 
-Trabajo Práctico Final de la materia Programación V - Licenciatura en Sistemas.
+Trabajo Integrador Final de la materia Programación V - Licenciatura en Sistemas (UNER).
 
 Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas de canchas y pagos.
 
@@ -11,6 +11,26 @@ Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas 
 - **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, `usuario`, `sede`, `membresia`, `acceso`, `clase`, `reserva`, `pago`, `reporte`). La presencia de un módulo no implica que su backend esté terminado.
 
 Entrega de la rama `feature/integracion-final-frontend`: [alcance, decisiones, pruebas y pendientes](docs/integracion-final-frontend.md).
+
+## Inicio rápido con Docker (todo el sistema)
+
+Requisito: Docker Desktop con Docker Compose. Desde la raíz del repositorio:
+
+```bash
+docker compose up --build -d
+```
+
+Compose levanta PostgreSQL, el backend (perfil `dev`, con 25 sedes de demostración y los usuarios de prueba) y el frontend. La primera vez tarda unos minutos porque construye las imágenes.
+
+| Qué | Dónde |
+|---|---|
+| Portal web (socio, recepción y gerencia) | http://localhost:8080 |
+| API | http://localhost:3000/api/v1 |
+| Swagger UI | http://localhost:8080/api/v1/swagger-ui/index.html |
+
+Entrá con alguno de los [usuarios de prueba](#usuarios-de-prueba-seed). Para detener todo: `docker compose down` (conserva la base; con `-v` la borra). Si un puerto del equipo está ocupado, se cambia con `POSTGRES_PORT`, `BACKEND_PORT` y `FRONTEND_PORT`. Si venís de una versión anterior del `docker-compose.yml` y el backend no encuentra `postgres`, ejecutá `docker compose down --remove-orphans` y volvé a levantar.
+
+Las secciones siguientes explican cómo trabajar en desarrollo sin construir las imágenes del backend y del frontend (JDK 21 y Node).
 
 ## Requisitos
 
@@ -43,10 +63,10 @@ Las variables definidas con `$env:` se aplican a esa terminal. Si abrís otra pa
 
 ### 2. Levantar PostgreSQL (elegir una opción)
 
-**Opción A: Docker.** Abrí Docker Desktop y esperá a que esté listo. Luego:
+**Opción A: Docker.** Abrí Docker Desktop y esperá a que esté listo. Levantá sólo la base de datos (el backend y el frontend los ejecutás vos, así que no uses el `docker compose up` completo: ocuparía los puertos `3000` y `8080`):
 
 ```powershell
-docker compose up -d
+docker compose up -d postgres
 docker compose ps
 ```
 
@@ -94,7 +114,7 @@ En Linux/macOS, el comando equivalente con los valores locales predeterminados e
 SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
 ```
 
-Al levantar por primera vez, Flyway aplica las migraciones de `src/main/resources/db/migration`. Hibernate valida el esquema sin modificarlo (`ddl-auto=validate`). En dev, `data.sql` agrega una sede y usuarios de prueba.
+Al levantar por primera vez, Flyway aplica las migraciones de `src/main/resources/db/migration`. Hibernate valida el esquema sin modificarlo (`ddl-auto=validate`). En dev, `data.sql` agrega 25 sedes de demostración y los usuarios de prueba.
 
 ### 4. Probar la API (terminal 2)
 
@@ -177,6 +197,7 @@ Las pruebas de persistencia requieren una base aparte, vacía y descartable, con
 - **`database "fitzone" does not exist`:** creá la base en el servidor indicado por `DB_URL`.
 - **Docker no inicia por puerto ocupado:** verificá si PostgreSQL local usa `5432` y elegí cuál ejecutar.
 - **Error de PowerShell al pegar el login:** ejecutá por separado la asignación de `$login` y la de `$headers`, como en los ejemplos.
+- **`UnknownHostException: postgres` en el contenedor del backend:** quedó un contenedor de una versión anterior de Compose sin red. Ejecutá `docker compose down --remove-orphans` y `docker compose up --build -d`.
 - **El frontend no puede iniciar sesión:** verificá que el backend esté activo en `3000` y usá las credenciales de prueba de la API; la contraseña del socio es `socio123`.
 
 Detené backend y frontend con `Ctrl+C` en sus respectivas terminales. Si usaste Docker, desde la raíz ejecutá `docker compose down`; conserva los datos del volumen. No agregues `--volumes` salvo que quieras eliminar toda la base local.
