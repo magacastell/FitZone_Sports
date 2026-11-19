@@ -1,6 +1,6 @@
 import { useCallback,useEffect,useRef,useState } from 'react';
 import { AppButton } from '../../components/ui/FitZoneUI';
-import { prepararTerminal,hayConexion } from '../../services/offline/api';
+import { prepararTerminal,consultarConexionTerminal } from '../../services/offline/api';
 import { db,copiaActual } from '../../services/offline/db';
 import { registrarLocal } from '../../services/offline/movimientos';
 import { sincronizar } from '../../services/offline/sync';
@@ -28,10 +28,10 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
       if(revisando.current||enviando.current)return;
       revisando.current=true;
       try {
-      let disponible=false;
-      try{await hayConexion();disponible=true;if(vivo.current)setConexion('disponible');}
-      catch(e){if(vivo.current)setConexion(e.status===401||e.status===403?'sesión requerida':'sin comunicación');}
-      if(disponible)try{
+      const estado=await consultarConexionTerminal();
+      if(!vivo.current||enviando.current)return;
+      setConexion(estado);
+      if(estado==='disponible')try{
         await sincronizar();
         const copia=await db.meta.get('copia');
         if(copia && Date.now()-copia.relojLocal>=60000 && !(await db.movimientos.where('estado').equals('PENDIENTE').count()))await prepararTerminal();
@@ -49,16 +49,23 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
   }
   async function operar(e) {
     e.preventDefault();await ejecutar(async()=>{
-      if(conexion==='sesión requerida')throw Error('Volvé a iniciar sesión antes de operar con el servidor disponible.');
-      if(conexion==='disponible' && tipo==='INGRESO') {
+      const sesion=localStorage.getItem('token');
+      const estado=await consultarConexionTerminal();
+      if(!vivo.current)return;
+      setConexion(estado);
+      if(estado==='sesión requerida')throw Error('Volvé a iniciar sesión con la cuenta habilitada de Recepción.');
+      if(estado==='respuesta no verificada')throw Error('El servidor no confirmó que esta terminal pueda operar. Consultá el estado antes de registrar un movimiento.');
+      if(estado==='disponible' && tipo==='INGRESO') {
         await sincronizar();
         if(await db.movimientos.where('estado').equals('PENDIENTE').count())throw Error('Sincronizá los pendientes antes de preparar un nuevo ingreso con conexión; los egresos siguen disponibles.');
         // Con central disponible se renueva la copia: no autorizar con una suspensión vieja.
         await prepararTerminal();
       }
+      if(sesion!==localStorage.getItem('token'))throw Error('Cambió la sesión. Volvé a verificar el movimiento.');
+      if(!vivo.current)return;
       const movimiento=await registrarLocal(tipo,codigo.trim(),porId,autonomo);
       if(vivo.current){setCodigo('');setMensaje(`${tipo==='INGRESO'?'Ingreso':'Egreso'} provisional guardado. Visita ${movimiento.visitaId}. Pendiente de confirmación central.`);}
-      if(conexion==='disponible') {
+      if(estado==='disponible') {
         try {
           const resultados=await sincronizar();const resultado=resultados.find(r=>r.id===movimiento.id);
           if(vivo.current)setMensaje(resultado?.estado==='CONFIRMADO'?'Movimiento confirmado por el servidor.':resultado?`${resultado.estado}: ${resultado.detalle}`:'Pendiente de confirmación central.');
@@ -67,8 +74,8 @@ export default function TerminalOffline({autonomo=false,onMovimiento=()=>{}}) {
       onMovimiento();
     });
   }
-  return <section className="panel offline-terminal" aria-label="Terminal offline"><h2>Terminal preparado · acceso de contingencia</h2>
-    <p>Servidor: <strong>{conexion}</strong>. {vista.copia?'Terminal preparado':'Terminal no preparado o caducado'}.</p>
+  return <section className="panel offline-terminal" aria-label="Terminal offline"><h2>Terminal de contingencia</h2>
+    <p role="status">Servidor: <strong>{conexion}</strong>. {vista.copia?'Terminal preparado':'Terminal no preparado o caducado'}.</p>
     {vista.error&&<p role="alert">{vista.error}</p>}
     <AppButton disabled={ocupado||conexion!=='disponible'||vista.pendientes>0} onClick={()=>ejecutar(async()=>{await prepararTerminal();setMensaje('Copia autorizada guardada por hasta dos horas.');})}>Preparar / actualizar terminal</AppButton>
     <AppButton disabled={ocupado||conexion!=='disponible'} onClick={()=>ejecutar(async()=>{await sincronizar();setMensaje('Respuesta central recibida. Revisá pendientes y conflictos.');onMovimiento();})}>Reintentar sincronización</AppButton>

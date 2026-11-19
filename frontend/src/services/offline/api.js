@@ -26,9 +26,19 @@ export async function obtenerQrAutomatico() {
   await guardarLote(respuesta);
   return qrPreparado();
 }
-export async function hayConexion() {
+export async function consultarConexionTerminal() {
   const token=localStorage.getItem('token');
-  const respuesta=await fetch(`${BASE_URL}/accesos/offline/conexion`,{headers:{Authorization:`Bearer ${token}`},cache:'no-store',signal:AbortSignal.timeout(4000)});
-  if(!respuesta.ok)throw Object.assign(Error('La sesión del operador necesita conexión para renovarse.'),{status:respuesta.status});
-  return true;
+  let respuesta;
+  try {
+    respuesta=await fetch(`${BASE_URL}/accesos/offline/conexion`,{
+      headers:token ? {Authorization:`Bearer ${token}`} : {},
+      cache:'no-store',signal:AbortSignal.timeout(4000),
+    });
+  } catch (error) {
+    if(localStorage.getItem('token')!==token)return 'sesión requerida';
+    return ['TypeError','TimeoutError','AbortError'].includes(error.name)
+      ? 'sin comunicación' : 'respuesta no verificada';
+  }
+  if(localStorage.getItem('token')!==token || !token || [401,403].includes(respuesta.status))return 'sesión requerida';
+  return respuesta.status===204 ? 'disponible' : 'respuesta no verificada';
 }

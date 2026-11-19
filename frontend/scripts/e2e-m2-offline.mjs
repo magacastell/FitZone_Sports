@@ -18,7 +18,7 @@ const docker=(args,input)=>execFileSync('docker',args,{input,encoding:'utf8',win
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const pasos=[];function paso(texto){pasos.push({instante:new Date().toISOString(),texto});console.log(texto);}
 const consola=createWriteStream(resolve(out,'browser.log'));
-let pgCreado=false,javaCreado=false,proceso,server,terminal,telefono,terminalPage,perderRespuesta=false,respuestaPerdida=false;
+let pgCreado=false,javaCreado=false,proceso,server,terminal,telefono,terminalPage,perderRespuesta=false,respuestaPerdida=false,estadoSonda;
 const sql=q=>docker(['exec','-i',pg,'psql','-U','postgres','-d','fitzone_e2e','-At','-v','ON_ERROR_STOP=1'],q);
 async function hasta(tarea,ms=120000){const inicio=Date.now();let ultimo;while(Date.now()-inicio<ms){try{const r=await tarea();if(r)return r;}catch(e){ultimo=e;}await pause(500);}throw Error(`Timeout: ${ultimo?.message||'condición no alcanzada'}`);}
 function png(){
@@ -54,6 +54,9 @@ try {
  recepcion.token=(await apiJson('/auth/login',null,{email:recepcion.email,password})).token;
  server=createServer(async(req,res)=>{
   if(req.url.startsWith('/api/')) {
+   if(estadoSonda && req.url==='/api/v1/accesos/offline/conexion') {
+    res.writeHead(estadoSonda);res.end();return;
+   }
    const destino=new URL(req.url,api.replace('/api/v1',''));
    const omitir=perderRespuesta && req.url.includes('/offline/sincronizacion');
    const remoto=httpRequest(destino,{method:req.method,headers:{...req.headers,host:destino.host}},r=>{
@@ -116,6 +119,18 @@ try {
  paso('Terminal conectado actualizó automáticamente su copia después de confirmar todos los pendientes');
  assert.equal(Number(sql('SELECT count(*) FROM registro_acceso WHERE offline_visita IS NOT NULL AND fecha_hora_salida IS NOT NULL;')),2);assert.equal(Number(sql("SELECT count(*) FROM acceso_evento_offline WHERE estado='CONFIRMADO';")),4);
  await terminalPage.screenshot({path:resolve(out,'confirmado.png'),fullPage:true});paso('ACK explícito retiró pendientes; replay HTTP real no duplicó visita ni eventos');
+ const cantidadEventos=(await registros(terminalPage,'movimientos')).length;
+ for(const [status,mensaje] of [[403,'Volvé a iniciar sesión con la cuenta habilitada'],[503,'El servidor no confirmó que esta terminal pueda operar']]) {
+  estadoSonda=status;
+  await terminalPage.getByLabel('Movimiento offline').selectOption('INGRESO');
+  await terminalPage.getByLabel('Código offline').fill(await qrGuardado(phone));
+  await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();
+  await expect(terminalPage.getByText(mensaje,{exact:false})).toBeVisible();
+  await expect(terminalPage.getByTestId('pendientes')).toHaveText('0');
+  assert.equal((await registros(terminalPage,'movimientos')).length,cantidadEventos);
+ }
+ estadoSonda=undefined;
+ paso('Sonda de conexión con 403 y 503 inyectados por el proxy de prueba: se bloqueó la captura sin cambiar la cola local');
  await writeFile(resolve(out,'resultado.json'),JSON.stringify({aprobada:true,fecha:new Date().toISOString(),navegador:'Chrome real headless',socioPosteriorAlCorte:true,sinPreparacionIndividual:true,pasos,visitas:2,eventos:4,duplicados:0,esperaRealMs:65000},null,2));
  console.log(`E2E APROBADA: ${out}`);
 } catch(error) {

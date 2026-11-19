@@ -7,11 +7,13 @@ function errorMovimiento(error, modo) {
   const status = error.status;
   if (!status || status >= 500) return {
     estado: 'error', titulo: 'No pudimos confirmar el movimiento',
-    mensaje: 'Revisá el aforo y verificá el resultado antes de volver a intentarlo.',
+    mensaje: 'El servidor pudo haber guardado el movimiento. Verificá el resultado con la sede antes de registrarlo otra vez, incluso en la terminal de contingencia.',
+  };
+  if (status === 401) return {
+    estado: 'rechazo', titulo: 'Sesión requerida', mensaje: 'Volvé a ingresar con tu cuenta de Recepción.',
   };
   const motivos = {
     400: 'El código no es válido o faltan datos. Volvé a escanear el QR.',
-    401: 'Tu sesión ya no está disponible. Volvé a ingresar.',
     403: 'No se autorizó la operación. Revisá la membresía, la cuenta o los permisos de sede.',
     404: 'No encontramos el ingreso o los datos necesarios para registrar el movimiento.',
     409: 'El QR puede haber vencido o existir un ingreso incompatible. Verificá el estado antes de continuar.',

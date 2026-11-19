@@ -114,7 +114,7 @@ for (const invalido of [await pase({tipo:'otro'}),await pase({permiso:'OTRO'}),a
 assert.equal(await db.movimientos.count(),0);
 console.log('OK automático: socio ausente del padrón, reapertura, replay, bloqueos, audiencia, tipo, caducidad y clave confiable');
 
-const {obtenerQrAutomatico}=await import('../src/services/offline/api.js');
+const {obtenerQrAutomatico,consultarConexionTerminal}=await import('../src/services/offline/api.js');
 const loteV2={version:2,usuarioId:777,tokens:[nuevo],jwk,servidorAhora:Date.now()};
 globalThis.fetch=async(url,opciones)=>{
   assert.ok(url.endsWith('/credenciales/automaticas'));assert.equal(opciones.method,'POST');assert.equal(opciones.body,undefined);
@@ -128,4 +128,21 @@ globalThis.fetch=async()=>Response.json({message:'Suspendida'},{status:403});
 await assert.rejects(()=>obtenerQrAutomatico(),/Suspendida/);
 await assert.rejects(()=>qrPreparado(),/No hay credenciales/);
 console.log('OK automático: obtención sin sede ni preparación, caché durable, fallback de red y 403 sin credencial vieja');
+
+for (const [status, estado] of [[204,'disponible'],[401,'sesión requerida'],[403,'sesión requerida'],
+  [200,'respuesta no verificada'],[404,'respuesta no verificada'],[500,'respuesta no verificada'],[503,'respuesta no verificada']]) {
+  globalThis.fetch=async(url,opciones)=>{
+    assert.ok(url.endsWith('/accesos/offline/conexion'));
+    assert.equal(opciones.cache,'no-store');
+    return new Response(null,{status});
+  };
+  assert.equal(await consultarConexionTerminal(),estado);
+}
+globalThis.fetch=async()=>{throw new TypeError('Sin red');};
+assert.equal(await consultarConexionTerminal(),'sin comunicación');
+globalThis.fetch=async()=>{throw new DOMException('Tiempo agotado','TimeoutError');};
+assert.equal(await consultarConexionTerminal(),'sin comunicación');
+globalThis.fetch=async()=>{localStorage.setItem('token','otra-sesion');return new Response(null,{status:204});};
+assert.equal(await consultarConexionTerminal(),'sesión requerida');
+console.log('OK terminal: 204 confirmado, sesión requerida, HTTP indeterminado, desconexión y cambio de sesión');
 await db.delete();
