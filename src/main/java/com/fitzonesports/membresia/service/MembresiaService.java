@@ -58,6 +58,16 @@ public class MembresiaService {
         return respuesta(membresia);
     }
 
+    /** Consulta administrativa desde el usuario: mismas reglas de sede y permisos que consultarPorId, sin pedir el ID de membresia. */
+    @Transactional(readOnly=true)
+    public MembresiaResponse consultarPorUsuario(String email, Integer usuarioId) {
+        var operador = usuarios.consultarPerfil(email);
+        validarActivo(operador);
+        var membresia = membresias.findByUsuarioId(usuarioId).orElseThrow(() -> error(404,"El usuario no tiene membresia"));
+        validarAdministracion(operador, membresia);
+        return respuesta(membresia);
+    }
+
     @Transactional
     public MembresiaResponse contratar(String email, CrearMembresiaRequest request, UUID clave) {
         var usuario = usuarios.consultarPerfil(email);

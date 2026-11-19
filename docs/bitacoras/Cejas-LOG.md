@@ -52,3 +52,17 @@
 - Agregó `GET /clases/me` (reservas, lista de espera y ofertas del usuario). El registro de asistencia queda en 501.
 - Frontend: nueva pantalla de Clases con reservar, cancelar, anotarse y salir de la lista, aceptar o rechazar la oferta, y para recepción y gerente crear, editar y cancelar clases y ver asistentes; se sumó el enlace en el menú del gerente.
 - Actualizó el contrato OpenAPI y `DECISIONES.md` con las operaciones y rutas nuevas de M3.
+
+### Claudio — 17/11/2026
+
+- Revisó el estado de Gerencia: los reportes `GET /reportes/ocupacion` e `/ingresos` respondían 501 y la pantalla de Reportes no tenía datos reales.
+- Implementó el backend de reportes consolidados del Gerente Central en el módulo `reporte` (controller, service, repository y DTO): accesos (ingresos, personas distintas, pico simultáneo y permanencia por sede, con serie diaria) y cobros, devoluciones y neto en ARS por sede, concepto y día. Usó SQL parametrizado con `JdbcTemplate` en lugar de JPA porque son agregaciones entre varios módulos con función de ventana.
+- Definió el criterio: período `[desde, hasta)` en hora argentina, cobros por fecha de pago y devoluciones por fecha de la devolución (el neto puede ser negativo), pagos atribuidos a la sede de la membresía o de la cancha y rechazados fuera de los importes.
+- Verificó los reportes con una prueba de integración contra PostgreSQL (9 casos: dos sedes, filtros, período vacío, reembolsos total y parcial, neto negativo, sin duplicación, 400, 401, 403 y 404); por decisión del equipo no la dejó en el repositorio.
+
+### Claudio — 18/11/2026
+
+- Frontend: nueva pantalla de Reportes con período y sede, indicadores, gráficos de barras con los datos reales y tablas por sede y por concepto; el Panel general muestra el resumen de 30 días y el aforo en una tabla con buscador. Agregó las tarifas de cancha y el recargo del horario pico dentro de Sedes.
+- Recorrió Gerencia en el navegador con una base aislada y corrigió lo que encontró: la tabla de 25 sedes tapaba el gráfico (ahora muestra primero las sedes con movimientos), el formulario de edición de una sede quedaba fuera de pantalla y el gerente veía botones de reservar en Clases.
+- Verificó las cifras contra consultas SQL propias y revisó que Recepción y Socio conservaran sus funciones. Medió el rendimiento con `EXPLAIN` (8 a 21 ms con 600 mil ingresos), por lo que no agregó índices.
+- Pruebas: suite completa del backend (131 con la prueba de reportes, sin fallos) y suites del frontend, que adaptó a los reportes reales. Dejó la documentación de Gerencia en `docs/gerencia-cierre/` (manual de usuario, extracto técnico, contrato OpenAPI, evidencia, decisiones y trazabilidad) para que Maga la consolide.

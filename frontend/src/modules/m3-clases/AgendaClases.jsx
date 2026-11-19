@@ -24,7 +24,8 @@ function VistaAgenda() {
   const esRecepcion = user.rol === 'RECEPCIONISTA';
   const esGerente = user.rol === 'GERENTE';
   const esStaff = esRecepcion || esGerente;
-  const puedeReservar = user.rol === 'USUARIO' || esGerente;
+  // El gerente administra la agenda; las reservas personales son del socio (el backend las sigue permitiendo).
+  const puedeReservar = user.rol === 'USUARIO';
   const permitido = esStaff || (user.rol === 'USUARIO' && puedeAbrirQr);
 
   const [contexto, setContexto] = useState({ estado: 'cargando', sedes: [] });
@@ -119,7 +120,7 @@ function VistaAgenda() {
         <ActividadClasesPanel actividad={actividad} gestion={gestion} actualizar={actualizar} />
       ) : <>
       <DataCard title={esRecepcion ? 'Tu sede operativa' : 'Elegí una sede'}
-        description={esRecepcion ? 'Administrás únicamente la sede asignada a tu cuenta.' : 'Podés ver y reservar clases en cualquier sede.'}>
+        description={esRecepcion ? 'Administrás únicamente la sede asignada a tu cuenta.' : esGerente ? 'Elegí la sede cuya agenda querés administrar.' : 'Podés ver y reservar clases en cualquier sede.'}>
         {contexto.estado === 'cargando' && <p role="status">Consultando sedes...</p>}
         {contexto.estado === 'error' && <p role="alert">No pudimos cargar las sedes.</p>}
         {contexto.estado === 'cargado' && (

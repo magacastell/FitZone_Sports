@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { listarSedes, listarUsuarios, consultarAforo, crearSede, actualizarSede, consultarMembresia, consultarReporte } from '../../services/gerenciaService';
+import { listarSedes, listarUsuarios, consultarAforo, crearSede, actualizarSede, consultarMembresiaDeUsuario, consultarReporteAccesos, consultarReporteFinanciero } from '../../services/gerenciaService';
 import { AppButton, AppLink, DataCard, PageHeading, StatusBadge } from '../../components/ui/FitZoneUI';
+import ReportesGerencia from './ReportesGerencia';
+import TarifasCancha from './TarifasCancha';
+import { PERIODOS_RAPIDOS, fechaHoraLegible, formatearEntero, formatearPesos, hoyArgentina, parametrosDeRango } from './reportesUtils';
 import './Gerencia.css';
 
 const mensaje = (e) => e.status === 501 ? 'Esta consulta aún no está disponible en el servicio.' : e.status === 403 ? 'No tenés autorización para esta operación.' : e.status === 404 ? 'No se encontró el recurso solicitado.' : e.status === 409 ? 'Hay un conflicto con los datos existentes. Actualizá la consulta antes de continuar.' : e.status === 400 ? 'Revisá los datos ingresados.' : 'No pudimos completar la operación. Actualizá la consulta para verificar el resultado antes de reintentar.';
@@ -33,8 +36,8 @@ export default function Gerencia({ vista = 'panel' }) {
 function Contenido({ vista }) {
   const titulos = { panel: 'Panel general', sedes: 'Sedes', usuarios: 'Usuarios y membresías', reportes: 'Reportes' };
   return <div className="fitzone-ui gerencia"><div className="page-stack">
-    <PageHeading eyebrow="GERENTE CENTRAL · TODA LA CADENA" title={titulos[vista]} description={vista === 'panel' ? 'Una mirada actual de FitZone, con datos verificables de todas las sedes.' : vista === 'reportes' ? 'Análisis histórico y detallado. Consultas sujetas a disponibilidad del servicio.' : 'Administración y consulta global, sin limitarse a la sede de tu perfil.'} />
-    {vista === 'panel' ? <PanelGeneral /> : vista === 'sedes' ? <Sedes /> : vista === 'usuarios' ? <Usuarios /> : <Reportes />}
+    <PageHeading eyebrow="GERENTE CENTRAL · TODA LA CADENA" title={titulos[vista]} description={vista === 'panel' ? 'Una mirada actual de FitZone, con datos verificables de todas las sedes.' : vista === 'reportes' ? 'Análisis histórico de toda la cadena: cobros, devoluciones y accesos por período y por sede.' : 'Administración y consulta global, sin limitarse a la sede de tu perfil.'} />
+    {vista === 'panel' ? <PanelGeneral /> : vista === 'sedes' ? <Sedes /> : vista === 'usuarios' ? <Usuarios /> : <ReportesGerencia />}
   </div></div>;
 }
 
@@ -44,18 +47,59 @@ function PanelGeneral() {
   return <><div className="gerencia-kpis">
     <DataCard title="Sedes registradas"><Resultado consulta={sedes}>{(datos) => <strong className="gerencia-numero">{datos.length}</strong>}</Resultado><AppLink to="/gestion/sedes">Ver sedes</AppLink></DataCard>
     <DataCard title="Usuarios registrados"><Resultado consulta={usuarios}>{(datos) => <strong className="gerencia-numero">{datos.length}</strong>}</Resultado><p>Incluye cuentas comerciales e internas; no equivale a socios activos.</p><AppLink to="/gestion/usuarios">Consultar usuarios</AppLink></DataCard>
-    </div><DataCard title="Estado actual por sede" description="Lecturas independientes de aforo. No representan accesos históricos ni un cierre financiero.">
+    </div><ResumenReciente />
+    <DataCard title="Estado actual por sede" description="Aforo en este momento, una lectura independiente por sede. No son accesos históricos ni un cierre financiero.">
       <AppButton onClick={() => { refrescar(); refrescarUsuarios(); }}>Actualizar panorama</AppButton>
-      <Resultado consulta={sedes}>{(datos) => datos.length ? <div className="gerencia-grid">{datos.map((s) => <Ocupacion key={s.id} sede={s} />)}</div> : <p>No hay sedes registradas.</p>}</Resultado>
-    </DataCard><DataCard title="Indicadores pendientes"><p>Membresías activas globales, accesos históricos y recaudación requieren agregaciones backend. No hay cifras disponibles para presentarlas.</p><AppLink to="/gestion/reportes">Ver disponibilidad de reportes</AppLink></DataCard></>;
+      <Resultado consulta={sedes}>{(datos) => <AforoPorSede sedes={datos} />}</Resultado>
+    </DataCard></>;
 }
 
-function Ocupacion({ sede }) {
+function AforoPorSede({ sedes }) {
+  const [busqueda, setBusqueda] = useState('');
+  const visibles = sedes.filter((s) => `${s.nombre} ${s.direccion || ''}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase()));
+  if (!sedes.length) return <p>No hay sedes registradas.</p>;
+  return <>
+    <label>Buscar sede<input type="search" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Nombre o dirección" /></label>
+    <div className="gerencia-tabla" role="region" aria-label="Aforo actual por sede" tabIndex={0}>
+      <table><thead><tr><th>Sede</th><th>Aforo actual</th><th>Lectura</th><th><span className="gerencia-oculto">Acción</span></th></tr></thead>
+        <tbody>{visibles.map((s) => <FilaAforo key={s.id} sede={s} />)}</tbody></table>
+      {!visibles.length && <p>No hay sedes para esta búsqueda.</p>}
+    </div>
+  </>;
+}
+
+function FilaAforo({ sede }) {
   const [aforo, refrescar] = useConsulta(() => consultarAforo(sede.id), [sede]);
-  return <article className="gerencia-sede"><h3>{sede.nombre}</h3><p>{sede.direccion || 'Dirección no informada'}</p>
-    <Resultado consulta={aforo}>{(dato) => <><strong>{dato.ocupacionActual} / {dato.capacidadMaxima} personas</strong><p>Lectura: {new Date(dato.calculadoEn).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</p></>}</Resultado>
-    <AppButton variant="secondary" onClick={refrescar}>Actualizar aforo de {sede.nombre}</AppButton>
-  </article>;
+  const porcentaje = aforo.estado === 'cargado' && aforo.datos.capacidadMaxima ? Math.round((aforo.datos.ocupacionActual / aforo.datos.capacidadMaxima) * 100) : null;
+  return <tr>
+    <td><strong>{sede.nombre}</strong><br /><small>{sede.direccion || 'Dirección no informada'}</small></td>
+    {aforo.estado === 'cargando' ? <td colSpan={2} role="status">Consultando...</td>
+      : aforo.estado === 'error' ? <td colSpan={2} role="alert">{aforo.mensaje}</td>
+        : <><td>{aforo.datos.ocupacionActual} / {aforo.datos.capacidadMaxima} personas{porcentaje !== null && ` (${porcentaje} %)`}</td>
+          <td>{new Date(aforo.datos.calculadoEn).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</td></>}
+    <td><AppButton variant="secondary" onClick={refrescar}>Actualizar<span className="gerencia-oculto"> aforo de {sede.nombre}</span></AppButton></td>
+  </tr>;
+}
+
+/** Resumen de los últimos 30 días con los mismos reportes de la pantalla Reportes (sin cifras propias). */
+function ResumenReciente() {
+  const [consulta, refrescar] = useConsulta(() => {
+    const filtros = parametrosDeRango({ ...PERIODOS_RAPIDOS[1].rango(hoyArgentina()), sedeId: '' });
+    return Promise.all([consultarReporteFinanciero(filtros), consultarReporteAccesos(filtros)]);
+  });
+  return <DataCard title="Últimos 30 días" description="Toda la cadena. Es el mismo cálculo de la pantalla Reportes, donde podés cambiar el período y filtrar por sede."
+    action={<AppButton variant="secondary" onClick={refrescar}>Actualizar resumen</AppButton>}>
+    <Resultado consulta={consulta}>{([finanzas, accesos]) => <>
+      <div className="gerencia-indicadores">
+        <div className="gerencia-indicador"><span>Cobros brutos</span><strong>{formatearPesos(finanzas.totales.cobrosBrutos)}</strong></div>
+        <div className="gerencia-indicador"><span>Devoluciones</span><strong>{formatearPesos(finanzas.totales.devoluciones)}</strong></div>
+        <div className={`gerencia-indicador${finanzas.totales.neto < 0 ? ' gerencia-indicador--negativo' : ''}`}><span>Neto</span><strong>{formatearPesos(finanzas.totales.neto)}</strong></div>
+        <div className="gerencia-indicador"><span>Ingresos a las sedes</span><strong>{formatearEntero(accesos.resumen.totalIngresos)}</strong><small>{formatearEntero(accesos.resumen.usuariosUnicos)} personas distintas</small></div>
+      </div>
+      <p><small>Generado el {fechaHoraLegible(finanzas.generadoEn)}.</small></p>
+    </>}</Resultado>
+    <AppLink to="/gestion/reportes">Ver reportes completos</AppLink>
+  </DataCard>;
 }
 
 function Sedes() {
@@ -85,63 +129,35 @@ function Sedes() {
       <label>Capacidad máxima<input required type="number" min="1" step="1" value={form.capacidadMaxima} onChange={(e) => setForm({ ...form, capacidadMaxima: e.target.value })} /></label>
     </div><AppButton type="submit">{guardando ? 'Guardando...' : 'Guardar sede'}</AppButton>{id !== null && <AppButton type="button" variant="secondary" onClick={() => { setId(null); setForm({ nombre: '', direccion: '', capacidadMaxima: '' }); setAviso(''); }}>Cancelar edición</AppButton>}</fieldset></form>
     {aviso && <p role="status">{aviso}</p>}
-  </DataCard><DataCard title="Todas las sedes" action={<AppButton disabled={guardando} onClick={refrescar}>Actualizar sedes</AppButton>}><Resultado consulta={sedes}>{(datos) => datos.length ? <div className="gerencia-grid">{datos.map((s) => <article className="gerencia-sede" key={s.id}><h3>{s.nombre}</h3><p>{s.direccion || 'Dirección no informada'}</p><p>Capacidad: {s.capacidadMaxima}</p><AppButton variant="secondary" disabled={guardando} onClick={() => { setId(s.id); setForm({ nombre: s.nombre, direccion: s.direccion || '', capacidadMaxima: String(s.capacidadMaxima) }); setAviso(''); }}>Editar {s.nombre}</AppButton></article>)}</div> : <p>No hay sedes registradas.</p>}</Resultado></DataCard></>;
+  </DataCard><Resultado consulta={sedes}>{(datos) => <TarifasCancha sedes={datos} />}</Resultado><DataCard title="Todas las sedes" action={<AppButton disabled={guardando} onClick={refrescar}>Actualizar sedes</AppButton>}><Resultado consulta={sedes}>{(datos) => datos.length ? <div className="gerencia-grid">{datos.map((s) => <article className="gerencia-sede" key={s.id}><h3>{s.nombre}</h3><p>{s.direccion || 'Dirección no informada'}</p><p>Capacidad: {s.capacidadMaxima}</p><AppButton variant="secondary" disabled={guardando} onClick={() => { setId(s.id); setForm({ nombre: s.nombre, direccion: s.direccion || '', capacidadMaxima: String(s.capacidadMaxima) }); window.scrollTo?.({ top: 0, behavior: 'smooth' }); setAviso(''); }}>Editar {s.nombre}</AppButton></article>)}</div> : <p>No hay sedes registradas.</p>}</Resultado></DataCard></>;
 }
 
 function Usuarios() {
   const [usuarios, refrescar] = useConsulta(listarUsuarios);
   const [busqueda, setBusqueda] = useState('');
-  const [id, setId] = useState('');
   const [seleccion, setSeleccion] = useState(null);
-  return <><DataCard title="Consulta global de usuarios" action={<AppButton onClick={refrescar}>Actualizar usuarios</AppButton>}>
+  const coincide = (u) => `${u.nombre} ${u.apellido} ${u.email} ${u.dni}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase());
+  return <>{seleccion && <DataCard title={`Membresía de ${seleccion.nombre} ${seleccion.apellido}`} description={seleccion.email}
+    action={<AppButton variant="secondary" onClick={() => setSeleccion(null)}>Cerrar</AppButton>}>
+    <DetalleMembresia key={seleccion.id} usuarioId={seleccion.id} />
+  </DataCard>}<DataCard title="Consulta global de usuarios" description="Buscá a una persona y, si es socio o cliente, consultá su membresía directamente desde la fila."
+    action={<AppButton onClick={refrescar}>Actualizar usuarios</AppButton>}>
     <label>Buscar nombre, email o DNI<input type="search" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} /></label>
-    <Resultado consulta={usuarios}>{(datos) => <div className="gerencia-tabla" role="region" aria-label="Usuarios de toda la cadena" tabIndex={0}><table><thead><tr>{['Nombre','Email','DNI','Autoridad','Sede habitual / operativa','Cuenta'].map((t) => <th key={t} scope="col">{t}</th>)}</tr></thead><tbody>
-      {datos.filter((u) => `${u.nombre} ${u.apellido} ${u.email} ${u.dni}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase())).map((u) => <tr key={u.id}><td>{u.nombre} {u.apellido}</td><td>{u.email}</td><td>{u.dni}</td><td>{u.rol}</td><td>{u.sedeNombre || 'Sin asignar'}</td><td>{u.activo ? 'Habilitada' : 'Inactiva'}</td></tr>)}
-    </tbody></table>{!datos.some((u) => `${u.nombre} ${u.apellido} ${u.email} ${u.dni}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase())) && <p>No hay usuarios para esta búsqueda.</p>}</div>}</Resultado>
-  </DataCard><DataCard title="Consultar membresía por ID" description="El backend no ofrece listado global ni búsqueda de membresía por usuario. El ID de usuario no es el ID de membresía.">
-    <form onSubmit={(e) => { e.preventDefault(); if (Number.isInteger(Number(id)) && Number(id) > 0) setSeleccion(Number(id)); }}><label>ID de membresía<input type="number" required min="1" step="1" value={id} onChange={(e) => setId(e.target.value)} /></label><AppButton type="submit">Consultar membresía</AppButton></form>
-    {seleccion && <DetalleMembresia key={seleccion} id={seleccion} />}
+    <Resultado consulta={usuarios}>{(datos) => <div className="gerencia-tabla" role="region" aria-label="Usuarios de toda la cadena" tabIndex={0}><table><thead><tr>{['Nombre','Email','DNI','Autoridad','Sede habitual / operativa','Cuenta','Membresía'].map((t) => <th key={t} scope="col">{t}</th>)}</tr></thead><tbody>
+      {datos.filter(coincide).map((u) => <tr key={u.id}><td>{u.nombre} {u.apellido}</td><td>{u.email}</td><td>{u.dni}</td><td>{u.rol}</td><td>{u.sedeNombre || 'Sin asignar'}</td><td>{u.activo ? 'Habilitada' : 'Inactiva'}</td>
+        <td>{u.rol === 'USUARIO' ? <AppButton variant="secondary" onClick={() => { setSeleccion(u); window.scrollTo?.({ top: 0, behavior: 'smooth' }); }}>Ver membresía<span className="gerencia-oculto"> de {u.nombre} {u.apellido}</span></AppButton> : <small>No aplica</small>}</td></tr>)}
+    </tbody></table>{!datos.some(coincide) && <p>No hay usuarios para esta búsqueda.</p>}</div>}</Resultado>
   </DataCard></>;
 }
 
-function DetalleMembresia({ id }) {
-  const [consulta, refrescar] = useConsulta(() => consultarMembresia(id), [id]);
+function DetalleMembresia({ usuarioId }) {
+  const [consulta, refrescar] = useConsulta(() => consultarMembresiaDeUsuario(usuarioId), [usuarioId]);
+  if (consulta.estado === 'error' && consulta.status === 404) return <><p>Este usuario todavía no contrató ninguna membresía.</p><AppButton variant="secondary" onClick={refrescar}>Actualizar membresía</AppButton></>;
   return <><AppButton variant="secondary" onClick={refrescar}>Actualizar membresía</AppButton><Resultado consulta={consulta}>{(m) => {
     const periodo = m.periodoVigente || [...m.periodos].reverse().find((p) => p.estado !== 'CANCELADA');
-    return <div><p>Membresía #{m.id} · Titular #{m.usuarioId}</p><StatusBadge>{m.estado}</StatusBadge><p>{periodo?.nombrePlan || 'Sin período contratado disponible'}</p><p>Referencia del último plan contratado: #{m.planId}</p>
-      {periodo && <p>{m.periodoVigente ? 'Período vigente' : 'Último período contratado'}: {new Date(periodo.inicio).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })} → {new Date(periodo.fin).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</p>}
+    const fecha = (valor) => new Date(valor).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+    return <div><StatusBadge>{m.estado}</StatusBadge><p><strong>{periodo?.nombrePlan || 'Sin período contratado disponible'}</strong></p>
+      {periodo && <p>{m.periodoVigente ? 'Período vigente' : 'Último período contratado'}: {fecha(periodo.inicio)} → {fecha(periodo.fin)}</p>}
       <p>Períodos registrados: {m.periodos.length}</p></div>;
   }}</Resultado></>;
-}
-
-function Reportes() {
-  const [sedes] = useConsulta(listarSedes);
-  const [form, setForm] = useState({ desde: '', hasta: '', sedeId: '', tipo: 'ocupacion' });
-  const [filtros, setFiltros] = useState(null);
-  return <><DataCard title="Período y alcance" description="Elegí qué período y sedes querés analizar. Los datos históricos estarán disponibles al habilitar el servicio de reportes.">
-    <form onSubmit={(e) => { e.preventDefault(); setFiltros({ ...form }); }}><div className="gerencia-form"><label>Desde<input type="date" required value={form.desde} onChange={(e) => setForm({ ...form, desde: e.target.value })} /></label><label>Hasta (sin incluir)<input type="date" required min={form.desde} value={form.hasta} onChange={(e) => setForm({ ...form, hasta: e.target.value })} /></label>
-      <label>Sede<select value={form.sedeId} onChange={(e) => setForm({ ...form, sedeId: e.target.value })}><option value="">Toda la cadena</option>{sedes.estado === 'cargado' && sedes.datos.map((s) => <option key={s.id} value={s.id}>{s.nombre}</option>)}</select></label><label>Tipo<select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}><option value="ocupacion">Ocupación</option><option value="ingresos">Ingresos financieros</option></select></label></div><AppButton type="submit">Consultar reporte</AppButton></form>
-    <Resultado consulta={sedes}>{() => null}</Resultado>
-    {filtros ? <ResultadoReporte key={JSON.stringify(filtros)} filtros={filtros} /> : <p>Los reportes históricos están pendientes de backend. Seleccioná filtros para consultar su disponibilidad.</p>}
-  </DataCard>
-    <section aria-labelledby="resumen-periodo"><h3 id="resumen-periodo">Resumen del período</h3>
-      <div className="gerencia-kpis gerencia-reportes-resumen">
-        <DataCard title="Membresías" description="Evolución de las membresías en el período seleccionado."><p className="gerencia-datos-pendientes">Datos no disponibles: pendiente servicio de reportes.</p></DataCard>
-        <DataCard title="Accesos" description="Ingresos históricos registrados en las sedes seleccionadas."><p className="gerencia-datos-pendientes">Datos no disponibles: pendiente servicio de reportes.</p></DataCard>
-        <DataCard title="Financiero / recaudación" description="Cobros y devoluciones del período, con alcance por sede."><p className="gerencia-datos-pendientes">Datos no disponibles: pendiente servicio de reportes.</p></DataCard>
-      </div>
-    </section>
-    <section aria-labelledby="evolucion-periodo"><h3 id="evolucion-periodo">Evolución</h3>
-      <div className="gerencia-grid gerencia-reportes-series">
-        <DataCard title="Accesos por período" description="Serie temporal de ingresos a las sedes."><div className="gerencia-reporte-vacio"><p>Datos no disponibles: pendiente servicio de reportes.</p><span>La evolución aparecerá cuando exista una serie histórica confirmada.</span></div></DataCard>
-        <DataCard title="Recaudación por período" description="Serie temporal de cobros y devoluciones."><div className="gerencia-reporte-vacio"><p>Datos no disponibles: pendiente servicio de reportes.</p><span>Sin importes ni tendencias estimadas.</span></div></DataCard>
-      </div>
-    </section>
-    <DataCard title="Comparación por sede" description="Resumen histórico comparable dentro del mismo período. No representa el aforo actual."><div className="gerencia-reporte-vacio"><p>Datos no disponibles: pendiente servicio de reportes.</p><span>El desglose por sede se mostrará cuando el servicio entregue indicadores comparables.</span></div></DataCard>
-  </>;
-}
-
-function ResultadoReporte({ filtros }) {
-  const [consulta, refrescar] = useConsulta(() => consultarReporte(filtros.tipo, { desde: `${filtros.desde}T00:00:00-03:00`, hasta: `${filtros.hasta}T00:00:00-03:00`, ...(filtros.sedeId && { sedeId: filtros.sedeId }) }));
-  return <><AppButton variant="secondary" onClick={refrescar}>Actualizar reporte</AppButton><Resultado consulta={consulta}>{() => <p>El servicio respondió, pero la representación del reporte requiere integración antes de presentar resultados.</p>}</Resultado></>;
 }

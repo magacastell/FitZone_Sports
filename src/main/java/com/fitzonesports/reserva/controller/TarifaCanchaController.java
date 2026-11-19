@@ -18,6 +18,8 @@ public class TarifaCanchaController {
     public TipoResponse crear(Authentication auth,@Valid @RequestBody TipoRequest req){return canchas.guardarTipo(auth.getName(),null,req);}
     @PutMapping("/tipos-cancha/{id}") @PreAuthorize("hasRole('GERENTE')")
     public TipoResponse actualizar(Authentication auth,@PathVariable Integer id,@Valid @RequestBody TipoRequest req){return canchas.guardarTipo(auth.getName(),id,req);}
+    @GetMapping("/sedes/{sedeId}/recargo-pico") @PreAuthorize("hasAnyRole('RECEPCIONISTA','GERENTE')")
+    public TarifaRequest consultarRecargo(@PathVariable Integer sedeId){return canchas.recargoPico(sedeId);}
     @PutMapping("/sedes/{sedeId}/recargo-pico") @PreAuthorize("hasRole('GERENTE')")
     public TarifaRequest recargo(Authentication auth,@PathVariable Integer sedeId,@Valid @RequestBody TarifaRequest req){return canchas.tarifaPico(auth.getName(),sedeId,req);}
 }

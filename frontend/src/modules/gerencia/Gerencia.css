@@ -28,3 +28,32 @@
 .gerencia-planes th { background: #edf3ec; }
 .gerencia-planes .table-scroll { max-width: 100%; overflow-x: auto; }
 .gerencia-planes td button { min-height: 44px; padding: 8px; margin: 4px; border: 1px solid #bbcdbf; border-radius: 8px; background: white; color: #234a36; cursor: pointer; }
+
+/* Reportes y resumen */
+.gerencia .gerencia-acciones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.gerencia .gerencia-error { color: #8f1d1d; }
+.gerencia .gerencia-indicadores { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,200px),1fr)); gap: 16px; margin-bottom: 20px; }
+.gerencia .gerencia-indicador { display: grid; gap: 4px; padding: 16px; border: 1px solid #dce5de; border-radius: 12px; background: #f6f8f5; min-width: 0; overflow-wrap: anywhere; }
+.gerencia .gerencia-indicador span { font-size: 13px; color: #52665a; font-weight: 600; }
+.gerencia .gerencia-indicador strong { font-size: 24px; color: #234a36; }
+.gerencia .gerencia-indicador small { color: #52665a; font-size: 12px; }
+.gerencia .gerencia-indicador--negativo strong, .gerencia td.negativo { color: #8f1d1d; }
+.gerencia .gerencia-sin-datos { padding: 16px; border: 1px dashed #c9d7cc; border-radius: 12px; background: #f6f8f5; color: #344f3f; }
+.gerencia h3 { margin: 24px 0 8px; font-size: 16px; color: #1e2d26; }
+.gerencia td.num, .gerencia th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gerencia .gerencia-glosario { margin: 0; padding-left: 20px; line-height: 1.7; }
+.gerencia .gerencia-notas { margin-top: 16px; font-size: 14px; color: #52665a; }
+.gerencia .gerencia-notas summary { cursor: pointer; font-weight: 600; }
+.gerencia .gerencia-grafico { margin: 0; }
+.gerencia .gerencia-grafico svg { width: 100%; height: 200px; display: block; }
+.gerencia .gerencia-grafico .eje { stroke: #bbcdbf; stroke-width: 1; }
+.gerencia .gerencia-grafico .etiqueta { font-size: 11px; fill: #52665a; }
+.gerencia .barra--cobros, .gerencia .barra--ingresos { fill: #2f704f; background: #2f704f; }
+.gerencia .barra--devoluciones { fill: #b4581f; background: #b4581f; }
+.gerencia .gerencia-grafico figcaption { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 8px; font-size: 13px; color: #52665a; }
+.gerencia .gerencia-leyenda { display: inline-flex; align-items: center; gap: 6px; }
+.gerencia .gerencia-leyenda i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.gerencia .gerencia-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.gerencia td small { color: #52665a; }
+.gerencia tfoot td { font-weight: 700; background: #f6f8f5; border-top: 2px solid #bbcdbf; }
+.gerencia .gerencia-tabla + .fit-button { margin-top: 12px; }

@@ -88,6 +88,13 @@ public class CanchaService {
         else if(jdbc.update("UPDATE tipo_cancha SET nombre=?,precio_hora=? WHERE id=?",req.nombre().strip(),req.precioHora(),id)==0)throw error(404,"El tipo no existe");
         return new TipoResponse(id,req.nombre().strip(),req.precioHora());
     }
+    /** Recargo vigente de la sede (columna sede.recargo_pico), exista o no alguna cancha cargada en ella. */
+    @Transactional(readOnly=true)
+    public TarifaRequest recargoPico(Integer sedeId) {
+        var valores=jdbc.queryForList("SELECT recargo_pico FROM sede WHERE id=?",java.math.BigDecimal.class,sedeId);
+        if(valores.isEmpty())throw error(404,"La sede no existe");
+        return new TarifaRequest(valores.getFirst());
+    }
     @Transactional
     public TarifaRequest tarifaPico(String email,Integer sedeId,TarifaRequest req) {
         if(!"GERENTE".equals(actor(email).rol()))throw error(403,"Solo gerente configura recargos");
