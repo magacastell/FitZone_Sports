@@ -49,3 +49,25 @@
 - Analizó el informe de auditoría documental del repositorio realizado con Codex para identificar entregables pendientes.
 - Identificó documentación existente que podía aprovecharse, como los ADR, diagramas y archivos técnicos del repositorio.
 - Organizó los pendientes del dossier, diferenciando los documentos que podían avanzarse de los que dependían de la integración de M4 y M5.
+
+### 11/11/2026
+- Elaboró una primera versión del Manual Técnico y del Manual de Instalación y Operación de FitZone Sports.
+- Revisó ambos documentos en relación con los lineamientos del TP, el código y la configuración actual del sistema.
+- Actualizó la planificación consolidada del proyecto a la versión v0.3, verificando las actividades, los períodos de trabajo, los enlaces y los commits registrados.
+- Identificó aspectos pendientes de documentación relacionados con los módulos M4 y M5 y los procedimientos operativos.
+
+### 18/11/2026
+- Retomó la revisión integral del repositorio principal para preparar el cierre del Trabajo Integrador.
+- Revisó el estado de los diagramas de arquitectura, DER, secuencias, estados y clases, verificando su correspondencia con la implementación actual.
+- Analizó los cambios incorporados al repositorio, incluyendo nuevos ADR y actualizaciones de documentación técnica.
+- Revisó los metadatos y la organización de los archivos de arquitectura para identificar documentación pendiente de actualizar.
+- Participó en la consolidación de los avances y en la identificación de los últimos entregables necesarios para la presentación.
+
+### 19/11/2026
+- Realizó una revisión final de los lineamientos de entrega y del estado general del repositorio, priorizando los requisitos de admisibilidad y los entregables obligatorios.
+- Analizó los resultados de las auditorías realizadas con Codex y contrastó las observaciones con los lineamientos académicos y la teoría de las unidades de Arquitectura y Patrones de Diseño.
+- Revisó y validó las actualizaciones del C4 Nivel 1 — Contexto (v4) y C4 Nivel 2 — Contenedores (v5), verificando su coherencia con la arquitectura implementada.
+- Participó en la revisión y actualización de los diagramas C4 Nivel 3 correspondientes a los módulos Canchas y Acceso.
+- Definió criterios de autoría, versiones y referencias de código para mantener la consistencia de los diagramas de arquitectura.
+- Coordinó la distribución de las tareas pendientes de cierre documental entre los integrantes del equipo.
+- Priorizó las correcciones obligatorias y la consolidación de los entregables para avanzar con la preparación del dossier final.
