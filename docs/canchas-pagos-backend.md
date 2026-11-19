@@ -56,7 +56,7 @@ Una retención nunca equivale a pago ni confirmación. El frontend debe leer el 
 
 ## Recorrido de pago sin cambiar código
 
-En desarrollo `data.sql` agrega 25 sedes, dos canchas por sede y turnos para los próximos siete días. No modifica tarifas existentes ni duplica recursos al reiniciar.
+En una instalación limpia con `dev`, [V17 de demostración](../src/main/resources/db/demo/V17__datos_demostracion.sql) crea 25 sedes, dos canchas por sede y dos turnos por cancha a cuatro días de la carga, uno en horario pico. Flyway aplica V17 una sola vez y conserva las tarifas existentes.
 
 1. Login `cliente@fitzone.com` / `cliente123` para aprobación.
 2. Consultar canchas por sede y turnos por fechas.

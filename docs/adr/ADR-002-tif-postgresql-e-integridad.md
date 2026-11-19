@@ -40,7 +40,7 @@ Se persiste el estado central en PostgreSQL mediante un esquema relacional evolu
 
 ### Evidencia y justificación
 
-- [Configuración](../../src/main/resources/application.properties): Flyway habilitado, `baseline-on-migrate=false`, `clean-disabled=true`, validación de migraciones y `spring.jpa.hibernate.ddl-auto=validate`. `data.sql` se activa en dev y se desactiva en staging/prod; no es una migración estructural.
+- [Configuración](../../src/main/resources/application.properties): Flyway habilitado, `baseline-on-migrate=false`, `clean-disabled=true`, validación de migraciones y `spring.jpa.hibernate.ddl-auto=validate`. Las migraciones comunes llegan a V16. [V17](../../src/main/resources/db/demo/V17__datos_demostracion.sql) carga datos de demostración una sola vez en `dev`.
 - [V1](../../src/main/resources/db/migration/V1__crear_esquema_inicial.sql): PK, FK, unicidad de DNI/email y de turno por cancha/fecha/inicio. Las tablas están en un esquema compartido, no en cinco esquemas SQL por módulo.
 - [V4](../../src/main/resources/db/migration/V4__qr_y_accesos_abiertos.sql): índice parcial único por usuario cuando la salida es null, garantía central de una presencia abierta (RN-01).
 - [V5](../../src/main/resources/db/migration/V5__membresias_y_periodos.sql) y [V6](../../src/main/resources/db/migration/V6__comprobantes_y_reembolsos.sql): períodos, operaciones de membresía y evolución de comprobantes/reembolsos. El precio histórico del período se conserva; no se recalcula desde un plan modificado.

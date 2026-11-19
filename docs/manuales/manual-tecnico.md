@@ -107,7 +107,7 @@ La cuenta está `ACTIVA` con un período no cancelado cuyo inicio es inclusivo y
 
 ## 3. Modelo de datos
 
-Flyway administra el esquema y Hibernate valida su correspondencia al arrancar. En desarrollo, el [perfil dev](../../src/main/resources/application-dev.properties) carga [data.sql](../../src/main/resources/data.sql) con datos de demostración. La regla del repositorio es agregar una migración nueva para cada cambio y preservar las ya aplicadas. Conviven entidades JPA, repositorios Spring Data y consultas SQL explícitas. La [decisión de persistencia](../adr/ADR-005-tif-spring-di-y-persistencia.md) y el [README](../../README.md) explican ese criterio.
+Flyway administra el esquema y Hibernate valida su correspondencia al arrancar. El [perfil dev](../../src/main/resources/application-dev.properties) agrega la ubicación `db/demo` y aplica V17 de demostración una sola vez. Staging y producción usan las migraciones comunes V1–V16. La regla del repositorio es agregar una migración nueva para cada cambio y preservar las ya aplicadas. Conviven entidades JPA, repositorios Spring Data y consultas SQL explícitas. La [decisión de persistencia](../adr/ADR-005-tif-spring-di-y-persistencia.md) y el [README](../../README.md) explican ese criterio.
 
 | Dominio | Relaciones y garantías del esquema |
 | --- | --- |
@@ -128,6 +128,7 @@ Flyway administra el esquema y Hibernate valida su correspondencia al arrancar. 
 | [V11](../../src/main/resources/db/migration/V11__credenciales_m2_offline.sql) · [V12](../../src/main/resources/db/migration/V12__terminal_y_copia_m2.sql) · [V13](../../src/main/resources/db/migration/V13__reconciliacion_m2_offline.sql) · [V14](../../src/main/resources/db/migration/V14__uso_qr_multisede.sql) | Credenciales de compatibilidad, terminal y copia, reconciliación y unicidad de uso del QR. |
 | [V15](../../src/main/resources/db/migration/V15__clases_grupales.sql) | Clases, reservas, espera, ofertas e índices correspondientes. |
 | [V16](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql) | Tarifas, ocupación, mantenimiento y vinculación entre pagos y reservas de canchas. |
+| [V17](../../src/main/resources/db/demo/V17__datos_demostracion.sql) | Datos de demostración versionados, exclusivos de `dev`. |
 
 ## 4. Patrones de diseño
 

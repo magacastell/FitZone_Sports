@@ -22,6 +22,15 @@ docker compose up --build -d
 
 Compose levanta PostgreSQL, el backend (perfil `dev`, con 25 sedes de demostración y los usuarios de prueba) y el frontend. La primera vez tarda unos minutos porque construye las imágenes.
 
+Para demostrar el acceso offline, instalá Node.js y ejecutá una vez, desde la raíz, antes de arrancar:
+
+```bash
+node scripts/preparar-config-m2.mjs
+docker compose up --build -d
+```
+
+El script genera la clave RSA local en `.env` y conserva una clave ya configurada. Compose pasa `FITZONE_OFFLINE_PRIVATE_KEY` al backend. Usá el mismo archivo en los próximos arranques y mantenelo fuera de Git. Si ya levantaste Compose, volvé a ejecutar el comando de arranque para que aplique la variable. Para este Compose no hace falta completar `DB_PASSWORD` en `.env`. Sin preparar la clave, el acceso online sigue disponible y la preparación offline devuelve `503`.
+
 | Qué | Dónde |
 |---|---|
 | Portal web (socio, recepción y gerencia) | http://localhost:8080 |
@@ -407,10 +416,10 @@ No prueban la validación de JWT.
 
 Para activar las pruebas de persistencia, definir `PLAN_TEST_DB_URL` con una URL
 JDBC hacia una base PostgreSQL **vacía y descartable**, usuario `postgres` y sin
-contraseña (solo entorno local de pruebas). Flyway aplica las migraciones hasta V9 y Hibernate valida
+contraseña (solo entorno local de pruebas). Flyway aplica las migraciones comunes V1–V16 y Hibernate valida
 el mapeo. Estas pruebas verifican decimales, restricciones, orden y conservación
 de referencias de membresía al desactivar, concurrencia y actualización desde V2.
-Sin la variable se omiten.
+Sin la variable se omiten. La carga V17 se valida por separado con la ubicación de demostración.
 
 ### Comprobantes PDF y reembolsos de membresías (M5)
 

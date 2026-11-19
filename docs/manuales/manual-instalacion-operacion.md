@@ -36,9 +36,20 @@ Desde la raíz podés comprobar el entorno con `.\mvnw.cmd -version`, `docker ve
 
 ## 2. Puesta en marcha en entorno de desarrollo
 
-### Base de datos
+### Arranque integrado con Docker Compose
 
-Elegí un solo PostgreSQL en el puerto local 5432. Con Docker abierto, desde la raíz:
+Desde la raíz, con Docker Desktop y Node.js, prepará la clave de M2 y levantá el sistema:
+
+~~~powershell
+node scripts/preparar-config-m2.mjs
+docker compose up --build -d
+~~~
+
+Compose inicia PostgreSQL, el backend en `dev` y Nginx con el frontend compilado. Abrí `http://localhost:8080` y usá las [cuentas de demostración](../../README.md#usuarios-de-prueba-seed). El script crea `.env` y conserva la clave RSA en arranques posteriores. Si sólo necesitás operar online, podés omitir el script. [Compose](../../docker-compose.yml)
+
+### Alternativa de desarrollo con procesos separados
+
+Si vas a ejecutar Spring y Vite por separado, iniciá únicamente el servicio PostgreSQL:
 
 ~~~powershell
 docker compose up -d postgres
@@ -46,7 +57,7 @@ docker compose ps
 docker compose exec postgres pg_isready -U postgres -d fitzone
 ~~~
 
-El servicio `postgres` crea la base local `fitzone`. El [Compose](../../docker-compose.yml) define únicamente PostgreSQL, publica `5432:5432` y guarda los datos en `fitzone_pgdata`. Para usar PostgreSQL local, creá una base de desarrollo dedicada según el [README](../../README.md) y configurá `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` para esa instancia. Flyway crea las tablas al iniciar el backend.
+El servicio `postgres` crea la base local `fitzone`, publica el puerto 5432 por defecto y guarda los datos en `fitzone_pgdata`. Para usar PostgreSQL local, creá una base dedicada según el [README](../../README.md) y configurá `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`. Flyway crea las tablas al iniciar el backend.
 
 **Advertencia para desarrollo.** El mapeo `5432:5432` no limita explícitamente el acceso a `127.0.0.1` y el servicio usa credenciales de demostración. Usá este Compose en un entorno de desarrollo aislado. Antes de usarlo en una red compartida, verificá y restringí quién puede conectarse al puerto publicado.
 
@@ -77,18 +88,18 @@ Para detener el entorno local, cerrá los procesos de frontend y backend con `Ct
 
 ## 3. Puesta en marcha en entorno de producción
 
-El código trae el [perfil prod](../../src/main/resources/application-prod.properties) y permite construir los artefactos por separado. **El despliegue productivo completo queda pendiente.** El repositorio no define el servidor estático del frontend, el proxy público ni la orquestación de los tres componentes.
+El código trae el [perfil prod](../../src/main/resources/application-prod.properties) y permite construir los artefactos por separado. El Compose integrado está configurado para desarrollo. En producción queda por definir el despliegue público con HTTPS y la configuración del ambiente.
 
 | Componente | Preparación comprobable en el repositorio |
 | --- | --- |
-| Base | Proveer una base PostgreSQL dedicada y accesible desde el proceso Java. El arranque ejecuta Flyway y valida el esquema. El perfil `prod` desactiva `data.sql` y el registro SQL de Hibernate. |
+| Base | Proveer una base PostgreSQL dedicada y accesible desde el proceso Java. Flyway aplica V1–V16 y Hibernate valida el esquema. `prod` excluye V17 de demostración y desactiva el registro SQL de Hibernate. |
 | Backend | Desde la raíz, `docker build -t fitzone-backend:local .` construye la imagen definida en el [Dockerfile](../../Dockerfile), que ejecuta `java -jar app.jar`. La imagen expone 3000 y el proceso lee `PORT`. El build empaqueta con `-DskipTests`. El entorno debe entregar explícitamente `SPRING_PROFILES_ACTIVE=prod`, las variables de PostgreSQL, `JWT_SECRET` y la clave persistente de M2 cuando se utilice offline. |
-| Frontend | Desde `frontend/`, `npm ci` seguido de `npm run build` genera `dist/`. El [build PWA](../../frontend/scripts/build-pwa.mjs) agrega `sw.js` y el manifiesto. Para el diseño de mismo origen, el servidor debe publicar `dist/` en la raíz de un origen HTTPS, servir la SPA en sus rutas y enrutar `/api/v1` al backend. El [registro del service worker](../../frontend/src/main.jsx) usa `/sw.js`. La configuración de publicación y proxy aún requiere implementación y prueba. |
+| Frontend | Desde `frontend/`, `npm ci` seguido de `npm run build` genera `dist/`, `sw.js` y el manifiesto. El [Nginx de Compose](../../frontend/nginx.conf) publica la SPA y reenvía `/api/` al backend. El despliegue público debe servir ambos bajo el mismo origen HTTPS. |
 | Cuentas iniciales | `staging` y `prod` comparten la desactivación del seed de desarrollo. V2 registra roles; el registro público crea usuarios con autoridad `USUARIO`. Queda por confirmar cómo provisionar Gerencia y Recepción en un ambiente limpio. [V2](../../src/main/resources/db/migration/V2__insertar_roles.sql) · [UsuarioService](../../src/main/java/com/fitzonesports/usuario/service/UsuarioService.java) |
 
 El perfil `staging` también exige una base propia y usa la [configuración sin seed](../../src/main/resources/application-staging.properties). La [plantilla de entorno](../../.env.example) propone `staging`. El archivo base contiene un comentario que anuncia error si falta el perfil, pero la expresión efectiva es `SPRING_PROFILES_ACTIVE:dev`. Fijá el perfil en el proceso de cada ambiente para que la omisión no active datos de demostración.
 
-`localhost` en `DB_URL` apunta al entorno de red del proceso Java. Si Java corre en un contenedor separado, el host de PostgreSQL depende de la red que se configure. El Compose actual no conecta un backend a esa red ni le inyecta las variables.
+`localhost` en `DB_URL` apunta al entorno de red del proceso Java. En Compose, el backend recibe su configuración de conexión y accede a la base por el nombre de servicio `postgres`.
 
 ## 4. Variables de entorno
 
@@ -131,7 +142,7 @@ Fuentes de la tabla: [configuración base](../../src/main/resources/application.
 node scripts/preparar-config-m2.mjs
 ~~~
 
-Completá `DB_PASSWORD` según la base elegida antes de cargar el archivo. Spring no lee `.env` por sí solo. Para el formato `CLAVE=valor` en una línea y sin comillas usado por la plantilla, cargá el archivo en la terminal que iniciará el proceso:
+Con Docker Compose, el arranque integrado toma la RSA de `.env` y usa la conexión a PostgreSQL declarada en el manifiesto. Para ejecutar Spring por separado, completá `DB_PASSWORD` según la base elegida y cargá el archivo en la terminal que iniciará el proceso. Spring por sí solo no lee `.env`:
 
 ~~~powershell
 Get-Content -LiteralPath .env | ForEach-Object {
@@ -145,7 +156,7 @@ Si vas a usar el seed de desarrollo, fijá `SPRING_PROFILES_ACTIVE=dev` después
 
 ## 5. Base de datos
 
-**Migraciones.** Flyway está habilitado, valida migraciones y busca los SQL en `classpath:db/migration`. `baseline-on-migrate=false` y `clean-disabled=true`. Hibernate usa `ddl-auto=validate`. El corte contiene V1 a V15, desde el [esquema inicial](../../src/main/resources/db/migration/V1__crear_esquema_inicial.sql) hasta [clases y lista de espera](../../src/main/resources/db/migration/V15__clases_grupales.sql). El [inventario del Manual Técnico](manual-tecnico.md#3-modelo-de-datos) resume cada migración. Agregá cambios de esquema en migraciones nuevas y preservá las que ya se aplicaron.
+**Migraciones.** Flyway aplica V1–V16 desde `classpath:db/migration`. `dev` agrega `classpath:db/demo` para V17. `baseline-on-migrate=false` y `clean-disabled=true`. Hibernate usa `ddl-auto=validate`. El [inventario del Manual Técnico](manual-tecnico.md#3-modelo-de-datos) resume cada migración. Agregá cambios de esquema en migraciones nuevas y preservá las ya aplicadas.
 
 Una vez iniciada la aplicación con la base de Compose, podés consultar la versión aplicada en modo lectura:
 
@@ -157,13 +168,13 @@ En una instalación nueva, la tabla aparece después de la primera migración. P
 
 **Reversión de esquema.** No se localizaron scripts de migración inversa. Un cambio de imagen o JAR conserva el esquema aplicado y podría dejar al backend anterior incompatible. Ante un error de validación, consultá el log de arranque y el historial de Flyway. Editar SQL ya aplicado, modificar el historial o desactivar la validación dejaría sin respaldo el estado de migraciones. El mecanismo de reversión queda pendiente de decisión y prueba.
 
-**Datos semilla.** [data.sql](../../src/main/resources/data.sql) carga una sede de demostración, cuatro cuentas de prueba, tipos de clase e instructores. Se ejecuta en `dev` y se desactiva en `staging` y `prod`. Ese seed no cubre la carga de 25 sedes con canchas y clases que piden los lineamientos. [V2](../../src/main/resources/db/migration/V2__insertar_roles.sql) y [V7](../../src/main/resources/db/migration/V7__autoridad_usuario_estable.sql) forman parte del esquema y catálogo versionados de roles.
+**Datos semilla.** En una base limpia, [V17](../../src/main/resources/db/demo/V17__datos_demostracion.sql) carga 25 sedes, 50 canchas, 25 clases futuras, 3 planes y 6 cuentas de demostración. Flyway aplica la carga una sola vez en `dev`. Los perfiles `staging` y `prod` quedan en V16.
 
 ## 6. Despliegue y reversión
 
-El mecanismo disponible consiste en **imagen del backend, build estático de la PWA y base PostgreSQL**. Los [scripts de pruebas](../pruebas.md) levantan instancias aisladas para verificación local. En la rama no se encontró un pipeline versionado, un servicio de publicación del frontend, un manifiesto de despliegue integrado ni un script de rollback. El requisito de levantar todo con `docker compose up --build` queda pendiente, porque el Compose actual solo inicia la base.
+`docker compose up --build` inicia la base, la API y el frontend publicado por Nginx para el entorno de entrega. Los [scripts de pruebas](../pruebas.md) levantan instancias aisladas para verificación local. Quedan pendientes un pipeline versionado y un procedimiento de reversión ensayado.
 
-La reversión de versión también queda pendiente. Antes de aprobar un procedimiento, el equipo debe verificar la compatibilidad del binario anterior con la versión de esquema alcanzada y cómo se preservan la base, la clave de M2 y los movimientos pendientes. Revertir el código y restaurar datos son operaciones distintas. El [índice de arquitectura](../arquitectura-tif.md) reserva ADR-009 para esta decisión.
+Antes de aprobar la reversión, el equipo debe verificar la compatibilidad del binario anterior con el esquema aplicado y cómo se preservan la base, la clave de M2 y los movimientos pendientes. [ADR-009](../adr/ADR-009-tif-despliegue-y-reversion.md)
 
 ## 7. Respaldo y restauración
 
@@ -179,7 +190,7 @@ En el ensayo de recuperación, comprobar al menos el historial de migraciones, s
 
 ### Preparar con conexión
 
-Usá una PWA construida en un origen seguro. Para probar localmente, con el backend en 3000 y la configuración de [M2 offline](#carga-local-para-probar-m2-offline) cargada, ejecutá desde la raíz:
+Usá una PWA en un contexto seguro, como HTTPS o localhost. En un teléfono, una URL HTTP con la IP de la LAN puede impedir la cámara y las APIs criptográficas del navegador. Compose ya sirve la PWA en `http://localhost:8080`. Para probar con procesos separados, con el backend en 3000 y la configuración de [M2 offline](#carga-local-para-probar-m2-offline) cargada, ejecutá desde la raíz:
 
 ~~~powershell
 npm --prefix frontend ci

@@ -45,15 +45,19 @@ El uso de PostgreSQL real permite verificar comportamientos que un repositorio d
 
 ### Criterios pendientes de aprobación
 
+La auditoría independiente del commit `8dff43678e78cec32338a75020dd0f0752275ae0` informó **147 pruebas backend aprobadas** y cobertura JaCoCo de **74,62 % de líneas**, **59,41 % de ramas** y **75,17 % de instrucciones**. Estos valores son una medición del corte auditado.
+
+La repetición local del 19/11/2026, con la corrección de Compose y sin cambios en el código Java ni en las pruebas, aprobó las **147 pruebas** sin omisiones. Su reporte JaCoCo registró **74,65 % de líneas** (1602/2146), **59,41 % de ramas** (723/1217) y **75,19 % de instrucciones** (12217/16248).
+
 1. **Pirámide y ejecución.** Acordar qué suites se requieren en cada revisión y cuáles en el candidato de entrega. Se propone ejecutar pruebas rápidas en cada cambio, integración real cuando cambien persistencia, permisos o contratos, y E2E en recorridos críticos o cambios de la PWA. Antes de la entrega, se propone una corrida completa sobre el mismo SHA, con las integraciones habilitadas.
-2. **Umbral de cobertura.** Obtener primero una medición reproducible del corte integrado. El equipo debe decidir métrica, alcance, exclusiones justificadas y mínimo exigido. Se propone conservar líneas y ramas con numerador y denominador y registrar por separado los resultados de Java, JS y E2E. El porcentaje histórico no fija el mínimo. También queda por decidir si se instrumentará cobertura JS.
+2. **Criterio de cobertura propuesto para el cierre.** Usar la medición del corte auditado como línea base y revisar toda caída de líneas o ramas en corridas comparables de la suite backend completa, con PostgreSQL habilitado. Las ramas ayudan a identificar decisiones de negocio sin ejercitar. Para aceptar el candidato, exigir además las pruebas de escenarios críticos, como concurrencia, permisos y reconciliación offline. Registrar numeradores, denominadores, exclusiones justificadas y SHA. El criterio se propone a partir de esta revisión, requiere aprobación y todavía carece de un bloqueo automático en Maven.
 3. **Integración continua y evidencia.** Acordar si un control automatizado impedirá fusionar, cuándo se ejecutará y cómo se conservarán sus reportes. Se propone registrar SHA, fecha, entorno, filtros, resultados y pruebas omitidas. No se localizó un workflow CI/CD versionado en este corte. [Manual Técnico](../manuales/manual-tecnico.md#9-pipeline-cicd) · [Manual de Instalación y Operación](../manuales/manual-instalacion-operacion.md#6-despliegue-y-reversión)
 
 ## Consecuencias
 
 - **Positivas:** fallos localizables por nivel, verificación de garantías SQL con el motor real y posibilidad de reproducir los recorridos críticos sobre un corte identificado.
 - **Negativas:** costo de sostener fixtures, contenedores y navegador. La cobertura de líneas y ramas indica ejecución de código y requiere leerse junto con las aserciones, los casos omitidos y las garantías probadas.
-- **Deuda asumida:** falta evidencia integral de cupo, cancelación y ofertas FIFO en M3. La prueba de elegibilidad de membresías usa una clase inexistente y el script de actividades verifica transporte. M4 requiere una prueba RN-02 con dos solicitudes por el mismo turno, una sola confirmación y comprobación del estado persistido. M5 requiere verificar pago, reintento y comprobante de cancha cuando se integre ese flujo. También faltan la corrida del corte final y la política de cobertura.
+- **Deuda asumida:** repetir sobre el candidato final la suite completa y las pruebas críticas de integración. El corte auditado ya incluye pruebas de clases, de concurrencia RN-02 y de cobro, reintento y comprobante de cancha. Sigue pendiente la aprobación del criterio de cobertura.
 
 ## Requisitos relacionados
 

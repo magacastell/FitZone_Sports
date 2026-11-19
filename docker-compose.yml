@@ -33,6 +33,8 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/fitzone
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      # Carga la clave persistente del .env local al preparar M2 offline.
+      FITZONE_OFFLINE_PRIVATE_KEY: "${FITZONE_OFFLINE_PRIVATE_KEY:-}"
       PORT: "3000"
       JAVA_TOOL_OPTIONS: -Duser.timezone=America/Argentina/Buenos_Aires
     ports:
