@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="24.7.17">
+  <diagram name="FitZone Sports | Diagrama de despliegue" id="despliegue">
+    <mxGraphModel dx="1500" dy="850" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1500" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="e2" value="FitZone Sports | Diagrama de despliegue" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=32;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="23" width="1428" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="Docker Compose en desarrollo y continuidad de acceso en sedes ante un corte de conexión." style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="37" y="75" width="1426" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="FitZone Sports · Equipo 02   |   Autor: Bautista Orge Perilli   |   19/11/2026   |   Versión 1.0   |   Base: 7040ef3" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#64748b;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="37" y="816" width="1426" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="" style="rounded=1;arcSize=10;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;dashed=1;dashPattern=8 5;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="121" width="478" height="565" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="" style="rounded=1;arcSize=10;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;dashed=1;dashPattern=8 5;html=0;" vertex="1" parent="1">
+          <mxGeometry x="574" y="121" width="890" height="565" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="Navegadores y terminales de sede" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=22;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="54" y="135" width="442" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="Host Docker · red interna de Compose" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=22;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="593" y="135" width="844" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="64" y="183" width="410" height="109" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="Portal y consola web" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="194" width="386" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" value="Navegadores de socios, clientes y personal.&#10;Cargan React/PWA y consultan la API." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="227" width="386" height="57" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="64" y="336" width="410" height="118" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="Terminal de sede · Recepción" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="347" width="386" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" value="Navegador con la misma PWA aprovisionada.&#10;Valida QR y registra ingresos y egresos." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="380" width="386" height="66" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" value="" style="rounded=1;arcSize=10;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="64" y="528" width="410" height="123" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" value="Almacenamiento en el navegador" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="539" width="386" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" value="Cache Storage conserva la PWA.&#10;IndexedDB conserva la copia firmada,&#10;el aforo provisional y la cola de movimientos." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="572" width="386" height="71" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="618" y="183" width="806" height="109" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" value="Frontend · Nginx y React/PWA" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="194" width="782" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e20" value="Servicio frontend · 8080 del host → 80 del contenedor.&#10;Sirve la SPA y reenvía /api/ al servicio backend." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="227" width="782" height="57" as="geometry"/>
+        </mxCell>
+        <mxCell id="e21" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="618" y="336" width="806" height="118" as="geometry"/>
+        </mxCell>
+        <mxCell id="e22" value="Backend · Spring Boot y Java 21" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="347" width="782" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" value="Servicio backend · 3000 del host → 3000 del contenedor · API /api/v1.&#10;Perfil dev · Flyway V1–V16 · Swagger UI de desarrollo." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="380" width="782" height="66" as="geometry"/>
+        </mxCell>
+        <mxCell id="e24" value="" style="rounded=1;arcSize=10;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="618" y="528" width="430" height="123" as="geometry"/>
+        </mxCell>
+        <mxCell id="e25" value="PostgreSQL 18" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="539" width="406" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e26" value="Servicio postgres · puerto del host 5432 → 5432.&#10;Base fitzone · datos de negocio y sincronización." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="572" width="406" height="71" as="geometry"/>
+        </mxCell>
+        <mxCell id="e27" value="" style="rounded=1;arcSize=10;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1116" y="528" width="308" height="123" as="geometry"/>
+        </mxCell>
+        <mxCell id="e28" value="Volumen fitzone_pgdata" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="539" width="284" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e29" value="Montado en /var/lib/postgresql.&#10;Persiste datos entre recreaciones." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="572" width="284" height="71" as="geometry"/>
+        </mxCell>
+        <mxCell id="e30" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="474" y="231" as="sourcePoint"/>
+            <mxPoint x="618" y="231" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e31" value="HTTP :8080" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="476" y="196" width="140" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="e32" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="474" y="394" as="sourcePoint"/>
+            <mxPoint x="618" y="265" as="targetPoint"/>
+            <Array as="points"><mxPoint x="545" y="394"/><mxPoint x="545" y="265"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e33" value="Copia y&#10;sincronización" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="477" y="415" width="139" height="37" as="geometry"/>
+        </mxCell>
+        <mxCell id="e34" style="edgeStyle=none;rounded=0;html=0;strokeColor=#176b58;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="269" y="454" as="sourcePoint"/>
+            <mxPoint x="269" y="528" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e35" value="Lectura y escritura local" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="273" y="473" width="193" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="e36" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1021" y="292" as="sourcePoint"/>
+            <mxPoint x="1021" y="336" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e37" value="Proxy HTTP → backend:3000" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1031" y="296" width="360" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="e38" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="833" y="454" as="sourcePoint"/>
+            <mxPoint x="833" y="528" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e39" value="JDBC → postgres:5432/fitzone" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="845" y="472" width="364" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="e40" style="edgeStyle=none;rounded=0;html=0;strokeColor=#176b58;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1048" y="590" as="sourcePoint"/>
+            <mxPoint x="1116" y="590" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e41" value="" style="rounded=1;arcSize=10;fillColor=#fff5df;strokeColor=#a66110;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="710" width="1428" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="e42" value="Durante el corte y al reconectar" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="48" y="721" width="1404" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e43" value="Con copia y QR vigentes, el terminal valida localmente y encola movimientos provisionales. Al reconectar, envía la cola a la API.&#10;M2 requiere una clave RSA persistente en el backend, externa al Compose base. La PWA requiere HTTPS o localhost." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="48" y="754" width="1404" height="36" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

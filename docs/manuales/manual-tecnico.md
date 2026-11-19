@@ -218,12 +218,12 @@ El [POM](../../pom.xml) configura JaCoCo. El runner copia Surefire y JaCoCo a `t
 | Elemento comprobado | Alcance |
 | --- | --- |
 | [Dockerfile](../../Dockerfile) | Construye el JAR en una etapa Java 21 JDK y lo copia a una imagen final Java 21 JRE. El build empaqueta con `-DskipTests`. |
-| [docker-compose.yml](../../docker-compose.yml) | Levanta PostgreSQL 18. Backend y frontend se arrancan por separado según el [README](../../README.md). |
+| [docker-compose.yml](../../docker-compose.yml) | Levanta PostgreSQL 18, la API Spring en perfil dev y Nginx con la PWA. El proxy reenvía `/api/` a la API. Ver el [diagrama de despliegue](../diagramas/despliegue.svg). |
 | [POM](../../pom.xml) y [runner backend](../../scripts/pruebas-backend.ps1) | Ejecutan pruebas y generan reportes localmente. |
 | [package.json](../../frontend/package.json) y [build-pwa.mjs](../../frontend/scripts/build-pwa.mjs) | Ejecutan pruebas JS y generan el frontend y su service worker. |
 | [runner E2E](../../scripts/prueba-m2-offline.ps1) | Orquesta localmente el recorrido offline. |
 
-El árbol de la rama carece de un workflow CI/CD versionado. Quedan por confirmar automatizaciones externas, verificación al abrir PR, reglas de protección de ramas, publicación de artefactos y despliegue a pruebas. El Anexo F pide describir el pipeline real. El arranque integrado con `docker compose up --build` también queda pendiente frente a los lineamientos, porque el Compose actual solo inicia la base. Documentar el despliegue y la reversión en ADR-009 cuando exista evidencia del procedimiento.
+El [diagrama del pipeline CI/CD](../diagramas/pipeline-cicd.svg) propone GitHub Actions para los controles por PR y un runner Ubuntu con Docker Compose para las pruebas del commit integrado. El entorno duraría lo que dure la ejecución. Quedan pendientes el workflow versionado y los controles de merge. El [ADR-009](../adr/ADR-009-tif-despliegue-y-reversion.md) documenta la propuesta de reversión.
 
 ## 10. Convenciones de desarrollo
 

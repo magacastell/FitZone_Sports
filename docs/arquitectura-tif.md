@@ -72,7 +72,7 @@ No se consultó ni reconstruyó el contenido de planificación ni se hicieron es
 
 ### Diagramas disponibles
 
-Cada archivo `.drawio` es XML editable no comprimido y cada `.svg` es su representación vectorial correspondiente. Abrir el editable en diagrams.net/draw.io; exportar como SVG conservando el tamaño de página y la leyenda. No se añade ninguna dependencia de producción ni se requiere instalar una para leerlos. Fecha/versión/base constan en el pie; **autor nominal pendiente de revisión grupal**, sin atribuirlo a un integrante.
+Cada archivo `.drawio` es XML editable no comprimido y cada `.svg` es su representación vectorial correspondiente. Abrir el editable en diagrams.net/draw.io; exportar como SVG conservando el tamaño de página y la leyenda. Los diagramas de despliegue y CI/CD consignan autor, fecha, versión y commit de referencia. La revisión de autoría nominal de las vistas anteriores queda pendiente.
 
 | Alcance | Fuente editable | Exportación |
 |---|---|---|
@@ -86,6 +86,10 @@ Cada archivo `.drawio` es XML editable no comprimido y cada `.svg` es su represe
 | UML — Acceso offline y reconciliación | [uml-secuencia-acceso-offline.drawio](diagramas/uml-secuencia-acceso-offline.drawio) | [SVG](diagramas/uml-secuencia-acceso-offline.svg) |
 | UML — Estados de membresía (RF-02) | [uml-estados-membresia.drawio](diagramas/uml-estados-membresia.drawio) | [SVG](diagramas/uml-estados-membresia.svg) · [Nota técnica](diagramas/uml-estados-membresia.md) |
 | UML — Actividad de lista de espera (RF-08) | [uml-actividad-lista-espera.drawio](diagramas/uml-actividad-lista-espera.drawio) | [SVG](diagramas/uml-actividad-lista-espera.svg) · [Nota técnica](diagramas/uml-actividad-lista-espera.md) |
+| UML — Clases del dominio | [uml-clases-dominio.drawio](diagramas/uml-clases-dominio.drawio) | [SVG](diagramas/uml-clases-dominio.svg) · [Nota técnica](diagramas/uml-clases-dominio.md) |
+| UML — Estados de reserva | [uml-estados-reserva.drawio](diagramas/uml-estados-reserva.drawio) | [SVG](diagramas/uml-estados-reserva.svg) · [Nota técnica](diagramas/uml-estados-reserva.md) |
+| Despliegue — Compose y contingencia en sede | [despliegue.drawio](diagramas/despliegue.drawio) | [SVG](diagramas/despliegue.svg) |
+| CI/CD — Del PR al entorno de pruebas | [pipeline-cicd.drawio](diagramas/pipeline-cicd.drawio) | [SVG](diagramas/pipeline-cicd.svg) |
 
 La secuencia es obligatoria en §5.3.2 de la versión de 25 páginas; no sustituye otra secuencia. Explicita que el socio puede obtener el lote con conexión propia después del corte de Recepción, siempre que el terminal conserve aprovisionamiento vigente. Si el socio también está desconectado, necesita ventanas previamente guardadas. La captura provisional, la cola durable, el ACK perdido y el reintento idempotente conservan su funcionamiento.
 
@@ -93,18 +97,7 @@ En C4-1 se muestran las responsabilidades de M1–M5 y los cuatro actores; Socio
 
 C4-2 representa un solo frontend React con instancias en distintos navegadores/dispositivos. IndexedDB y Cache Storage son mecanismos locales del navegador, visualmente distintos de los contenedores principales. C4-3 descompone únicamente la API backend M2: frontend/terminal y PostgreSQL quedan fuera de su límite. El detalle JavaScript continúa descrito en ADR-003/007 y en la secuencia, sin generar una quinta vista ni nuevos procesos de despliegue.
 
-### Inventario obligatorio restante
-
-La tabla de §5.3 enumera los diagramas obligatorios. El C4 de Canchas, las secuencias de reserva y el DER se incorporaron con `146fd2d`. La tabla siguiente conserva el trabajo pendiente de este inventario. En RF-08 queda pendiente la validación integral del flujo y del canal de aviso.
-
-| Diagrama restante | Dependencias de cierre |
-|---|---|
-| UML — Clases del dominio | M3 ya aporta entidades y Observer; falta elaborar el diagrama conjunto con multiplicidades y Strategy/Repository y contrastar M4/M5. |
-| UML — Estados de reserva | Ciclo real de clases/canchas, pagos/cancelación/penalidad; M3/M4/M5. |
-| Despliegue | Compose completo, red, secretos, PWA y terminales; contraste con responsable de despliegue. C4-2 no lo sustituye. |
-| Pipeline CI/CD | Etapas y entorno de pruebas reales; no se encontró configuración CI versionada en el corte. |
-
-C4-4/PricingStrategy es opcional y permanece fuera de esta etapa.
+El inventario contiene las 14 vistas obligatorias del §5.3. El despliegue refleja los tres servicios del [Compose](../docker-compose.yml) y las condiciones de [M2 offline](m2-offline.md). El pipeline propone GitHub Actions para coordinar los [scripts existentes](pruebas.md) y levantar un entorno de pruebas efímero con Docker Compose en un runner Ubuntu. El workflow por PR y los controles de merge siguen pendientes de configuración.
 
 ## Evidencia de validación consultada
 

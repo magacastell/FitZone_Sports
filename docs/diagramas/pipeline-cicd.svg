@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="850" viewBox="0 0 1500 850" role="img">
+<title>FitZone Sports | Arquitectura del pipeline CI/CD</title>
+<defs><marker id="a0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#176b58"/></marker><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#a66110"/></marker></defs>
+<rect width="1500" height="850" fill="white"/>
+<g font-family="Arial, sans-serif">
+<text font-size="32" fill="#16324f" font-weight="bold" text-anchor="start"><tspan x="36" y="56.4">FitZone Sports | Arquitectura del pipeline CI/CD</tspan></text>
+<text font-size="18" fill="#42596d" font-weight="normal" text-anchor="start"><tspan x="37" y="94.6">Plataforma propuesta: GitHub Actions · runner Ubuntu hospedado por GitHub · pruebas con Docker Compose.</tspan></text>
+<text font-size="15" fill="#64748b" font-weight="normal" text-anchor="start"><tspan x="37" y="831.1">FitZone Sports · Equipo 02   |   Autor: Bautista Orge Perilli   |   19/11/2026   |   Versión 1.1   |   Base: 7040ef3</tspan></text>
+<rect x="36" y="124" width="1428" height="287" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 5"/>
+<rect x="36" y="442" width="1428" height="243" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 5"/>
+<text font-size="22" fill="#16324f" font-weight="bold" text-anchor="start"><tspan x="54" y="158.5">GitHub Actions · integración continua en cada Pull Request</tspan></text>
+<text font-size="22" fill="#16324f" font-weight="bold" text-anchor="start"><tspan x="54" y="476.5">GitHub Actions · entrega continua después del merge a main</tspan></text>
+<rect x="64" y="185" width="287" height="146" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="207.5" y="216.3">Pull Request</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="207.5" y="258.8">Rama de trabajo hacia main.</tspan><tspan x="207.5" y="281.8">Vincular tarjeta y registrar SHA.</tspan><tspan x="207.5" y="304.7">Revisión de código y alcance.</tspan></text>
+<rect x="426" y="185" width="578" height="146" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="715" y="216.3">Verificar el candidato</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="715" y="258.8">Backend · Java 21, PostgreSQL 18 descartable y Maven verify.</tspan><tspan x="715" y="281.8">Frontend · npm ci, npm test y build de la PWA.</tspan><tspan x="715" y="304.7">Contrato · validar OpenAPI y cotejar swagger.json.</tspan></text>
+<rect x="1080" y="185" width="356" height="146" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="1258" y="216.3">Revisión y merge</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="1258" y="258.8">Revisar resultados y cobertura.</tspan><tspan x="1258" y="281.8">Confirmar aprobación del PR.</tspan><tspan x="1258" y="304.7">Integrar a main tras controles verdes.</tspan></text>
+<rect x="452" y="351" width="526" height="43" rx="8" fill="#fff5df" stroke="#a66110" stroke-width="2"/>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="715" y="378.3">Si falla un control, conservar el informe y corregir el PR.</tspan></text>
+<polyline points="351,257 426,257" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<polyline points="1004,257 1080,257" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<text font-size="15" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="1042" y="240.6">Pasa</tspan></text>
+<polyline points="715,331 715,351" fill="none" stroke="#a66110" stroke-width="2.2" marker-end="url(#a2)"/>
+<polyline points="1258,331 1258,500" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<rect x="1080" y="500" width="356" height="145" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="1258" y="531.3">Construir imágenes</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="1258" y="573.3">Empaquetar backend y PWA/NGINX.</tspan><tspan x="1258" y="596.3">Identificar artefactos por SHA.</tspan><tspan x="1258" y="619.2">Guardar resultados Surefire y JaCoCo.</tspan></text>
+<rect x="426" y="500" width="578" height="145" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="715" y="531.3">Levantar el entorno de pruebas</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="715" y="573.3">Docker Compose efímero en un runner Ubuntu.</tspan><tspan x="715" y="596.3">PostgreSQL descartable y migraciones Flyway.</tspan><tspan x="715" y="619.2">Comprobar HTTP y ejecutar E2E selectivos.</tspan></text>
+<rect x="64" y="500" width="287" height="145" rx="8" fill="#e1f1e9" stroke="#176b58" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="207.5" y="531.3">Evidencia de la ejecución</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="207.5" y="573.3">Guardar reportes y resultado E2E.</tspan><tspan x="207.5" y="596.3">Registrar SHA y migración.</tspan><tspan x="207.5" y="619.2">Resolver fallos antes de promover.</tspan></text>
+<polyline points="1080,572 1004,572" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<polyline points="426,572 351,572" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<rect x="36" y="710" width="1428" height="88" rx="8" fill="#fff5df" stroke="#a66110" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="750" y="741.3">Estado en el corte</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="750" y="766.3">Disponibles: pruebas-backend.ps1, suites npm, verificación OpenAPI, E2E locales y Docker Compose en perfil dev.</tspan><tspan x="750" y="789.3">Pendientes: versionar el workflow de GitHub Actions y configurar los controles de merge.</tspan></text>
+</g>
+</svg>

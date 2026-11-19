@@ -264,7 +264,7 @@ Probabilidad e impacto históricos quedan **PC** cuando las fuentes carecen de u
 | P3 | Kit local, `06_Plan_Periodo_3.docx`, «Tareas programadas», «Estimación de dedicación», «Semana 1», «Semana 2» y «Resultado esperado del período». |
 | P4 | Kit local, `07_Plan_Periodo_4.docx`, «Resumen del período anterior», «Tareas programadas», «Estimación de dedicación», «Semana 1», «Semana 2» y «Resultado esperado del período». |
 | P09 | Kit local, `04_Informe_Coordinacion_09-11.pdf`, §§2–7. Informe reconstruido de estado y propuesta de coordinación, con el alcance declarado en su portada. |
-| B0 | [Bitácora grupal](../bitacoras/LOG.md), Unidad I. |
+| B0 | [Bitácora grupal histórica](https://github.com/magacastell/FitZone_Sports/blob/63d20b9fcfe3ebf1b6a9229b09d2043226c548a1/docs/bitacoras/LOG.md), Unidad I. |
 | B1 | [Bitácora de Magalí Castell Ziegler](../bitacoras/CastellZiegler-LOG.md). |
 | B2 | [Bitácora de Claudio Cejas](../bitacoras/Cejas-LOG.md). |
 | B3 | [Bitácora de Ignacio Denis](../bitacoras/Denis-LOG.md). |
