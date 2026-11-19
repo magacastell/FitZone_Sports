@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="24.7.17">
+  <diagram name="FitZone Sports | Arquitectura del pipeline CI/CD" id="pipeline-cicd">
+    <mxGraphModel dx="1500" dy="850" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1500" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="e2" value="FitZone Sports | Arquitectura del pipeline CI/CD" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=32;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="23" width="1428" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="Plataforma propuesta: GitHub Actions · runner Ubuntu hospedado por GitHub · pruebas con Docker Compose." style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=18;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="37" y="75" width="1426" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="FitZone Sports · Equipo 02   |   Autor: Bautista Orge Perilli   |   19/11/2026   |   Versión 1.1   |   Base: 7040ef3" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#64748b;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="37" y="816" width="1426" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="" style="rounded=1;arcSize=10;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;dashed=1;dashPattern=8 5;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="124" width="1428" height="287" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="" style="rounded=1;arcSize=10;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=2;dashed=1;dashPattern=8 5;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="442" width="1428" height="243" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="GitHub Actions · integración continua en cada Pull Request" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=22;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="54" y="137" width="1380" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="GitHub Actions · entrega continua después del merge a main" style="text;align=left;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=22;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="54" y="455" width="1380" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="64" y="185" width="287" height="146" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="Pull Request" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="196" width="263" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" value="Rama de trabajo hacia main.&#10;Vincular tarjeta y registrar SHA.&#10;Revisión de código y alcance." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="229" width="263" height="94" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="426" y="185" width="578" height="146" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="Verificar el candidato" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="438" y="196" width="554" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" value="Backend · Java 21, PostgreSQL 18 descartable y Maven verify.&#10;Frontend · npm ci, npm test y build de la PWA.&#10;Contrato · validar OpenAPI y cotejar swagger.json." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="438" y="229" width="554" height="94" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="185" width="356" height="146" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" value="Revisión y merge" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="196" width="332" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" value="Revisar resultados y cobertura.&#10;Confirmar aprobación del PR.&#10;Integrar a main tras controles verdes." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="229" width="332" height="94" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" value="" style="rounded=1;arcSize=10;fillColor=#fff5df;strokeColor=#a66110;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="452" y="351" width="526" height="43" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" value="Si falla un control, conservar el informe y corregir el PR." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="464" y="359" width="502" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="351" y="257" as="sourcePoint"/>
+            <mxPoint x="426" y="257" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1004" y="257" as="sourcePoint"/>
+            <mxPoint x="1080" y="257" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e22" value="Pasa" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=15;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1006" y="223" width="72" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" style="edgeStyle=none;rounded=0;html=0;strokeColor=#a66110;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="715" y="331" as="sourcePoint"/>
+            <mxPoint x="715" y="351" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e24" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1258" y="331" as="sourcePoint"/>
+            <mxPoint x="1258" y="500" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e25" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="500" width="356" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="e26" value="Construir imágenes" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="511" width="332" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e27" value="Empaquetar backend y PWA/NGINX.&#10;Identificar artefactos por SHA.&#10;Guardar resultados Surefire y JaCoCo." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="544" width="332" height="93" as="geometry"/>
+        </mxCell>
+        <mxCell id="e28" value="" style="rounded=1;arcSize=10;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="426" y="500" width="578" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="e29" value="Levantar el entorno de pruebas" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="438" y="511" width="554" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e30" value="Docker Compose efímero en un runner Ubuntu.&#10;PostgreSQL descartable y migraciones Flyway.&#10;Comprobar HTTP y ejecutar E2E selectivos." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="438" y="544" width="554" height="93" as="geometry"/>
+        </mxCell>
+        <mxCell id="e31" value="" style="rounded=1;arcSize=10;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="64" y="500" width="287" height="145" as="geometry"/>
+        </mxCell>
+        <mxCell id="e32" value="Evidencia de la ejecución" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="511" width="263" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e33" value="Guardar reportes y resultado E2E.&#10;Registrar SHA y migración.&#10;Resolver fallos antes de promover." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="76" y="544" width="263" height="93" as="geometry"/>
+        </mxCell>
+        <mxCell id="e34" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1080" y="572" as="sourcePoint"/>
+            <mxPoint x="1004" y="572" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e35" style="edgeStyle=none;rounded=0;html=0;strokeColor=#64748b;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="426" y="572" as="sourcePoint"/>
+            <mxPoint x="351" y="572" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e36" value="" style="rounded=1;arcSize=10;fillColor=#fff5df;strokeColor=#a66110;strokeWidth=2;html=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="710" width="1428" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="e37" value="Estado en el corte" style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=20;fontColor=#16324f;fontStyle=1;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="48" y="721" width="1404" height="27" as="geometry"/>
+        </mxCell>
+        <mxCell id="e38" value="Disponibles: pruebas-backend.ps1, suites npm, verificación OpenAPI, E2E locales y Docker Compose en perfil dev.&#10;Pendientes: versionar el workflow de GitHub Actions y configurar los controles de merge." style="text;align=center;verticalAlign=middle;whiteSpace=wrap;spacing=0;fontSize=17;fontColor=#42596d;fontStyle=0;fontFamily=Arial;html=0;" vertex="1" parent="1">
+          <mxGeometry x="48" y="754" width="1404" height="36" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

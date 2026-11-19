@@ -464,7 +464,7 @@ python scripts/exportar-openapi.py --check
 
 ## Asistencia de IA
 
-Se utilizó Codex como asistencia para auditar y revisar la documentación de cierre del TIF. Esta declaración se limita al trabajo documental verificable de este cierre. Cualquier alcance adicional del uso de IA en el proyecto queda pendiente de confirmación por el equipo.
+Se utilizó Codex como asistencia para auditar y revisar la documentación de cierre del TIF y elaborar los diagramas de despliegue y del pipeline CI/CD. Cualquier alcance adicional del uso de IA en el proyecto queda pendiente de confirmación por el equipo.
 
 ## Dominio Cliente/Socio y comprobantes
 

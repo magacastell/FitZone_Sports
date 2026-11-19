@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="850" viewBox="0 0 1500 850" role="img">
+<title>FitZone Sports | Diagrama de despliegue</title>
+<defs><marker id="a0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#176b58"/></marker><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#a66110"/></marker></defs>
+<rect width="1500" height="850" fill="white"/>
+<g font-family="Arial, sans-serif">
+<text font-size="32" fill="#16324f" font-weight="bold" text-anchor="start"><tspan x="36" y="56.4">FitZone Sports | Diagrama de despliegue</tspan></text>
+<text font-size="18" fill="#42596d" font-weight="normal" text-anchor="start"><tspan x="37" y="94.6">Docker Compose en desarrollo y continuidad de acceso en sedes ante un corte de conexión.</tspan></text>
+<text font-size="15" fill="#64748b" font-weight="normal" text-anchor="start"><tspan x="37" y="831.1">FitZone Sports · Equipo 02   |   Autor: Bautista Orge Perilli   |   19/11/2026   |   Versión 1.0   |   Base: 7040ef3</tspan></text>
+<rect x="36" y="121" width="478" height="565" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 5"/>
+<rect x="574" y="121" width="890" height="565" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 5"/>
+<text font-size="22" fill="#16324f" font-weight="bold" text-anchor="start"><tspan x="54" y="156.5">Navegadores y terminales de sede</tspan></text>
+<text font-size="22" fill="#16324f" font-weight="bold" text-anchor="start"><tspan x="593" y="156.5">Host Docker · red interna de Compose</tspan></text>
+<rect x="64" y="183" width="410" height="109" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="269" y="214.3">Portal y consola web</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="269" y="249.8">Navegadores de socios, clientes y personal.</tspan><tspan x="269" y="272.8">Cargan React/PWA y consultan la API.</tspan></text>
+<rect x="64" y="336" width="410" height="118" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="269" y="367.3">Terminal de sede · Recepción</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="269" y="407.3">Navegador con la misma PWA aprovisionada.</tspan><tspan x="269" y="430.3">Valida QR y registra ingresos y egresos.</tspan></text>
+<rect x="64" y="528" width="410" height="123" rx="8" fill="#e1f1e9" stroke="#176b58" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="269" y="559.3">Almacenamiento en el navegador</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="269" y="590.3">Cache Storage conserva la PWA.</tspan><tspan x="269" y="613.3">IndexedDB conserva la copia firmada,</tspan><tspan x="269" y="636.2">el aforo provisional y la cola de movimientos.</tspan></text>
+<rect x="618" y="183" width="806" height="109" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="1021" y="214.3">Frontend · Nginx y React/PWA</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="1021" y="249.8">Servicio frontend · 8080 del host → 80 del contenedor.</tspan><tspan x="1021" y="272.8">Sirve la SPA y reenvía /api/ al servicio backend.</tspan></text>
+<rect x="618" y="336" width="806" height="118" rx="8" fill="#dceefa" stroke="#16324f" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="1021" y="367.3">Backend · Spring Boot y Java 21</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="1021" y="407.3">Servicio backend · 3000 del host → 3000 del contenedor · API /api/v1.</tspan><tspan x="1021" y="430.3">Perfil dev · Flyway V1–V16 · Swagger UI de desarrollo.</tspan></text>
+<rect x="618" y="528" width="430" height="123" rx="8" fill="#e1f1e9" stroke="#176b58" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="833" y="559.3">PostgreSQL 18</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="833" y="601.8">Servicio postgres · puerto del host 5432 → 5432.</tspan><tspan x="833" y="624.8">Base fitzone · datos de negocio y sincronización.</tspan></text>
+<rect x="1116" y="528" width="308" height="123" rx="8" fill="#e1f1e9" stroke="#176b58" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="1270" y="559.3">Volumen fitzone_pgdata</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="1270" y="601.8">Montado en /var/lib/postgresql.</tspan><tspan x="1270" y="624.8">Persiste datos entre recreaciones.</tspan></text>
+<polyline points="474,231 618,231" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<text font-size="15" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="546" y="214.1">HTTP :8080</tspan></text>
+<polyline points="474,394 545,394 545,265 618,265" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)" stroke-dasharray="7 5"/>
+<text font-size="15" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="546.5" y="428.5">Copia y</tspan><tspan x="546.5" y="448.7">sincronización</tspan></text>
+<polyline points="269,454 269,528" fill="none" stroke="#176b58" stroke-width="2.2" marker-end="url(#a1)"/>
+<text font-size="15" fill="#42596d" font-weight="normal" text-anchor="start"><tspan x="273" y="493.1">Lectura y escritura local</tspan></text>
+<polyline points="1021,292 1021,336" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<text font-size="15" fill="#42596d" font-weight="normal" text-anchor="start"><tspan x="1031" y="314.1">Proxy HTTP → backend:3000</tspan></text>
+<polyline points="833,454 833,528" fill="none" stroke="#64748b" stroke-width="2.2" marker-end="url(#a0)"/>
+<text font-size="15" fill="#42596d" font-weight="normal" text-anchor="start"><tspan x="845" y="491.1">JDBC → postgres:5432/fitzone</tspan></text>
+<polyline points="1048,590 1116,590" fill="none" stroke="#176b58" stroke-width="2.2" marker-end="url(#a1)"/>
+<rect x="36" y="710" width="1428" height="88" rx="8" fill="#fff5df" stroke="#a66110" stroke-width="2"/>
+<text font-size="20" fill="#16324f" font-weight="bold" text-anchor="middle"><tspan x="750" y="741.3">Durante el corte y al reconectar</tspan></text>
+<text font-size="17" fill="#42596d" font-weight="normal" text-anchor="middle"><tspan x="750" y="766.3">Con copia y QR vigentes, el terminal valida localmente y encola movimientos provisionales. Al reconectar, envía la cola a la API.</tspan><tspan x="750" y="789.3">M2 requiere una clave RSA persistente en el backend, externa al Compose base. La PWA requiere HTTPS o localhost.</tspan></text>
+</g>
+</svg>
