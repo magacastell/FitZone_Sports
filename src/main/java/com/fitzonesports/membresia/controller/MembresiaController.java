@@ -46,6 +46,12 @@ public class MembresiaController {
         return ResponseEntity.ok(service.consultarPorId(auth.getName(),membresiaId));
     }
 
+    @GetMapping("/usuarios/{usuarioId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA','GERENTE')")
+    public ResponseEntity<MembresiaResponse> consultarMembresiaPorUsuario(Authentication auth, @PathVariable Integer usuarioId) {
+        return ResponseEntity.ok(service.consultarPorUsuario(auth.getName(),usuarioId));
+    }
+
     @PatchMapping("/{membresiaId}/estado")
     @PreAuthorize("hasAnyRole('RECEPCIONISTA','GERENTE')")
     public ResponseEntity<MembresiaResponse> actualizarEstado(Authentication auth, @PathVariable Integer membresiaId,

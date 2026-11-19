@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { actualizarRecargoPico, actualizarTipoCancha, crearTipoCancha, listarCanchasDeSede, listarTiposCancha } from '../../services/gerenciaService';
+import { actualizarRecargoPico, actualizarTipoCancha, consultarRecargoPico, crearTipoCancha, listarTiposCancha } from '../../services/gerenciaService';
 import { AppButton, DataCard } from '../../components/ui/FitZoneUI';
 import { formatearPesos } from './reportesUtils';
 
@@ -34,7 +34,7 @@ export default function TarifasCancha({ sedes }) {
     if (!sedeId) { setRecargo({ estado: 'inicial' }); return undefined; }
     let activo = true;
     setRecargo({ estado: 'cargando' });
-    listarCanchasDeSede(sedeId).then((canchas) => { if (activo) setRecargo({ estado: 'cargado', valor: canchas[0]?.recargoPico ?? null, hayCanchas: canchas.length > 0 }); },
+    consultarRecargoPico(sedeId).then((datos) => { if (activo) setRecargo({ estado: 'cargado', valor: datos.recargoPico }); },
       (e) => { if (activo) setRecargo({ estado: 'error', mensaje: mensaje(e) }); });
     return () => { activo = false; };
   }, [sedeId, revision]);
@@ -100,7 +100,7 @@ export default function TarifasCancha({ sedes }) {
       </div>
       {recargo.estado === 'cargando' && <p role="status">Consultando recargo actual...</p>}
       {recargo.estado === 'error' && <p role="alert">{recargo.mensaje}</p>}
-      {recargo.estado === 'cargado' && <p>{recargo.valor === null ? 'Esta sede todavía no tiene canchas, por eso no hay un recargo vigente para mostrar; igual podés configurarlo.' : `Recargo vigente: ${Number(recargo.valor)} % sobre el precio estándar de 19:00 a 21:00.`}</p>}
+      {recargo.estado === 'cargado' && <p>{`Recargo vigente: ${Number(recargo.valor)} % sobre el precio estándar de 19:00 a 21:00.`}</p>}
       <AppButton type="submit">Guardar recargo</AppButton>
       {avisoRecargo && <p role="status">{avisoRecargo}</p>}
     </fieldset></form>

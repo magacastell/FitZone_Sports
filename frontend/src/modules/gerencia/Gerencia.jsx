@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { listarSedes, listarUsuarios, consultarAforo, crearSede, actualizarSede, consultarMembresia, consultarReporteAccesos, consultarReporteFinanciero } from '../../services/gerenciaService';
+import { listarSedes, listarUsuarios, consultarAforo, crearSede, actualizarSede, consultarMembresiaDeUsuario, consultarReporteAccesos, consultarReporteFinanciero } from '../../services/gerenciaService';
 import { AppButton, AppLink, DataCard, PageHeading, StatusBadge } from '../../components/ui/FitZoneUI';
 import ReportesGerencia from './ReportesGerencia';
 import TarifasCancha from './TarifasCancha';
@@ -135,25 +135,29 @@ function Sedes() {
 function Usuarios() {
   const [usuarios, refrescar] = useConsulta(listarUsuarios);
   const [busqueda, setBusqueda] = useState('');
-  const [id, setId] = useState('');
   const [seleccion, setSeleccion] = useState(null);
-  return <><DataCard title="Consulta global de usuarios" action={<AppButton onClick={refrescar}>Actualizar usuarios</AppButton>}>
+  const coincide = (u) => `${u.nombre} ${u.apellido} ${u.email} ${u.dni}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase());
+  return <>{seleccion && <DataCard title={`Membresía de ${seleccion.nombre} ${seleccion.apellido}`} description={seleccion.email}
+    action={<AppButton variant="secondary" onClick={() => setSeleccion(null)}>Cerrar</AppButton>}>
+    <DetalleMembresia key={seleccion.id} usuarioId={seleccion.id} />
+  </DataCard>}<DataCard title="Consulta global de usuarios" description="Buscá a una persona y, si es socio o cliente, consultá su membresía directamente desde la fila."
+    action={<AppButton onClick={refrescar}>Actualizar usuarios</AppButton>}>
     <label>Buscar nombre, email o DNI<input type="search" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} /></label>
-    <Resultado consulta={usuarios}>{(datos) => <div className="gerencia-tabla" role="region" aria-label="Usuarios de toda la cadena" tabIndex={0}><table><thead><tr>{['Nombre','Email','DNI','Autoridad','Sede habitual / operativa','Cuenta'].map((t) => <th key={t} scope="col">{t}</th>)}</tr></thead><tbody>
-      {datos.filter((u) => `${u.nombre} ${u.apellido} ${u.email} ${u.dni}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase())).map((u) => <tr key={u.id}><td>{u.nombre} {u.apellido}</td><td>{u.email}</td><td>{u.dni}</td><td>{u.rol}</td><td>{u.sedeNombre || 'Sin asignar'}</td><td>{u.activo ? 'Habilitada' : 'Inactiva'}</td></tr>)}
-    </tbody></table>{!datos.some((u) => `${u.nombre} ${u.apellido} ${u.email} ${u.dni}`.toLocaleLowerCase().includes(busqueda.toLocaleLowerCase())) && <p>No hay usuarios para esta búsqueda.</p>}</div>}</Resultado>
-  </DataCard><DataCard title="Consultar membresía por ID" description="El backend no ofrece listado global ni búsqueda de membresía por usuario. El ID de usuario no es el ID de membresía.">
-    <form onSubmit={(e) => { e.preventDefault(); if (Number.isInteger(Number(id)) && Number(id) > 0) setSeleccion(Number(id)); }}><label>ID de membresía<input type="number" required min="1" step="1" value={id} onChange={(e) => setId(e.target.value)} /></label><AppButton type="submit">Consultar membresía</AppButton></form>
-    {seleccion && <DetalleMembresia key={seleccion} id={seleccion} />}
+    <Resultado consulta={usuarios}>{(datos) => <div className="gerencia-tabla" role="region" aria-label="Usuarios de toda la cadena" tabIndex={0}><table><thead><tr>{['Nombre','Email','DNI','Autoridad','Sede habitual / operativa','Cuenta','Membresía'].map((t) => <th key={t} scope="col">{t}</th>)}</tr></thead><tbody>
+      {datos.filter(coincide).map((u) => <tr key={u.id}><td>{u.nombre} {u.apellido}</td><td>{u.email}</td><td>{u.dni}</td><td>{u.rol}</td><td>{u.sedeNombre || 'Sin asignar'}</td><td>{u.activo ? 'Habilitada' : 'Inactiva'}</td>
+        <td>{u.rol === 'USUARIO' ? <AppButton variant="secondary" onClick={() => { setSeleccion(u); window.scrollTo?.({ top: 0, behavior: 'smooth' }); }}>Ver membresía<span className="gerencia-oculto"> de {u.nombre} {u.apellido}</span></AppButton> : <small>No aplica</small>}</td></tr>)}
+    </tbody></table>{!datos.some(coincide) && <p>No hay usuarios para esta búsqueda.</p>}</div>}</Resultado>
   </DataCard></>;
 }
 
-function DetalleMembresia({ id }) {
-  const [consulta, refrescar] = useConsulta(() => consultarMembresia(id), [id]);
+function DetalleMembresia({ usuarioId }) {
+  const [consulta, refrescar] = useConsulta(() => consultarMembresiaDeUsuario(usuarioId), [usuarioId]);
+  if (consulta.estado === 'error' && consulta.status === 404) return <><p>Este usuario todavía no contrató ninguna membresía.</p><AppButton variant="secondary" onClick={refrescar}>Actualizar membresía</AppButton></>;
   return <><AppButton variant="secondary" onClick={refrescar}>Actualizar membresía</AppButton><Resultado consulta={consulta}>{(m) => {
     const periodo = m.periodoVigente || [...m.periodos].reverse().find((p) => p.estado !== 'CANCELADA');
-    return <div><p>Membresía #{m.id} · Titular #{m.usuarioId}</p><StatusBadge>{m.estado}</StatusBadge><p>{periodo?.nombrePlan || 'Sin período contratado disponible'}</p><p>Referencia del último plan contratado: #{m.planId}</p>
-      {periodo && <p>{m.periodoVigente ? 'Período vigente' : 'Último período contratado'}: {new Date(periodo.inicio).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })} → {new Date(periodo.fin).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}</p>}
+    const fecha = (valor) => new Date(valor).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+    return <div><StatusBadge>{m.estado}</StatusBadge><p><strong>{periodo?.nombrePlan || 'Sin período contratado disponible'}</strong></p>
+      {periodo && <p>{m.periodoVigente ? 'Período vigente' : 'Último período contratado'}: {fecha(periodo.inicio)} → {fecha(periodo.fin)}</p>}
       <p>Períodos registrados: {m.periodos.length}</p></div>;
   }}</Resultado></>;
 }

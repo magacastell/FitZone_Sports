@@ -26,7 +26,8 @@ for(const [fn,args,ruta,metodo,body] of [
   ['crearTipoCancha',[{nombre:'Tenis',precioHora:9500}],'/tipos-cancha','POST',{nombre:'Tenis',precioHora:9500}],
   ['actualizarTipoCancha',[4,{nombre:'Tenis',precioHora:10000}],'/tipos-cancha/4','PUT',{nombre:'Tenis',precioHora:10000}],
   ['actualizarRecargoPico',[2,25],'/sedes/2/recargo-pico','PUT',{recargoPico:25}],
-  ['listarCanchasDeSede',[2],'/canchas?sedeId=2'],
+  ['consultarRecargoPico',[2],'/sedes/2/recargo-pico'],
+  ['consultarMembresiaDeUsuario',[7],'/membresias/usuarios/7'],
 ]) {
   assert.equal((await mod.namespace[fn](...args)).real,true);assert.equal(llamada[0],ruta);assert.equal(llamada[1]?.method,metodo);assert.equal(llamada[1]?.body,body?JSON.stringify(body):undefined);
   error=Object.assign(new Error('original'),{status:501});assert.throws(()=>mod.namespace[fn](...args),e=>e===error);error=null;aprobadas++;
