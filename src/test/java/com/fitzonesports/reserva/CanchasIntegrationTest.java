@@ -266,15 +266,16 @@ class CanchasIntegrationTest {
     @Test void datosDevSonRepetiblesYPreparanAmbosRecorridosSinTocarCodigo() {
         String esquema="seed_m4_"+UUID.randomUUID().toString().replace("-","");
         String url=System.getenv("PLAN_TEST_DB_URL");
-        org.flywaydb.core.Flyway.configure().dataSource(url,"postgres","").schemas(esquema).load().migrate();
+        var flyway=org.flywaydb.core.Flyway.configure().dataSource(url,"postgres","").schemas(esquema)
+                .locations("classpath:db/migration","classpath:db/demo")
+                .placeholders(Map.of("demoProfiles","dev")).load();
+        flyway.migrate();flyway.migrate();
         var ds=new org.springframework.jdbc.datasource.DriverManagerDataSource(url,"postgres","");
         var props=new java.util.Properties();props.setProperty("currentSchema",esquema+",public");ds.setConnectionProperties(props);
-        var seed=new org.springframework.jdbc.datasource.init.ResourceDatabasePopulator(new org.springframework.core.io.ClassPathResource("data.sql"));
-        seed.execute(ds);seed.execute(ds);
         var base=new JdbcTemplate(ds);
         assertEquals(25,base.queryForObject("SELECT count(*) FROM sede",Integer.class));
         assertEquals(50,base.queryForObject("SELECT count(*) FROM cancha",Integer.class));
-        assertEquals(4200,base.queryForObject("SELECT count(*) FROM turno_cancha",Integer.class));
+        assertEquals(100,base.queryForObject("SELECT count(*) FROM turno_cancha",Integer.class));
         assertEquals("99999999",base.queryForObject("SELECT dni FROM usuario WHERE email='rechazo@fitzone.com'",String.class));
         String hash=base.queryForObject("SELECT contrasenia FROM usuario WHERE email='rechazo@fitzone.com'",String.class);
         assertTrue(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().matches("cliente123",hash));

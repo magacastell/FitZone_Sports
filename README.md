@@ -114,7 +114,7 @@ En Linux/macOS, el comando equivalente con los valores locales predeterminados e
 SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
 ```
 
-Al levantar por primera vez, Flyway aplica las migraciones de `src/main/resources/db/migration`. Hibernate valida el esquema sin modificarlo (`ddl-auto=validate`). En dev, `data.sql` agrega 25 sedes de demostración y los usuarios de prueba.
+Al levantar por primera vez, Flyway aplica las migraciones de `src/main/resources/db/migration`. Hibernate valida el esquema sin modificarlo (`ddl-auto=validate`). En `dev`, Flyway incluye además `src/main/resources/db/demo`: V17 carga una sola vez los datos de demostración descritos en [Usuarios de prueba](#usuarios-de-prueba-seed).
 
 ### 4. Probar la API (terminal 2)
 
@@ -139,7 +139,7 @@ Invoke-RestMethod -Uri "http://localhost:3000/api/v1/usuarios" -Headers $headers
 Invoke-RestMethod -Uri "http://localhost:3000/api/v1/planes" -Headers $headers
 ```
 
-El perfil debe devolver los datos del gerente. Los listados devuelven los datos existentes; `/planes` puede devolver `[]` si todavía no hay planes. Para probar una escritura, creá un plan con nombre único:
+El perfil debe devolver los datos del gerente. En una instalación limpia con `dev`, `/planes` incluye planes activos mensual, trimestral y anual. Para probar una escritura, creá un plan con nombre único:
 
 ```powershell
 $plan = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/v1/planes" -Headers $headers -ContentType "application/json" -Body '{"nombre":"Plan de prueba local","duracionMeses":1,"precio":15000}'
@@ -213,7 +213,9 @@ Flyway es la única herramienta que modifica el esquema. Para realizar un cambio
 5. Arrancar el backend. Flyway valida `flyway_schema_history` y ejecuta, en orden, solamente las migraciones pendientes. Luego Hibernate valida el resultado.
 6. Verificar el cambio tanto sobre una base existente como desde una base limpia antes de integrarlo.
 
-`data.sql` se reserva para datos ficticios del perfil `dev`; los datos obligatorios para todos los ambientes deben incorporarse mediante una migración versionada.
+Los datos ficticios se migraron de `data.sql` a `src/main/resources/db/demo/V17__datos_demostracion.sql` y se deshabilitó el inicializador SQL de Spring: no hay dos mecanismos sembrando los mismos registros. Sólo `dev` agrega esa ubicación a Flyway; `staging` y `prod` mantienen únicamente `db/migration`. V17 también rechaza perfiles `prod`/`staging`, incluso combinados con `dev`. No habilitar `dev` ni promover una base demo a producción. Las futuras migraciones deben usar versiones globalmente distintas; V17 ya está reservada para esta carga.
+
+Para cargar desde cero, usar el inicio rápido con Docker sobre una base nueva de desarrollo, o arrancar el backend con `SPRING_PROFILES_ACTIVE=dev` y una base vacía propia. No borrar ni reinicializar una base existente. Flyway registra V17 en `flyway_schema_history`: reiniciar no vuelve a insertar ni mueve fechas. En una base dev anterior conserva identidades, claves, precios, clases y membresías existentes; completa sólo faltantes, por lo que sus cantidades/credenciales pueden diferir de las de una instalación limpia. No renueva automáticamente una membresía que ya existía.
 
 PostgreSQL guarda sus datos y el historial de Flyway en el volumen Docker `fitzone_pgdata`. Estos datos sobreviven a `docker compose down` y a la recreación del contenedor. El comando `docker compose down --volumes` elimina el volumen y toda la base, por lo que debe usarse solamente cuando se quiera probar una inicialización completamente limpia.
 
@@ -240,12 +242,20 @@ Para reemplazarla, agregar un adaptador que implemente la misma interfaz y activ
 
 La contratación, renovación manual/automática, consulta histórica, suspensión/reactivación y arrepentimiento están implementados con pagos fake. Ver [guía y ejemplos de membresías](docs/membresias.md). El QR requiere membresía vigente; el rol por sí solo no habilita acceso.
 
-| Email | Password | Rol |
+| Email | Password de demostración | Autoridad / escenario inicial |
 |---|---|---|
-| socio@fitzone.com | socio123 | USUARIO |
-| cliente@fitzone.com | cliente123 | USUARIO |
-| recepcion@fitzone.com | recepcion123 | RECEPCIONISTA |
-| gerente@fitzone.com | gerente123 | GERENTE |
+| socio@fitzone.com | socio123 | USUARIO, membresía anual activa |
+| cliente@fitzone.com | cliente123 | USUARIO, externo sin membresía |
+| recepcion@fitzone.com | recepcion123 | RECEPCIONISTA, Sede Central |
+| gerente@fitzone.com | gerente123 | GERENTE, gestión global |
+| vencido@fitzone.com | socio123 | USUARIO, membresía mensual vencida |
+| rechazo@fitzone.com | cliente123 | USUARIO externo, DNI ficticio de rechazo de pagos |
+
+Son claves públicas exclusivamente de demostración. En una base limpia V17 crea **25 sedes, 50 canchas** (pádel y fútbol 5 por sede), **100 turnos** (17–18 y 19–20, cuatro días después de la carga), **25 clases** de una hora con 12 cupos (una por sede), **6 usuarios, 3 planes activos, 2 membresías, 2 períodos y 2 pagos históricos FAKE aprobados**. No precarga reservas ni accesos: todos los cupos/turnos quedan libres para operar desde la aplicación. Los pagos respaldan los períodos; sus PDF se generan mediante la descarga habitual, sin archivos PDF ficticios ni tarjetas.
+
+Las clases se distribuyen desde cuatro días después de la primera aplicación, sin superponer al instructor y con más de 48 h para inscribirse. Las fechas son relativas a esa aplicación en `America/Argentina/Buenos_Aires`, no fechas fijas del calendario ni una agenda que se regenere en cada arranque. Al envejecer esta base, crear nuevas clases/turnos desde la aplicación. El socio activo tiene un año de vigencia desde el día previo a la carga, sin renovación automática; el vencido conserva un período histórico terminado un mes antes. Para reportes financieros incluir el día anterior a la carga (o los dos meses anteriores para ambos pagos). Los reportes de accesos comienzan vacíos hasta registrar ingresos/egresos reales de demostración.
+
+Recorridos: con el socio activo, abrir QR, reservar/cancelar una clase y comparar su descuento en canchas; con el externo reservar/pagar cancha y contratar un plan; con el vencido comprobar restricciones y renovar; con Recepción registrar accesos y gestionar su sede; con Gerencia consultar sedes, planes y reportes. La preparación offline RSA sigue requiriendo la configuración indicada en la guía M2; esta carga no cambia esa funcionalidad.
 
 Login: `POST /api/v1/auth/login` con `{ "email": "...", "password": "..." }`, devuelve un JWT para usar como `Authorization: Bearer <token>` en el resto de los endpoints.
 
@@ -451,7 +461,7 @@ Incluye catálogo por sede, tarifas globales por tipo, disponibilidad, Strategy,
 retención, cobro aprobado/rechazado, PDF, cancelación/reembolso y mantenimiento.
 V16 agrega la garantía SQL de ocupación y requiere `btree_gist`.
 
-En dev hay 25 sedes con canchas y turnos para los próximos siete días. Para probar
+En dev hay 25 sedes con canchas y dos turnos por cancha, fechados cuatro días después de aplicar V17. Para probar
 el rechazo sin cambiar código: `rechazo@fitzone.com` / `cliente123`, DNI `99999999`.
 Para aprobación: `cliente@fitzone.com` / `cliente123`. Usar las mismas rutas de
 reserva y pago; nunca enviar importes desde el cliente.
@@ -493,7 +503,7 @@ python scripts/exportar-openapi.py --check
 V7 unifica las autoridades comerciales en USUARIO sin borrar cuentas, períodos ni pagos.
 Registro y login emiten esa autoridad estable; la membresía decide condición de Socio
 sin volver a iniciar sesión al comprar. La sede habitual no cambia la condición.
-Ambas cuentas demo son USUARIO: sus nombres no garantizan membresía.
+Las cuentas comerciales demo son USUARIO: la vigencia se deriva de los períodos. En una instalación limpia V17 prepara al socio activo y al vencido, y deja al cliente externo sin membresía.
 La contratación POST /membresias incluye cobro fake aprobado y comprobante persistido.
 La interfaz consulta pagoId de los períodos y descarga GET /pagos/{id}/comprobante,
 con JWT y control de titularidad; no usa el listado demo ni inventa registros.
