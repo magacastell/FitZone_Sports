@@ -1,0 +1,16 @@
+.fit-dialogo-reserva {
+  width: min(440px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: 24px;
+  border: 1px solid #dce5dd;
+  border-radius: 16px;
+  color: #263e30;
+  background: #fff;
+  box-shadow: 0 20px 56px rgb(20 48 35 / 24%);
+}
+
+.fit-dialogo-reserva::backdrop { background: rgb(20 48 35 / 54%); }
+.fit-dialogo-reserva h3 { margin: 0; font-size: 20px; }
+.fit-dialogo-reserva__detalle p { margin: 10px 0 0; font-size: 14px; line-height: 1.55; }
+.fit-dialogo-reserva__acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.fit-dialogo-reserva__acciones .fit-button { min-height: 44px; }

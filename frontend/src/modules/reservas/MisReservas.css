@@ -1,0 +1,13 @@
+.mis-reservas-page__accesos { display: flex; flex-wrap: wrap; gap: 8px; }
+.mis-reservas-page__secciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 20px; }
+.mis-reservas-page__secciones > section { min-width: 0; scroll-margin-top: 100px; border-radius: 16px; }
+.mis-reservas-page__secciones > section > div { display: grid; gap: 12px; }
+.mis-reservas-page__secciones .panel { padding: 20px; }
+.mis-reservas-page__secciones .empty-state { min-height: 140px; padding: 20px 0; }
+.mis-reservas-page .mis-clases { margin-top: 16px; }
+.mis-reservas-page .m4-reservas-lista { margin-top: 16px; }
+.grilla-canchas .m4-reservas-paginacion { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px; }
+
+@media (max-width: 900px) {
+  .mis-reservas-page__secciones { grid-template-columns: minmax(0, 1fr); }
+}

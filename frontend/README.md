@@ -1,6 +1,6 @@
 # Frontend de FitZone Sports
 
-Frontend en React, Vite y React Router. El portal y las vistas de Recepción y Gerencia consumen la API en los recorridos de identidad, membresías, acceso y clases, y en la consulta de canchas por sede. Para preparar PostgreSQL e iniciar la API, seguí la [guía local del README principal](../README.md#cómo-levantar-el-proyecto-localmente).
+Frontend en React, Vite y React Router. El portal y las vistas de Recepción y Gerencia consumen la API de identidad, membresías, acceso, clases, canchas y pagos según el rol. Para preparar PostgreSQL e iniciar la API, seguí la [guía local del README principal](../README.md#cómo-levantar-el-proyecto-localmente).
 
 ## Requisitos y ejecución local
 
@@ -36,11 +36,15 @@ La pantalla de ingreso muestra las credenciales de prueba `socio@fitzone.com` / 
 | `/mi-qr` y `/qr-offline` | QR dinámico con membresía habilitada y consulta sin conexión si hay un lote vigente guardado. |
 | `/recepcion/acceso` y `/recepcion/aforo` | Ingresos, egresos y aforo de la sede. |
 | `/terminal-offline` | Terminal de Recepción con autorización aprovisionada, captura provisional y sincronización al volver la red. |
-| `/clases` | Agenda por sede, reserva y cancelación, lista de espera y ofertas en «Mis clases». Incluye administración de agenda según el rol. |
-| `/canchas` | Catálogo por sede conectado a la API. La pantalla todavía carece de selección de turnos, reserva y pago. |
-| `/admin/canchas/mantenimiento` | Pantalla pendiente de conectar a la API de mantenimiento. |
-| `/comprobantes` | Historial y descarga de PDF de pagos de membresía. |
+| `/clases` | Próximas clases por sede con filtro opcional por día. Permite reservar y administrar la agenda según el rol. |
+| `/canchas` | Muestra el primer día con turnos libres y permite elegir otra fecha. El modal muestra el importe y el tiempo de retención para confirmar el pago o salir. |
+| `/mis-reservas` | Turnos personales de canchas y actividad de clases en la misma pantalla, con cancelaciones y ofertas de lista de espera. |
+| `/admin/canchas` | Administración de canchas, turnos, tarifas y mantenimiento según permisos. |
+| `/pagos` | Historial de canchas y membresías, estados, reembolsos y descarga de comprobantes. |
+| `/comprobantes` | Enlace anterior de comprobantes que redirige a Mis pagos para Cliente/Socio. |
 | `/gestion/reportes` y `/admin/reportes-consolidados` | Reportes consolidados pendientes. |
+
+Para Cliente/Socio, **Mis reservas** reúne los turnos de cancha con pago y la actividad de clases. Desde ahí se puede cancelar cuando corresponde y gestionar la lista de espera y sus ofertas. **Mis pagos** conserva el historial financiero y los comprobantes descargables. En **Mi membresía** se muestran el período vigente y el próximo período pagado, cuando existen.
 
 Los permisos y las guardas comerciales se validan en el backend. Las rutas y la navegación se definen en [AppRoutes.jsx](src/routes/AppRoutes.jsx).
 
@@ -52,7 +56,7 @@ El acceso offline requiere aprovisionamiento previo y un build PWA. Los movimien
 
 Las ofertas de clases aparecen en el portal. El aviso externo se simula en el log del servidor. Siguen pendientes el registro de asistencia, la aplicación de penalidades y los reportes consolidados.
 
-La API de M4/M5 ya ofrece turnos, reservas, pagos, comprobantes, reembolsos y mantenimiento. Queda pendiente conectar esos recorridos de cancha a sus pantallas. El historial de `/comprobantes` muestra los PDF de membresía. [Guía de integración M4/M5](../docs/integracion-canchas-pagos.md)
+Los importes, el vencimiento de la retención y el resultado del pago de cancha provienen del servidor. El ingreso por reserva queda en el alcance de integración con M2. [Guía de integración M4/M5](../docs/integracion-canchas-pagos.md)
 
 `node_modules/`, `dist/` y `.vite/` están excluidos de Git mediante el `.gitignore` de la raíz. `package.json` y `package-lock.json` se versionan.
 

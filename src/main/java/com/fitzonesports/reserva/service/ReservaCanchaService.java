@@ -73,6 +73,11 @@ public class ReservaCanchaService {
         var u=canchas.actor(email);boolean personal=Set.of("RECEPCIONISTA","GERENTE").contains(u.rol());
         if(personal)canchas.administrar(u,r.sedeId());else if(!u.id().equals(r.usuarioId()))throw error(403,"La reserva pertenece a otro usuario");
         if("CANCELADA".equals(r.estado()))return r;
+        if(req!=null && Boolean.TRUE.equals(req.soloRetencion())) {
+            if("EXPIRADA".equals(r.estado()))return r;
+            if(!"PENDIENTE_PAGO".equals(r.estado()) || r.pagoId()!=null)
+                throw error(409,"El turno ya no es una retencion sin pago");
+        }
         if(!Set.of("CONFIRMADA","PENDIENTE_PAGO").contains(r.estado()))throw error(409,"La reserva no admite cancelacion");
         if(!r.inicio().toLocalDateTime().isAfter(canchas.ahora()))throw error(409,"El turno ya comenzo");
         if(req!=null && req.porcentajeReembolso()!=null && !"GERENTE".equals(u.rol()))throw error(403,"Solo gerente puede elegir una devolucion administrativa");
