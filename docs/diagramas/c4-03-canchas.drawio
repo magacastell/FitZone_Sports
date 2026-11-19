@@ -26,6 +26,12 @@
         <mxCell id="api-title" value="API backend · monolito modular · Java / Spring Boot" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=24;fontColor=#142e49;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="63" y="275" width="650" height="31" as="geometry" />
         </mxCell>
+        <mxCell id="gestor-bloqueos" value="Gestor de bloqueos (responsabilidad distribuida)" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=19;fontColor=#194d76;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="950" y="271" width="780" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="gestor-bloqueos-detalle" value="CanchaService coordina · CanchaRepository bloquea la fila · PostgreSQL V16 protege la ocupación" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#41566e;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="950" y="296" width="780" height="23" as="geometry" />
+        </mxCell>
         <mxCell id="m4-title" value="M4 · Componentes de Canchas" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=22;fontColor=#194d76;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="371" y="341" width="530" height="26" as="geometry" />
         </mxCell>
@@ -35,10 +41,10 @@
         <mxCell id="m5-title" value="M5 · Pagos y comprobantes" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=22;fontColor=#59397d;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="1342" y="341" width="492" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="footer" value="Autor nominal pendiente de confirmación · 18/11/2026 · v1.0 · Base de código 2493668" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=18;fontColor=#41566e;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+        <mxCell id="footer" value="Autora: Magali Castell · Fecha de edición: 19/11/2026 · v1.1 · Commit de código auditado: 7335bf3de23418a0a8f96dc8d72b018866d2d345" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=18;fontColor=#41566e;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="48" y="1350" width="1810" height="29" as="geometry" />
         </mxCell>
-        <mxCell id="frontend" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;Frontend React&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Contenedor web · catálogo por sede&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#f2f5f8;strokeColor=#70869b;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#27435d;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+        <mxCell id="frontend" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;Frontend React&lt;/b&gt;&lt;/div&gt;&lt;div&gt;SPA/PWA · Canchas&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#f2f5f8;strokeColor=#70869b;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#27435d;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="660" y="133" width="373" height="81" as="geometry" />
         </mxCell>
         <mxCell id="tarifa" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;TarifaCanchaController&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Tipos, tarifas y recargo por sede&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
@@ -50,10 +56,10 @@
         <mxCell id="reserva-ctrl" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;ReservaController&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Consulta e historial de reservas&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="994" y="388" width="286" height="101" as="geometry" />
         </mxCell>
-        <mxCell id="cancha-svc" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;CanchaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Catálogo, turnos y mantenimiento&lt;/div&gt;&lt;div&gt;Valida sede y consulta vigencia&lt;/div&gt;&lt;div&gt;Selecciona Strategy y pide el bloqueo&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+        <mxCell id="cancha-svc" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;CanchaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Catálogo, turnos y mantenimiento&lt;/div&gt;&lt;div&gt;Valida sede y selecciona tarifa por vigencia&lt;/div&gt;&lt;div&gt;Coordina el bloqueo transaccional&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="397" y="584" width="359" height="149" as="geometry" />
         </mxCell>
-        <mxCell id="reserva-svc" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;ReservaCanchaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Retención, pago y cancelación&lt;/div&gt;&lt;div&gt;Coordina bloqueo, precio e idempotencia&lt;/div&gt;&lt;div&gt;Actualiza el estado de la reserva&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+        <mxCell id="reserva-svc" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;ReservaCanchaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Retención, pago y cancelación&lt;/div&gt;&lt;div&gt;Coordina bloqueo, precio e idempotencia&lt;/div&gt;&lt;div&gt;Gestiona estados y política de cancelación&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="831" y="584" width="435" height="149" as="geometry" />
         </mxCell>
         <mxCell id="membresias" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;MembresiaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Informa vigencia del titular&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#8665a3;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#50346f;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
@@ -62,7 +68,7 @@
         <mxCell id="strategy" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;PricingStrategy&lt;/b&gt;&lt;/div&gt;&lt;div&gt;PrecioEstandarStrategy · base y pico&lt;/div&gt;&lt;div&gt;PrecioSocioStrategy · −15 %&lt;/div&gt;&lt;div&gt;sobre el total estándar&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="368" y="903" width="309" height="116" as="geometry" />
         </mxCell>
-        <mxCell id="repo" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;CanchaRepository&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Spring Data JPA · entidad Cancha&lt;/div&gt;&lt;div&gt;PESSIMISTIC_WRITE por fila&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+        <mxCell id="repo" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;CanchaRepository&lt;/b&gt;&lt;/div&gt;&lt;div&gt;JPA · Persiste la entidad Cancha&lt;/div&gt;&lt;div&gt;PESSIMISTIC_WRITE por fila&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="700" y="903" width="283" height="116" as="geometry" />
         </mxCell>
         <mxCell id="job" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;VencimientoReservasJob&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Expira retenciones y marca&lt;/div&gt;&lt;div&gt;reservas cumplidas&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#416f96;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#163c60;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
@@ -71,7 +77,7 @@
         <mxCell id="pago-ctrl" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;PagoController&lt;/b&gt;&lt;/div&gt;&lt;div&gt;POST /pagos · deriva el cobro de cancha a M4&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#8665a3;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#50346f;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="1382" y="388" width="438" height="101" as="geometry" />
         </mxCell>
-        <mxCell id="pago-svc" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;PagoCanchaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Cobra y reembolsa el precio persistido&lt;/div&gt;&lt;div&gt;Registra el resultado en la transacción de M4&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#8665a3;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#50346f;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+        <mxCell id="pago-svc" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;PagoCanchaService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Cobra el importe persistido y calcula la devolución&lt;/div&gt;&lt;div&gt;según la política de cancelación&lt;/div&gt;&lt;div&gt;Registra el resultado en la transacción de M4&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#8665a3;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#50346f;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
           <mxGeometry x="1382" y="584" width="438" height="121" as="geometry" />
         </mxCell>
         <mxCell id="pdf" value="&lt;div style=&quot;font-size:20px&quot;&gt;&lt;b&gt;ComprobanteService&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Emite y conserva el PDF del pago aprobado&lt;/div&gt;&lt;div&gt;Usa ComprobantePdfRenderer (PDFBox)&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;overflow=hidden;fillColor=#ffffff;strokeColor=#8665a3;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#50346f;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
@@ -85,6 +91,13 @@
         </mxCell>
         <mxCell id="http" value="" style="endArrow=block;endSize=8;endFill=1;rounded=0;html=0;strokeColor=#466179;strokeWidth=2;exitX=0.49865951742627346;exitY=1.0;exitPerimeter=0;entryX=0.5745454545454546;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="frontend" target="cancha-ctrl">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="http-pago" value="" style="endArrow=block;endSize=8;endFill=1;rounded=0;html=0;strokeColor=#466179;strokeWidth=2;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.8401826484018264;entryY=0;entryPerimeter=0;" edge="1" parent="1" source="frontend" target="pago-ctrl">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1750" y="173.5" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="control-tarifa" value="" style="endArrow=block;endSize=8;endFill=1;rounded=0;html=0;strokeColor=#466179;strokeWidth=2;exitX=0.486013986013986;exitY=1.0;exitPerimeter=0;entryX=0.3147632311977716;entryY=0.0;entryPerimeter=0;" edge="1" parent="1" source="tarifa" target="cancha-svc">
           <mxGeometry relative="1" as="geometry" />
@@ -125,7 +138,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="reloj" value="" style="endArrow=block;endSize=8;endFill=1;rounded=0;html=0;strokeColor=#466179;strokeWidth=2;exitX=0.48014440433212996;exitY=0.0;exitPerimeter=0;entryX=0.7011494252873564;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="job" target="reserva-svc">
+        <mxCell id="reloj" value="" style="endArrow=block;endSize=8;endFill=1;rounded=0;html=0;strokeColor=#466179;strokeWidth=2;exitX=0.4223826714801444;exitY=0.0;exitPerimeter=0;entryX=0.664367816091954;entryY=1.0;entryPerimeter=0;" edge="1" parent="1" source="job" target="reserva-svc">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="delegacion-pago" value="" style="endArrow=block;endSize=8;endFill=1;rounded=0;html=0;strokeColor=#466179;strokeWidth=2;exitX=0.0;exitY=0.48514851485148514;exitPerimeter=0;entryX=1.0;entryY=0.1610738255033557;entryPerimeter=0;" edge="1" parent="1" source="pago-ctrl" target="reserva-svc">
@@ -190,8 +203,11 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="label-http" value="REST/JSON · GET /canchas" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="857" y="223" width="245" height="26" as="geometry" />
+        <mxCell id="label-http" value="REST/JSON · Catálogo, turnos, disponibilidad y reservas" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="857" y="223" width="425" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="label-http-pago" value="REST/JSON · Pago de reservas" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1265" y="143" width="250" height="26" as="geometry" />
         </mxCell>
         <mxCell id="label-control-tarifa" value="Configura tarifas" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="408" y="520" width="151" height="26" as="geometry" />
@@ -214,11 +230,11 @@
         <mxCell id="label-seleccion" value="Elige por vigencia" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="427" y="788" width="189" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="label-jpa" value="Bloquea por cancha" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="734" y="810" width="188" height="26" as="geometry" />
+        <mxCell id="label-jpa" value="Persiste y solicita bloqueo" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="842" y="810" width="206" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="label-reloj" value="vencer()" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1147" y="795" width="92" height="26" as="geometry" />
+        <mxCell id="label-reloj" value="Actualiza vencimientos&#10;y cumplimiento" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1126" y="789" width="158" height="46" as="geometry" />
         </mxCell>
         <mxCell id="label-delegacion-pago" value="Paga" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="1278" y="574" width="63" height="26" as="geometry" />
@@ -235,8 +251,8 @@
         <mxCell id="label-jdbc-canchas" value="JDBC · gestión y turnos" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="373" y="1101" width="225" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="label-sql-bloqueo" value="SQL · lock de fila" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="759" y="1110" width="170" height="26" as="geometry" />
+        <mxCell id="label-sql-bloqueo" value="SQL · Persiste y bloquea la fila" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="601" y="1110" width="235" height="26" as="geometry" />
         </mxCell>
         <mxCell id="label-jdbc-reserva" value="JDBC · reservas" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#29445c;fontStyle=0;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
           <mxGeometry x="1060" y="1099" width="175" height="26" as="geometry" />

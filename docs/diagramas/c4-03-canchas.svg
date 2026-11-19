@@ -21,6 +21,12 @@
   <g id="api-title">
     <text x="63" y="290.5" font-family="Arial, sans-serif" font-size="24" fill="#142e49" font-weight="700" text-anchor="start" dominant-baseline="middle">API backend · monolito modular · Java / Spring Boot</text>
   </g>
+  <g id="gestor-bloqueos">
+    <text x="950" y="283.5" font-family="Arial, sans-serif" font-size="19" fill="#194d76" font-weight="700" text-anchor="start" dominant-baseline="middle">Gestor de bloqueos (responsabilidad distribuida)</text>
+  </g>
+  <g id="gestor-bloqueos-detalle">
+    <text x="950" y="307.5" font-family="Arial, sans-serif" font-size="16" fill="#41566e" font-weight="400" text-anchor="start" dominant-baseline="middle">CanchaService coordina · CanchaRepository bloquea la fila · PostgreSQL V16 protege la ocupación</text>
+  </g>
   <g id="m4-title">
     <text x="371" y="354.0" font-family="Arial, sans-serif" font-size="22" fill="#194d76" font-weight="700" text-anchor="start" dominant-baseline="middle">M4 · Componentes de Canchas</text>
   </g>
@@ -31,12 +37,12 @@
     <text x="1342" y="354.0" font-family="Arial, sans-serif" font-size="22" fill="#59397d" font-weight="700" text-anchor="start" dominant-baseline="middle">M5 · Pagos y comprobantes</text>
   </g>
   <g id="footer">
-    <text x="48" y="1364.5" font-family="Arial, sans-serif" font-size="18" fill="#41566e" font-weight="400" text-anchor="start" dominant-baseline="middle">Autor nominal pendiente de confirmación · 18/11/2026 · v1.0 · Base de código 2493668</text>
+    <text x="48" y="1364.5" font-family="Arial, sans-serif" font-size="18" fill="#41566e" font-weight="400" text-anchor="start" dominant-baseline="middle">Autora: Magali Castell · Fecha de edición: 19/11/2026 · v1.1 · Commit de código auditado: 7335bf3de23418a0a8f96dc8d72b018866d2d345</text>
   </g>
   <g id="frontend">
     <rect x="660" y="133" width="373" height="81" rx="8" fill="#f2f5f8" stroke="#70869b" stroke-width="2" />
     <text x="846.5" y="159.0" font-family="Arial, sans-serif" font-size="20" fill="#27435d" font-weight="700" text-anchor="middle" dominant-baseline="middle">Frontend React</text>
-    <text x="846.5" y="188.0" font-family="Arial, sans-serif" font-size="17" fill="#27435d" font-weight="400" text-anchor="middle" dominant-baseline="middle">Contenedor web · catálogo por sede</text>
+    <text x="846.5" y="188.0" font-family="Arial, sans-serif" font-size="17" fill="#27435d" font-weight="400" text-anchor="middle" dominant-baseline="middle">SPA/PWA · Canchas</text>
   </g>
   <g id="tarifa">
     <rect x="371" y="388" width="286" height="101" rx="8" fill="#ffffff" stroke="#416f96" stroke-width="2" />
@@ -58,15 +64,15 @@
     <rect x="397" y="584" width="359" height="149" rx="8" fill="#ffffff" stroke="#416f96" stroke-width="2" />
     <text x="576.5" y="621.0" font-family="Arial, sans-serif" font-size="20" fill="#163c60" font-weight="700" text-anchor="middle" dominant-baseline="middle">CanchaService</text>
     <text x="576.5" y="650.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Catálogo, turnos y mantenimiento</text>
-    <text x="576.5" y="673.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Valida sede y consulta vigencia</text>
-    <text x="576.5" y="696.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Selecciona Strategy y pide el bloqueo</text>
+    <text x="576.5" y="673.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Valida sede y selecciona tarifa por vigencia</text>
+    <text x="576.5" y="696.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Coordina el bloqueo transaccional</text>
   </g>
   <g id="reserva-svc">
     <rect x="831" y="584" width="435" height="149" rx="8" fill="#ffffff" stroke="#416f96" stroke-width="2" />
     <text x="1048.5" y="621.0" font-family="Arial, sans-serif" font-size="20" fill="#163c60" font-weight="700" text-anchor="middle" dominant-baseline="middle">ReservaCanchaService</text>
     <text x="1048.5" y="650.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Retención, pago y cancelación</text>
     <text x="1048.5" y="673.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Coordina bloqueo, precio e idempotencia</text>
-    <text x="1048.5" y="696.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Actualiza el estado de la reserva</text>
+    <text x="1048.5" y="696.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Gestiona estados y política de cancelación</text>
   </g>
   <g id="membresias">
     <rect x="77" y="614" width="242" height="103" rx="8" fill="#ffffff" stroke="#8665a3" stroke-width="2" />
@@ -83,7 +89,7 @@
   <g id="repo">
     <rect x="700" y="903" width="283" height="116" rx="8" fill="#ffffff" stroke="#416f96" stroke-width="2" />
     <text x="841.5" y="935.0" font-family="Arial, sans-serif" font-size="20" fill="#163c60" font-weight="700" text-anchor="middle" dominant-baseline="middle">CanchaRepository</text>
-    <text x="841.5" y="964.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">Spring Data JPA · entidad Cancha</text>
+    <text x="841.5" y="964.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">JPA · Persiste la entidad Cancha</text>
     <text x="841.5" y="987.0" font-family="Arial, sans-serif" font-size="17" fill="#163c60" font-weight="400" text-anchor="middle" dominant-baseline="middle">PESSIMISTIC_WRITE por fila</text>
   </g>
   <g id="job">
@@ -99,9 +105,10 @@
   </g>
   <g id="pago-svc">
     <rect x="1382" y="584" width="438" height="121" rx="8" fill="#ffffff" stroke="#8665a3" stroke-width="2" />
-    <text x="1601.0" y="618.5" font-family="Arial, sans-serif" font-size="20" fill="#50346f" font-weight="700" text-anchor="middle" dominant-baseline="middle">PagoCanchaService</text>
-    <text x="1601.0" y="647.5" font-family="Arial, sans-serif" font-size="17" fill="#50346f" font-weight="400" text-anchor="middle" dominant-baseline="middle">Cobra y reembolsa el precio persistido</text>
-    <text x="1601.0" y="670.5" font-family="Arial, sans-serif" font-size="17" fill="#50346f" font-weight="400" text-anchor="middle" dominant-baseline="middle">Registra el resultado en la transacción de M4</text>
+    <text x="1601.0" y="607.0" font-family="Arial, sans-serif" font-size="20" fill="#50346f" font-weight="700" text-anchor="middle" dominant-baseline="middle">PagoCanchaService</text>
+    <text x="1601.0" y="636.0" font-family="Arial, sans-serif" font-size="17" fill="#50346f" font-weight="400" text-anchor="middle" dominant-baseline="middle">Cobra el importe persistido y calcula la devolución</text>
+    <text x="1601.0" y="659.0" font-family="Arial, sans-serif" font-size="17" fill="#50346f" font-weight="400" text-anchor="middle" dominant-baseline="middle">según la política de cancelación</text>
+    <text x="1601.0" y="682.0" font-family="Arial, sans-serif" font-size="17" fill="#50346f" font-weight="400" text-anchor="middle" dominant-baseline="middle">Registra el resultado en la transacción de M4</text>
   </g>
   <g id="pdf">
     <rect x="1382" y="768" width="438" height="103" rx="8" fill="#ffffff" stroke="#8665a3" stroke-width="2" />
@@ -122,6 +129,7 @@
     <text x="960.0" y="1283.5" font-family="Arial, sans-serif" font-size="17" fill="#174c3d" font-weight="400" text-anchor="middle" dominant-baseline="middle">Tablas compartidas para canchas, turnos, reservas, bloqueos, pagos y comprobantes</text>
   </g>
   <polyline id="http" data-source="frontend" data-target="cancha-ctrl" points="846,214 846,388" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+  <polyline id="http-pago" data-source="frontend" data-target="pago-ctrl" points="1033,173.5 1750,173.5 1750,388" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="control-tarifa" data-source="tarifa" data-target="cancha-svc" points="510,489 510,584" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="control-gestion" data-source="cancha-ctrl" data-target="cancha-svc" points="756,489 756,519 666,519 666,584" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="control-reserva" data-source="cancha-ctrl" data-target="reserva-svc" points="894,489 894,523 941,523 941,584" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
@@ -130,7 +138,7 @@
   <polyline id="coordina" data-source="reserva-svc" data-target="cancha-svc" points="831,649 756,649" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="seleccion" data-source="cancha-svc" data-target="strategy" points="521,733 521,903" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="jpa" data-source="cancha-svc" data-target="repo" points="715,733 715,783 827,783 827,903" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
-  <polyline id="reloj" data-source="job" data-target="reserva-svc" points="1136,903 1136,733" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+  <polyline id="reloj" data-source="job" data-target="reserva-svc" points="1120,903 1120,733" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="delegacion-pago" data-source="pago-ctrl" data-target="reserva-svc" points="1382,437 1311,437 1311,608 1266,608" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="cobro" data-source="reserva-svc" data-target="pago-svc" points="1266,657 1382,657" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="emision" data-source="reserva-svc" data-target="pdf" points="1266,707 1326,707 1326,819 1382,819" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
@@ -141,8 +149,12 @@
   <polyline id="jdbc-pdf" data-source="pdf" data-target="db" points="1411,871 1411,1161" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <polyline id="jdbc-pago" data-source="pago-svc" data-target="db" points="1820,616 1850,616 1850,1133 1739,1133 1739,1161" fill="none" stroke="#466179" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
   <g id="label-http">
-    <rect x="857" y="223" width="245" height="26" rx="3" fill="#ffffff" />
-    <text x="979.5" y="236.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">REST/JSON · GET /canchas</text>
+    <rect x="857" y="223" width="425" height="26" rx="3" fill="#ffffff" />
+    <text x="1069.5" y="236.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">REST/JSON · Catálogo, turnos, disponibilidad y reservas</text>
+  </g>
+  <g id="label-http-pago">
+    <rect x="1265" y="143" width="250" height="26" rx="3" fill="#ffffff" />
+    <text x="1390.0" y="156.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">REST/JSON · Pago de reservas</text>
   </g>
   <g id="label-control-tarifa">
     <rect x="408" y="520" width="151" height="26" rx="3" fill="#ffffff" />
@@ -173,12 +185,13 @@
     <text x="521.5" y="801.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">Elige por vigencia</text>
   </g>
   <g id="label-jpa">
-    <rect x="734" y="810" width="188" height="26" rx="3" fill="#ffffff" />
-    <text x="828.0" y="823.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">Bloquea por cancha</text>
+    <rect x="842" y="810" width="206" height="26" rx="3" fill="#ffffff" />
+    <text x="945.0" y="823.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">Persiste y solicita bloqueo</text>
   </g>
   <g id="label-reloj">
-    <rect x="1147" y="795" width="92" height="26" rx="3" fill="#ffffff" />
-    <text x="1193.0" y="808.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">vencer()</text>
+    <rect x="1126" y="789" width="158" height="46" rx="3" fill="#ffffff" />
+    <text x="1205.0" y="802.5" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">Actualiza vencimientos</text>
+    <text x="1205.0" y="821.5" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">y cumplimiento</text>
   </g>
   <g id="label-delegacion-pago">
     <rect x="1278" y="574" width="63" height="26" rx="3" fill="#ffffff" />
@@ -201,8 +214,8 @@
     <text x="485.5" y="1114.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">JDBC · gestión y turnos</text>
   </g>
   <g id="label-sql-bloqueo">
-    <rect x="759" y="1110" width="170" height="26" rx="3" fill="#ffffff" />
-    <text x="844.0" y="1123.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">SQL · lock de fila</text>
+    <rect x="601" y="1110" width="235" height="26" rx="3" fill="#ffffff" />
+    <text x="718.5" y="1123.0" font-family="Arial, sans-serif" font-size="15" fill="#29445c" font-weight="400" text-anchor="middle" dominant-baseline="middle">SQL · Persiste y bloquea la fila</text>
   </g>
   <g id="label-jdbc-reserva">
     <rect x="1060" y="1099" width="175" height="26" rx="3" fill="#ffffff" />

@@ -1,126 +1,188 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mxfile host="app.diagrams.net" version="24.7.17">
   <diagram name="FitZone Sports | C4 nivel 2 — Contenedores y operación offline" id="c4-02-contenedores">
-    <mxGraphModel dx="1600" dy="1190" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1600" pageHeight="1190" math="0" shadow="0">
+    <mxGraphModel dx="1600" dy="1176" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1600" pageHeight="1176" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="e4" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#f8fafc;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
-          <mxGeometry x="30" y="120" width="1540" height="900" as="geometry" />
+          <mxGeometry as="geometry" x="30" y="238" width="1540" height="855" />
         </mxCell>
         <mxCell id="e6" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#f8fafc;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
-          <mxGeometry x="60" y="175" width="690" height="790" as="geometry" />
+          <mxGeometry as="geometry" x="60" y="278" width="675" height="795" />
         </mxCell>
         <mxCell id="e8" value="" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#f8fafc;strokeColor=#64748b;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
-          <mxGeometry x="840" y="175" width="690" height="790" as="geometry" />
+          <mxGeometry as="geometry" x="870" y="278" width="655" height="795" />
         </mxCell>
-        <mxCell id="e12" value="IndexedDB / Dexie&#10;[Mecanismo local]&#10;Copia/cola en sede;&#10;lote QR en el socio" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
-          <mxGeometry x="100" y="775" width="260" height="125" as="geometry" />
+        <mxCell id="e31" value="[Person]&#10;Socio activo" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="82" y="108" width="144" height="82" />
         </mxCell>
-        <mxCell id="e13" value="Cache Storage / Workbox&#10;[Mecanismo local PWA]&#10;Recursos estáticos;&#10;sin respuestas API" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
-          <mxGeometry x="405" y="775" width="265" height="125" as="geometry" />
+        <mxCell id="e32" value="[Person]&#10;Cliente externo" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="244" y="108" width="144" height="82" />
         </mxCell>
-        <mxCell id="e10" value="Portal / consola web&#10;[Instancia del frontend: navegador del usuario]&#10;Socio, cliente, Recepción y Gerencia" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="255" width="570" height="130" as="geometry" />
+        <mxCell id="e33" value="[Person]&#10;Recepcionista /&#10;Administrador de sede" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="400" y="108" width="186" height="82" />
         </mxCell>
-        <mxCell id="e11" value="Terminal de sede / PWA&#10;[Instancia del mismo frontend: navegador de sede]&#10;Validación local, movimientos y aforo provisional" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="505" width="570" height="140" as="geometry" />
+        <mxCell id="e34" value="[Person]&#10;Gerente central" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e7eff8;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="600" y="108" width="144" height="82" />
         </mxCell>
-        <mxCell id="e14" value="API backend — monolito modular&#10;[Container: Java 21 / Spring Boot 4.1.1]&#10;M1/M2 y pagos de membresía; M3 incorporado:&#10;agenda, reservas, espera y Observer (avisos por log).&#10;M3: asistencia/penalidades pendientes; M4 parcial.&#10;PasarelaPagoFake interna, sin REST." style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=19;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="890" y="385" width="580" height="205" as="geometry" />
+        <mxCell id="e10" value="Aplicación web React / PWA&#10;[Contenedor lógico · en el navegador]&#10;Portal del socio · Consola de administración&#10;Terminal de sede · uso de Recepción" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="90" y="318" width="610" height="135" />
         </mxCell>
-        <mxCell id="e15" value="PostgreSQL central&#10;[Container: base de datos relacional]&#10;Flyway V1–V15 · tablas compartidas e inbox offline" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=20;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="890" y="775" width="580" height="125" as="geometry" />
+        <mxCell id="e35" value="Navegador del socio&#10;Mi QR · usa el lote vigente" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="95" y="541" width="264" height="108" />
         </mxCell>
-        <mxCell id="e28" value="IndexedDB y Cache Storage pertenecen al navegador; no son servidores ni procesos desplegables. Cada equipo guarda su propia copia.&#10;Offline: copia y ventanas vigentes. Sin servidor local ni réplica física de PostgreSQL en sede." style="rounded=0;whiteSpace=wrap;html=0;fillColor=white;strokeColor=#94a3b8;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
-          <mxGeometry x="45" y="1030" width="1510" height="55" as="geometry" />
+        <mxCell id="e11" value="Navegador del terminal&#10;Recepción · control de acceso&#10;Valida QR con copia vigente&#10;Movimientos y aforo provisionales" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="400" y="541" width="300" height="108" />
+        </mxCell>
+        <mxCell id="e36" value="IndexedDB · acceso con Dexie&#10;Lote QR local del socio" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="95" y="720" width="264" height="107" />
+        </mxCell>
+        <mxCell id="e12" value="IndexedDB · acceso con Dexie&#10;Copia y presencias locales&#10;Cola de movimientos de Recepción" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="400" y="720" width="300" height="107" />
+        </mxCell>
+        <mxCell id="e13" value="Service Worker con Workbox&#10;Cache Storage · recursos estáticos de la PWA&#10;[Mecanismo local · por navegador]" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#176b58;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;dashed=1;dashPattern=8 5;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="190" y="880" width="415" height="106" />
+        </mxCell>
+        <mxCell id="e37" value="NGINX · contenedor frontend&#10;[Servidor web y proxy]&#10;Sirve el build de React y resuelve rutas de la SPA&#10;Reenvía /api/ al backend" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="900" y="312" width="590" height="144" />
+        </mxCell>
+        <mxCell id="e14" value="API REST /api/v1 · monolito modular&#10;[Contenedor · Java 21 / Spring Boot 4.1.1]&#10;Spring Security · JWT Bearer&#10;M1 Usuarios y membresías · M2 Control de accesos y aforo&#10;M3 Clases y lista de espera · M4 Gestión y reservas de canchas&#10;M5 Pagos simulados y comprobantes · Reportes de Gerencia&#10;Reconciliación offline · pasarela simulada interna" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#dceefa;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="900" y="575" width="590" height="250" />
+        </mxCell>
+        <mxCell id="e15" value="PostgreSQL 18 central&#10;[Contenedor de datos · persistencia relacional]&#10;Spring aplica migraciones Flyway V1–V16&#10;Datos de negocio y reconciliación offline" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#e1f1e9;strokeColor=#16324f;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="900" y="925" width="590" height="125" />
+        </mxCell>
+        <mxCell id="e38" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="94" y="190" />
+            <mxPoint as="targetPoint" x="94" y="318" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e39" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="249" y="190" />
+            <mxPoint as="targetPoint" x="249" y="318" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e40" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="408" y="190" />
+            <mxPoint as="targetPoint" x="408" y="318" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e41" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="605" y="190" />
+            <mxPoint as="targetPoint" x="605" y="318" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="e16" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="670" y="320" as="sourcePoint" />
-            <mxPoint x="890" y="430" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="790" y="320" />
-              <mxPoint x="790" y="430" />
-            </Array>
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="700" y="384" />
+            <mxPoint as="targetPoint" x="900" y="384" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e18" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;dashed=1;dashPattern=7 5;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="670" y="575" as="sourcePoint" />
-            <mxPoint x="890" y="530" as="targetPoint" />
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="700" y="605" />
+            <mxPoint as="targetPoint" x="900" y="427" />
             <Array as="points">
-              <mxPoint x="790" y="575" />
-              <mxPoint x="790" y="530" />
+              <mxPoint x="805" y="605" />
+              <mxPoint x="805" y="427" />
             </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e20" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="230" y="645" as="sourcePoint" />
-            <mxPoint x="230" y="775" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e22" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="100" y="320" as="sourcePoint" />
-            <mxPoint x="100" y="837" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="80" y="320" />
-              <mxPoint x="80" y="837" />
-            </Array>
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="227" y="649" />
+            <mxPoint as="targetPoint" x="227" y="720" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="550" y="649" />
+            <mxPoint as="targetPoint" x="550" y="720" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e24" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="538" y="775" as="sourcePoint" />
-            <mxPoint x="538" y="645" as="targetPoint" />
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="90" y="414" />
+            <mxPoint as="targetPoint" x="190" y="933" />
+            <Array as="points">
+              <mxPoint x="77" y="414" />
+              <mxPoint x="77" y="933" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e44" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1195" y="456" />
+            <mxPoint as="targetPoint" x="1195" y="575" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e26" style="edgeStyle=none;rounded=0;html=0;strokeWidth=2;strokeColor=#64748b;endArrow=block;endFill=1;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1180" y="590" as="sourcePoint" />
-            <mxPoint x="1180" y="775" as="targetPoint" />
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="1195" y="825" />
+            <mxPoint as="targetPoint" x="1195" y="925" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e2" value="FitZone Sports | C4 nivel 2 — Contenedores y operación offline" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=26;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="35" y="25" width="1530" height="35" as="geometry" />
+        <mxCell id="e2" value="FitZone Sports | C4 nivel 2 — Contenedores y operación offline" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=26;fontColor=#16324f;fontStyle=1;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="25" width="1530" height="35" />
         </mxCell>
-        <mxCell id="e3" value="Portal y terminal son el mismo frontend React en distintos navegadores/dispositivos, sin despliegues independientes añadidos." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="35" y="65" width="1530" height="35" as="geometry" />
+        <mxCell id="e3" value="Flujo entre la aplicación web, los servicios centrales y el almacenamiento local." style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="65" width="1530" height="35" />
         </mxCell>
-        <mxCell id="e5" value="FitZone Sports — límite del sistema" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="45" y="128" width="1510" height="30" as="geometry" />
+        <mxCell id="e5" value="FitZone Sports — límite del sistema" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=1;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="885" y="243" width="625" height="27" />
         </mxCell>
-        <mxCell id="e7" value="Frontend web React — un contenedor lógico, distintas instancias" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="75" y="183" width="660" height="30" as="geometry" />
+        <mxCell id="e7" value="Navegadores · datos locales separados por perfil y origen" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#16324f;fontStyle=1;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="75" y="1020" width="645" height="28" />
         </mxCell>
-        <mxCell id="e9" value="Ejecución central — backend y almacenamiento" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=18;fontColor=#16324f;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="855" y="183" width="660" height="30" as="geometry" />
+        <mxCell id="e9" value="Ejecución central — servicios y almacenamiento" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="886" y="283" width="625" height="24" />
         </mxCell>
-        <mxCell id="e17" value="REST / JSON&#10;HTTP localhost /&#10;HTTPS requerido" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="680" y="205" width="155" height="85" as="geometry" />
+        <mxCell id="e17" value="Carga la SPA&#10;Usa la API&#10;HTTP&#10;Mismo origen" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="741" y="290" width="123" height="85" />
         </mxCell>
-        <mxCell id="e19" value="Copia/JWK y batch/ACK&#10;REST / JSON con sesión&#10;Se interrumpe sin red" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="680" y="660" width="195" height="85" as="geometry" />
+        <mxCell id="e19" value="Al reconectar&#10;Envía movimientos&#10;pendientes por&#10;la API REST" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="737" y="614" width="132" height="84" />
         </mxCell>
-        <mxCell id="e21" value="Transacción local&#10;Dexie / IndexedDB" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="100" y="675" width="260" height="60" as="geometry" />
+        <mxCell id="e21" value="Lee y escribe" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="567" y="662" width="126" height="41" />
         </mxCell>
-        <mxCell id="e23" value="Portal: guarda lote QR&#10;Dexie / IndexedDB" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="100" y="405" width="260" height="60" as="geometry" />
+        <mxCell id="e23" value="Guarda el lote" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="243" y="662" width="110" height="41" />
         </mxCell>
-        <mxCell id="e25" value="Recursos del build&#10;Cache API" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="405" y="675" width="265" height="60" as="geometry" />
+        <mxCell id="e25" value="Usa caché" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="87" y="900" width="100" height="25" />
         </mxCell>
-        <mxCell id="e27" value="JDBC / SQL&#10;Transacciones centrales" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;fillColor=white;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="1200" y="660" width="250" height="60" as="geometry" />
+        <mxCell id="e45" value="Reenvía /api/v1&#10;HTTP · API REST" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1217" y="483" width="266" height="58" />
         </mxCell>
-        <mxCell id="e29" value="Azul: aplicaciones; PostgreSQL: contenedor de datos; verde punteado: mecanismos locales; relación discontinua: dependiente de red." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="35" y="1099" width="1530" height="32" as="geometry" />
+        <mxCell id="e27" value="Consulta y persiste datos&#10;JDBC / SQL" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=16;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1217" y="848" width="266" height="53" />
         </mxCell>
-        <mxCell id="e30" value="Autor nominal: pendiente de revisión grupal | Fecha de edición: 2026-11-10 | v3 | Código: 5f71e61" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="35" y="1138" width="1530" height="30" as="geometry" />
+        <mxCell id="e29" value="Verde punteado · almacenamiento local | Flecha discontinua · sincronización al reconectar" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=15;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="1106" width="1530" height="27" />
+        </mxCell>
+        <mxCell id="e30" value="v5 | Fecha de edición: 2026-11-19 | Autoría: pendiente de validación | Commit de código: 7335bf3de23418a0a8f96dc8d72b018866d2d345" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=left;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="35" y="1138" width="1530" height="27" />
+        </mxCell>
+        <mxCell id="e46" value="Usa el portal&#10;del socio" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="106" y="193" width="125" height="41" />
+        </mxCell>
+        <mxCell id="e47" value="Consulta y contrata&#10;servicios" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="261" y="193" width="135" height="41" />
+        </mxCell>
+        <mxCell id="e48" value="Opera el terminal&#10;de sede" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="420" y="193" width="166" height="41" />
+        </mxCell>
+        <mxCell id="e49" value="Usa la consola&#10;administrativa" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=14;fontColor=#64748b;fontStyle=0;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="617" y="193" width="128" height="41" />
+        </mxCell>
+        <mxCell id="e50" value="Contextos de ejecución de la misma SPA" style="text;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;strokeWidth=2;fontFamily=Arial;fontSize=17;fontColor=#16324f;fontStyle=1;align=center;verticalAlign=middle;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="95" y="481" width="605" height="29" />
         </mxCell>
       </root>
     </mxGraphModel>
