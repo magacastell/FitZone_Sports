@@ -11,8 +11,8 @@ info:
     DTO implementados exactos; PATCH application/json con omitido/null = no modificar. Problem Details con code y errores de campo es objetivo técnico, no garantía del runtime actual. Paginación selectiva base 0, size 20 y máximo 100; operationId únicos en español.
     Campos/precios/estados futuros, coordinación entre módulos, métricas y políticas permanecen draft cuando falta implementación o acuerdo. Las rutas de membresías reflejan el backend con cobros fake y arrepentimiento por período; ver docs/membresias.md. El MVP offline se implementa en /accesos/offline/*; alcance y límites en docs/m2-offline.md.
 servers:
-- url: http://localhost:3000/api/v1
-  description: Servidor local; los paths son relativos a /api/v1.
+- url: /api/v1
+  description: API del mismo origen; funciona con el backend directo y con el proxy de Compose.
 tags:
 - name: Auth
   description: Autenticación pública.
@@ -1052,7 +1052,9 @@ paths:
                 type: object
                 required: [evidencia, jwk, servidorAhora, sedeNombre]
                 properties:
-                  evidencia: {type: string, description: JWS con version 2, revision, terminalId, operadorId, sedeId, capacidad, miembros anteriores, presencias y bloqueados}
+                  evidencia:
+                    type: string
+                    description: JWS de versión 2 con revisión, terminalId, operadorId, sedeId, capacidad, miembros anteriores, presencias y bloqueados.
                   jwk: {type: object}
                   servidorAhora: {type: integer, format: int64}
                   sedeNombre: {type: string}
@@ -3053,7 +3055,6 @@ components:
           "type": "boolean"
     "M4ActualizarCancha":
       "type": "object"
-      "required": []
       "properties":
         "nombre":
           "type": "string"
@@ -3232,7 +3233,6 @@ components:
           "nullable": true
     "M4Cancelar":
       "type": "object"
-      "required": []
       "properties":
         "porcentajeReembolso":
           "type": "number"
@@ -4281,8 +4281,7 @@ components:
                 example: 4
               porcentajePico:
                 type: number
-                description: picoSimultaneo sobre capacidadMaxima
-                1 decimal.:
+                description: Pico simultáneo sobre la capacidad máxima, redondeado a un decimal.
                 example: 2.0
               permanenciaMediaMinutos:
                 type: number
@@ -4315,9 +4314,7 @@ components:
           type: array
           items:
             type: string
-          description: Aclaraciones de lectura (offline
-          aforo:
-          permanencia).:
+          description: Aclaraciones de lectura sobre accesos offline, aforo y permanencia.
       x-contract-status: stable
     ReporteFinanciero:
       type: object

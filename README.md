@@ -440,10 +440,26 @@ reserva y pago; nunca enviar importes desde el cliente.
 - Pruebas, cobertura y ejecución aislada: [guía de testing](docs/pruebas.md).
 
 - Contrato objetivo API v1: [OpenAPI](docs/openapi/openapi.yaml)
+- Exportación JSON para Swagger UI: [swagger.json](src/main/resources/fitzone-api-docs/swagger.json)
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
 - [Índice de arquitectura, ADR y diagramas](docs/arquitectura-tif.md) · [Manual Técnico](docs/manuales/manual-tecnico.md) · [Instalación y Operación](docs/manuales/manual-instalacion-operacion.md) · [Planificación](docs/planificacion/planificacion-seguimiento-tif.md).
 - Los manuales y la planificación indican su corte documental. Para el alcance incorporado después de ese corte, consultá las [guías de Canchas y Pagos](#canchas-y-pagos-de-reservas-m4m5).
 - Bitácoras del equipo: `docs/bitacoras/`
+
+### Swagger UI
+
+En el perfil `dev`, abrí Swagger UI en `http://localhost:3000/api/v1/swagger-ui/index.html`
+o en `http://localhost:8080/api/v1/swagger-ui/index.html` desde el proxy de Compose.
+Ejecutá `POST /auth/login`, copiá el token de la respuesta y pegalo en **Authorize**
+para probar las rutas protegidas.
+
+Para validar el YAML y regenerar el JSON después de modificar el contrato, usá Python 3.10 o posterior:
+
+```powershell
+python -m pip install openapi-spec-validator==0.9.0
+python scripts/exportar-openapi.py
+python scripts/exportar-openapi.py --check
+```
 
 
 ## Asistencia de IA

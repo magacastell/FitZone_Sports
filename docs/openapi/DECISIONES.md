@@ -98,7 +98,7 @@ Las restantes 3 operaciones mantienen sus schemas útiles como draft. Su ruta y 
 
 Estas decisiones estructuran la interfaz y **no adjudican al equipo reglas comerciales**:
 
-- OpenAPI 3.0.3, único punto de entrada `openapi.yaml`, servidor local `http://localhost:3000/api/v1`, paths relativos al prefijo, textos en español y operationId camelCase únicos.
+- OpenAPI 3.0.3, fuente `openapi.yaml`, servidor `/api/v1` relativo al origen, paths relativos al prefijo, textos en español y operationId camelCase únicos. Swagger UI en desarrollo consume la exportación `swagger.json` generada por `scripts/exportar-openapi.py`.
 - JWT/Bearer global, login/registro públicos. La seguridad de `GET /sedes` queda como en el código actual; elección autenticada al contratar según P12, sin apertura pública. `x-roles-actuales` no se usa para inferir nuevos permisos. `x-propuesta-permisos` contiene alternativas futuras, sin ampliar autorización por sí mismo.
 - Reutilización de schemas, responses, parameters, headers y securitySchemes. Los trece DTO implementados conservan campos/tipos/restricciones. Los DTO de planes usan precio numérico en ARS, no el objeto monetario draft de otros módulos. Se mantiene `application/json` en PATCH con omitido/null = no modificar; no es JSON Merge Patch.
 - Errores objetivo Problem Details con `code` y errores de campo: 400 formato/validación, 401 autenticación, 403 autorización, 404 inexistente, 409 conflicto, 412 sólo precondición de versión vieja. Backend actual aún no garantiza esa representación uniforme.
