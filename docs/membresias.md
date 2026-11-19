@@ -127,7 +127,7 @@ Renovación no recibe sede ni modifica origen/habitual.
 
 Cambio posterior, responsable y autorización quedan pendientes (P12). Las sedes
 anteriores se conservan: no se puede inferir cuáles provienen del viejo default.
-Ver [verificación de este bloque](sede-habitual-verificacion.md).
+Ver [pruebas de persistencia y membresía](pruebas.md#inventario-backend).
 
 ## Ciclo de vida y presentación personal
 
@@ -161,7 +161,7 @@ con un hueco no suprime el aviso. La barra indica el período actual, no toda la
 duración futura. La UI reconsulta al cargar/F5 y recuperar foco; la autorización
 efectiva de QR e ingreso siempre se vuelve a comprobar en backend.
 
-Ver [auditoría, escenarios y verificación del ciclo](ciclo-vida-membresia-verificacion.md).
+Ver [pruebas de estados, QR e idempotencia](pruebas.md#inventario-backend).
 
 ## Experiencia personal RF-01/RF-02 (07/11/2026, cambios locales para revisión)
 

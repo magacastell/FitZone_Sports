@@ -7,7 +7,7 @@ Panel general resume estado actual con datos reales; Reportes es análisis hist�
 sujeto al backend disponible. No portar las series DEMO de v0. Sedes reutiliza el
 contrato real de nombre/dirección/capacidad y no inventa estados operativos.
 Usuarios y Membresías se consultan sin confundir sus IDs ni inferir vigencia en React.
-Ver [auditoría y verificación](gerencia-central-frontend.md).
+Ver [implementación y verificación posteriores de Gerencia](bitacoras/Cejas-LOG.md#claudio--18112026).
 Reportes conserva la estructura futura de resumen/evolución/comparación con estados
 textuales de datos no disponibles; nunca mostrar gráficos ni KPIs de relleno.
 Gerente consulta aforo global desde Panel; el flujo de ingreso/salida queda en Admin
@@ -18,7 +18,7 @@ de Sede. Esta separación visual no altera autorizaciones backend.
 Clases/Canchas reutilizan composición de las páginas de actividades v0: filtros por
 sede, paneles, pasos y estados vacíos. Datos demo, precios, disponibilidad y handlers
 locales de reserva no se trasladan. Los servicios reales responden 501; la UI lo
-expresa sin fingir catálogo vacío ni éxito. Ver [contratos y límites](m3-m4-frontend.md).
+expresa sin fingir catálogo vacío ni éxito. Ver [implementación posterior de Clases y Canchas](manuales/manual-tecnico.md#m3--clases-grupales).
 Las ilustraciones SVG de public/canchas son recursos visuales locales por tipo,
 no fotos de una cancha real, ni fuente de estado/disponibilidad/precio.
 

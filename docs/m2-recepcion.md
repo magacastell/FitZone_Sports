@@ -7,7 +7,7 @@ Base: b2b3a11e4ec99d56891c604e845259ab5caf2224. Fecha: 30/10/2026.
 
 > Evolución posterior (sede habitual): V8/V9 permiten sede null sólo para USUARIO comercial.
 > El personal mantiene sede obligatoria; contexto y autorización de Recepción no cambian.
-> Ver [verificación](sede-habitual-verificacion.md). La auditoría debajo describe el corte original de este bloque.
+> Ver [sede habitual y origen del alta](membresias.md#sede-habitual-y-origen-del-alta-v8). La auditoría debajo describe el corte original de este bloque.
 > Evolución posterior de UI: Admin de Sede conserva ingreso/salida, aforo y accesos a
 > Clases/Canchas preparados; Gerente Central consulta aforo global desde Panel y no
 > entra al puesto de Recepción. Los permisos backend M2 existentes no se revocaron.
@@ -199,5 +199,5 @@ que anónimo/usuario común/sede manipulada/QR inválido no autorizan el ingreso
 la salida por ID conserva la foto y deja aforo cero tras vencer QR/membresía.
 La regresión concurrente ejecuta dos ingresos en sedes distintas: uno confirma y
 otro obtiene 409, con una sola fila abierta. Evidencia completa y límites en
-[pruebas.md](pruebas.md); recorrido de código en [la guía de defensa](defensa-m1-m2-online.md).
+[pruebas.md](pruebas.md); código y recorrido vigentes en [el cierre de M2](m2-cierre/alcance-decisiones-recepcion.md).
 El listado/corrección 501 y el funcionamiento offline conservan su alcance pendiente.

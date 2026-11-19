@@ -111,7 +111,7 @@ Los controllers siguen 501 y las pantallas directas informan no disponibilidad.
 En el corte de esta decisión Clases/Canchas quedaron fuera del menú operativo.
 La preparación frontend posterior ofrece vistas de consulta por actor con mensajes
 de servicio pendiente; no habilita reservas ni cambia esta decisión de dominio.
-Ver [preparación M3/M4](../m3-m4-frontend.md).
+Ver [integración posterior de Clases y Canchas](../manuales/manual-tecnico.md#m3--clases-grupales).
 
 La lista de comprobantes reutiliza períodos con pagoId, incluso vencidos/cancelados:
 no equivale al listado financiero general de M5. Ordena por inicio del período, sin

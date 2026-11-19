@@ -258,7 +258,7 @@ de 500 nunca fue un contrato aprobado. El implementado admite 100 eventos.
 - **Multisede:** no se comparan sede habitual y sede del recurso para conceder beneficios; M1 sigue determinando vigencia. Recepción conserva aislamiento por sede operativa.
 - **M3/M4 futuros (no implementados):** Socio puede iniciar en su habitual y elegir otra sede para clases/canchas, conservando beneficios según TP. Cliente elige sede de cancha y paga tarifa externa; Socio vencido puede usar tarifa externa. La reserva pertenece a la sede del recurso. No confundir con el origen histórico de membresía.
 - **Pendientes:** cambio posterior de habitual, autorizaciones, responsables y eventual gestión administrativa. Sin endpoint de traslado, historial ni múltiples habituales. Los datos anteriores no permiten distinguir elección explícita del antiguo default.
-- **Estado:** IMPLEMENTADO, revisión funcional y visual aprobada para cierre. Ver ../sede-habitual-verificacion.md y ../membresias.md.
+- **Estado:** IMPLEMENTADO, revisión funcional y visual aprobada para cierre. Ver [sede habitual y origen del alta](../membresias.md#sede-habitual-y-origen-del-alta-v8).
 
 ### Trazabilidad de los antecedentes D1–D20
 
@@ -284,4 +284,4 @@ administrativo auditado. Renovar usa max(último fin no cancelado, ahora), sin c
 retroactivo. No hay gracia. El umbral visual <=7 días y su supresión por continuidad
 PROGRAMADA no son reglas comerciales ni autorizan QR/M2. Se conservan HTTP, DTOs,
 headers e idempotencia: no se modifica openapi.yaml en este corte ni se crea ADR.
-Ver ../ciclo-vida-membresia-verificacion.md para escenarios, pruebas y límites.
+Ver [ciclo de vida de membresía](../membresias.md#ciclo-de-vida-y-presentación-personal) e [inventario de pruebas](../pruebas.md#inventario-backend) para escenarios, pruebas y límites.
