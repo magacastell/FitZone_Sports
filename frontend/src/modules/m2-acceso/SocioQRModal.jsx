@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import './SocioQRModal.css';
 import { obtenerQrAutomatico } from '../../services/offline/api';
+import { misMovimientos } from '../../services/m2Service';
 
 // RF-04: el QR cambia cada minuto. Se pide uno nuevo un poco antes de que venza el actual.
 const MARGEN_RENOVACION_MS = 5000;
@@ -24,6 +25,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
   const [vence, setVence] = useState(0);
   const [segundos, setSegundos] = useState(0);
   const [error, setError] = useState('');
+  const [avisos, setAvisos] = useState([]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -31,6 +33,39 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
 
     dialog.showModal();
     return () => dialog.close();
+  }, [isOpen]);
+
+  useEffect(() => {
+    setAvisos([]);
+    if (!isOpen) return;
+    const sesion = localStorage.getItem('token');
+    const peticion = new AbortController();
+    const vistos = new Set();
+    let inicio;
+    let timer;
+    async function consultar() {
+      if (peticion.signal.aborted || localStorage.getItem('token') !== sesion) return;
+      try {
+        const datos = await misMovimientos(inicio, peticion.signal);
+        if (peticion.signal.aborted || localStorage.getItem('token') !== sesion) return;
+        inicio = datos.inicio;
+        const nuevos = datos.movimientos.filter(movimiento => {
+          const id = `${movimiento.accesoId}:${movimiento.tipo}`;
+          if (vistos.has(id)) return false;
+          vistos.add(id);
+          return true;
+        });
+        if (nuevos.length) setAvisos(actual => [...nuevos, ...actual].slice(0, 4));
+      } catch (error) {
+        if ([400, 401, 403].includes(error.status)) return;
+      }
+      if (!peticion.signal.aborted) timer = setTimeout(consultar, 3000);
+    }
+    consultar();
+    return () => {
+      peticion.abort();
+      clearTimeout(timer);
+    };
   }, [isOpen]);
 
   // Pide el QR al abrir y lo renueva solo mientras el diálogo siga abierto.
@@ -94,6 +129,13 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
       <h2 id="socio-qr-title">Acceso a Sede - Credencial Digital</h2>
       <p id="socio-qr-description">Mostrá este código en recepción. Se renueva solo cada minuto.</p>
       <p>Se guarda automáticamente para cortes de conexión. <a href="/qr-offline">Abrir Mi QR sin conexión</a></p>
+      <div role="status" aria-live="polite" aria-relevant="additions">
+        {avisos.map(aviso => <p className="socio-qr-confirmacion" key={`${aviso.accesoId}:${aviso.tipo}`}>
+          <strong>{aviso.tipo === 'INGRESO' ? 'Ingreso confirmado' : 'Egreso confirmado'}</strong>
+          {' · '}{aviso.sede}{' · '}
+          {new Date(aviso.instante).toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false })}
+        </p>)}
+      </div>
 
       <div style={qrContainerStyle}>
         {token ? (

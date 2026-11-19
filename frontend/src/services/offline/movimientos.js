@@ -1,10 +1,11 @@
 import { db,copiaActual } from './db.js';
 import { verificar,verificarAutorizacion } from './crypto.js';
 
-export async function registrarLocal(tipo,codigo,porId=false,autonomo=false) {
+export async function registrarLocal(tipo,codigo,porId=false,autonomo=false,sedeId) {
   if(!['INGRESO','SALIDA'].includes(tipo))throw Error('Movimiento inválido');
   const {copia,ahora}=await copiaActual(autonomo);
   const datos=copia.datos;
+  if(sedeId && datos.sedeId!==sedeId)throw Error('La copia pertenece a otra sede.');
   let qr=null;
   let multisede=false;
   if(!porId) {

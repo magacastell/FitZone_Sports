@@ -18,7 +18,7 @@ const docker=(args,input)=>execFileSync('docker',args,{input,encoding:'utf8',win
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const pasos=[];function paso(texto){pasos.push({instante:new Date().toISOString(),texto});console.log(texto);}
 const consola=createWriteStream(resolve(out,'browser.log'));
-let pgCreado=false,javaCreado=false,proceso,server,terminal,telefono,terminalPage,perderRespuesta=false,respuestaPerdida=false,estadoSonda;
+let pgCreado=false,javaCreado=false,proceso,server,terminal,telefono,terminalPage,perderRespuesta=false,respuestaPerdida=false,estadoSonda,perderIngreso=false;
 const sql=q=>docker(['exec','-i',pg,'psql','-U','postgres','-d','fitzone_e2e','-At','-v','ON_ERROR_STOP=1'],q);
 async function hasta(tarea,ms=120000){const inicio=Date.now();let ultimo;while(Date.now()-inicio<ms){try{const r=await tarea();if(r)return r;}catch(e){ultimo=e;}await pause(500);}throw Error(`Timeout: ${ultimo?.message||'condición no alcanzada'}`);}
 function png(){
@@ -29,7 +29,8 @@ function png(){
 }
 async function registros(page,store){return page.evaluate(store=>new Promise((resolve,reject)=>{const r=indexedDB.open('fitzone-m2-offline');r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,q=db.transaction(store).objectStore(store).getAll();q.onsuccess=()=>{resolve(q.result);db.close();};q.onerror=()=>reject(q.error);};}),store);}
 const contrato=e=>{const {id,visitaId,usuarioId,tipo,instante,qrToken,revision,secuencia}=e;return {id,visitaId,usuarioId,tipo,instante,qrToken,revision,secuencia};};
-async function qrGuardado(page){const datos=await registros(page,'meta');const lote=datos.find(x=>x.id.startsWith('qr:'));const ahora=Date.now()+lote.desfase;return lote.tokens.find(t=>{const p=JSON.parse(Buffer.from(t.split('.')[1],'base64url'));return p.nbf*1000<=ahora && ahora<p.exp*1000;});}
+async function qrGuardado(page,margen=0){const datos=await registros(page,'meta');const lote=datos.find(x=>x.id.startsWith('qr:'));const ahora=Date.now()+lote.desfase;return lote.tokens.find(t=>{const p=JSON.parse(Buffer.from(t.split('.')[1],'base64url'));return p.nbf*1000<=ahora && ahora+margen<p.exp*1000;});}
+const qrParaCaptura=page=>hasta(()=>qrGuardado(page,4500),15000);
 async function abrirTerminal(offline=false){
  const contexto=await chromium.launchPersistentContext(resolve(out,'terminal-profile'),{channel:'chrome',headless:true,offline,viewport:{width:1100,height:850}});
  contexto.setDefaultTimeout(15000);const page=contexto.pages()[0]||await contexto.newPage();return {contexto,page};
@@ -58,7 +59,8 @@ try {
     res.writeHead(estadoSonda);res.end();return;
    }
    const destino=new URL(req.url,api.replace('/api/v1',''));
-   const omitir=perderRespuesta && req.url.includes('/offline/sincronizacion');
+   const omitir=(perderRespuesta && req.url.includes('/offline/sincronizacion'))
+    || (perderIngreso && req.url==='/api/v1/accesos/ingresos');
    const remoto=httpRequest(destino,{method:req.method,headers:{...req.headers,host:destino.host}},r=>{
     if(omitir){r.resume();r.on('end',()=>{respuestaPerdida=true;res.destroy();});}
     else{res.writeHead(r.statusCode,r.headers);r.pipe(res);}
@@ -72,7 +74,14 @@ try {
    res.writeHead(200,{'Content-Type':tipos[extname(ruta)]||'application/octet-stream','Cache-Control':'no-cache'});createReadStream(ruta).pipe(res);
   }catch{res.writeHead(404);res.end();}
  });await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=`http://127.0.0.1:${server.address().port}`;
- ({contexto:terminal,page:terminalPage}=await abrirTerminal());await terminalPage.goto(base+'/login');await terminalPage.evaluate(token=>localStorage.setItem('token',token),recepcion.token);await terminalPage.goto(base+'/terminal-offline');
+ ({contexto:terminal,page:terminalPage}=await abrirTerminal());await terminalPage.goto(base+'/login');await terminalPage.evaluate(token=>localStorage.setItem('token',token),recepcion.token);
+ await terminalPage.goto(base+'/recepcion/acceso');
+ await expect(terminalPage.getByRole('button',{name:'Escanear QR'})).toBeEnabled();
+ await terminal.setOffline(true);
+ await expect(terminalPage.getByText('El acceso offline requiere una terminal preparada',{exact:false})).toBeVisible({timeout:16000});
+ await expect(terminalPage.getByRole('button',{name:'Escanear QR'})).toBeDisabled();
+ await terminal.setOffline(false);
+ await terminalPage.goto(base+'/terminal-offline');
  await terminalPage.getByRole('button',{name:'Preparar / actualizar terminal'}).click();await expect(terminalPage.getByText('Copia del',{exact:false})).toBeVisible();await terminalPage.evaluate(async()=>{await navigator.serviceWorker.ready;});
  await hasta(()=>terminalPage.evaluate(()=>!!navigator.serviceWorker.controller));
  const copia=(await registros(terminalPage,'meta')).find(x=>x.id==='copia');assert.equal(copia.datos.miembros.length,0);assert.ok(!JSON.stringify(copia.datos).includes('foto'));
@@ -85,22 +94,22 @@ try {
  await expect(phone.getByRole('img',{name:'Código QR de acceso'})).toBeVisible({timeout:15000});
  assert.equal(await phone.getByLabel('Sede offline').count(),0);assert.equal(await phone.getByRole('button',{name:'Preparar QR offline'}).count(),0);
  await phone.goto(base+'/qr-offline');await expect(phone.locator('svg')).toBeVisible({timeout:15000});await phone.evaluate(async()=>{await navigator.serviceWorker.ready;});
- const primerQr=await qrGuardado(phone);
+ const primerQr=await qrParaCaptura(phone);
  assert.equal(JSON.parse(Buffer.from(primerQr.split('.')[1],'base64url')).tipo,'m2-autorizacion');
  await terminalPage.getByLabel('Código offline').fill(primerQr);await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('1');
  await terminalPage.screenshot({path:resolve(out,'socio-nuevo-sin-padron.png'),fullPage:true});
- await terminalPage.getByLabel('Movimiento offline').selectOption('SALIDA');await terminalPage.getByLabel('Código offline').fill(await qrGuardado(phone));await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('2');
+ await terminalPage.getByLabel('Movimiento offline').selectOption('SALIDA');await terminalPage.getByLabel('Código offline').fill(await qrParaCaptura(phone));await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('2');
  await terminalPage.getByLabel('Movimiento offline').selectOption('INGRESO');
  paso('Socio registrado y contratado por HTTP real después del corte; Mi QR automático sin sede; terminal offline admite sin padrón');
  const anterior=await qrGuardado(phone),svgAnterior=await phone.locator('svg').innerHTML();
  docker(['pause',java]);await terminal.setOffline(true);await telefono.setOffline(true);paso('Spring pausado y red cortada en ambos contextos Chrome, sin respuestas API simuladas');
- await pause(65000);assert.notEqual(await phone.locator('svg').innerHTML(),svgAnterior);const actual=await qrGuardado(phone);assert.notEqual(actual,anterior);
+ await pause(65000);assert.notEqual(await phone.locator('svg').innerHTML(),svgAnterior);const actual=await qrParaCaptura(phone);assert.notEqual(actual,anterior);
  await terminalPage.getByLabel('Código offline').fill(anterior);await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('2');assert.equal((await registros(terminalPage,'movimientos')).length,2);
  paso('Tras 65 segundos el QR rotó y el anterior fue rechazado sin crear movimientos');
  await terminalPage.getByLabel('Código offline').fill(actual);await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('3');await expect(terminalPage.getByTestId('aforo-local')).toHaveText('1');
  await terminalPage.screenshot({path:resolve(out,'ingreso-provisional.png'),fullPage:true});paso('Ingreso provisional persistido en IndexedDB; aforo local 1');
  await terminal.close();terminal=null;({contexto:terminal,page:terminalPage}=await abrirTerminal(true));await terminalPage.goto(base+'/terminal-offline');await expect(terminalPage.getByTestId('pendientes')).toHaveText('3');paso('Chrome cerrado y reabierto sin red: aplicación y pendientes conservados');
- await terminalPage.getByLabel('Movimiento offline').selectOption('SALIDA');await terminalPage.getByLabel('Código offline').fill(await qrGuardado(phone));await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('4');await expect(terminalPage.getByTestId('aforo-local')).toHaveText('0');
+ await terminalPage.getByLabel('Movimiento offline').selectOption('SALIDA');await terminalPage.getByLabel('Código offline').fill(await qrParaCaptura(phone));await terminalPage.getByRole('button',{name:'Registrar movimiento preparado'}).click();await expect(terminalPage.getByTestId('pendientes')).toHaveText('4');await expect(terminalPage.getByTestId('aforo-local')).toHaveText('0');
  await terminalPage.setViewportSize({width:390,height:844});assert.ok(await terminalPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  assert.ok(await phone.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await terminalPage.screenshot({path:resolve(out,'terminal-movil.png'),fullPage:true});await terminalPage.setViewportSize({width:1100,height:850});
@@ -131,7 +140,108 @@ try {
  }
  estadoSonda=undefined;
  paso('Sonda de conexión con 403 y 503 inyectados por el proxy de prueba: se bloqueó la captura sin cambiar la cola local');
- await writeFile(resolve(out,'resultado.json'),JSON.stringify({aprobada:true,fecha:new Date().toISOString(),navegador:'Chrome real headless',socioPosteriorAlCorte:true,sinPreparacionIndividual:true,pasos,visitas:2,eventos:4,duplicados:0,esperaRealMs:65000},null,2));
+
+ const segundaSede=Number(sql("INSERT INTO sede(nombre,capacidad_maxima) VALUES ('Otra sede de pruebas',20) RETURNING id;").split('\n')[0]);
+ const segundoSocio=await registrar('Segundo');
+ const iniciarSeguimiento=async token=>(await apiJson('/accesos/me/movimientos',token)).inicio;
+ const cursorAjeno=await iniciarSeguimiento(segundoSocio.token);
+ const agenda=(sedeId)=>apiJson('/clases?sedeId='+sedeId,recepcion.token,undefined,sedeId===sede?200:403);
+ await agenda(sede);await agenda(segundaSede);
+ const tipoClaseId=Number(sql("INSERT INTO tipo_clase(nombre) VALUES ('Pilates E2E recepción') RETURNING id;").split('\n')[0]);
+ const instructorId=Number(sql("INSERT INTO instructor(nombre,apellido) VALUES ('Instructor','E2E') RETURNING id;").split('\n')[0]);
+ const clase={tipoClaseId,instructorId,cupo:10,inicio:new Date(Date.now()+4*86400000).toISOString(),fin:new Date(Date.now()+4*86400000+3600000).toISOString()};
+ await apiJson('/clases',recepcion.token,{...clase,sedeId:segundaSede},403);
+ const propia=await apiJson('/clases',recepcion.token,clase,201);
+ assert.equal(propia.sedeId,sede);
+ for(const [ruta,metodo,cuerpo] of [
+  ['/sedes','POST',{nombre:'No autorizada',capacidadMaxima:20}],
+  ['/sedes/'+sede+'/recargo-pico','PUT',{recargoPico:20}],
+  ['/reportes/ingresos','GET'],
+  ['/accesos/sedes/'+segundaSede+'/aforo','GET'],
+  ['/accesos/sedes/'+segundaSede+'/movimientos','GET'],
+  ['/accesos/me/movimientos','GET'],
+ ]) {
+  const denegado=await fetch(api+ruta,{method:metodo,headers:{Authorization:`Bearer ${recepcion.token}`,'Content-Type':'application/json'},body:cuerpo?JSON.stringify(cuerpo):undefined});
+  assert.equal(denegado.status,403,ruta);
+ }
+ await apiJson('/accesos/sedes/'+sede+'/movimientos',segundoSocio.token,undefined,403);
+ const tipoCancha=Number(sql("INSERT INTO tipo_cancha(nombre,precio_hora) VALUES ('Tipo E2E recepción',100) RETURNING id;").split('\n')[0]);
+ for(const sedeCancha of [sede,segundaSede]) {
+  const cancha=Number(sql(`INSERT INTO cancha(nombre,costo_base_hora,activa,sedeid,tipo_canchaid) VALUES ('Cancha de pruebas',100,1,${sedeCancha},${tipoCancha}) RETURNING id;`).split('\n')[0]);
+  const inicio=new Date(Date.now()+86400000).toISOString();
+  const fin=new Date(Date.now()+90000000).toISOString();
+  await apiJson(`/canchas/${cancha}/mantenimientos`,recepcion.token,{inicio,fin,motivo:'Mantenimiento E2E'},sedeCancha===sede?201:403);
+ }
+ paso('Permisos HTTP: agenda y mantenimiento propios permitidos; sede ajena, configuración, reportes y seguimiento de recepción denegados');
+
+ const peticionSeguimiento=phone.waitForResponse(r=>r.url().endsWith('/accesos/me/movimientos')&&r.ok());
+ await phone.goto(base+'/mi-qr');await peticionSeguimiento;
+ await expect(phone.getByRole('img',{name:'Código QR de acceso'})).toBeVisible();
+ await expect(phone.locator('.socio-qr-confirmacion')).toHaveCount(0);
+ await terminalPage.goto(base+'/recepcion/acceso');
+ await expect(terminalPage.locator('#aforo')).toBeVisible();
+ await terminalPage.getByRole('button',{name:'Escanear QR'}).click();
+ const camara=terminalPage.getByRole('dialog',{name:'Escanear QR'});
+ await expect(camara.getByText('No pudimos abrir la cámara',{exact:false})).toBeVisible();
+ await camara.getByRole('button',{name:'Cerrar cámara'}).click();
+ const enviar=async boton=>{
+    await terminalPage.locator('#access-code').fill(await qrParaCaptura(phone));
+  await terminalPage.getByRole('button',{name:boton}).click();
+ };
+ await enviar('Validar ingreso');
+ await expect(terminalPage.getByText('Acceso autorizado',{exact:true})).toBeVisible();
+ await expect(terminalPage.locator('.occupancy-count strong')).toHaveText('1');
+ await expect(phone.locator('.socio-qr-confirmacion').getByText('Ingreso confirmado')).toBeVisible();
+ await enviar('Validar ingreso');
+ await expect(terminalPage.getByText('Acceso rechazado',{exact:true})).toBeVisible();
+ await terminalPage.getByRole('button',{name:'Salida',exact:true}).click();
+ await enviar('Registrar salida');
+ await expect(terminalPage.getByText('Salida registrada',{exact:true})).toBeVisible();
+ await expect(terminalPage.locator('.occupancy-count strong')).toHaveText('0');
+ await expect(phone.locator('.socio-qr-confirmacion').getByText('Egreso confirmado')).toBeVisible();
+ assert.equal((await apiJson('/accesos/me/movimientos?inicio='+encodeURIComponent(cursorAjeno),segundoSocio.token)).movimientos.length,0);
+ paso('Dashboard confirma ingreso y egreso desde PostgreSQL, actualiza aforo, rechaza duplicado y avisa solo al titular; error y cierre de cámara probados sin cámara física');
+
+ // Esperar una nueva credencial, porque la anterior ya se usó para un ingreso.
+ const usado=await qrGuardado(phone);
+ await hasta(async()=>await qrGuardado(phone)!==usado,65000);
+ await terminalPage.getByRole('button',{name:'Ingreso',exact:true}).click();
+ await terminal.setOffline(true);
+ await expect(terminalPage.getByText('Contingencia activa',{exact:false})).toBeVisible({timeout:16000});
+ await enviar('Validar ingreso');
+ await expect(terminalPage.getByRole('list',{name:'Movimientos provisionales'})).toContainText('Ingreso provisional');
+ await expect(terminalPage.getByTestId('pendientes')).toHaveText('1');
+ await expect(phone.locator('.socio-qr-confirmacion').getByText('Ingreso confirmado')).toHaveCount(1);
+ await terminal.setOffline(false);
+ await expect(terminalPage.getByTestId('pendientes')).toHaveText('0',{timeout:20000});
+ await expect(terminalPage.locator('.occupancy-count strong')).toHaveText('1');
+ await expect(phone.locator('.socio-qr-confirmacion').getByText('Ingreso confirmado')).toHaveCount(2);
+ await expect(terminalPage).toHaveURL(base+'/recepcion/acceso');
+ await terminalPage.getByRole('button',{name:'Salida',exact:true}).click();
+ await enviar('Registrar salida');
+ await expect(terminalPage.locator('.occupancy-count strong')).toHaveText('0');
+ paso('Corte real en Chrome mantiene el mismo dashboard, muestra movimiento provisional y reconecta con sincronización automática y aviso central posterior');
+ const antesDelPost=(await registros(terminalPage,'movimientos')).length;
+ const otroAlta=await fetch(api+'/membresias',{method:'POST',headers:{Authorization:`Bearer ${segundoSocio.token}`,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify({planId:plan,sedeId:sede})});
+ assert.equal(otroAlta.status,201);
+ const otroQr=await apiJson('/accesos/qr',segundoSocio.token);
+ perderIngreso=true;
+ await terminalPage.getByRole('button',{name:'Ingreso',exact:true}).click();
+ await terminalPage.locator('#access-code').fill(otroQr.token);
+ await terminalPage.getByRole('button',{name:'Validar ingreso'}).click();
+ await expect(terminalPage.getByText('No pudimos confirmar el movimiento',{exact:true})).toBeVisible();
+ await expect(terminalPage.getByRole('button',{name:'Escanear QR'})).toBeDisabled();
+ assert.equal((await registros(terminalPage,'movimientos')).length,antesDelPost);
+ assert.equal(Number(sql('SELECT count(*) FROM registro_acceso WHERE fecha_hora_salida IS NULL;')),1);
+ perderIngreso=false;
+ await terminalPage.reload();
+ await expect(terminalPage.getByText('Hay un movimiento central sin resultado verificado',{exact:false})).toBeVisible();
+ await expect(terminalPage.getByRole('button',{name:'Escanear QR'})).toBeDisabled();
+ await expect(terminalPage.locator('.occupancy-count strong')).toHaveText('1');
+ await terminalPage.getByRole('button',{name:'Ya verifiqué el resultado'}).click();
+ await expect(terminalPage.getByRole('button',{name:'Escanear QR'})).toBeEnabled();
+ paso('POST central guardado con respuesta perdida bloquea el escaneo incluso tras recargar, hasta revisar el central; no crea un evento offline');
+ await writeFile(resolve(out,'resultado.json'),JSON.stringify({aprobada:true,fecha:new Date().toISOString(),navegador:'Chrome real headless',socioPosteriorAlCorte:true,sinPreparacionIndividual:true,pasos,visitasEscenarioAutonomo:2,eventosEscenarioAutonomo:4,duplicados:0,esperaRealMs:65000},null,2));
  console.log(`E2E APROBADA: ${out}`);
 } catch(error) {
  if(terminalPage)await terminalPage.screenshot({path:resolve(out,'fallo.png'),fullPage:true}).catch(()=>{});

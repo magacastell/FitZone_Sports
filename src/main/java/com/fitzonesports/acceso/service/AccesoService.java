@@ -2,6 +2,7 @@ package com.fitzonesports.acceso.service;
 
 import com.fitzonesports.acceso.dto.AccesoResponse;
 import com.fitzonesports.acceso.dto.AforoResponse;
+import com.fitzonesports.acceso.dto.MovimientoAccesoResponse;
 import com.fitzonesports.acceso.dto.QrAccesoResponse;
 import com.fitzonesports.acceso.dto.RegistrarIngresoRequest;
 import com.fitzonesports.acceso.dto.RegistrarSalidaRequest;
@@ -15,6 +16,7 @@ import com.fitzonesports.usuario.service.UsuarioService;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.List;
 import com.fitzonesports.membresia.service.MembresiaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -136,6 +138,42 @@ public class AccesoService {
         SedeResponse sede = sedeService.consultarSede(sedeId);
         long ocupacion = registroAccesoRepository.countBySedeIdAndFechaHoraSalidaIsNull(sedeId);
         return new AforoResponse(sedeId, (int) ocupacion, sede.capacidadMaxima(), OffsetDateTime.now(clock));
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovimientoAccesoResponse> movimientosSede(String email, Integer sedeId) {
+        validarSedePropia(usuarioService.consultarPerfil(email), sedeId);
+        return movimientos("r.sedeid", sedeId, LocalDateTime.now(clock).minusDays(1), true);
+    }
+
+    @Transactional(readOnly = true)
+    public MovimientoAccesoResponse.Seguimiento misMovimientos(String email, OffsetDateTime inicio) {
+        OffsetDateTime ahora = OffsetDateTime.now(clock);
+        if (inicio == null) return new MovimientoAccesoResponse.Seguimiento(ahora, List.of());
+        if (inicio.isBefore(ahora.minusHours(2)) || inicio.isAfter(ahora)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reabrí Mi QR para seguir los movimientos");
+        }
+        Integer usuarioId = usuarioService.consultarPerfil(email).id();
+        return new MovimientoAccesoResponse.Seguimiento(inicio, movimientos("r.usuarioid", usuarioId,
+                inicio.atZoneSameInstant(clock.getZone()).toLocalDateTime(), false));
+    }
+
+    private List<MovimientoAccesoResponse> movimientos(String alcance, Integer id, LocalDateTime desde, boolean titular) {
+        String sql = """
+                SELECT r.id, s.nombre AS sede, e.tipo, e.instante, concat_ws(' ', u.nombre, u.apellido) AS titular
+                FROM registro_acceso r
+                JOIN sede s ON s.id = r.sedeid
+                JOIN usuario u ON u.id = r.usuarioid
+                CROSS JOIN LATERAL (VALUES ('INGRESO', r.fecha_hora_ingreso), ('EGRESO', r.fecha_hora_salida))
+                  AS e(tipo, instante)
+                WHERE %s = ? AND e.instante > ?
+                ORDER BY e.instante DESC, r.id DESC, e.tipo
+                LIMIT 12
+                """.formatted(alcance);
+        return jdbc.query(sql, (rs, row) -> new MovimientoAccesoResponse(
+                rs.getInt("id"), rs.getString("tipo"), rs.getString("sede"),
+                rs.getObject("instante", LocalDateTime.class).atZone(clock.getZone()).toOffsetDateTime(),
+                titular ? rs.getString("titular") : null), id, desde);
     }
 
     private RegistroAcceso accesoAbiertoDelQr(String qrToken) {

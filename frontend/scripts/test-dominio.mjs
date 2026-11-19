@@ -49,13 +49,14 @@ function env(){
   actualizarMiPerfil:(...a)=>call('updates',a),actualizarMiFoto:(...a)=>call('updates',a),configurarRenovacionAutomatica:(...a)=>call('preferences',a),
   listarPlanes:()=>call('plans',[]),listarSedes:()=>call('sedes',[]),contratarMembresia:(...a)=>call('contracts',a),renovarMembresia:(...a)=>call('renewals',a)
  };
- e.m2={consultarAforo:(...a)=>call('aforos',a),listarSedesAcceso:(...a)=>call('sedes',a),registrarIngreso:(...a)=>call('ingresos',a),registrarSalida:(...a)=>call('salidas',a)};
+ e.m2={movimientosDeSede:async()=>[],misMovimientos:async()=>({inicio:'2026-11-18T20:00:00-03:00',movimientos:[]}),consultarAforo:(...a)=>call('aforos',a),listarSedesAcceso:(...a)=>call('sedes',a),registrarIngreso:(...a)=>call('ingresos',a),registrarSalida:(...a)=>call('salidas',a)};
  e.focus=()=>{for(const f of e.listeners.get('focus')??[])f();};
  return e;
 }
 function synthetic(values,context){return new vm.SyntheticModule(Object.keys(values),function(){for(const[k,v]of Object.entries(values))this.setExport(k,v);},{context});}
 async function runner(name,e,props={},target='default'){
  const context=vm.createContext({
+ AbortController,
   console,Date,JSON,Math,Number,String,Promise,Error,globalThis:undefined,
   localStorage:e.localStorage,sessionStorage:e.sessionStorage,
   document:{get visibilityState(){return e.visibilityState;},createElement:()=>({click(){e.downloads.push(this.download);}})},
@@ -107,6 +108,7 @@ async function runner(name,e,props={},target='default'){
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
   if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check','Plus','Wallet','AlertCircle'].map(k=>[k,()=>jsx('svg',{})])),context);
   if(spec.endsWith('LectorAcceso'))return synthetic({default:p=>{e.lectorProps=p;return jsx('lector',p);}},context);
+ if(spec.endsWith('TerminalOffline'))return synthetic({default:p=>p.lector?.(undefined,{})},context);
   if(spec.endsWith('useAforoSede')||spec.endsWith('TarjetaAforo')){
    const file=spec.endsWith('useAforoSede')?'src/modules/m2-acceso/useAforoSede.js':'src/modules/m2-acceso/TarjetaAforo.jsx';
    const child=new vm.SourceTextModule(transformSync(fs.readFileSync(file,'utf8'),{loader:'jsx',format:'esm',jsx:'automatic'}).code,{context});
@@ -516,7 +518,7 @@ await test('Lector desmontado ignora resultado/callback; nueva sesion inicia lim
 });
 await test('Recepcion token nuevo remonta contexto sin sede/datos previos',async()=>{
  const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('recepcion',e);assert.equal(r.tree.key,'sesion-A');r.unmount();e.token='sesion-B';
- const next=await runner('recepcion',e);assert.equal(next.tree.key,'sesion-B');assert.equal(e.lectorProps,undefined);assert(text(next.view).includes('Consultando tu sede'));
+ const next=await runner('recepcion',e);assert.equal(next.tree.key,'sesion-B');assert.equal(e.lectorProps.sedeId,undefined);assert.equal(e.lectorProps.bloqueado,true);assert(text(next.view).includes('Consultando tu sede'));
 });
 
 
@@ -742,7 +744,7 @@ await test('Reportes prepara resumen evolucion y comparacion sin KPIs ni grafico
  assert.equal(nodes(r.view,n=>n.type==='form').length,1);assert(text(r.view).includes('Consultar reporte'));
 });
 await test('Gerente sin operacion de acceso; Recepcion conserva navegacion operativa',async()=>{
- for(const rol of ['GERENTE','RECEPCIONISTA']){const e=env();e.user.rol=rol;const r=await layout(e);for(const ruta of ['/recepcion/acceso','/recepcion/aforo'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===ruta).length,rol==='GERENTE'?0:1);if(rol==='RECEPCIONISTA')for(const ruta of ['/clases','/canchas'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===ruta).length,1);}
+ for(const rol of ['GERENTE','RECEPCIONISTA']){const e=env();e.user.rol=rol;const r=await layout(e);assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href==='/recepcion/acceso').length,rol==='GERENTE'?0:1);assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href==='/recepcion/aforo').length,0);if(rol==='RECEPCIONISTA')for(const ruta of ['/clases','/canchas'])assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href===ruta).length,1);}
 });
 async function perfilEditable() {
  const e=env();e.shared={membresia:{estado:'sin-membresia'}};

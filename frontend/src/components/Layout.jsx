@@ -468,12 +468,6 @@ function LayoutAutenticado() {
                       Control de acceso
                     </NavigationLink>
 
-                    <NavigationLink
-                      to="/recepcion/aforo"
-                      icon={LayoutGrid}
-                    >
-                      Aforo
-                    </NavigationLink>
                   </>
                 )}
 

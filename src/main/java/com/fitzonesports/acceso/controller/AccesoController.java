@@ -2,12 +2,16 @@ package com.fitzonesports.acceso.controller;
 
 import com.fitzonesports.acceso.dto.AccesoResponse;
 import com.fitzonesports.acceso.dto.AforoResponse;
+import com.fitzonesports.acceso.dto.MovimientoAccesoResponse;
 import com.fitzonesports.acceso.dto.QrAccesoResponse;
 import com.fitzonesports.acceso.dto.RegistrarIngresoRequest;
 import com.fitzonesports.acceso.dto.RegistrarSalidaRequest;
 import com.fitzonesports.acceso.service.AccesoService;
 import jakarta.validation.Valid;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** QR, ingreso, salida y aforo estan implementados; listado y correccion siguen en 501. */
@@ -58,6 +63,22 @@ public class AccesoController {
     @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'GERENTE')")
     public ResponseEntity<AforoResponse> consultarAforo(Authentication authentication, @PathVariable Integer sedeId) {
         return ResponseEntity.ok(accesoService.consultarAforo(authentication.getName(), sedeId));
+    }
+
+    @GetMapping("/sedes/{sedeId}/movimientos")
+    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    public ResponseEntity<List<MovimientoAccesoResponse>> movimientosSede(Authentication authentication,
+            @PathVariable Integer sedeId) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(accesoService.movimientosSede(authentication.getName(), sedeId));
+    }
+
+    @GetMapping("/me/movimientos")
+    @PreAuthorize("hasRole('USUARIO')")
+    public ResponseEntity<MovimientoAccesoResponse.Seguimiento> misMovimientos(Authentication authentication,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime inicio) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(accesoService.misMovimientos(authentication.getName(), inicio));
     }
 
     @GetMapping

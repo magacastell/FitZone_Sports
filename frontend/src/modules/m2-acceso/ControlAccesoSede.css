@@ -55,3 +55,8 @@
 @media (max-width: 1280px) { .fitzone-ui.recepcion .reader-input-row { flex-wrap: wrap; } .fitzone-ui.recepcion .reader-input-row input { width: calc(100% - 48px); flex: 1; } .fitzone-ui.recepcion .reader-input-row .fit-button { width: 100%; } }
 @media (max-width: 1020px) { .fitzone-ui.recepcion .access-overview-grid { grid-template-columns: minmax(0, 1fr); } .fitzone-ui.recepcion .occupancy-card { min-height: 290px; } }
 @media (max-width: 640px) { .fitzone-ui.recepcion .page-heading__actions, .fitzone-ui.recepcion .access-site-meta { width: 100%; } .fitzone-ui.recepcion .reader-panel, .fitzone-ui.recepcion .occupancy-card { padding: 18px; } .fitzone-ui.recepcion .reader-ready { white-space: normal; } .fitzone-ui.recepcion .reader-panel .panel-heading { flex-wrap: wrap; } }
+.access-camera-dialog { width:min(440px, calc(100% - 32px)); padding:20px; border:0; border-radius:16px; }
+.access-camera-dialog::backdrop { background:rgb(16 42 35 / 65%); }
+.access-camera-dialog video { width:100%; max-height:55dvh; background:#142e26; border-radius:8px; }
+.access-connectivity-note { margin:0; padding:10px 14px; border-radius:10px; background:#f8f1dc; color:#634c14; }
+.access-result--provisional { border-color:#bd8e36; background:#fff7e4; }
