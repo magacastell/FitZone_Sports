@@ -418,8 +418,6 @@ paths:
       - USUARIO
       - RECEPCIONISTA
       - GERENTE
-      x-propuesta-pending:
-      - P12
     post:
       tags:
       - M1 · Usuarios
@@ -971,6 +969,7 @@ paths:
       x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Reconciliar eventos del terminal sin duplicarlos
+      operationId: sincronizarAccesosOffline
       description: Sólo el operador autorizado del terminal y sede. Hasta 100 eventos por batch; inbox y accesos en una transacción. Reintentar los mismos IDs tras respuesta incierta. Verifica la copia y el QR al instante de captura, no al recibir; copias de hasta dos horas y futuro limitado a 30 segundos. Admisiones provisionales; conflictos de presencia y solapamiento histórico conservan evidencia sin sobrescribir accesos. EN_ESPERA conserva el pendiente por dependencia faltante. ID reutilizado con otro payload registra intento incompatible. QR offline sólo es admisible mediante este protocolo; los endpoints online conservan su QR anterior y la regla de último emitido.
       requestBody:
         required: true
@@ -1023,6 +1022,7 @@ paths:
       x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Comprobar comunicación autenticada con el servidor
+      operationId: consultarConexionOffline
       responses:
         '204': {description: Comunicación disponible; no-store}
         '401': {$ref: '#/components/responses/NoAutenticado'}
@@ -1032,6 +1032,7 @@ paths:
       x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Autorizar el terminal principal de Recepción y obtener su copia
+      operationId: prepararTerminalOffline
       description: Sólo RECEPCIONISTA habilitado de la sede. Un terminal y operador por sede; otro UUID devuelve 403. Copia versión 2 con sede, operador, capacidad, presencia abierta mínima entre sedes y IDs bloqueados conocidos. Los miembros con períodos/lotes anteriores se conservan para compatibilidad, hasta 1000; no son necesarios para verificar las nuevas autorizaciones multisede. Sin fotos, DNI, email de socios ni contraseñas. Evidencia RS256 tipo m2-copia con audiencia fitzone-acceso y kid, válida dos horas. La JWK se aprovisiona por esta respuesta autenticada, nunca desde un QR. No-store. No reemplazar una copia con pendientes.
       requestBody:
         required: true
@@ -1066,6 +1067,7 @@ paths:
       x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Obtener automáticamente autorizaciones QR multisede
+      operationId: obtenerCredencialesOfflineAutomaticas
       description: USUARIO o GERENTE con cuenta activa y membresía vigente no suspendida. Sin body ni sede. Ventanas de hasta 60 segundos, limitadas a períodos pagados reales y horizonte máximo de dos horas. Cada JWS RS256 incluye issuer fitzone-m2, audience fitzone-acceso, kid, tipo m2-autorizacion, uid, permiso INGRESO, ambito FITZONE, iat, nbf, exp y jti estable por usuario/minuto. No incluye datos personales ni secretos. Recepción verifica contra su clave previamente aprovisionada sin exigir al socio en el snapshot. Capturas y revocación diferida siguen limitadas por caducidad; RN-01 global no se garantiza bajo partición. No-store.
       responses:
         '200':
@@ -1091,6 +1093,7 @@ paths:
       x-contract-status: stable
       tags: [M2 · Accesos]
       summary: Preparar QR rotativos offline para una sede (compatibilidad anterior)
+      operationId: emitirCredencialesOffline
       deprecated: true
       description: Cuenta y membresía vigentes. Lote RS256 exclusivo de M2 de hasta dos horas, ventanas estrictas de 60 segundos. No reemplaza el último QR online. Preparar habilita incluir los datos mínimos del titular en la copia de esa sede. Sin fotos, contraseñas ni secretos de login.
       requestBody:
