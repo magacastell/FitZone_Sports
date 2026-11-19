@@ -4,7 +4,7 @@
 **Versión del manual:** 0.1 · **Fecha:** 11/11/2026  
 **Base verificada:** rama `docs/cierre-tif`, commit `b6323ac91ab5537fb543f073e24df1f4e0d9af1e`.
 
-Este manual sigue el Anexo F de los Lineamientos de Entrega (p. 22). Describe cómo está construido el sistema, dónde revisar cada comportamiento y qué trabajo queda para integrar M4 y M5. En las tablas, **implementado** indica lógica localizada en el código, **parcial** indica que solo una parte del módulo está operativa y **pendiente** indica que el flujo aún no está implementado o acreditado. La revisión de código y la ejecución de pruebas son evidencias distintas.
+Este manual sigue el Anexo F de los Lineamientos de Entrega (p. 22). Describe cómo está construido el sistema y dónde revisar el comportamiento de cada módulo. En las tablas, **implementado** indica lógica localizada en el código, **parcial** indica que solo una parte del módulo está operativa y **pendiente** indica que el flujo aún no está implementado o acreditado. La revisión de código y la ejecución de pruebas son evidencias distintas.
 
 ## Índice
 
@@ -40,11 +40,12 @@ El [ADR-001](../adr/ADR-001-tif-monolito-modular.md) justifica el monolito modul
 | C4 nivel 1 · Contexto | [draw.io](../diagramas/c4-01-contexto.drawio) | [SVG](../diagramas/c4-01-contexto.svg) |
 | C4 nivel 2 · Contenedores | [draw.io](../diagramas/c4-02-contenedores.drawio) | [SVG](../diagramas/c4-02-contenedores.svg) |
 | C4 nivel 3 · Acceso | [draw.io](../diagramas/c4-03-m2.drawio) | [SVG](../diagramas/c4-03-m2.svg) |
+| C4 nivel 3 · Canchas | [draw.io](../diagramas/c4-03-canchas.drawio) | [SVG](../diagramas/c4-03-canchas.svg) |
 | UML · Secuencia de acceso offline | [draw.io](../diagramas/uml-secuencia-acceso-offline.drawio) | [SVG](../diagramas/uml-secuencia-acceso-offline.svg) |
 | UML · Estados de membresía | [draw.io](../diagramas/uml-estados-membresia.drawio) | [SVG](../diagramas/uml-estados-membresia.svg) · [notas](../diagramas/uml-estados-membresia.md) |
 | UML · Actividad de lista de espera | [draw.io](../diagramas/uml-actividad-lista-espera.drawio) | [SVG](../diagramas/uml-actividad-lista-espera.svg) · [notas](../diagramas/uml-actividad-lista-espera.md) |
 
-El C4 de contexto marca como prevista la integración con una pasarela externa. El adaptador simulado de M5 corre dentro del backend. El [índice de arquitectura](../arquitectura-tif.md) registra los seis pares disponibles y los diagramas pendientes. El C4 de componentes de canchas sigue pendiente.
+El C4 de contexto marca como prevista la integración con una pasarela externa. El adaptador simulado de M5 corre dentro del backend. El [índice de arquitectura](../arquitectura-tif.md) registra las vistas disponibles y los diagramas pendientes.
 
 ### Índice de ADR
 
@@ -53,7 +54,7 @@ El C4 de contexto marca como prevista la integración con una pasarela externa. 
 | [001](../adr/ADR-001-tif-monolito-modular.md) | Monolito modular. Aceptado. |
 | [002](../adr/ADR-002-tif-postgresql-e-integridad.md) | PostgreSQL e integridad transaccional. Aceptado. |
 | [003](../adr/ADR-003-tif-validacion-qr-offline.md) | Validación de QR offline. Aceptado. |
-| 004 | Concurrencia de reservas de canchas. Pendiente de M4. |
+| [004](../adr/ADR-004-tif-concurrencia-canchas.md) | Concurrencia de reservas de canchas. Aceptado. |
 | [005](../adr/ADR-005-tif-spring-di-y-persistencia.md) | Spring, inyección de dependencias y persistencia híbrida. Aceptado. |
 | [006](../adr/ADR-006-tif-react-componentes-y-estado.md) | React, componentes y gestión de estado. Aceptado. |
 | [007](../adr/ADR-007-tif-replica-y-reconciliacion.md) | Copia local y reconciliación del terminal. Aceptado. |
@@ -98,15 +99,11 @@ La cuenta está `ACTIVA` con un período no cancelado cuyo inicio es inclusivo y
 
 ### M4 · Canchas deportivas
 
-**Pendiente de integración.** `reserva` contiene [CanchaController](../../src/main/java/com/fitzonesports/reserva/controller/CanchaController.java) y [ReservaController](../../src/main/java/com/fitzonesports/reserva/controller/ReservaController.java). El primero expone `GET/POST /canchas`, `PATCH /canchas/{canchaId}`, `GET/POST /canchas/{canchaId}/turnos`, reserva y cancelación bajo `/canchas/{canchaId}/reservas` y mantenimiento bajo `/canchas/{canchaId}/mantenimientos`. El segundo expone `GET /reservas` y `GET /reservas/me`. Estas rutas devuelven `501`. El esquema contiene sedes, tipos de cancha, turnos y reservas. No se localizó un servicio de negocio integrado ni una implementación de precios de cancha.
-
-La pantalla [GrillaCanchas.jsx](../../frontend/src/modules/m4-canchas/GrillaCanchas.jsx) delega en [ServiciosSede.jsx](../../frontend/src/components/ServiciosSede.jsx). [m4Service.js](../../frontend/src/services/m4Service.js) contiene llamadas al contrato previsto. La integración necesita catálogo por sede, disponibilidad, reserva concurrente, mantenimiento, reglas de vigencia M1 y cobro M5. Los reportes consolidados se mantienen como rutas `501` en [ReporteController](../../src/main/java/com/fitzonesports/reporte/controller/ReporteController.java).
+**Implementado.** [CanchaService](../../src/main/java/com/fitzonesports/reserva/service/CanchaService.java) administra los recursos, calcula disponibilidad y resuelve el precio del turno con la vigencia de M1. [ReservaCanchaService](../../src/main/java/com/fitzonesports/reserva/service/ReservaCanchaService.java) retiene el turno, coordina el pago con M5 y aplica la política de cancelación. [GrillaCanchas.jsx](../../frontend/src/modules/m4-canchas/GrillaCanchas.jsx) muestra el importe de la API y confirma el pago dentro del modal. La administración comprueba el alcance por sede. [Mapa de endpoints y guía](../integracion-canchas-pagos.md)
 
 ### M5 · Pagos y facturación
 
-**Parcial.** `pago` tiene un puerto de cobro y reembolso y un adaptador simulado interno. [CobroMembresiaService](../../src/main/java/com/fitzonesports/pago/service/CobroMembresiaService.java) registra cobros aprobados en ARS con clave de operación, proveedor y referencia. [ComprobanteService](../../src/main/java/com/fitzonesports/pago/service/ComprobanteService.java) y [ComprobantePdfRenderer](../../src/main/java/com/fitzonesports/pago/service/ComprobantePdfRenderer.java) generan el PDF de membresía a partir del período pagado. [ReembolsoService](../../src/main/java/com/fitzonesports/pago/service/ReembolsoService.java) delega en M1 el arrepentimiento del período asociado.
-
-[PagoController](../../src/main/java/com/fitzonesports/pago/controller/PagoController.java) implementa `GET /pagos/{pagoId}/comprobante` y `POST /pagos/{pagoId}/reembolsos` para el flujo de membresías. `POST /pagos` y los listados o detalles generales de pagos devuelven `501`. [HistorialComprobante.jsx](../../frontend/src/modules/m5-pagos/HistorialComprobante.jsx) deriva su lista de los períodos de membresía y usa [pagosService.js](../../frontend/src/services/pagosService.js) para descargar el PDF. Quedan pendientes el cobro y PDF de reserva de cancha y la validación de tokenización del flujo final. El fake actual opera con claves y referencias simuladas, sin campos de tarjeta en la [solicitud de cobro](../../src/main/java/com/fitzonesports/pago/pasarela/SolicitudCobro.java).
+**Implementado con pasarela simulada.** [PagoController](../../src/main/java/com/fitzonesports/pago/controller/PagoController.java) expone el cobro de reservas de cancha, consulta de pagos, comprobantes y reembolsos. [PagoCanchaService](../../src/main/java/com/fitzonesports/pago/service/PagoCanchaService.java) cobra el importe fijado por M4. [CobroMembresiaService](../../src/main/java/com/fitzonesports/pago/service/CobroMembresiaService.java) conserva el circuito de M1. [ComprobanteService](../../src/main/java/com/fitzonesports/pago/service/ComprobanteService.java) genera el PDF de cada concepto. [HistorialPagos.jsx](../../frontend/src/modules/m5-pagos/HistorialPagos.jsx) consume el historial del titular y descarga el PDF por identificador de pago. El adaptador simulado maneja referencias y el flujo de tarjetas reales sigue fuera de alcance.
 
 ## 3. Modelo de datos
 
@@ -117,7 +114,7 @@ Flyway administra el esquema y Hibernate valida su correspondencia al arrancar. 
 | Usuarios y membresías | `usuario` referencia un rol y puede adquirir sede habitual en el alta comercial. DNI y correo son únicos. Hay una membresía por usuario y múltiples períodos con plan, precio y fechas de cada contratación. [Usuario](../../src/main/java/com/fitzonesports/usuario/model/Usuario.java) · [Membresia](../../src/main/java/com/fitzonesports/membresia/model/Membresia.java) · [PeriodoMembresia](../../src/main/java/com/fitzonesports/membresia/model/PeriodoMembresia.java) |
 | Acceso | `registro_acceso` vincula usuario y sede. Un índice parcial limita a una visita abierta central por usuario. El circuito offline persiste terminal, revisiones y eventos recibidos; el identificador de QR también se controla en el registro central. [RegistroAcceso](../../src/main/java/com/fitzonesports/acceso/model/RegistroAcceso.java) · [RegistroAccesoRepository](../../src/main/java/com/fitzonesports/acceso/repository/RegistroAccesoRepository.java) |
 | Clases | Cada clase referencia sede, tipo e instructor. Reserva, inscripción y oferta se vinculan a clase y usuario. V15 garantiza unicidad de reserva confirmada por usuario/clase, posición de espera por clase, inscripción activa por usuario/clase y oferta pendiente por inscripción. [ClaseGrupal](../../src/main/java/com/fitzonesports/clase/model/ClaseGrupal.java) · [ReservaClase](../../src/main/java/com/fitzonesports/clase/model/ReservaClase.java) · [OfertaClase](../../src/main/java/com/fitzonesports/clase/model/OfertaClase.java) |
-| Canchas | `cancha` referencia `sede` y `tipo_cancha`. `turno_cancha` referencia la cancha y tiene clave única por cancha, fecha y hora inicial. `reserva_cancha` referencia turno y usuario. Esa clave del turno deja abierta la restricción sobre reservas ocupantes. [V1](../../src/main/resources/db/migration/V1__crear_esquema_inicial.sql) |
+| Canchas | `cancha` referencia `sede` y `tipo_cancha`. `reserva_cancha` referencia turno y usuario, guarda el importe aplicado y permite una sola reserva ocupante por turno. [V16](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql) |
 | Pagos | `pago` registra titular, importe y referencia comercial. V5 agrega idempotencia de pago y vínculo del período al cobro. V6 agrega unicidad por pago de comprobante y reembolso. Estos flujos emplean `JdbcTemplate`. [CobroMembresiaService](../../src/main/java/com/fitzonesports/pago/service/CobroMembresiaService.java) · [ComprobanteService](../../src/main/java/com/fitzonesports/pago/service/ComprobanteService.java) |
 
 ### Migraciones versionadas
@@ -130,12 +127,13 @@ Flyway administra el esquema y Hibernate valida su correspondencia al arrancar. 
 | [V7](../../src/main/resources/db/migration/V7__autoridad_usuario_estable.sql) · [V8](../../src/main/resources/db/migration/V8__sede_habitual_en_contratacion.sql) · [V9](../../src/main/resources/db/migration/V9__contexto_funciones_sede.sql) · [V10](../../src/main/resources/db/migration/V10__foto_perfil_persistente.sql) | Autoridad estable, sede habitual, contexto de sede y almacenamiento de foto. |
 | [V11](../../src/main/resources/db/migration/V11__credenciales_m2_offline.sql) · [V12](../../src/main/resources/db/migration/V12__terminal_y_copia_m2.sql) · [V13](../../src/main/resources/db/migration/V13__reconciliacion_m2_offline.sql) · [V14](../../src/main/resources/db/migration/V14__uso_qr_multisede.sql) | Credenciales de compatibilidad, terminal y copia, reconciliación y unicidad de uso del QR. |
 | [V15](../../src/main/resources/db/migration/V15__clases_grupales.sql) | Clases, reservas, espera, ofertas e índices correspondientes. |
+| [V16](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql) | Tarifas, ocupación, mantenimiento y vinculación entre pagos y reservas de canchas. |
 
 ## 4. Patrones de diseño
 
 | Patrón | Problema, participantes y límites |
 | --- | --- |
-| **Strategy · pendiente en M4** | RF-11 pide tarifa estándar, descuento del 15 % a socios y recargo en horario pico de 19:00 a 21:00 mediante variantes de precio intercambiables. RN-03 exige tarifa de externo al socio en mora. En este corte no hay una `PricingStrategy` de canchas. El [segundo caso de extensión](#72-caso-2-incorporar-una-estrategia-de-precio) desarrolla una propuesta que mantiene las reglas fuera del controlador. |
+| **Strategy · implementado en M4** | [PricingStrategy](../../src/main/java/com/fitzonesports/reserva/pricing/PricingStrategy.java) permite seleccionar tarifa estándar o de socio. [PrecioSocioStrategy](../../src/main/java/com/fitzonesports/reserva/pricing/PrecioSocioStrategy.java) aplica el 15 % a la tarifa con el recargo pico correspondiente. M4 consulta la vigencia de M1 para elegir estrategia (RF-11 y RN-03). |
 | **Observer · implementado en M3** | [PublicadorClase](../../src/main/java/com/fitzonesports/clase/observer/PublicadorClase.java) distribuye eventos a [ObservadorClase](../../src/main/java/com/fitzonesports/clase/observer/ObservadorClase.java). [GestorListaEspera](../../src/main/java/com/fitzonesports/clase/observer/GestorListaEspera.java) responde a `CupoLiberado`, selecciona por posición FIFO y emite `OfertaGenerada`. [NotificadorClase](../../src/main/java/com/fitzonesports/clase/observer/NotificadorClase.java) prepara el aviso después del commit. La asignación dentro de la misma transacción conserva el cupo y desacopla a quien lo libera de quien lo ofrece. El despacho es síncrono y local al proceso, sin broker ni entrega durable de avisos. |
 | **Repository · implementado** | [MembresiaRepository](../../src/main/java/com/fitzonesports/membresia/repository/MembresiaRepository.java), [PeriodoMembresiaRepository](../../src/main/java/com/fitzonesports/membresia/repository/PeriodoMembresiaRepository.java) y [ReservaClaseRepository](../../src/main/java/com/fitzonesports/clase/repository/ReservaClaseRepository.java) encapsulan consultas de dominio sobre JPA. Reducen SQL en servicios, aunque el esquema compartido, JPQL y consultas específicas conservan dependencia de la persistencia. |
 | **Adapter · implementado** | [PasarelaPagoFake](../../src/main/java/com/fitzonesports/pago/pasarela/PasarelaPagoFake.java) implementa [PasarelaPago](../../src/main/java/com/fitzonesports/pago/pasarela/PasarelaPago.java) y se selecciona mediante configuración. [NotificadorLog](../../src/main/java/com/fitzonesports/clase/observer/NotificadorLog.java) implementa [Notificador](../../src/main/java/com/fitzonesports/clase/observer/Notificador.java). Ambos puertos permiten cambiar el adaptador sin alterar el caso de uso. Los adaptadores actuales simulan efectos y no acreditan integración externa. |
@@ -143,7 +141,7 @@ Flyway administra el esquema y Hibernate valida su correspondencia al arrancar. 
 
 ## 5. Concurrencia de reservas
 
-**RN-02 · canchas.** Ante dos intentos simultáneos sobre la misma cancha, fecha y horario, solo uno debe confirmar. [V1](../../src/main/resources/db/migration/V1__crear_esquema_inicial.sql) evita duplicar el turno con `uk_turno_cancha_horario`. La clave foránea de `reserva_cancha` permite que varias reservas referencien el mismo turno. Las rutas devuelven `501` y no se encontró una prueba de dos reservas de cancha que confirme una sola. Quedan pendientes el mecanismo, su respaldo en la base y la prueba concurrente. Registrar la decisión verificada en ADR-004 cuando M4 se integre.
+**RN-02 · canchas.** La reserva serializa escrituras por cancha usando [bloqueo pesimista JPA](../../src/main/java/com/fitzonesports/reserva/repository/CanchaRepository.java). El índice único parcial de [V16](../../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql) garantiza una sola ocupación por turno. El perdedor recibe un conflicto y el frontend recarga la grilla. [ADR-004](../adr/ADR-004-tif-concurrencia-canchas.md) · [Prueba concurrente](../../src/test/java/com/fitzonesports/reserva/CanchasIntegrationTest.java) · [UML](../diagramas/uml-secuencia-reserva-concurrente.md)
 
 **Cupo de clases.** Es un caso implementado con una garantía diferente. [ClaseGrupalRepository](../../src/main/java/com/fitzonesports/clase/repository/ClaseGrupalRepository.java) toma un bloqueo pesimista de la fila de la clase. [ReservaClaseService](../../src/main/java/com/fitzonesports/clase/service/ReservaClaseService.java) comprueba duplicado, espera activa y solapamiento bajo bloqueo de usuario y cuenta cupos en la misma transacción. [CuposClase](../../src/main/java/com/fitzonesports/clase/service/CuposClase.java) suma reservas confirmadas y ofertas pendientes. [V15](../../src/main/resources/db/migration/V15__clases_grupales.sql) impide duplicados por usuario/clase y respalda las unicidades de espera y oferta. El límite total se aplica en servicio bajo el bloqueo. Se localizaron comprobaciones de elegibilidad en [MembresiaIntegrationTest](../../src/test/java/com/fitzonesports/membresia/MembresiaIntegrationTest.java). Falta una prueba de concurrencia de M3 que ejercite dos solicitudes por el último cupo y compruebe la persistencia final.
 
@@ -161,24 +159,23 @@ La secuencia de acceso offline sigue el [UML](../diagramas/uml-secuencia-acceso-
 
 ## 7. Guía de extensión
 
-Los dos casos siguientes son propuestas de diseño con pasos y criterios de aceptación. Su aplicación depende de que el equipo integre M4 y cierre el contrato de reservas y pagos.
+Los dos casos siguientes son propuestas de extensión sobre el contrato vigente de M4/M5.
 
 ### 7.1 Caso 1 incorporar canchas de tenis
 
 **Escenario.** Gerencia habilita una cancha de tenis en una sede existente. El socio ve la disponibilidad y reserva con la misma operación que una cancha de pádel. El tipo se resuelve en el catálogo del servidor.
 
-1. **Datos.** [V1](../../src/main/resources/db/migration/V1__crear_esquema_inicial.sql) ya separa `tipo_cancha`, `cancha` y `turno_cancha`. Después de acordar un identificador estable para el catálogo, agregar `TENIS` mediante la gestión de tipos si se implementa, o mediante una nueva migración con una inserción controlada. La cancha referencia el tipo y la sede y conserva su costo base. Si tenis utiliza los mismos turnos, la relación reserva–turno sigue sirviendo.
-2. **API.** Integrar catálogo, disponibilidad y alta detrás de [CanchaController](../../src/main/java/com/fitzonesports/reserva/controller/CanchaController.java). El [contrato](../openapi/openapi.yaml) tiene `CanchaRequest.tipo` como cadena de trabajo. Definir el catálogo admitido, la respuesta a un tipo desconocido, qué rol puede crear canchas y cómo se restringe Recepción a su sede. Si tenis exige duraciones distintas, definir primero cómo se representa el intervalo y revisar solapamientos.
-3. **Frontend.** Reutilizar [m4Service.js](../../frontend/src/services/m4Service.js) para traer recursos y turnos cuando la API esté operativa. Revisar el mapa de imágenes por tipo de [ServiciosSede.jsx](../../frontend/src/components/ServiciosSede.jsx). Agregar etiqueta para tenis y, si se usa una imagen, conservar un recurso genérico para tipos nuevos. La reserva debe enviar la identidad del turno y obtener el precio del servidor.
-4. **Criterios de aceptación propuestos.** Una cancha de tenis creada en sede A aparece filtrada en sede A y no en sede B. Un tipo inexistente y una operación fuera de sede se rechazan según el contrato acordado. El mantenimiento afecta disponibilidad y el circuito concurrente cumple RN-02 con la misma garantía que el resto de los tipos. La prueba de pago verifica que el comprobante referencia la cancha y el turno reservados cuando M5 se integre.
+1. **Datos y API.** Usar el catálogo de tipos administrado por Gerencia y `POST /canchas` para crear el recurso en su sede. Mantener el contrato de [CanchaController](../../src/main/java/com/fitzonesports/reserva/controller/CanchaController.java). Si tenis exige una duración distinta, primero confirmar esa regla y los solapamientos.
+2. **Frontend.** Reutilizar [m4Service.js](../../frontend/src/services/m4Service.js) y la grilla existente. La reserva envía la identidad del turno y presenta el importe del servidor.
+3. **Criterios de aceptación.** La cancha aparece en su sede, una operación fuera del alcance del actor se rechaza y el mantenimiento respeta ocupaciones previas. Reservar y pagar debe producir el comprobante de la cancha y el horario elegidos.
 
 ### 7.2 Caso 2 incorporar una estrategia de precio
 
 **Escenario.** El equipo incorpora una tarifa promocional de tenis para horarios valle. La elegibilidad, las franjas y los valores se acuerdan en el contrato de M4. Un turno fuera de la promoción conserva su tarifa aplicable.
 
-1. **Contrato de cálculo propuesto.** Introducir en M4 una interfaz `PricingStrategy` que calcule en `BigDecimal` a partir de un contexto de servidor con costo base, turno, sede, tipo y elegibilidad comercial. El servicio toma el horario de la sede y consulta la vigencia mediante [MembresiaService](../../src/main/java/com/fitzonesports/membresia/service/MembresiaService.java). Definir moneda, redondeo y reglas en los bordes horarios.
+1. **Contrato de cálculo.** Reutilizar `PricingStrategy` y resolver en el servidor la elegibilidad y los bordes horarios de la promoción. Conservar `BigDecimal`, la moneda y el redondeo del flujo.
 2. **Selección de estrategia.** Inyectar las variantes en un servicio de precios y definir una política de selección explícita y determinista. Documentar si la promoción se combina con el descuento de socio o el recargo pico, cómo se resuelve una coincidencia múltiple y cuál es la tarifa por defecto. Añadir una estrategia de promoción con su propio criterio de aplicabilidad. El controlador y la vista consumen el resultado del servicio.
-3. **Integración.** Calcular antes de confirmar la retención o reserva, según el flujo acordado. Persistir el importe aplicado en `reserva_cancha.precio_aplicado`, que ya existe en [V1](../../src/main/resources/db/migration/V1__crear_esquema_inicial.sql). Revisar su precisión frente al criterio monetario acordado antes de admitir centavos. M5 debe cobrar y emitir el comprobante usando el importe persistido. La interfaz de [PasarelaPago](../../src/main/java/com/fitzonesports/pago/pasarela/PasarelaPago.java) ya recibe una solicitud con monto; el circuito de canchas debe integrarse por separado.
+3. **Integración.** Fijar el importe al retener, como en el circuito vigente. M5 cobra el importe persistido y emite el comprobante de ese pago, aunque la tarifa de la cancha cambie después.
 4. **Criterios de aceptación propuestos.** Probar tarifa base, promoción elegible y fuera de franja, socio vigente y vencido, límites de horario pico y precedencia de políticas. En integración, comprobar que la API, el importe persistido, el cobro y el comprobante coinciden, incluso si la tarifa cambia después de reservar.
 
 ## 8. Pruebas
@@ -214,7 +211,7 @@ Para el E2E, ejecutar `./scripts/prueba-m2-offline.ps1` desde la raíz con depen
 
 El [POM](../../pom.xml) configura JaCoCo. El runner copia Surefire y JaCoCo a `target/test-runs/<id>/`. Revisar primero cantidad de pruebas, errores, fallos y omitidas. En JaCoCo, comparar las líneas y ramas cubiertas con sus totales por paquete, registrando el commit y el alcance del run. El E2E deja `resultado.json` en `target/e2e-m2/<id>/`. Antes de usarlo como evidencia, comprobar el resultado y asociarlo al SHA probado.
 
-[El historial de pruebas](../pruebas.md) registra ejecuciones anteriores a la integración de M3. Los reportes históricos mencionados no están disponibles en este clon, y para esta versión del manual se hizo revisión estática. Quedan pendientes la ejecución integrada en el corte de entrega, el umbral acordado para ADR-008 y evidencia específica de cupo/espera M3, concurrencia M4 y pago y comprobante de cancha M5.
+[El historial de pruebas](../pruebas.md) registra la evidencia de concurrencia M4 y la ejecución en Chrome con Spring/PostgreSQL para la reserva, el pago y el PDF. Queda pendiente acordar el umbral de ADR-008 y ejecutar la validación sobre el corte final de entrega.
 
 ## 9. Pipeline CI/CD
 
@@ -237,7 +234,7 @@ El árbol de la rama carece de un workflow CI/CD versionado. Quedan por confirma
 
 ### Confirmaciones para el cierre
 
-- **M4/M5.** Validar el contrato final de reservas, precio y pagos, la garantía concurrente RN-02, el medio de pago y la emisión de comprobante de cancha. Contrastar los dos casos de extensión con ese diseño antes de considerarlos implementables.
+- **M4/M5.** Incorporar al dossier las pruebas y diagramas del [circuito validado](../integracion-canchas-pagos.md#6-referencias-de-implementación-para-el-dossier) y cerrar con el equipo el ADR-010 y la coordinación de ingreso por reserva con M2.
 - **M3/M2.** Acordar con la cátedra el canal aceptable de aviso para RF-08 y el criterio de las 48 horas. Confirmar la política operativa para conflictos offline y el método de medición de disponibilidad.
 - **Pruebas y operación.** Acordar pirámide y umbral de cobertura, generar evidencia del corte integrado y confirmar CI externo, despliegue y reversión.
 - **Documentación de arquitectura.** Confirmar autores de diagramas y autoría y sprint de los ADR existentes.

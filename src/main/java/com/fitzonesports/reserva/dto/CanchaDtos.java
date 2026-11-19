@@ -18,7 +18,8 @@ public final class CanchaDtos {
     public record CrearTurno(@NotNull OffsetDateTime inicio,@NotNull OffsetDateTime fin) {}
     public record Reservar(@NotNull @Positive Integer turnoId) {}
     public record MantenimientoRequest(@NotNull OffsetDateTime inicio,OffsetDateTime fin,@NotBlank @Size(max=255) String motivo) {}
-    public record CancelarRequest(@DecimalMin("50") @DecimalMax("100") BigDecimal porcentajeReembolso) {}
+    public record CancelarRequest(@DecimalMin("50") @DecimalMax("100") BigDecimal porcentajeReembolso,
+                                 Boolean soloRetencion) {}
     public record TipoResponse(Integer id,String nombre,BigDecimal precioHora) {}
     public record CanchaResponse(Integer id,String nombre,String tipo,Integer sedeId,boolean activa,BigDecimal precioHora,BigDecimal recargoPico) {}
     public record TurnoResponse(Integer id,Integer canchaId,OffsetDateTime inicio,OffsetDateTime fin,boolean disponible,Precio precio) {}

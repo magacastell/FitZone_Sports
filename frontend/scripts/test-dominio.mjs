@@ -7,6 +7,8 @@ import { createRequire } from 'node:module';
 const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { transformSync } = require('esbuild');
 const sources = {
+ gridM4:'src/modules/m4-canchas/GrillaCanchas.jsx', adminM4:'src/modules/m4-canchas/AdministracionCanchas.jsx', pagosM5:'src/modules/m5-pagos/HistorialPagos.jsx',
+ reservasM4:'src/modules/m4-canchas/ReservasCanchas.jsx',
  avatar:'src/components/ui/FitZoneUI.jsx',
  servicios:'src/components/ServiciosSede.jsx',
  aforoLocal:'src/modules/m2-acceso/AforoSede.jsx',
@@ -58,7 +60,7 @@ async function runner(name,e,props={},target='default'){
   localStorage:e.localStorage,sessionStorage:e.sessionStorage,
   document:{get visibilityState(){return e.visibilityState;},createElement:()=>({click(){e.downloads.push(this.download);}})},
   URL:{createObjectURL:()=> 'blob:pdf-real',revokeObjectURL:url=>e.revoked.push(url)},
-  window:{addEventListener:(k,f)=>{if(!e.listeners.has(k))e.listeners.set(k,new Set);e.listeners.get(k).add(f);},removeEventListener:(k,f)=>e.listeners.get(k)?.delete(f),confirm:()=>true},
+  window:{setInterval:fn=>{e.relojM4=fn;return 31;},clearInterval:()=>{},addEventListener:(k,f)=>{if(!e.listeners.has(k))e.listeners.set(k,new Set);e.listeners.get(k).add(f);},removeEventListener:(k,f)=>e.listeners.get(k)?.delete(f),confirm:()=>true},
   crypto:{randomUUID:()=>{e.uuids++;return '00000000-0000-4000-8000-'+String(e.uuids).padStart(12,'0');}},
   setTimeout:(fn,ms)=>{const id=++e.timerId;e.timers.set(id,{fn,ms});return id;},clearTimeout:id=>e.timers.delete(id),setInterval:(fn)=>{e.intervals=(e.intervals||0)+1;e.poll=fn;return 2;},clearInterval:()=>{e.clearedIntervals=(e.clearedIntervals||0)+1;},
   atob:s=>Buffer.from(s,'base64').toString()
@@ -80,9 +82,19 @@ async function runner(name,e,props={},target='default'){
   if(spec==='react-router-dom')return synthetic(router,context);
   if(spec.includes('AuthContext'))return synthetic({useAuth:()=>({token:e.token,user:e.user,loading:!!e.loading,login:e.login,register:e.register,isAuthenticated:!!e.token,logout:()=>{e.loggedOut=true;e.token=null;}})},context);
   if(spec.includes('m1Service'))return synthetic(e.services,context);
+  if(spec.includes('m4Service')&&e.m4)return synthetic(e.m4,context);
+  if(spec.includes('pagosService')&&e.pagosM5)return synthetic(e.pagosM5,context);
   if(spec.endsWith('SelectorFoto'))return synthetic({default:p=>jsx('selector-foto',p)},context);
   if(spec.endsWith('fotoPerfil')){
    const child=new vm.SourceTextModule(fs.readFileSync('src/services/fotoPerfil.js','utf8'),{context});await child.link(linker);await child.evaluate();return child;
+  }
+  const reservasCancha = {
+   './ReservasCanchas':'src/modules/m4-canchas/ReservasCanchas.jsx',
+   './reservasCanchaUtils':'src/modules/m4-canchas/reservasCanchaUtils.js',
+  }[spec];
+  if (reservasCancha) {
+   const child=new vm.SourceTextModule(transformSync(fs.readFileSync(reservasCancha,'utf8'),{loader:'jsx',format:'esm',jsx:'automatic'}).code,{context});
+   await child.link(linker);await child.evaluate();return child;
   }
   if(spec.includes('sedesService'))return synthetic({listarSedes:e.services.listarSedes},context);
   if(spec.includes('gerenciaService'))return synthetic(Object.fromEntries(['listarSedes','listarUsuarios','consultarAforo','crearSede','actualizarSede','consultarMembresia','consultarReporte'].map(nombre=>[nombre,(...args)=>{const d=deferred();d.args=args;(e.gerencia??={})[nombre]??=[];e.gerencia[nombre].push(d);return d.promise;}])),context);
@@ -93,7 +105,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('services/offline/api'))return synthetic({obtenerQrAutomatico:()=>{const d=deferred();d.args=['/accesos/offline/credenciales/automaticas',{method:'POST'}];e.qrs.push(d);return d.promise;}},context);
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
-  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check','Plus','Wallet','AlertCircle'].map(k=>[k,()=>jsx('svg',{})])),context);
   if(spec.endsWith('LectorAcceso'))return synthetic({default:p=>{e.lectorProps=p;return jsx('lector',p);}},context);
   if(spec.endsWith('useAforoSede')||spec.endsWith('TarjetaAforo')){
    const file=spec.endsWith('useAforoSede')?'src/modules/m2-acceso/useAforoSede.js':'src/modules/m2-acceso/TarjetaAforo.jsx';
@@ -176,6 +188,13 @@ await test('foco visible revalida, oculta no; consultas simultaneas comparten pr
  e.visibilityState='visible';e.focus();const a=e.shared.refrescarMembresia(),b=e.shared.refrescarMembresia();
  assert.equal(a,b);assert.equal(e.members.length,2);await setMember(e,dto('VENCIDA'));
  assert.equal(e.shared.puedeAbrirQr,false);
+});
+await test('al volver a Mi membresía se revalida el DTO compartido sin duplicar la consulta inicial',async()=>{
+ const e=env();e.pathname='/membresia';await layout(e);assert.equal(e.members.length,1);
+ await setMember(e,dto());e.pathname='/pagos';await settle(e);
+ assert.equal(e.members.length,1);
+ e.pathname='/membresia';await settle(e);assert.equal(e.members.length,2);
+ await setMember(e,dto('VENCIDA'));assert.equal(e.shared.membresia.datos.estado,'VENCIDA');
 });
 await test('GET viejo no sobrescribe DTO del POST ni borra una consulta nueva',async()=>{
  const e=env();await layout(e);const old=e.members[0];e.shared.actualizarMembresia({estado:'cargada',datos:dto()});await settle(e);
@@ -363,9 +382,10 @@ await test('cliente sin membresia ve catalogo real y no capacidades de socio',as
  assert(text(r.view).includes('Elegí tu plan'));assert(text(r.view).includes('Plan del servidor'));assert(!text(r.view).includes('Tu ingreso'));
  assert(!nodes(l.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!hasQr(r));
 });
-await test('comprobantes solo para periodos con pago real, tambien tras vencimiento',async()=>{
+await test('la membresía vencida conserva Mis pagos y un único enlace financiero',async()=>{
  const e=env();const l=await layout(e);await setMember(e,dto('VENCIDA',{periodos:[{id:9,pagoId:99,estado:'VENCIDA'}]}));
- assert(nodes(l.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!hasQr(l));
+ assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/pagos').length,1);
+ assert.equal(nodes(l.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length,0);assert(!hasQr(l));
 });
 await test('sesion: claims legados o desconocidos se descartan, USUARIO no expira por membresia',async()=>{
  const source=fs.readFileSync('src/context/AuthContext.jsx','utf8');const code=source.slice(source.indexOf('const isExpired'),source.indexOf('const getStoredToken'))+'\nisExpired';
@@ -620,10 +640,28 @@ await test('aviso a siete dias: continuidad confirmada evita falsa urgencia',asy
  assert.equal(visual({...periodo,fin:new Date(now+8*86400000).toISOString()},now).aviso,null);
  assert.equal(visual({...periodo,fin:new Date(now).toISOString()},now).aviso,null);
 });
-await test('vencida conserva plan historico sede comprobantes y renovacion sin onboarding',async()=>{
+await test('Mi membresía resume el pago vigente y el próximo pagado con el DTO compartido',async()=>{
+ const e=env();await layout(e);
+ const vigente={...cercana().periodoVigente,id:3,estado:'ACTIVA',pagoId:13,precio:12500.75};
+ const proximo={id:4,nombrePlan:'Trimestral próximo',estado:'PROGRAMADA',pagoId:14,precio:34000,inicio:vigente.fin,fin:'2090-04-01T00:00:00-03:00'};
+ const posterior={...proximo,id:5,pagoId:15,nombrePlan:'Futuro más lejano',inicio:proximo.fin,fin:'2090-07-01T00:00:00-03:00'};
+ const historico={id:1,estado:'VENCIDA',pagoId:11,nombrePlan:'Pago histórico'};
+ const cancelado={id:2,estado:'CANCELADA',pagoId:12,nombrePlan:'Pago cancelado'};
+ const periodos=[historico,cancelado,vigente,posterior,proximo];
+ await setMember(e,dto('ACTIVA',{periodoVigente:vigente,periodos}));
+ const r=await runner('perfil',e);e.profiles.at(-1).resolve({id:7});await settle(e);
+ const panel=()=>nodes(r.view,n=>n.props.className?.includes('member-payments-panel'))[0];
+ for(const dato of ['Mensual actual','Vigente','12.500,75','Trimestral próximo','Próximo período','34.000,00'])assert(text(panel()).includes(dato));
+ for(const dato of ['Pago histórico','Pago cancelado','Futuro más lejano'])assert(!text(panel()).includes(dato));
+ assert.equal(nodes(panel(),n=>n.type==='a'&&n.props.href==='/pagos').length,1);
+ e.shared.actualizarMembresia({estado:'cargada',datos:dto('ACTIVA',{periodoVigente:vigente,periodos:[vigente,posterior,{...proximo,estado:'CANCELADA'}]})});
+ await settle(e);assert(!text(panel()).includes('Trimestral próximo'));assert(text(panel()).includes('Futuro más lejano'));
+ assert.equal(e.members.length,1);
+});
+await test('vencida conserva plan histórico, sede, enlace a pagos y renovación sin onboarding',async()=>{
  const e=env(),l=await layout(e);const data=dto('VENCIDA',{periodos:[{id:1,estado:'VENCIDA',nombrePlan:'Plan histórico',precio:12345.67,duracionMeses:1,inicio:'2020-01-01T12:00:00-03:00',fin:'2020-02-01T12:00:00-03:00',pagoId:44}]});
  await setMember(e,data);const r=await runner('perfil',e);e.profiles.at(-1).resolve({id:7,nombre:'Titular',apellido:'Real',sedeId:12,sedeNombre:'Sede conservada'});await settle(e);
- const t=text(r.view);for(const esperado of ['Membresía vencida','Plan histórico','Sede conservada','12.345,67','2020','Comprobantes'])assert(t.includes(esperado));
+ const t=text(r.view);for(const esperado of ['Membresía vencida','Plan histórico','Sede conservada','12.345,67','2020','Sin pagos de períodos vigentes o próximos'])assert(t.includes(esperado));
  assert.equal(e.plans.length,0);assert.equal(e.contracts.length,0);assert.equal(hasQr(l),false);assert(text(l.view).includes('Membresía vencida'));
  consultaRenovacion(e);const ren=await runner('renew',e,e.renewalProps);await settle(e);button(ren,'Renovar membresía').props.onClick();await settle(e);e.plans[0].resolve([{id:3,nombre:'Plan vigente',duracionMeses:1,precio:15000}]);await settle(e);
  const envio=button(ren,'Confirmar renovación').props.onClick();await settle(e);assert.deepEqual(e.renewals[0].args.slice(0,2),[22,3]);const key=e.renewals[0].args[2];e.renewals[0].reject(err(500));await envio;await settle(e);
@@ -636,7 +674,7 @@ await test('suspendida muestra bloqueo sin QR ni una nueva renovacion',async()=>
 });
 await test('reload consulta estado real y conserva historial sin convertir vencida a cliente nuevo',async()=>{
  const e=env(),primero=await layout(e);await setMember(e,dto());primero.unmount();const recargado=await layout(e);await setMember(e,dto('VENCIDA',{periodos:[{id:1,pagoId:44,estado:'VENCIDA'}]}));
- assert.equal(hasQr(recargado),false);assert.equal(e.shared.membresia.estado,'cargada');assert(nodes(recargado.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length);assert(!text(recargado.view).includes('Elegí tu plan'));
+ assert.equal(hasQr(recargado),false);assert.equal(e.shared.membresia.estado,'cargada');assert(nodes(recargado.view,n=>n.type==='a'&&n.props.href==='/pagos').length);assert(!text(recargado.view).includes('Elegí tu plan'));
 });
 for(const clases of [true,false])await test('Actividades '+clases+': habitual inicial, multisede y 501 honesto',async()=>{
  const e=env();e.shared={puedeAbrirQr:true,membresia:{estado:'cargada',datos:dto()}};
@@ -803,28 +841,50 @@ await test('revalidación antes de pagar detecta automática activada o período
 });
 await test('automática habilita/deshabilita sin cambiar períodos y bloquea doble clic',async()=>{
  const data=cercana();data.periodos=[{...data.periodoVigente,id:1,estado:'ACTIVA',nombrePlan:'Mensual'}];
- const {e,r}=await flujoRenovacion(data);const activar=button(r,'Habilitar renovación automática').props.onClick;const p=activar();activar();assert.equal(e.preferences.length,1);assert.deepEqual(e.preferences[0].args,[22,true]);
+ const {e,r}=await flujoRenovacion(data);const activar=button(r,'Activar').props.onClick;const p=activar();activar();assert.equal(e.preferences.length,1);assert.deepEqual(e.preferences[0].args,[22,true]);
  e.preferences[0].resolve({...data,renovacionAutomatica:true});await p;await settle(e);assert(text(r.view).includes('habilitada'));assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);assert.equal(e.actual.periodos,data.periodos);
- const off=button(r,'Desactivar renovación automática').props.onClick();assert.deepEqual(e.preferences[1].args,[22,false]);e.preferences[1].resolve({...data,renovacionAutomatica:false});await off;await settle(e);button(r,'Renovar plan');assert.equal(e.renewals.length,0);assert.equal(e.actual.periodos,data.periodos);
+ const off=button(r,'Desactivar').props.onClick();assert.deepEqual(e.preferences[1].args,[22,false]);e.preferences[1].resolve({...data,renovacionAutomatica:false});await off;await settle(e);button(r,'Renovar plan');assert.equal(e.renewals.length,0);assert.equal(e.actual.periodos,data.periodos);
 });
 for(const status of [400,403,404,409,500,undefined])await test('automática error '+(status??'red')+' no invierte preferencia ni permite pago manual',async()=>{
  const data=cercana();data.periodos=[{...data.periodoVigente,estado:'ACTIVA'}];const {e,r}=await flujoRenovacion(data);
- const p=button(r,'Habilitar renovación automática').props.onClick();e.preferences[0].reject(err(status));await p;await settle(e);
+ const p=button(r,'Activar').props.onClick();e.preferences[0].reject(err(status));await p;await settle(e);
  assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);const retry=button(r,'Reintentar la misma preferencia').props.onClick();assert.deepEqual(e.preferences[1].args,[22,true]);e.preferences[1].resolve({...data,renovacionAutomatica:true});await retry;await settle(e);assert.equal(e.renewals.length,0);
 });
 await test('automática toma el último plan futuro al finalizar todos los períodos, sin mostrarlo vigente',async()=>{
  const data=cercana({planId:9,renovacionAutomatica:true,periodos:[{estado:'PROGRAMADA',nombrePlan:'Trimestral futuro',fin:new Date(Date.now()+95*86400000).toISOString()}]});
- const {r}=await flujoRenovacion(data);assert(text(r.view).replace(/\s+/g,' ').includes('último plan contratado: Trimestral futuro'));assert(text(r.view).includes('No reemplaza tu plan actual'));assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);
+ const {r}=await flujoRenovacion(data);
+ const zona={timeZone:'America/Argentina/Buenos_Aires',day:'numeric',month:'short',year:'numeric'};
+ const fecha=new Date(data.periodos[0].fin).toLocaleDateString('es-AR',zona);
+ assert(text(r.view).replace(/\s+/g,' ').includes('Desde '+fecha+' · Trimestral futuro'));
+ assert.equal(nodes(r.view,n=>n.type==='button'&&text(n).includes('Renovar plan')).length,0);
 });
-await test('automática vencida advierte próximo cobro simulado y suspendida sólo permite desactivar',async()=>{
+await test('automática vencida solicita confirmación antes de guardar la preferencia',async()=>{
  const periodos=[{estado:'VENCIDA',nombrePlan:'Mensual',fin:'2020-01-01T12:00:00-03:00'}];
- const {r}=await flujoRenovacion(dto('VENCIDA',{periodos}));assert(text(r.view).includes('próxima ejecución'));assert(text(r.view).includes('simulado'));
- const {e,r:s}=await flujoRenovacion(dto('SUSPENDIDA',{periodos,renovacionAutomatica:true}));assert(text(s.view).includes('no se realizan renovaciones automáticas'));button(s,'Desactivar renovación automática');assert.equal(nodes(s.view,n=>n.type==='button'&&text(n).includes('Habilitar')).length,0);assert.equal(e.renewals.length,0);
+ const data=dto('VENCIDA',{periodos}),{e,r}=await flujoRenovacion(data);
+ button(r,'Activar').props.onClick();await settle(e);
+ assert(text(r.view).includes('El cobro simulado puede intentarse en la próxima ejecución'));
+ assert.equal(e.preferences.length,0);
+ button(r,'Volver').props.onClick();await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);assert.equal(e.preferences.length,0);
+ button(r,'Activar').props.onClick();await settle(e);
+ const guardar=button(r,'Confirmar activación').props.onClick;
+ const p=guardar();guardar();assert.equal(e.preferences.length,1);assert.deepEqual(e.preferences[0].args,[22,true]);
+ e.preferences[0].resolve({...data,renovacionAutomatica:true});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);assert.equal(e.renewals.length,0);
+});
+await test('automática suspendida indica pausa y sólo permite desactivar',async()=>{
+ const data=dto('SUSPENDIDA',{renovacionAutomatica:true}),{e,r}=await flujoRenovacion(data);
+ assert(text(r.view).includes('Pausada'));
+ assert.equal(nodes(r.view,n=>n.props['aria-label']==='Activar renovación automática').length,0);
+ const p=button(r,'Desactivar').props.onClick();assert.deepEqual(e.preferences[0].args,[22,false]);
+ e.preferences[0].resolve({...data,renovacionAutomatica:false});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.props['aria-label']==='Activar renovación automática').length,0);
+ assert.equal(e.renewals.length,0);
 });
 await test('automática bloqueada por intención monetaria pendiente y cambio de sesión',async()=>{
- const {e,r}=await flujoRenovacion();await elegirPlanes(e,r);const p=button(r,'Confirmar renovación').props.onClick();await settle(e);e.renewals[0].reject(err(500));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='button'&&/automática/.test(text(n))).length,0);
- const data=cercana({periodos:[{estado:'ACTIVA',fin:new Date(Date.now()+5*86400000).toISOString()}]});const f=await flujoRenovacion(data);f.e.localStorage.setItem('token','sesion-B');await button(f.r,'Habilitar renovación automática').props.onClick();assert.equal(f.e.preferences.length,0);
- const g=await flujoRenovacion(data);const cambiar=button(g.r,'Habilitar renovación automática').props.onClick();g.e.localStorage.setItem('token','sesion-B');g.e.preferences[0].resolve({...data,renovacionAutomatica:true});await cambiar;await settle(g.e);assert.equal(g.e.actual,undefined);
+ const {e,r}=await flujoRenovacion();await elegirPlanes(e,r);const p=button(r,'Confirmar renovación').props.onClick();await settle(e);e.renewals[0].reject(err(500));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='button'&&/automática/.test(n.props['aria-label'])).length,0);
+ const data=cercana({periodos:[{estado:'ACTIVA',fin:new Date(Date.now()+5*86400000).toISOString()}]});const f=await flujoRenovacion(data);f.e.localStorage.setItem('token','sesion-B');await button(f.r,'Activar').props.onClick();assert.equal(f.e.preferences.length,0);
+ const g=await flujoRenovacion(data);const cambiar=button(g.r,'Activar').props.onClick();g.e.localStorage.setItem('token','sesion-B');g.e.preferences[0].resolve({...data,renovacionAutomatica:true});await cambiar;await settle(g.e);assert.equal(g.e.actual,undefined);
 });
 await test('aviso próximo con automática habilitada no invita también a renovar manualmente',async()=>{
  const e=env();await layout(e);await setMember(e,cercana({renovacionAutomatica:true}));const p=await runner('perfil',e);e.profiles[0].resolve({id:7});await settle(e);
@@ -883,5 +943,267 @@ await test('Salida por número de ingreso usa contrato existente y valida el ide
  nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'id'}});await settle(e);
  for(const codigo of ['abc','0','2147483648']){const p=escanear(r,codigo)({preventDefault(){}});await p;await settle(e);assert.equal(e.salidas.length,0);assert(text(r.view).includes('número de ingreso válido'));}
  const p=escanear(r,'88')({preventDefault(){}});assert.deepEqual(e.salidas[0].args,[null,88]);e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).replace(/\s/g,'').includes('Ingreso#88'));assert(text(r.view).includes('Salida registrada'));
+});
+function entornoM4() {
+ const e=env();e.user={rol:'USUARIO',email:'socio@test.invalid'};e.llamadasM4=[];
+ e.services.consultarMiPerfil=async()=>({sedeId:1,sedeNombre:'Central'});
+ e.services.listarSedes=async()=>[{id:1,nombre:'Central'},{id:2,nombre:'Sin canchas'}];
+ e.m4=Object.fromEntries(['listarCanchas','listarTurnos','reservarCancha','listarMisReservas','listarReservas','consultarReserva','cancelarReservaCancha','listarTiposCancha','crearCancha','actualizarCancha','crearTurno','crearMantenimiento','listarMantenimientos','eliminarMantenimiento','crearTipoCancha','actualizarTipoCancha','actualizarRecargoPico'].map(nombre=>[nombre,(...args)=>{const d=deferred();d.nombre=nombre;d.args=args;e.llamadasM4.push(d);return d.promise;}]));
+ e.m4.listarCanchas=async id=>String(id)==='1'?[{id:1,sedeId:1,nombre:'Cancha real',tipo:'Tenis',activa:true,precioHora:100,recargoPico:20}]:[];
+ e.m4.listarTiposCancha=async()=>[{id:1,nombre:'Tenis',precioHora:100}];
+ e.m4.listarMantenimientos=async()=>[];
+ e.m4.listarMisReservas=async()=>[];e.m4.listarReservas=async()=>[];
+ const fecha=fechaM4(2);
+ e.m4.listarTurnos=async()=>[{id:3,disponible:true,inicio:fecha+'T18:00:00-03:00',fin:fecha+'T19:00:00-03:00',precio:{total:10200,base:10000,recargo:2000,descuento:1800,estrategia:'SOCIO'}}];
+ e.pagosM5={pagarReservaCancha:(...args)=>{const d=deferred();d.nombre='pago';d.args=args;e.llamadasM4.push(d);return d.promise;},consultarPago:async()=>({estado:'APROBADO',monto:10200})};
+ return e;
+}
+function fechaM4(dias) {
+ return new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Argentina/Buenos_Aires'}).format(new Date(Date.now()+dias*86400000));
+}
+await test('M4 reintento confirmado no anuncia otra retención ni abre un nuevo pago',async()=>{
+ const e=entornoM4(),r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ const enviar=button(r,'Elegir turno').props.onClick;const p=enviar();enviar();
+ assert.equal(e.llamadasM4.length,1);const llamada=e.llamadasM4[0];assert.equal(llamada.nombre,'reservarCancha');assert(llamada.args[2]);
+ llamada.resolve({id:10,estado:'CONFIRMADA'});await p;await settle(e);
+ assert(text(r.view).includes('No se creó una nueva retención'));assert(!text(r.view).includes('Tenés hasta'));
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);
+});
+await test('M4 respuesta perdida conserva clave de reserva al reintentar',async()=>{
+ const e=entornoM4(),r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ let p=button(r,'Elegir turno').props.onClick();e.llamadasM4[0].reject(err(null,'Sin respuesta'));await p;await settle(e);
+ p=button(r,'Elegir turno').props.onClick();assert.equal(e.llamadasM4[0].args[2],e.llamadasM4[1].args[2]);
+ e.llamadasM4[1].resolve({id:10,estado:'PENDIENTE_PAGO',venceEn:'2026-11-25T17:10:00-03:00'});await p;
+});
+for (const resultado of ['éxito', 'error']) {
+ await test(`M4 retención demorada mantiene cancha y fecha y desbloquea tras ${resultado}`, async () => {
+  const e = entornoM4();
+  const fechaA = fechaM4(2);
+  const fechaB = fechaM4(4);
+  const consultas = [];
+  e.m4.listarCanchas = async () => [
+   { id: 1, sedeId: 1, nombre: 'Cancha A', activa: true },
+   { id: 2, sedeId: 1, nombre: 'Cancha B', activa: true },
+  ];
+  e.m4.listarTurnos = async (id, desde, hasta) => {
+   consultas.push([id, desde, hasta]);
+   const dia = id === '1' ? fechaA : fechaB;
+   if (dia < desde || dia > hasta) return [];
+   return ['18', '19'].map((hora, indice) => ({
+    id: Number(id) * 10 + indice,
+    disponible: true,
+    inicio: `${dia}T${hora}:00:00-03:00`,
+    fin: `${dia}T${Number(hora) + 1}:00:00-03:00`,
+   }));
+  };
+  const r = await runner('gridM4', e, {}, 'GrillaCuenta');
+  await settle(e);
+  const fecha = () => nodes(r.view, nodo => nodo.type === 'input' && nodo.props.type === 'date')[0];
+  const opciones = () => nodes(r.view, nodo => nodo.type === 'button' && text(nodo).includes('Elegir turno'));
+  const cambiarCancha = button(r, 'Cancha B').props.onClick;
+  const cambiarFecha = fecha().props.onChange;
+  const actualizar = button(r, 'Actualizar').props.onClick;
+  const [seleccionarA, seleccionarOtro] = opciones().map(opcion => opcion.props.onClick);
+  const cantidadConsultas = consultas.length;
+
+  const pendiente = seleccionarA();
+  cambiarCancha();
+  cambiarFecha({ target: { value: fechaB } });
+  actualizar();
+  await seleccionarOtro();
+  await settle(e);
+
+  assert.equal(button(r, 'Cancha B').props.disabled, true);
+  assert.equal(button(r, 'Actualizar').props.disabled, true);
+  assert.equal(fecha().props.disabled, true);
+  assert.equal(opciones()[0].props.disabled, true);
+  assert.equal(button(r, 'Reservando...').props.disabled, true);
+  assert.equal(nodes(r.view, nodo => nodo.props.role === 'status' && text(nodo).replace(/\s+/g, ' ').includes('Reteniendo el turno de Cancha A')).length, 1);
+  assert.equal(button(r, 'Cancha A').props['aria-pressed'], true);
+  assert.equal(fecha().props.value, fechaA);
+  assert.equal(consultas.length, cantidadConsultas);
+  assert.equal(e.llamadasM4.length, 1);
+  const retencion = e.llamadasM4[0];
+  assert.equal(retencion.args[0], 1);
+  assert.equal(retencion.args[1].turnoId, 10);
+
+  const reserva = {
+   id: 50, canchaId: 1, cancha: 'Cancha A', turnoId: 10, estado: 'PENDIENTE_PAGO',
+   inicio: `${fechaA}T18:00:00-03:00`, venceEn: new Date(Date.now() + 600000).toISOString(),
+  };
+  if (resultado === 'éxito') retencion.resolve(reserva);
+  else retencion.reject(err(409));
+  await pendiente;
+  await settle(e);
+
+  assert.equal(button(r, 'Cancha A').props['aria-pressed'], true);
+  assert.equal(fecha().props.value, fechaA);
+  assert.equal(consultas.slice(cantidadConsultas).every(([id]) => id === '1'), true);
+  const dialogos = nodes(r.view, nodo => nodo.type === 'dialog');
+  if (resultado === 'éxito') {
+   assert.equal(dialogos.length, 1);
+   assert.match(text(dialogos[0]), /Cancha A/);
+   assert.doesNotMatch(text(dialogos[0]), /Cancha B/);
+   const salir = button(r, 'Salir').props.onClick();
+   e.llamadasM4[1].resolve({ ...reserva, estado: 'CANCELADA' });
+   await salir;
+   await settle(e);
+  } else {
+   assert.equal(dialogos.length, 0);
+   assert.match(text(r.view), /Ese horario acaba de cambiar/);
+  }
+
+  assert.equal(fecha().props.disabled, false);
+  button(r, 'Cancha B').props.onClick();
+  await settle(e);
+  assert.equal(button(r, 'Cancha B').props['aria-pressed'], true);
+  assert.equal(fecha().props.value, fechaB);
+  assert.equal(consultas.at(-1)[0], '2');
+ });
+}
+
+await test('Mis reservas conserva la paginación personal y las retenciones quedan fuera del listado',async()=>{
+ const e=entornoM4(),paginas=[];
+ e.m4.listarMisReservas=async(page,size)=>{
+  paginas.push([page,size]);
+  return page===0 ? Array.from({length:20},(_,i)=>({id:i,estado:'EXPIRADA',cancha:'Retención sin pago'}))
+   : [{id:22,estado:'CONFIRMADA',pagoId:11,cancha:'Cancha reservada'}];
+ };
+ const r=await runner('reservasM4',e);await settle(e);
+ assert(!text(r.view).includes('Retención sin pago'));
+ button(r,'Siguiente').props.onClick();await settle(e);
+ assert.deepEqual(paginas.at(-1),[1,20]);assert(text(r.view).includes('Cancha reservada'));
+ button(r,'Anterior').props.onClick();await settle(e);assert.deepEqual(paginas.at(-1),[0,20]);
+});
+await test('M4 consulta las reservas operativas de la sede seleccionada',async()=>{
+ const e=entornoM4(),paginas=[];e.user.rol='GERENTE';
+ e.m4.listarReservas=async(sede,page,size)=>{
+  paginas.push([sede,page,size]);
+  return sede==='1' ? Array.from({length:20},(_,i)=>({id:i,estado:'CANCELADA',cancha:'Cancha'})) : [];
+ };
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ button(r,'Siguiente').props.onClick();await settle(e);assert.deepEqual(paginas.at(-1),['1',1,20]);
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'2'}});await settle(e);
+ assert.deepEqual(paginas.at(-1),['2',0,20]);
+});
+for(const admin of [false,true])await test('M4 recupera contexto inicial '+(admin?'administración':'grilla'),async()=>{
+ const e=entornoM4();if(admin)e.user.rol='GERENTE';let intentos=0;e.services.consultarMiPerfil=async()=>{if(++intentos===1)throw err(500);return{sedeId:1};};
+ const r=await runner(admin?'adminM4':'gridM4',e,{},admin?'AdministracionCuenta':'GrillaCuenta');await settle(e);
+ const actualizar=nodes(r.view,n=>n.type==='button'&&text(n).includes('Actualizar'))[0];assert(actualizar);actualizar.props.onClick();await settle(e);assert.equal(intentos,2);assert(text(r.view).includes('Cancha real'));
+});
+await test('M4 administración conserva formulario fallido y bloquea doble envío',async()=>{
+ const e=entornoM4();e.user.rol='GERENTE';const r=await runner('adminM4',e,{},'AdministracionCuenta');await settle(e);
+ let f=nodes(r.view,n=>n.type==='form')[0];nodes(f,n=>n.type==='input')[0].props.onChange({target:{value:'Nueva cancha'}});r.render();
+ f=nodes(r.view,n=>n.type==='form')[0];nodes(f,n=>n.type==='select')[0].props.onChange({target:{value:'Tenis'}});r.render();
+ const enviar=nodes(r.view,n=>n.type==='form')[0].props.onSubmit;enviar({preventDefault(){}});enviar({preventDefault(){}});assert.equal(e.llamadasM4.length,1);
+ e.llamadasM4[0].reject(err(409,'Cancha duplicada'));await settle(e);assert.equal(nodes(nodes(r.view,n=>n.type==='form')[0],n=>n.type==='input')[0].props.value,'Nueva cancha');
+ enviar({preventDefault(){}});e.llamadasM4[1].resolve({id:8});await settle(e);assert.equal(nodes(nodes(r.view,n=>n.type==='form')[0],n=>n.type==='input')[0].props.value,'');
+});
+await test('M4 administración limpia recargo al pasar a sede vacía',async()=>{
+ const e=entornoM4();e.user.rol='GERENTE';const r=await runner('adminM4',e,{},'AdministracionCuenta');await settle(e);
+ const recargo=()=>nodes(r.view,n=>n.type==='input'&&Number(n.props.max)===100)[0];assert.equal(recargo().props.value,'20');
+ nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'2'}});await settle(e);assert.equal(recargo().props.value,'');
+});
+await test('M4 usuario comercial no accede a administración ni consulta sedes ajenas',async()=>{
+ const e=entornoM4();let consultas=0;e.services.consultarMiPerfil=async()=>{consultas++;};const r=await runner('adminM4',e,{},'AdministracionCuenta');await settle(e);assert.equal(consultas,0);assert(text(r.view).includes('No tenés permisos'));
+});
+await test('M4 pago con respuesta perdida se recupera sin otro cobro ni cancelación simultánea',async()=>{
+ const e=entornoM4(),fecha=fechaM4(2);
+ const reserva={id:10,canchaId:1,turnoId:3,estado:'PENDIENTE_PAGO',cancha:'Cancha real',inicio:fecha+'T19:00:00-03:00',fin:fecha+'T20:00:00-03:00',venceEn:fecha+'T18:00:00-03:00'};
+ e.m4.listarMisReservas=async()=>[reserva];e.m4.reservarCancha=async()=>reserva;
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ await button(r,'Elegir turno').props.onClick();await settle(e);
+ assert.equal(e.llamadasM4.length,0);
+ assert(!text(r.view).includes('Pagar reserva'));
+ assert(!text(r.view).includes('Pendiente de pago'));
+ const confirmar=button(r,'Confirmar pago').props.onClick;
+ const salir=button(r,'Salir').props.onClick;
+ const p=confirmar();confirmar();salir();assert.equal(e.llamadasM4.length,1);e.llamadasM4[0].reject(err(null,'Respuesta perdida'));await settle(e);
+ assert.equal(e.llamadasM4[1].nombre,'consultarReserva');e.llamadasM4[1].resolve({id:10,pagoId:7,estado:'CONFIRMADA'});await p;await settle(e);
+ assert.equal(e.llamadasM4.filter(x=>x.nombre==='pago').length,1);assert(text(r.view).includes('Pago aprobado'));
+ assert(text(r.view).includes('Recuperamos el resultado del pago'));
+ assert(nodes(r.view,n=>n.type==='a'&&n.props.href==='/pagos').length);
+ button(r,'Cerrar').props.onClick();await settle(e);assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);
+});
+await test('M4 salir libera solo la retención sin iniciar un pago',async()=>{
+ const e=entornoM4(),fecha=fechaM4(2);
+ const reserva={id:10,canchaId:1,turnoId:3,estado:'PENDIENTE_PAGO',inicio:fecha+'T19:00:00-03:00',venceEn:fecha+'T18:00:00-03:00'};
+ e.m4.reservarCancha=async()=>reserva;
+ e.m4.listarMisReservas=async()=>[{...reserva,id:9,estado:'CANCELADA'}];
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ await button(r,'Elegir turno').props.onClick();await settle(e);
+ assert(text(r.view).includes('Tiempo para pagar'));
+ const clave='fitzone:m4:intencion:'+e.user.email+':1:3';
+ assert(e.localStorage.getItem(clave),'una cancelación histórica no elimina la intención actual');
+ const salir=button(r,'Salir').props.onClick();
+ const [canchaId,reservaId,opciones]=e.llamadasM4[0].args;
+ assert.equal(canchaId,1);assert.equal(reservaId,10);assert.equal(opciones.soloRetencion,true);
+ assert.equal(e.llamadasM4[0].nombre,'cancelarReservaCancha');
+ e.llamadasM4[0].resolve({...reserva,estado:'CANCELADA'});await salir;await settle(e);
+ assert.equal(e.localStorage.getItem(clave),null);
+ assert.equal(e.llamadasM4.length,1);
+ assert.equal(nodes(r.view,n=>n.type==='dialog').length,0);
+});
+await test('M4 abre el primer día con turno libre y mantiene la fecha manual', async () => {
+ const e=entornoM4(), consultas=[];
+ e.m4.listarTurnos=async(id,desde,hasta)=>{
+  consultas.push({id,desde,hasta});
+  if(desde===hasta)return [];
+  return [
+   {id:1,inicio:fechaM4(1)+'T18:00:00-03:00',disponible:false},
+   {id:2,inicio:fechaM4(2)+'T18:00:00-03:00',fin:fechaM4(2)+'T19:00:00-03:00',disponible:true,precio:{total:9600,descuento:1440,recargo:0}},
+  ];
+ };
+ const r=await runner('gridM4',e,{},'GrillaCuenta');
+ await settle(e);
+ assert.equal(consultas.length,1);
+ assert.equal((Date.parse(consultas[0].hasta)-Date.parse(consultas[0].desde))/86400000,13);
+ const obtenerFecha=()=>nodes(r.view,n=>n.type==='input'&&n.props.type==='date')[0];
+ assert.equal(obtenerFecha().props.value,fechaM4(2));
+ assert(!text(r.view).includes('Ver próxima fecha disponible'));
+ assert(text(r.view).includes('Descuento de socio aplicado'));
+ const manual=fechaM4(4);
+ obtenerFecha().props.onChange({target:{value:manual}});await settle(e);
+ assert.deepEqual(consultas[1],{id:'1',desde:manual,hasta:manual});
+ assert.equal(obtenerFecha().props.value,manual);
+ assert(text(r.view).includes('Sin horarios para esta fecha'));
+});
+
+await test('M4 cambiar cancha descarta una búsqueda anterior y distingue un error', async () => {
+ const e=entornoM4(), anterior=deferred();
+ e.m4.listarCanchas=async()=>[
+  {id:1,sedeId:1,nombre:'Cancha uno',activa:true},
+  {id:2,sedeId:1,nombre:'Cancha dos',activa:true},
+ ];
+ e.m4.listarTurnos=async(id,desde,hasta)=>{
+  if(id==='2')throw err(500);
+  return desde===hasta ? [] : anterior.promise;
+ };
+ const r=await runner('gridM4',e,{},'GrillaCuenta');await settle(e);
+ button(r,'Cancha dos').props.onClick();await settle(e);
+ anterior.resolve([{disponible:true,inicio:new Date(Date.now()+86400000).toISOString()}]);await settle(e);
+ assert(nodes(r.view,n=>n.props.role==='alert').length);
+ assert(!text(r.view).includes('Ver próxima fecha disponible'));
+ assert(!text(r.view).includes('Sin horarios para esta fecha'));
+});
+
+await test('Mis pagos presenta comprobantes por pago, reembolso e historial de período', async () => {
+ const e=paidEnv();
+ e.shared.membresia.datos.periodos[0].estado='CANCELADA';
+ e.pagosM5={
+  listarMisPagos:async()=>[
+   {id:e.shared.membresia.datos.periodos[0].pagoId,concepto:'MEMBRESIA',estado:'REEMBOLSADO',monto:100,fecha:'2026-11-01T10:00:00-03:00'},
+   {id:55,concepto:'RESERVA_CANCHA',estado:'APROBADO',monto:1000,fecha:'2026-11-02T10:00:00-03:00',recursoId:12},
+  ],
+  descargarComprobante:async id=>{e.pdfs.push(id);return {};},
+ };
+ const r=await runner('pagosM5',e);await settle(e);
+ assert(text(r.view).includes('Período cancelado'));
+ assert(text(r.view).includes('Reembolsado'));assert(text(r.view).includes('Reserva #12'));
+ const descargas=nodes(r.view,n=>n.type==='button'&&text(n).includes('Descargar PDF'));
+ assert.equal(descargas.length,2);
+ for (const descarga of descargas) await descarga.props.onClick();
+ assert.deepEqual(e.pdfs,[55,e.shared.membresia.datos.periodos[0].pagoId]);
+ assert.equal(nodes(r.view,n=>n.type==='a'&&n.props.href==='/comprobantes').length,0);
 });
 console.log('RESULTADO: '+passed+' aprobadas'+(process.exitCode?' con fallos':''));

@@ -216,6 +216,19 @@ local; mantuve la fecha local de esta actividad y los timestamps originales del 
 | Pendientes | Revisión antes de integrar/publicar. Reaprovisionar terminales a versión 2; mantener clave persistente y aplicar el procedimiento de rotación con pendientes conciliados. ADR-003/007 pendientes de preparación grupal, sin renumeración unilateral. |
 | Horas efectivas | Pendientes de confirmación. |
 
+### 18/11/2026 — integración frontend de Canchas y Mis pagos
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Integración M4/M5. Numeración pendiente de confirmar con la planificación del equipo. |
+| Actividad | Incorporé el trabajo de Ignacio y completé el recorrido de canchas y pagos. Unifiqué las reservas de clases y canchas, simplifiqué la renovación y agregué el resumen de pagos vigentes de membresía. Cargué una clase de Pilates en el entorno descartable para revisión visual. |
+| Decisiones | Mostrar próximas clases y el primer día con turnos libres, con filtro por fecha. El servidor fija precio, vencimiento y resultado. El modal permite confirmar o salir. Mis reservas muestra turnos con pago y actividad de clases. Mis pagos reúne los comprobantes. |
+| Problema y solución | El pago aparecía debajo de la grilla. Moví el contador al modal y limité la salida a liberar la retención sin cobro. Evité borrar la clave de una reserva nueva al consultar una cancelación histórica. Durante una retención demorada bloqueé el cambio de cancha o fecha y comprobé la recuperación tras éxito o conflicto. |
+| Pruebas | Pasaron las seis suites frontend con 204 casos de dominio, el build PWA y, en la verificación previa, 74 pruebas focalizadas de backend. Chrome con Spring y PostgreSQL descartables confirmó ingreso por formulario, contratación y renovación, permisos de agenda, reservas y pagos con recuperación sin duplicados. Ajusté dos selectores del E2E durante la verificación. [Resultados en pruebas.md](../pruebas.md#18112026--integración-de-canchas-y-mis-pagos) |
+| Commits | `b2a5252` — integración original de Ignacio, incorporada por `34a265c`. `ae995c1` — flujo de Canchas/Pagos. `bee31c1` — consulta de clases por fecha y sede. `541696a` — renovación y resumen de pagos de membresía. `888669a` — Mis reservas, agenda, retención demorada y E2E. |
+| Pendientes | Revisión del PR por otro integrante, coordinación del ingreso por reserva con M2 y consolidación de la evidencia en el dossier del equipo. |
+| Horas efectivas | Pendientes de confirmación. |
+
 ### 18/11/2026 — verificación de la contingencia de Recepción
 
 | Campo | Registro |

@@ -154,7 +154,7 @@ El login, el registro y los flujos integrados usan la API. Vite redirige `/api` 
 - **M2.** QR dinámico para socios habilitados, ingresos, egresos y aforo. En contingencia, Recepción necesita un terminal aprovisionado. Si el socio pierde su conexión, necesita un lote de QR vigente guardado en su navegador. [Guía M2 offline](docs/m2-offline.md)
 - **M3.** Agenda por sede, reservas y cancelaciones, inscripción voluntaria en lista de espera y ofertas visibles en «Mis clases». El aviso externo se simula por log. Asistencia y aplicación de penalidades siguen pendientes.
 
-El frontend también consulta el catálogo de canchas por sede. La API de M4/M5 ya implementa turnos, reservas, mantenimiento, cobro, comprobantes y reembolsos de cancha. Queda pendiente conectar a esas pantallas el flujo completo de reserva, pago y mantenimiento. Los reportes consolidados siguen pendientes. [Guía de integración M4/M5](docs/integracion-canchas-pagos.md)
+En Canchas se puede elegir sede, cancha y turno, confirmar el pago simulado y consultar o cancelar reservas. Mis pagos reúne cobros de canchas y membresías y permite descargar los comprobantes emitidos. La administración conecta tarifas, turnos y mantenimiento según el rol. Los reportes consolidados siguen pendientes. [Guía de integración M4/M5](docs/integracion-canchas-pagos.md)
 
 Para verificar la compilación del frontend, desde `frontend/`:
 

@@ -1,9 +1,7 @@
 # Integración de Canchas y Pagos con frontend y otros módulos
 
-Fecha: 11/11/2026. Alcance: contratos del backend M4/M5 implementado.
-
-Esta guía describe **qué existe**, cómo consumirlo y qué requiere coordinación.
-No implica que el frontend ni el ingreso por reserva en M2 ya estén integrados.
+Alcance: integración de las pantallas de Canchas y Mis pagos con M4/M5.
+La validación de ingreso por reserva en M2 sigue pendiente de coordinación (sección 8).
 Referencia normativa de la API: [OpenAPI](openapi/openapi.yaml).
 Reglas y operación: [guía backend](canchas-pagos-backend.md).
 
@@ -11,9 +9,9 @@ Reglas y operación: [guía backend](canchas-pagos-backend.md).
 
 | Consumidor | Integración | Estado |
 |---|---|---|
-| Frontend Usuario | Disponibilidad → retención → pago → confirmación/PDF; cancelación e historial | API disponible; conectar pantallas |
-| Frontend Recepción | Canchas, turnos, mantenimiento y reservas de su sede | API disponible; no puede iniciar pagos ni consultar pagos ajenos |
-| Frontend Gerencia | Tarifas, recargos por sede, administración global y consultas de pagos | API disponible |
+| Frontend Usuario | Canchas, elección de horario, pago en modal, cancelación e historial/PDF en Mis pagos | Integrado con la API |
+| Frontend Recepción | Canchas, turnos, mantenimiento y reservas de su sede | Administración y consulta de sede conectadas; cobros fuera de su rol |
+| Frontend Gerencia | Tarifas, recargos por sede, administración y consultas de pagos | Administración de canchas y consulta de M5 conectadas |
 | M1 Membresías | M4 consulta vigencia para descuento; conserva su contratación/renovación y política de 24 h | Conectado por servicio de M1 |
 | M2 Acceso | Identificar cliente externo y validar reserva confirmada para sede/horario | **Pendiente**, ver sección 8 |
 | M3 Clases | Clases incluidas en membresía, sin cobro individual | No requiere llamar a M5 para reservar clases |
@@ -45,6 +43,12 @@ entre servicios del monolito.
 ## 3. Flujo frontend: disponibilidad, reserva y pago
 
 ### A. Elegir sede, cancha y turno
+
+La pantalla abre en el primer día con turnos libres dentro de los próximos 14 días,
+incluido hoy, y permite elegir otra fecha manualmente. El día se interpreta en
+horario argentino. La grilla muestra tarifa general o importe con descuento para
+socios vigentes según `precio.descuento` y `precio.total`. La tarifa pico se indica
+cuando `precio.recargo` es mayor que cero. La UI sólo formatea esos valores.
 
 ```http
 GET /api/v1/canchas?sedeId=1
@@ -115,6 +119,13 @@ Respuesta `201` con `Location: /api/v1/reservas/456` y representación:
   cancelación/rechazo/expiración, crear otra clave; la anterior devuelve su historia.
 - Mostrar el tiempo restante desde `venceEn`, no iniciar siempre un contador nuevo
   de 10 minutos al montar el componente. El servidor limita también por inicio del turno.
+- «Elegir turno» abre el modal con el precio fijado y el contador. «Confirmar pago»
+  continúa al cobro, y «Salir» solicita liberar la retención con el DELETE existente
+  y `{ "soloRetencion": true }`. La rama de cancelación se evalúa bajo el bloqueo
+  de la cancha y da 409 si el pago ya existe. Una salida interrumpida puede dejar
+  la retención hasta su vencimiento automático. «Mis reservas» conserva el acceso
+  a los turnos que tienen pago para consulta y cancelación; las retenciones quedan
+  fuera de la vista de Cliente/Socio.
 - Recargar `/reservas/{id}` permite recuperar estado. No reiniciar la retención en
   frontend ni confirmar una reserva por el solo hecho de recibir `201`.
 
@@ -150,8 +161,8 @@ Ejemplo aprobado (`201`):
 
 | Resultado | Qué mostrar / hacer |
 |---|---|
-| Pago APROBADO | Recargar reserva: CONFIRMADA. Habilitar PDF por pago.id. |
-| Pago RECHAZADO, también HTTP 201 | Informar rechazo, refrescar grilla; reserva RECHAZADA, turno liberado, sin PDF. |
+| Pago APROBADO | Verificar que la reserva quedó CONFIRMADA. El modal permite cerrar o ir a Mis pagos con el PDF de `pago.id`. |
+| Pago RECHAZADO, también HTTP 201 | Mostrar el resultado en el modal y refrescar la disponibilidad. La reserva queda RECHAZADA, el turno se libera y el rechazo carece de PDF. |
 | HTTP 409 | Reserva vencida/no pagable o conflicto. Consultar estado y refrescar. |
 | Error de red/respuesta perdida | Consultar reserva; si tiene pagoId, consultar ese pago. Repetir POST para la misma reserva es seguro. |
 
@@ -246,26 +257,20 @@ cambiar el catálogo no cambia el PDF ni el precio contratado. Desactivar una ca
 impide nuevas reservas y pagar retenciones todavía no cobradas; no borra confirmadas.
 Mantenimiento superpuesto con reservas activas devuelve 409, no las cancela.
 
-## 6. Cambios concretos que necesita el frontend existente
+## 6. Referencias de implementación para el dossier
 
-`frontend/src/services/m4Service.js` fue preparado para drafts. Para integrarlo:
+| Requisito | Implementación y evidencia |
+|---|---|
+| RF-09 y RF-12 | [Administración de canchas](../frontend/src/modules/m4-canchas/AdministracionCanchas.jsx) · [Servicio M4](../src/main/java/com/fitzonesports/reserva/service/CanchaService.java) · [Pruebas PostgreSQL](../src/test/java/com/fitzonesports/reserva/CanchasIntegrationTest.java) |
+| RF-10 y RN-02 | [Grilla](../frontend/src/modules/m4-canchas/GrillaCanchas.jsx) · [Reserva transaccional](../src/main/java/com/fitzonesports/reserva/service/ReservaCanchaService.java) · [Restricciones V16](../src/main/resources/db/migration/V16__canchas_reservas_y_pagos.sql) · [Secuencia concurrente](diagramas/uml-secuencia-reserva-concurrente.md) |
+| RF-11 y RN-03 | [Estrategias de precio](../src/main/java/com/fitzonesports/reserva/pricing) · [PrecioCanchaTest](../src/test/java/com/fitzonesports/reserva/PrecioCanchaTest.java) |
+| RF-13, RF-14 y RNF-02 | [Pasarela simulada](../src/main/java/com/fitzonesports/pago/pasarela/PasarelaPagoFake.java) · [Mis pagos](../frontend/src/modules/m5-pagos/HistorialPagos.jsx) · [Secuencia reserva y pago](diagramas/uml-secuencia-reserva-pago.md) |
 
-1. Agregar parámetro `clave` a `reservarCancha` y enviar `Idempotency-Key`; hoy no lo envía.
-2. Usar fechas `YYYY-MM-DD` en `listarTurnos`; para escrituras, instantes con offset.
-3. Agregar consulta individual de reserva, historiales y pago de reserva mediante
-   las rutas anteriores. Mantener el seguimiento de la intención por cuenta/recurso.
-4. Consumir precio/disponible del backend; usar precioAplicado tras retener.
-5. Manejar pago RECHAZADO aunque HTTP sea 201. No descargar PDF de un rechazo.
-6. Adaptar el historial de comprobantes para pagos de canchas: la pantalla actual
-   lista períodos de membresía y por eso no los descubre automáticamente. Usar
-   `/pagos/me` para reunir ambos conceptos.
-7. Conectar administración a tipos, recargo y mantenimiento reales. No habilitar
-   permisos solo por ocultar enlaces: presentar el 403 del servidor.
-8. Conservar `error.status` y `error.data` de fetchAPI; diferenciar errores recuperables,
-   validación, conflicto, sin sesión y prohibido. Eliminar avisos de «501 pendiente»
-   solo en las pantallas que efectivamente se conecten a estas rutas.
-
-No se modificaron archivos frontend como parte de esta documentación.
+[C4 Canchas](diagramas/c4-03-canchas.md), [DER físico](diagramas/der-fisico.md),
+[ADR-004](adr/ADR-004-tif-concurrencia-canchas.md) y [pruebas y reproducción](pruebas.md)
+completan las referencias. En la pasarela simulada, el navegador envía el ID de
+la reserva y el servidor guarda una referencia. La integración de tarjetas reales
+queda fuera de este circuito. Usar el hash que el equipo efectivamente entregue.
 
 ## 7. Llamadas internas desde otros módulos
 

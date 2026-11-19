@@ -361,7 +361,7 @@
 }
 
 .fitzone-ui .member-profile-panel,
-.fitzone-ui .receipts-panel {
+.fitzone-ui .member-payments-panel {
   min-width: 0;
   padding: 21px 22px 18px;
 }
@@ -434,17 +434,6 @@
   overflow-wrap: anywhere;
 }
 
-.fitzone-ui .receipt-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 7px;
-  padding-top: 12px;
-  border-top: 1px solid #edf0ed;
-}
-
-.fitzone-ui .receipt-footer > span,
 .fitzone-ui .text-link {
   display: inline-flex;
   align-items: center;
@@ -452,11 +441,6 @@
   font-size: 9px;
 }
 
-.fitzone-ui .receipt-footer > span {
-  color: #66816d;
-}
-
-.fitzone-ui .receipt-footer > span svg,
 .fitzone-ui .text-link svg {
   width: 13px;
   height: 13px;
@@ -501,11 +485,29 @@
 .fitzone-ui .portal-renovacion__manual--lista { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .fitzone-ui .portal-renovacion__manual--lista > .fit-button { grid-column: 2; grid-row: 1; }
 .fitzone-ui .portal-renovacion__manual--lista > p { grid-column: 1 / -1; }
-.fitzone-ui .portal-automatica { display: grid; gap: 10px; padding: 20px 24px; }
+.fitzone-ui .portal-automatica { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px 20px; padding: 20px 24px; }
+.fitzone-ui .portal-automatica__resumen { display: grid; gap: 4px; }
 .fitzone-ui .portal-automatica__heading { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-.fitzone-ui .portal-automatica > .fit-button { justify-self: start; }
+.fitzone-ui .portal-automatica > .fit-button { grid-column: 2; min-height: 44px; }
+.fitzone-ui .portal-automatica > p { grid-column: 1 / -1; }
 .fitzone-ui .portal-renovacion .renewal-secondary { color: #63776a; font-size: 12px; line-height: 1.6; }
-.fitzone-ui .portal-automatica > .renewal-secondary { max-width: 85ch; }
+.fitzone-ui .portal-automatica__dialogo {
+  width: min(440px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: 24px;
+  border: 1px solid #dce5dd;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 20px 56px rgb(20 48 35 / 24%);
+}
+.fitzone-ui .portal-automatica__dialogo::backdrop { background: rgb(20 48 35 / 54%); }
+.fitzone-ui .portal-automatica__dialogo p { margin-top: 10px; }
+.fitzone-ui .portal-automatica__acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.fitzone-ui .portal-automatica__acciones .fit-button { min-height: 44px; }
+@media (max-width: 640px) {
+  .fitzone-ui .portal-automatica { grid-template-columns: minmax(0, 1fr); }
+  .fitzone-ui .portal-automatica > .fit-button { grid-column: 1; width: 100%; }
+}
 .fitzone-ui .portal-perfil-form, .fitzone-ui .portal-perfil-form fieldset { display: grid; gap: 16px; }
 .fitzone-ui .portal-perfil-form fieldset { border: 0; padding: 0; margin: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
 .fitzone-ui .portal-perfil-form label { display: grid; gap: 8px; color: #344a3c; }
@@ -517,11 +519,24 @@
 .fitzone-ui .qr-card__status, .fitzone-ui .qr-card__footnote { font-size: 11px; }
 .fitzone-ui .qr-card__unavailable { padding: 12px; border-radius: 10px; background: #f3f5f3; }
 .fitzone-ui .member-identity p, .fitzone-ui .member-data-item dt,
-.fitzone-ui .member-data-item dd, .fitzone-ui .receipt-footer > span, .fitzone-ui .text-link { font-size: 12px; }
+.fitzone-ui .member-data-item dd, .fitzone-ui .text-link { font-size: 12px; }
 .fitzone-ui .member-identity p, .fitzone-ui .member-data-item dt { color: #63776a; }
-.fitzone-ui .receipts-panel { display: flex; flex-direction: column; }
-.fitzone-ui .receipts-panel .empty-state { min-height: 0; flex: 1; padding: 20px 0; }
-.fitzone-ui .receipts-panel .receipt-footer { margin-top: auto; }
+.fitzone-ui .member-payments { display: grid; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+.fitzone-ui .member-payments li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 10px 12px;
+  border: 1px solid #e2e9e3;
+  border-radius: 10px;
+  background: #f7faf7;
+}
+.fitzone-ui .member-payment__period { display: grid; gap: 4px; overflow-wrap: anywhere; }
+.fitzone-ui .member-payment__period > div { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; font-size: 13px; }
+.fitzone-ui .member-payment__period > span, .fitzone-ui .member-payments-empty { color: #526357; font-size: 12px; }
+.fitzone-ui .member-payment__amount { color: #2f704f; font-size: 14px; }
+.fitzone-ui .member-payments-empty { margin: 14px 0 0; }
 .fitzone-ui .portal-contratacion { min-width: 0; }
 .fitzone-ui.portal-cliente .page-heading .eyebrow { color: #52665a; }
 .fitzone-ui.portal-cliente .page-heading__description { font-size: 14px; }
@@ -574,14 +589,13 @@
   .fitzone-ui .qr-card { display: flex; padding: 19px 16px 15px; }
   .fitzone-ui .qr-card__preview { min-width: 0; }
   .fitzone-ui .qr-card__footnote { margin-top: 12px; }
-  .fitzone-ui .member-profile-panel, .fitzone-ui .receipts-panel { padding-right: 15px; padding-left: 15px; }
+  .fitzone-ui .member-profile-panel, .fitzone-ui .member-payments-panel { padding-right: 15px; padding-left: 15px; }
   .fitzone-ui .member-identity { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
   .fitzone-ui .member-identity > .status-badge { grid-column: 2; justify-self: start; margin: 0; }
   .fitzone-ui .member-data-grid { grid-template-columns: minmax(0, 1fr); gap: 13px; }
   .fitzone-ui .member-data-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .fitzone-ui .member-data-item dt { margin: 0; }
   .fitzone-ui .member-data-item dd { text-align: right; }
-  .fitzone-ui .receipt-footer { align-items: flex-start; flex-direction: column; }
   .fitzone-ui .membership-period__heading { flex-wrap: wrap; gap: 6px; }
 }
 

@@ -8,7 +8,9 @@ import { disponibilidadRenovacion, mensajePortal } from './PortalSocioCards';
 export default function RenovacionMembresia({ perfil, membresia, onRenovada }) {
   const [renovacion, setRenovacion] = useState({ estado: 'cargando' });
   const [automatica, setAutomatica] = useState({ estado: 'lista' });
+  const [confirmarActivacion, setConfirmarActivacion] = useState(false);
   const [ahora, setAhora] = useState(Date.now);
+  const dialogoActivacion = useRef(null);
   const intento = useRef(null);
   const enviando = useRef(false);
   const montado = useRef(false);
@@ -234,9 +236,47 @@ export default function RenovacionMembresia({ perfil, membresia, onRenovada }) {
   const planesPreparados = renovacion.estado === 'confirmar' && puedeNueva;
   const ultimo = (membresia.periodos || []).filter((p) => p.estado !== 'CANCELADA')
     .sort((a, b) => Date.parse(b.fin) - Date.parse(a.fin))[0];
+  const activada = membresia.renovacionAutomatica;
+  const suspendida = membresia.estado === 'SUSPENDIDA';
+  const finUltimoPeriodo = Date.parse(ultimo?.fin);
+  const fechaAutomatica = finUltimoPeriodo > ahora
+    ? new Date(finUltimoPeriodo).toLocaleDateString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires', day: 'numeric', month: 'short', year: 'numeric',
+    })
+    : null;
   const puedeAutomatica = ['lista', 'exito'].includes(renovacion.estado) && !intento.current
-    && (membresia.renovacionAutomatica || (membresia.estado !== 'SUSPENDIDA' && ultimo));
+    && (activada || (!suspendida && ultimo));
+  const mostrarConfirmacion = confirmarActivacion && puedeAutomatica && !activada && !suspendida;
   const mostrarManual = !['lista', 'exito'].includes(renovacion.estado) || puedeNueva || disponibilidad === 'suspendida';
+
+  let resumenAutomatica = 'Renová al terminar tus períodos pagados.';
+  if (suspendida) resumenAutomatica = 'Tu membresía está suspendida.';
+  else if (!ultimo) resumenAutomatica = 'Renová manualmente para habilitar esta opción.';
+  else if (activada) {
+    resumenAutomatica = fechaAutomatica
+      ? <>Desde <strong>{fechaAutomatica}</strong> · {ultimo.nombrePlan}</>
+      : <>Puede renovarse en la próxima ejecución · {ultimo.nombrePlan}</>;
+  }
+
+  useEffect(() => {
+    const dialogo = dialogoActivacion.current;
+    if (mostrarConfirmacion && dialogo && !dialogo.open) dialogo.showModal();
+  }, [mostrarConfirmacion]);
+
+  const pedirCambioAutomatica = () => {
+    if (!puedeAutomatica || enviando.current || !mismaSesion()) return;
+    if (!activada && finUltimoPeriodo <= Date.now()) {
+      setConfirmarActivacion(true);
+      return;
+    }
+    return cambiarAutomatica(!activada);
+  };
+
+  const cerrarConfirmacion = () => {
+    dialogoActivacion.current?.close();
+    setConfirmarActivacion(false);
+  };
+
   return (
     <div className="portal-renovacion" aria-busy={enviando.current || renovacion.estado === 'cargando'}>
       {mostrarManual && <section className={`panel portal-renovacion__manual${['lista', 'exito'].includes(renovacion.estado) && puedeNueva ? ' portal-renovacion__manual--lista' : ''}`} aria-labelledby="renovacion-titulo">
@@ -287,18 +327,41 @@ export default function RenovacionMembresia({ perfil, membresia, onRenovada }) {
       {!mostrarManual && renovacion.estado === 'exito' && <p className="membership-renewed" role="status">Renovación confirmada</p>}
       {disponibilidad === 'programada' && <p className="renewal-secondary">Tus períodos futuros conservan sus fechas. Si hay un intervalo sin cobertura, consultá con administración.</p>}
       <section className="panel portal-automatica" aria-labelledby="automatica-titulo">
-        <div className="portal-automatica__heading"><h3 id="automatica-titulo">Renovación automática</h3><StatusBadge tone={membresia.renovacionAutomatica ? 'success' : 'neutral'}>{membresia.renovacionAutomatica ? 'Activada' : 'Desactivada'}</StatusBadge></div>
-        <p>Renová al terminar tus períodos pagados, sin cambiar su vigencia.</p>
-        {ultimo && <p className="renewal-secondary">Desde {new Date(ultimo.fin).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false })} (hora argentina), con el último plan contratado: <strong>{ultimo.nombrePlan}</strong>, al precio vigente. No reemplaza tu plan actual.</p>}
-        {ultimo && Date.parse(ultimo.fin) <= ahora && membresia.estado !== 'SUSPENDIDA' && <p>Tu período ya finalizó. Al activarla, el cobro puede intentarse en la próxima ejecución, dentro de aproximadamente un minuto.</p>}
-        {membresia.renovacionAutomatica && <p>Para elegir otro plan, primero desactivá la automática.</p>}
-        {membresia.estado === 'SUSPENDIDA' && <p>Mientras esté suspendida no se realizan renovaciones automáticas.</p>}
-        {!ultimo && <p>Contratá un período mediante renovación manual antes de habilitar la automática.</p>}
-        {automatica.mensaje && <p role={automatica.estado === 'incierta' ? 'alert' : 'status'}>{automatica.mensaje}</p>}
-        {automatica.estado === 'guardando' && <p role="status">Guardando preferencia…</p>}
-        {puedeAutomatica && automatica.estado === 'lista' && <AppButton type="button" variant="secondary" disabled={enviando.current} onClick={() => cambiarAutomatica(!membresia.renovacionAutomatica)}>{membresia.renovacionAutomatica ? 'Desactivar renovación automática' : 'Habilitar renovación automática'}</AppButton>}
+        <div className="portal-automatica__resumen">
+          <div className="portal-automatica__heading">
+            <h3 id="automatica-titulo">Renovación automática</h3>
+            <StatusBadge tone={activada && !suspendida ? 'success' : 'neutral'}>
+              {activada ? (suspendida ? 'Pausada' : 'Activada') : 'Desactivada'}
+            </StatusBadge>
+          </div>
+          <p id="automatica-resumen">{resumenAutomatica}</p>
+          {ultimo && !suspendida && <p className="renewal-secondary">Cobro simulado al precio vigente al renovar.</p>}
+        </div>
+        {puedeAutomatica && ['lista', 'guardando'].includes(automatica.estado) && (
+          <AppButton type="button" variant={activada ? 'secondary' : 'primary'}
+            aria-label={activada ? 'Desactivar renovación automática' : 'Activar renovación automática'}
+            aria-describedby="automatica-resumen"
+            disabled={automatica.estado === 'guardando' || enviando.current} onClick={pedirCambioAutomatica}>
+            {activada ? 'Desactivar' : 'Activar'}
+          </AppButton>
+        )}
         {automatica.estado === 'incierta' && <AppButton type="button" variant="secondary" onClick={() => cambiarAutomatica(automatica.habilitada)}>Reintentar la misma preferencia</AppButton>}
-        <small className="renewal-secondary">Cobro simulado para este TP.</small>
+        {automatica.mensaje && (automatica.estado === 'incierta'
+          ? <p role="alert">{automatica.mensaje}</p>
+          : <p className="sr-only" role="status">{automatica.mensaje}</p>)}
+        {automatica.estado === 'guardando' && <p role="status">Guardando preferencia…</p>}
+        {mostrarConfirmacion && (
+          <dialog ref={dialogoActivacion} className="portal-automatica__dialogo"
+            aria-labelledby="activar-automatica-titulo" aria-describedby="activar-automatica-aviso"
+            onClose={() => setConfirmarActivacion(false)}>
+            <h3 id="activar-automatica-titulo">¿Activar la renovación automática?</h3>
+            <p id="activar-automatica-aviso">Tu membresía ya venció. El cobro simulado puede intentarse en la próxima ejecución con tu último plan, al precio vigente.</p>
+            <div className="portal-automatica__acciones">
+              <AppButton type="button" variant="secondary" autoFocus onClick={cerrarConfirmacion}>Volver</AppButton>
+              <AppButton type="button" onClick={() => { cerrarConfirmacion(); return cambiarAutomatica(true); }}>Confirmar activación</AppButton>
+            </div>
+          </dialog>
+        )}
       </section>
     </div>
   );
