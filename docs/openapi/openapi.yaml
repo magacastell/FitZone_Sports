@@ -1307,6 +1307,68 @@ paths:
       - El formato común Problem Details sigue siendo objetivo técnico; no hay manejo uniforme configurado.
     parameters:
     - $ref: '#/components/parameters/sedeId'
+  /accesos/sedes/{sedeId}/movimientos:
+    parameters:
+    - $ref: '#/components/parameters/sedeId'
+    get:
+      tags: [M2 · Accesos]
+      summary: Consultar movimientos confirmados de la propia sede
+      operationId: consultarMovimientosDeSede
+      x-implementation-status: implemented
+      x-roles-actuales: [RECEPCIONISTA]
+      description: Devuelve hasta 12 ingresos o egresos de las últimas 24 horas, ordenados del más reciente al más antiguo. Incluye offline reconciliado y excluye la cola provisional local.
+      responses:
+        '200':
+          description: Movimientos confirmados de la sede, con el nombre del titular.
+          headers:
+            Cache-Control:
+              schema: {type: string, example: no-store}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovimientoAcceso'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+  /accesos/me/movimientos:
+    get:
+      tags: [M2 · Accesos]
+      summary: Seguir movimientos confirmados del socio autenticado
+      operationId: consultarMisMovimientos
+      x-implementation-status: implemented
+      x-roles-actuales: [USUARIO]
+      description: La primera consulta devuelve la marca temporal del servidor y una lista vacía. Las siguientes devuelven hasta 12 movimientos propios capturados después de esa marca. Un movimiento offline aparece una vez reconciliado.
+      parameters:
+      - name: inicio
+        in: query
+        description: Marca temporal devuelta al abrir el seguimiento. Debe estar dentro de las últimas dos horas.
+        schema: {type: string, format: date-time}
+      responses:
+        '200':
+          description: Marca temporal y movimientos del socio autenticado.
+          headers:
+            Cache-Control:
+              schema: {type: string, example: no-store}
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [inicio, movimientos]
+                properties:
+                  inicio: {type: string, format: date-time}
+                  movimientos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MovimientoAcceso'
+        '400':
+          $ref: '#/components/responses/Validacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
   /accesos:
     get:
       tags:
@@ -3849,6 +3911,18 @@ components:
       x-contract-status: draft
       description: Schema de trabajo draft. Campos, variantes y valores funcionales son propuestas, no requisitos
         cerrados; x-propuesta-required/valores preserva el diseño previo para revisión. Los ejemplos no fijan políticas.
+    MovimientoAcceso:
+      type: object
+      required: [accesoId, tipo, sede, instante]
+      properties:
+        accesoId: {type: integer}
+        tipo: {type: string, enum: [INGRESO, EGRESO]}
+        sede: {type: string}
+        instante: {type: string, format: date-time}
+        titular:
+          type: string
+          nullable: true
+          description: Nombre visible solo en la consulta de la sede.
     Aforo:
       type: object
       description: |-

@@ -11,16 +11,24 @@ export default function useAforoSede(sedeId) {
 
   const refrescar = useCallback((forzar = false) => {
     if (!sedeId || !montado.current) return Promise.resolve();
-    // Después de un movimiento, una lectura anterior no debe restaurar el aforo viejo.
-    if (forzar) { revision.current++; pendiente.current = null; }
-    if (pendiente.current) return pendiente.current;
+    const enCurso = pendiente.current;
+    if (enCurso) {
+      if (forzar && !enCurso.siguiente) {
+        // Descartar la lectura previa al movimiento y compartir una sola consulta posterior.
+        const version = ++revision.current;
+        enCurso.siguiente = enCurso.consulta.then(() => {
+          if (montado.current && version === revision.current) return refrescar();
+        });
+      }
+      return enCurso.siguiente ?? enCurso.consulta;
+    }
     const version = revision.current;
     setAforo((actual) => ({ ...actual, estado: actual.datos ? actual.estado : 'cargando', actualizando: true }));
     const consulta = consultarAforo(sedeId).then(
       (datos) => { if (montado.current && version === revision.current) setAforo({ sedeId, estado: 'cargado', datos, actualizando: false }); },
       () => { if (montado.current && version === revision.current) setAforo((actual) => ({ ...actual, estado: 'error', actualizando: false })); },
-    ).finally(() => { if (pendiente.current === consulta) pendiente.current = null; });
-    pendiente.current = consulta;
+    ).finally(() => { if (pendiente.current?.consulta === consulta) pendiente.current = null; });
+    pendiente.current = { consulta };
     return consulta;
   }, [sedeId]);
 

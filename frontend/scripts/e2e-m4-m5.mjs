@@ -171,8 +171,7 @@ try {
  const rp=await contextoRecepcion.newPage();
  terminalPage=rp;
  await iniciarSesion(rp,recepcion,'/recepcion/acceso');
- await rp.getByRole('link',{name:'Aforo',exact:true}).click();
- await expect(rp).toHaveURL(base+'/recepcion/aforo');
+ await expect(rp.locator('#aforo')).toBeVisible();
  await rp.getByRole('link',{name:'Clases',exact:true}).click();
  const selectorSedeRecepcion=rp.locator('.agenda-filtros select');
  await expect(selectorSedeRecepcion).toBeDisabled();

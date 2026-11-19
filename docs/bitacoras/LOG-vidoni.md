@@ -228,3 +228,58 @@ local; mantuve la fecha local de esta actividad y los timestamps originales del 
 | Commits | `b2a5252` — integración original de Ignacio, incorporada por `34a265c`. `ae995c1` — flujo de Canchas/Pagos. `bee31c1` — consulta de clases por fecha y sede. `541696a` — renovación y resumen de pagos de membresía. `888669a` — Mis reservas, agenda, retención demorada y E2E. |
 | Pendientes | Revisión del PR por otro integrante, coordinación del ingreso por reserva con M2 y consolidación de la evidencia en el dossier del equipo. |
 | Horas efectivas | Pendientes de confirmación. |
+
+### 18/11/2026 — verificación de la contingencia de Recepción
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Cierre de M2. Numeración pendiente de confirmación. |
+| Actividad | Revisé lector online y terminal offline contra RF-03 a RF-05, RN-01 y RNF-01. Trabajé desde `origin/main` `8e0ba85` en `feat/cierre-m2-recepcion`. |
+| Problema y decisión | El estado del último sondeo podía quedar obsoleto. Distinguí sesión requerida, caída de red y respuesta HTTP no verificada. La captura consulta de nuevo antes de guardar. Si un envío central queda incierto, la pantalla pide verificar el movimiento antes de cargarlo otra vez. |
+| Pruebas | Pasaron seis suites frontend y el build PWA. Chrome con Spring/PostgreSQL descartables comprobó corte real, QR rotativo, reapertura, ACK perdido y replay sin duplicados. Las respuestas 403 y 503 se inyectaron en el proxy y conservaron la cola. [Alcance y evidencias](../m2-cierre/alcance-decisiones-recepcion.md) |
+| Commits | `584a469` — clasificación de conexión, protección de captura y pruebas. |
+| Pendientes | Validar el recorrido con Recepción, escaneo físico y decisión de equipo sobre reconciliación de resultados online desconocidos. |
+| Horas efectivas | Pendientes de confirmación. |
+
+## Sprint pendiente de confirmar — Unidad Cierre — Semana del 2026-11-16
+
+### 2026-11-19 · Horas efectivas pendientes de confirmar
+
+**Actividad**
+
+Completé la integración y revisión del portal Cliente/Socio con Canchas y
+Pagos. El PR #3 quedó incorporado a `main` mediante `a2396a8`, con el aporte
+original de Ignacio (`b2a5252`) conservado. Para cerrar Recepción, revisé
+el alcance por sede y probé personalmente el recorrido con notebook
+como socio y celular como recepcionista. Confirmé escaneo, ingreso, egreso,
+aforo y avisos en ambas sesiones.
+
+**Decisión**
+
+Concentré el flujo en un lector por cámara y un panel común para los
+modos online y offline. Conservé la diferencia entre movimiento provisional
+y confirmado, la cola persistente y los permisos del operador. Registré
+el alcance y la evidencia para manuales, ADR y dossier en la
+[documentación de M2](../m2-cierre/alcance-decisiones-recepcion.md).
+
+**Problema o bloqueo**
+
+El login local y el HTTPS usaban bases distintas. Verifiqué las cuentas
+ficticias y usé el mismo origen HTTPS en ambos dispositivos. Al cerrar
+la demo, detuve el proxy y el backend y pausé el PostgreSQL temporal
+para conservar la base montada en memoria.
+
+**Verificación**
+
+En el candidato funcional pasaron 72 pruebas focalizadas con PostgreSQL,
+las suites frontend y el E2E con cámara virtual y backend real. Mi
+aceptación física respalda el escaneo con la cámara del celular.
+Para el cierre verifiqué el build PWA, el empaquetado Java 21 y el diff,
+sin repetir el E2E.
+
+**Commits**
+
+`a2396a8` integración del PR #3 · `584a469` sonda de conectividad ·
+`ecc56bc` documentación de contingencia · `8caa37e` incorporación del
+portal a la rama de M2 · `f0d6c67` lector, avisos y contingencia ·
+`ad2e0d1` operación y evidencias · `880a843` flujo final de escaneo.
