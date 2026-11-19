@@ -7,7 +7,7 @@ Sistema de gestión para FitZone Sports: membresías, clases grupales, reservas 
 ## Stack
 
 - **Backend:** Java 21 + Spring Boot 4.1.1 (Maven), PostgreSQL, Flyway, Spring Data JPA, Spring Security + JWT
-- **Frontend:** React + Vite + React Router; Cliente/Socio, Recepción y Gerencia integrados según el soporte real de la API. Clases, Canchas y Reportes tienen frontend preparado y backend pendiente, con estados explícitos de no disponibilidad.
+- **Frontend:** React + Vite + React Router; portal del Socio y consolas de Recepción y Gerencia conectados a la API. Clases, Canchas, Pagos y Reportes están implementados; el registro de asistencia a clases sigue pendiente (la API devuelve `501`).
 - **Arquitectura:** Monolito Modular (ADR-001), organizado por módulo de dominio (`auth`, `usuario`, `sede`, `membresia`, `acceso`, `clase`, `reserva`, `pago`, `reporte`). La presencia de un módulo no implica que su backend esté terminado.
 
 Entrega de la rama `feature/integracion-final-frontend`: [alcance, decisiones, pruebas y pendientes](docs/integracion-final-frontend.md).
@@ -154,7 +154,7 @@ El login, el registro y los flujos integrados usan la API. Vite redirige `/api` 
 - **M2.** QR dinámico para socios habilitados, ingresos, egresos y aforo. En contingencia, Recepción necesita un terminal aprovisionado. Si el socio pierde su conexión, necesita un lote de QR vigente guardado en su navegador. [Guía M2 offline](docs/m2-offline.md)
 - **M3.** Agenda por sede, reservas y cancelaciones, inscripción voluntaria en lista de espera y ofertas visibles en «Mis clases». El aviso externo se simula por log. Asistencia y aplicación de penalidades siguen pendientes.
 
-En Canchas se puede elegir sede, cancha y turno, confirmar el pago simulado y consultar o cancelar reservas. Mis pagos reúne cobros de canchas y membresías y permite descargar los comprobantes emitidos. La administración conecta tarifas, turnos y mantenimiento según el rol. Los reportes consolidados siguen pendientes. [Guía de integración M4/M5](docs/integracion-canchas-pagos.md)
+En Canchas se puede elegir sede, cancha y turno, confirmar el pago simulado y consultar o cancelar reservas. Mis pagos reúne cobros de canchas y membresías y permite descargar los comprobantes emitidos. La administración conecta tarifas, turnos y mantenimiento según el rol. Gerencia dispone de reportes consolidados de cobros, devoluciones y accesos, por período y por sede. [Guía de integración M4/M5](docs/integracion-canchas-pagos.md)
 
 Para verificar la compilación del frontend, desde `frontend/`:
 
@@ -332,8 +332,8 @@ Reglas de `sede`: cualquier rol autenticado lista las sedes; solo el gerente cre
 | pago | GET | `/pagos/{pagoId}` | S, C, G | consultarPago |
 | pago | GET | `/pagos` | G | listarPagos |
 | pago | POST | `/pagos/{pagoId}/reembolsos` | S, C, G | solicitarReembolso |
-| reporte | GET | `/reportes/ocupacion` | G | Pendiente (`501`) |
-| reporte | GET | `/reportes/ingresos` | G | Pendiente (`501`) |
+| reporte | GET | `/reportes/ocupacion` | G | consultarReporteOcupacion |
+| reporte | GET | `/reportes/ingresos` | G | consultarReporteIngresos |
 
 La autenticación y el registro públicos usan `POST /auth/login` y `POST /auth/register`. La vista de Clases usa la API para agenda, reservas y ofertas. La pantalla de comprobantes usa el historial de membresías. Para reservas de cancha, la API expone creación, consulta, comprobante y reembolso de pagos según la operación y el rol.
 
@@ -442,7 +442,7 @@ reserva y pago; nunca enviar importes desde el cliente.
 - Contrato objetivo API v1: [OpenAPI](docs/openapi/openapi.yaml)
 - Exportación JSON para Swagger UI: [swagger.json](src/main/resources/fitzone-api-docs/swagger.json)
 - Decisiones del contrato: [Evidencia y decisiones pendientes](docs/openapi/DECISIONES.md)
-- [Índice de arquitectura, ADR y diagramas](docs/arquitectura-tif.md) · [Manual Técnico](docs/manuales/manual-tecnico.md) · [Instalación y Operación](docs/manuales/manual-instalacion-operacion.md) · [Planificación](docs/planificacion/planificacion-seguimiento-tif.md).
+- [Índice de arquitectura, ADR y diagramas](docs/arquitectura-tif.md) · [Manual de usuario (PDF)](docs/manuales/manual-usuario.pdf) · [Manual Técnico](docs/manuales/manual-tecnico.md) · [Instalación y Operación](docs/manuales/manual-instalacion-operacion.md) · [Planificación](docs/planificacion/planificacion-seguimiento-tif.md).
 - Los manuales y la planificación indican su corte documental. Para el alcance incorporado después de ese corte, consultá las [guías de Canchas y Pagos](#canchas-y-pagos-de-reservas-m4m5).
 - Bitácoras del equipo: `docs/bitacoras/`
 
@@ -464,7 +464,8 @@ python scripts/exportar-openapi.py --check
 
 ## Asistencia de IA
 
-Se utilizó Codex como asistencia para auditar y revisar la documentación de cierre del TIF y elaborar los diagramas de despliegue y del pipeline CI/CD. Cualquier alcance adicional del uso de IA en el proyecto queda pendiente de confirmación por el equipo.
+- **Codex** se utilizó como asistencia para auditar y revisar la documentación de cierre del TIF y elaborar los diagramas de despliegue y del pipeline CI/CD.
+- **Claude** (Anthropic) se utilizó como asistencia para la redacción de los logs de bitácora y para el armado del PDF del manual de usuario, incluidas sus capturas de pantalla.
 
 ## Dominio Cliente/Socio y comprobantes
 
