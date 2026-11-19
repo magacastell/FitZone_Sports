@@ -215,3 +215,15 @@ local; mantuve la fecha local de esta actividad y los timestamps originales del 
 | Commits | 4da0a00 — autorizaciones verificables y V14; 769cafc — QR automático y actualización del terminal. Pruebas E2E y documentación acompañan esta entrada en el commit de cierre. |
 | Pendientes | Revisión antes de integrar/publicar. Reaprovisionar terminales a versión 2; mantener clave persistente y aplicar el procedimiento de rotación con pendientes conciliados. ADR-003/007 pendientes de preparación grupal, sin renumeración unilateral. |
 | Horas efectivas | Pendientes de confirmación. |
+
+### 18/11/2026 — verificación de la contingencia de Recepción
+
+| Campo | Registro |
+|---|---|
+| Sprint y unidad | Cierre de M2. Numeración pendiente de confirmación. |
+| Actividad | Revisé lector online y terminal offline contra RF-03 a RF-05, RN-01 y RNF-01. Trabajé desde `origin/main` `8e0ba85` en `feat/cierre-m2-recepcion`. |
+| Problema y decisión | El estado del último sondeo podía quedar obsoleto. Distinguí sesión requerida, caída de red y respuesta HTTP no verificada. La captura consulta de nuevo antes de guardar. Si un envío central queda incierto, la pantalla pide verificar el movimiento antes de cargarlo otra vez. |
+| Pruebas | Pasaron seis suites frontend y el build PWA. Chrome con Spring/PostgreSQL descartables comprobó corte real, QR rotativo, reapertura, ACK perdido y replay sin duplicados. Las respuestas 403 y 503 se inyectaron en el proxy y conservaron la cola. [Alcance y evidencias](../m2-cierre/alcance-decisiones-recepcion.md) |
+| Commits | `584a469` — clasificación de conexión, protección de captura y pruebas. |
+| Pendientes | Validar el recorrido con Recepción, escaneo físico y decisión de equipo sobre reconciliación de resultados online desconocidos. |
+| Horas efectivas | Pendientes de confirmación. |
