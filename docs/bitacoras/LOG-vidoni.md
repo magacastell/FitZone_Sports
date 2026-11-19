@@ -240,3 +240,46 @@ local; mantuve la fecha local de esta actividad y los timestamps originales del 
 | Commits | `584a469` — clasificación de conexión, protección de captura y pruebas. |
 | Pendientes | Validar el recorrido con Recepción, escaneo físico y decisión de equipo sobre reconciliación de resultados online desconocidos. |
 | Horas efectivas | Pendientes de confirmación. |
+
+## Sprint pendiente de confirmar — Unidad Cierre — Semana del 2026-11-16
+
+### 2026-11-19 · Horas efectivas pendientes de confirmar
+
+**Actividad**
+
+Completé la integración y revisión del portal Cliente/Socio con Canchas y
+Pagos. El PR #3 quedó incorporado a `main` mediante `a2396a8`, con el aporte
+original de Ignacio (`b2a5252`) conservado. Para cerrar Recepción, revisé
+el alcance por sede y probé personalmente el recorrido con notebook
+como socio y celular como recepcionista. Confirmé escaneo, ingreso, egreso,
+aforo y avisos en ambas sesiones.
+
+**Decisión**
+
+Concentré el flujo en un lector por cámara y un panel común para los
+modos online y offline. Conservé la diferencia entre movimiento provisional
+y confirmado, la cola persistente y los permisos del operador. Registré
+el alcance y la evidencia para manuales, ADR y dossier en la
+[documentación de M2](../m2-cierre/alcance-decisiones-recepcion.md).
+
+**Problema o bloqueo**
+
+El login local y el HTTPS usaban bases distintas. Verifiqué las cuentas
+ficticias y usé el mismo origen HTTPS en ambos dispositivos. Al cerrar
+la demo, detuve el proxy y el backend y pausé el PostgreSQL temporal
+para conservar la base montada en memoria.
+
+**Verificación**
+
+En el candidato funcional pasaron 72 pruebas focalizadas con PostgreSQL,
+las suites frontend y el E2E con cámara virtual y backend real. Mi
+aceptación física respalda el escaneo con la cámara del celular.
+Para el cierre verifiqué el build PWA, el empaquetado Java 21 y el diff,
+sin repetir el E2E.
+
+**Commits**
+
+`a2396a8` integración del PR #3 · `584a469` sonda de conectividad ·
+`ecc56bc` documentación de contingencia · `8caa37e` incorporación del
+portal a la rama de M2 · `f0d6c67` lector, avisos y contingencia ·
+`ad2e0d1` operación y evidencias · `880a843` flujo final de escaneo.

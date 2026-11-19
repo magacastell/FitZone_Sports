@@ -117,6 +117,12 @@ un rechazo automático de ingresos por ese umbral.
 
 ### Verificación del flujo final
 
+- **Aceptación funcional de Augusto, 19/11/2026.** Augusto probó el flujo
+  físico con una notebook en sesión de Socio y un celular en sesión de
+  Recepción. Confirmó la lectura del QR con la cámara, el ingreso y egreso,
+  los cambios de aforo y los avisos en ambas sesiones. La evidencia es su
+  confirmación de aceptación. La prueba de corte y resincronización se
+  respalda por separado con el E2E automatizado.
 - El 19/11/2026 pasaron 72 pruebas focalizadas de membresía, acceso offline y
   canchas con PostgreSQL aislado. Pasaron también las seis suites frontend
   (201 casos de dominio), el build PWA y `git diff --check`.
@@ -131,8 +137,11 @@ un rechazo automático de ingresos por ese umbral.
   el backend real.
 - Se verificaron alta de cancha y mantenimiento en sede propia, y los
   rechazos de administración ajena, alta de sede, tarifa global, recargo
-  pico y reportes consolidados para Recepción. El escaneo óptico con dos
-  dispositivos queda pendiente.
+  pico y reportes consolidados para Recepción. El código de este recorrido
+  está en `f0d6c67` y `880a843`.
+- El cierre de integración repitió únicamente el build PWA, el empaquetado
+  backend con Java 21 y `git diff --check`. Se conservó la evidencia de las
+  pruebas anteriores.
 
 ### Evidencia de la integración anterior
 
@@ -154,8 +163,7 @@ un rechazo automático de ingresos por ese umbral.
   Cliente Externo y Gerencia y la navegación de Recepción con aforo integrado.
   Evidencia local en `target/e2e-m4-m5/b715770b-b184-4a82-9b24-a7f3c0ecdc17/resultado.json`.
 - La instancia de prueba por HTTPS respondió con cuentas ficticias de ambos
-  roles. El reconocimiento del QR con la cámara del celular requiere la
-  verificación física.
+  roles. Esa corrida automatizada usó cámara de prueba.
 
 ### Evidencia anterior del cambio de conectividad
 
@@ -190,9 +198,8 @@ utilizaron un teléfono físico ni un lector óptico.
   reenviar al recuperar red y la sesión del operador original.
 - Para producción quedan pendientes una política de protección del equipo y su
   perfil, rotación de claves, resolución operativa de conflictos y medición de
-  disponibilidad. El E2E automatiza la interacción con el escáner utilizando
-  video de prueba y detección inyectada. El escaneo óptico queda pendiente en
-  el celular.
+  disponibilidad. Las dos horas limitan la operación autónoma. El aviso del
+  socio depende de que Mi QR esté abierto y pueda consultar al servidor.
 
 ## Procedimiento operativo y transferencia
 
@@ -226,10 +233,45 @@ utilizaron un teléfono físico ni un lector óptico.
    detecte la conexión y se vacíe la cola. Un HTTP 503 del proxy se conserva
    como error del servidor.
 
-Para el dossier: incorporar el recorrido al manual de usuario, instalación y
-operación. Referenciar la clave persistente y la preparación en el manual
-técnico, la diferencia entre captura y ACK en ADR-003/007 y el flujo de conflicto
-en el diagrama de secuencia. En la matriz vincular los cinco requisitos con
-evidencia fechada y declarar la limitación de RN-01 y la medición pendiente de
-RNF-01. Registrar los commits y las pruebas en la bitácora propia con horas y
-sprint confirmados. Los documentos grupales se consolidan mediante revisión.
+### Entorno local de la demostración
+
+Usar una base PostgreSQL exclusiva de la demo, backend Java 21 con perfil
+`staging` y build PWA. Preparar la clave RSA persistente y el secreto JWT
+mediante [la configuración del módulo](../m2-offline.md#clave-privada-y-continuidad-tras-reiniciar-spring)
+y usar cuentas ficticias. El Socio necesita una membresía vigente y
+Recepción debe estar asignada a la sede de prueba. Servir el build y
+`/api` bajo el mismo origen HTTPS en la LAN, con la CA de prueba
+instalada en ambos dispositivos. En la notebook usada para el ensayo,
+`:5443` redirigía la API a `127.0.0.1:3002` y a la base
+`fitzone_m2_celular`. El entorno de `:5173` apuntaba a una base distinta.
+Las cuentas, el certificado y las claves se conservan localmente fuera de Git.
+
+Al cerrar la demo se detuvieron el proxy/frontend HTTPS y el backend
+`fitzone-m2-celular-api`. Se pausó `fitzone-m2-celular-pg` porque su base
+está en `tmpfs`. Para reutilizarla en la misma sesión de Docker, ejecutar
+`docker unpause fitzone-m2-celular-pg`, iniciar el backend de demo con
+`docker start fitzone-m2-celular-api` y levantar
+`target/m2-prueba-celular/preview.mjs` con Node. Verificá la IP de la LAN y
+la vigencia del certificado antes de abrir ambas sesiones. Para otra
+máquina o tras reiniciar Docker, recrear un entorno descartable y sus
+cuentas de prueba. El montaje temporal no es un respaldo.
+
+### Material para Magali
+
+| Entregable | Material de M2 para incorporar |
+|---|---|
+| Manual de usuario, Anexo D §§3.3–3.4 y 4.1–4.4 | En Mi QR, explicar vigencia, confirmaciones y qué hacer si el código es rechazado. En Recepción, describir Ingreso/Salida, cámara, aforo, sesión y contingencia. Agenda y mantenimiento conservan sus recorridos por sede. |
+| Manual de instalación y operación, Anexo E §8 | HTTPS confiable, sesión de prueba por rol, clave RSA persistente, preparación de una terminal por sede, vencimiento de copia, visualización de pendientes y resolución de ACK perdido. |
+| Manual técnico, Anexo F §6, y ADR-003 | Documentar QR preemitido RS256, validación local y copia acotada en IndexedDB. La validación central exclusiva interrumpe el acceso ante el corte y compartir la clave de firma amplía el riesgo si se compromete una terminal. La verificación con clave pública permite operar provisionalmente hasta la caducidad. Ver [ADR-003](../adr/ADR-003-tif-validacion-qr-offline.md). |
+| ADR-007 | Explicar por qué se eligieron cola persistente, UUID, acuse e inbox central frente a reenvío ciego y resolución por último escritor. Mostrar preservación de conflictos, revocación diferida y límite de RN-01 durante particiones. Ver [ADR-007](../adr/ADR-007-tif-replica-y-reconciliacion.md). |
+| Diagramas | Contrastar [C4 de M2](../diagramas/c4-03-m2.drawio) y [secuencia offline](../diagramas/uml-secuencia-acceso-offline.drawio) con el lector único, la decisión de contingencia, las consultas de avisos y la reconciliación. |
+| Matriz y evidencia del dossier | RF-03 enlaza ingreso fuera de la sede habitual con `MembresiaIntegrationTest` y autorización de un socio fuera del padrón local con el E2E. RF-04 y RF-05 enlazan lector y aforo con aceptación física y E2E. RN-01 enlaza rechazo de duplicados y reconciliación con el límite entre sedes aisladas. RNF-01 enlaza corte y recuperación del E2E sin extrapolar el 99,5 %. Conservar SHA, fecha y resultado del E2E por separado de la aceptación física. |
+
+El código de referencia es [AccesoController](../../src/main/java/com/fitzonesports/acceso/controller/AccesoController.java),
+[ControlAccesoSede](../../frontend/src/modules/m2-acceso/ControlAccesoSede.jsx),
+[TerminalOffline](../../frontend/src/modules/m2-acceso/TerminalOffline.jsx),
+[SocioQRModal](../../frontend/src/modules/m2-acceso/SocioQRModal.jsx) y
+[SincronizacionOfflineService](../../src/main/java/com/fitzonesports/acceso/offline/SincronizacionOfflineService.java).
+Los contratos están en [OpenAPI](../openapi/openapi.yaml). Las referencias
+del cierre son `584a469`, `f0d6c67` y `880a843`. El equipo consolida los
+documentos compartidos a partir de estas referencias.
