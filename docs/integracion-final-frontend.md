@@ -80,7 +80,7 @@ regla. No se reescriben V1–V6. Los cambios Java afectan JWT, anotaciones de se
 de módulos existentes, Usuario y contratación M1; M5 conserva snapshots y mejora
 la emisión PDF sin regenerar bytes ya persistidos. M3/M4 sólo adaptaron authorities,
 no incorporaron servicios de negocio. Detalles en [ADR-007](adr/0007-actores-y-membresia.md),
-[sede habitual](sede-habitual-verificacion.md) y [ciclo](ciclo-vida-membresia-verificacion.md).
+[sede habitual](membresias.md#sede-habitual-y-origen-del-alta-v8) y [ciclo](membresias.md#ciclo-de-vida-y-presentación-personal).
 
 ## 4. Experiencias implementadas y preparadas
 
@@ -137,8 +137,8 @@ aporte Git; no son requisitos del runtime ni se publican.
   pasarela remota/reconciliación durable y demás decisiones draft siguen pendientes.
 
 Fuentes sin duplicar contratos: [membresías](membresias.md),
-[Recepción/M2](m2-recepcion.md), [M3/M4](m3-m4-frontend.md),
-[Gerencia](gerencia-central-frontend.md), [guía UI](frontend-ui-guidelines.md),
+[Recepción/M2](m2-recepcion.md), [M3/M4](manuales/manual-tecnico.md#m3--clases-grupales),
+[Gerencia](bitacoras/Cejas-LOG.md#claudio--18112026), [guía UI](frontend-ui-guidelines.md),
 [OpenAPI](openapi/openapi.yaml) y [decisiones](openapi/DECISIONES.md).
 Los informes de verificación y la bitácora conservan resultados de cada corte;
 «sin commit» o «pendiente» en esos registros no describe el estado final de esta entrega.
