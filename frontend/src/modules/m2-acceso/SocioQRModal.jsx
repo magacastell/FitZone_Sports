@@ -41,6 +41,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
     const sesion = localStorage.getItem('token');
     const peticion = new AbortController();
     const vistos = new Set();
+    const vencimientos = new Set();
     let inicio;
     let timer;
     async function consultar() {
@@ -55,7 +56,14 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
           vistos.add(id);
           return true;
         });
-        if (nuevos.length) setAvisos(actual => [...nuevos, ...actual].slice(0, 4));
+        if (nuevos.length) {
+          setAvisos(actual => [...nuevos, ...actual].slice(0, 4));
+          const vencimiento = setTimeout(() => {
+            vencimientos.delete(vencimiento);
+            setAvisos(actual => actual.filter(aviso => !nuevos.includes(aviso)));
+          }, 4000);
+          vencimientos.add(vencimiento);
+        }
       } catch (error) {
         if ([400, 401, 403].includes(error.status)) return;
       }
@@ -65,6 +73,7 @@ export default function SocioQRModal({ isOpen, onClose, onAccesoDenegado }) {
     return () => {
       peticion.abort();
       clearTimeout(timer);
+      vencimientos.forEach(clearTimeout);
     };
   }, [isOpen]);
 

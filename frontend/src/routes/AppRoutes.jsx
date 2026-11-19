@@ -19,9 +19,7 @@ import GestionPlanes from '../modules/m1-usuarios/GestionPlanes';
 import Gerencia from '../modules/gerencia/Gerencia';
 
 import ControlAccesoSede from '../modules/m2-acceso/ControlAccesoSede';
-import AforoSede from '../modules/m2-acceso/AforoSede';
 import SocioQRModal from '../modules/m2-acceso/SocioQRModal';
-import TerminalOffline from '../modules/m2-acceso/TerminalOffline';
 import QrOffline from '../modules/m2-acceso/QrOffline';
 
 import AgendaClases from '../modules/m3-clases/AgendaClases';
@@ -136,15 +134,7 @@ export default function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegisterPage />} />
 
-        {/* El flujo offline no depende del Layout remoto. */}
-        <Route
-          path="/terminal-offline"
-          element={
-            <main className="fitzone-ui">
-              <TerminalOffline autonomo />
-            </main>
-          }
-        />
+        <Route path="/terminal-offline" element={<Navigate to="/recepcion/acceso" replace />} />
         <Route path="/qr-offline" element={<QrOffline />} />
 
         <Route element={<ProtectedRoute />}>
@@ -170,7 +160,7 @@ export default function AppRoutes() {
             <Route path="pagos" element={<HistorialPagos />} />
 
             <Route path="recepcion/acceso" element={<ControlAccesoSede />} />
-            <Route path="recepcion/aforo" element={<AforoSede />} />
+            <Route path="recepcion/aforo" element={<Navigate to="/recepcion/acceso" replace />} />
 
             <Route path="admin/canchas" element={<AdministracionCanchas />} />
             <Route

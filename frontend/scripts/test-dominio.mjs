@@ -11,7 +11,6 @@ const sources = {
  reservasM4:'src/modules/m4-canchas/ReservasCanchas.jsx',
  avatar:'src/components/ui/FitZoneUI.jsx',
  servicios:'src/components/ServiciosSede.jsx',
- aforoLocal:'src/modules/m2-acceso/AforoSede.jsx',
  gerente:'src/modules/gerencia/Gerencia.jsx',
  layout:'src/components/Layout.jsx', perfil:'src/modules/m1-usuarios/MembresiaUsuario.jsx',contrato:'src/modules/m1-usuarios/ContratacionMembresia.jsx',cuenta:'src/modules/m1-usuarios/PerfilUsuario.jsx',renew:'src/modules/m1-usuarios/RenovacionMembresia.jsx',
  route:'src/routes/AppRoutes.jsx', qr:'src/modules/m2-acceso/SocioQRModal.jsx', login:'src/modules/auth/LoginPage.jsx', register:'src/modules/auth/RegisterPage.jsx', protected:'src/components/ProtectedRoute.jsx', receipts:'src/modules/m5-pagos/HistorialComprobante.jsx', recepcion:'src/modules/m2-acceso/ControlAccesoSede.jsx', lector:'src/modules/m2-acceso/LectorAcceso.jsx'
@@ -107,6 +106,7 @@ async function runner(name,e,props={},target='default'){
   if(spec.includes('services/api'))return synthetic({fetchAPI:(...a)=>{const d=deferred();d.args=a;e.qrs.push(d);return d.promise;}},context);
   if(spec==='qrcode.react')return synthetic({QRCodeSVG:p=>jsx('qr-svg',p)},context);
   if(spec==='lucide-react')return synthetic(Object.fromEntries(['CalendarDays','ChartColumn','DoorOpen','Dumbbell','LayoutGrid','LogOut','QrCode','ReceiptText','UserRound','Wrench','List','Menu','X','ShieldCheck','Mail','Fingerprint','MapPin','FileText','ArrowRight','ArrowDownToLine','ArrowUpFromLine','CheckCircle2','Clock3','ScanLine','XCircle','Users','RefreshCw','CreditCard','Check','Plus','Wallet','AlertCircle'].map(k=>[k,()=>jsx('svg',{})])),context);
+  if(spec.endsWith('EscanerQr'))return synthetic({default:p=>jsx('escaner-qr',p)},context);
   if(spec.endsWith('LectorAcceso'))return synthetic({default:p=>{e.lectorProps=p;return jsx('lector',p);}},context);
  if(spec.endsWith('TerminalOffline'))return synthetic({default:p=>p.lector?.(undefined,{})},context);
   if(spec.endsWith('useAforoSede')||spec.endsWith('TarjetaAforo')){
@@ -458,14 +458,15 @@ async function puesto(rol='RECEPCIONISTA'){
 const aforoDto=(n=0,sedeId=12)=>({sedeId,ocupacionActual:n,capacidadMaxima:10,calculadoEn:'2026-10-30T12:00:00-03:00'});
 await test('Recepcion usa sede de perfil, no selector ni membresia ni sedes globales',async()=>{
  const {e,r}=await puesto();assert.equal(e.sedes.length,0);assert.equal(e.members.length,0);assert.equal(e.aforos[0].args[0],12);
- assert.equal(nodes(r.view,n=>n.type==='select').length,0);assert(text(r.view).includes('Sede real'));assert.equal(e.lectorProps.esGerente,false);
+ assert.equal(nodes(r.view,n=>n.type==='select').length,0);assert(text(r.view).includes('Sede real'));assert.equal(e.lectorProps.sedeNombre,'Sede real');
 });
 await test('Gerente conserva seleccion existente, nueva sede descarta aforo anterior',async()=>{
  const {e,r}=await puesto('GERENTE');e.aforos[0].resolve(aforoDto(7));await settle(e);
  nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'13'}});r.render();
  assert.equal(nodes(r.view,n=>n.props?.role==='progressbar').length,0,'No exponer aforo de sede anterior ni un render');await settle(e);
  assert.equal(e.aforos[1].args[0],13);assert.equal(nodes(r.view,n=>n.props?.role==='progressbar').length,0);
- e.aforos[1].resolve(aforoDto(2,13));await settle(e);assert.equal(e.lectorProps.sedeId,13);
+ e.aforos[1].resolve(aforoDto(2,13));await settle(e);
+ assert.equal(e.lectorProps.sedeNombre,nodes(r.view,n=>n.type==='option'&&Number(n.props.value)===13)[0].props.children);
 });
 await test('Recepcion error de perfil recuperable y desmontaje ignora respuesta',async()=>{
  const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('recepcion',e,{},'PuestoAcceso');e.profiles[0].reject(err(500));await settle(e);
@@ -482,7 +483,8 @@ await test('Aforo error inicial sin cero ficticio; retry muestra respuesta real'
 });
 await test('Aforo polling sin duplicar; POST invalida lectura vieja; error retiene dato marcado',async()=>{
  const {e,r}=await puesto();e.aforos[0].resolve(aforoDto(0));await settle(e);e.poll();e.poll();assert.equal(e.aforos.length,2);
- e.lectorProps.onMovimiento();assert.equal(e.aforos.length,3);e.aforos[2].resolve(aforoDto(1));await settle(e);e.aforos[1].resolve(aforoDto(0));await settle(e);
+ e.lectorProps.onMovimiento();e.lectorProps.onMovimiento();assert.equal(e.aforos.length,2);e.aforos[1].resolve(aforoDto(0));await settle(e);
+ assert.equal(e.aforos.length,3);e.aforos[2].resolve(aforoDto(1));await settle(e);
  assert.equal(nodes(r.view,n=>n.props.role==='progressbar')[0].props['aria-valuenow'],10);
  e.poll();e.aforos[3].reject(err(undefined));await settle(e);assert(text(r.view).includes('último dato disponible'));assert(text(r.view).includes('SIN ACTUALIZAR'));
  r.unmount();assert.equal(e.clearedIntervals,1);
@@ -493,32 +495,43 @@ await test('Aforo desmontado no escribe, StrictMode descarta consulta previa',as
  x.profiles[0].resolve({sedeId:99,sedeNombre:'Vieja'});x.profiles[1].resolve({sedeId:12,sedeNombre:'Actual'});await settle(x);assert.equal(x.aforos[0].args[0],12);
 });
 const accesoDto={id:88,sedeId:12,ingreso:'2026-10-30T12:00:00-03:00',salida:'2026-10-30T12:05:00-03:00',titular:{nombre:'Titular real',apellido:'Prueba'}};
-async function lector(){const e=env();e.refrescos=0;const r=await runner('lector',e,{sedeId:12,sedeNombre:'Sede real',esGerente:false,onMovimiento:()=>e.refrescos++});return{e,r};}
-function escanear(r,valor='Aa.Qr-Sensible'){nodes(r.view,n=>n.type==='input')[0].props.onChange({target:{value:valor}});r.render();return nodes(r.view,n=>n.type==='form')[0].props.onSubmit;}
-await test('Lector Enter/form preserva QR, bloqueo ref inmediato, limpia y recupera foco',async()=>{
- const {e,r}=await lector(),submit=escanear(r,'  Aa.Qr-Sensible  '),p=submit({preventDefault(){}});submit({preventDefault(){}});
- assert.equal(e.ingresos.length,1);assert.equal(e.ingresos[0].args[0],'Aa.Qr-Sensible');assert.equal(e.ingresos[0].args[1],undefined);
+async function lector(){const e=env();e.refrescos=0;const r=await runner('lector',e,{sedeNombre:'Sede real',onMovimiento:()=>e.refrescos++,procesarMovimiento:async(_tipo,_lectura,enLinea)=>({acceso:await enLinea()})});return{e,r};}
+function abrirEscaner(r){
+ button(r,'Escanear QR').props.onClick();r.render();
+ return nodes(r.view,n=>n.type==='escaner-qr')[0].props;
+}
+const escanear=(r,valor='Aa.Qr-Sensible')=>abrirEscaner(r).onLeer(valor);
+await test('Cámara envía sólo una vez y el aviso desaparece a los cuatro segundos',async()=>{
+ const {e,r}=await lector();
+ assert.equal(nodes(r.view,n=>['input','select','form'].includes(n.type)).length,0);
+ const {onLeer}=abrirEscaner(r),p=onLeer('  Aa.Qr-Sensible  ');onLeer('Aa.Qr-Sensible');
+ assert.deepEqual(e.ingresos[0].args,['Aa.Qr-Sensible']);assert.equal(e.ingresos.length,1);
  button(r,'Salida').props.onClick();r.render();assert.equal(button(r,'Ingreso').props['aria-pressed'],true);
- e.ingresos[0].resolve(accesoDto);await p;await settle(e);assert.equal(e.refrescos,1);assert(text(r.view).includes('Acceso autorizado'));assert(text(r.view).includes('Titular real'));assert(e.focos>=2);
- assert.equal(nodes(r.view,n=>n.type==='input')[0].props.value,'');
+ e.ingresos[0].resolve(accesoDto);await p;await settle(e);assert.equal(e.refrescos,1);
+ assert(text(r.view).includes('Ingreso autorizado'));assert(text(r.view).includes('Titular real'));
+ const aviso=[...e.timers.values()].find(t=>t.ms===4000);assert(aviso);aviso.fn();await settle(e);
+ assert(!text(r.view).includes('Ingreso autorizado'));assert.equal(button(r,'Escanear QR').props.disabled,false);
 });
-await test('Salida usa operacion real, no ingreso; cambio de modo limpia lectura y resultado',async()=>{
- const {e,r}=await lector();escanear(r);button(r,'Salida').props.onClick();r.render();assert.equal(nodes(r.view,n=>n.type==='input')[0].props.value,'');
- const p=escanear(r)( {preventDefault(){}});assert.equal(e.ingresos.length,0);assert.equal(e.salidas.length,1);e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).includes('Salida registrada'));assert.equal(e.refrescos,1);
+await test('La cámara cerrada ignora lecturas tardías y Salida envía el QR por el circuito de egreso',async()=>{
+ const {e,r}=await lector();const anterior=abrirEscaner(r);anterior.onCerrar();r.render();
+ button(r,'Salida').props.onClick();r.render();const actual=abrirEscaner(r);
+ anterior.onLeer('QR de la cámara anterior');assert.equal(e.salidas.length,0);
+ const p=actual.onLeer('Aa.Qr-Sensible');assert.equal(e.ingresos.length,0);assert.deepEqual(e.salidas[0].args,['Aa.Qr-Sensible']);
+ e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).includes('Salida registrada'));assert.equal(e.refrescos,1);
 });
 for(const status of [400,403,404,409,500,undefined])await test('Lector rechazo/error '+(status??'red')+' sin exito ni optimismo',async()=>{
- const {e,r}=await lector();const p=escanear(r)({preventDefault(){}});const error=err(status,'stack tecnico');if(status===409)error.data={detail:'El QR venció: pedí uno nuevo'};
- e.ingresos[0].reject(error);await p;await settle(e);assert(!text(r.view).includes('stack tecnico'));assert(!text(r.view).includes('Acceso autorizado'));assert(nodes(r.view,n=>n.props.role==='alert').length);
+ const {e,r}=await lector();const p=escanear(r);const error=err(status,'stack tecnico');if(status===409)error.data={detail:'El QR venció: pedí uno nuevo'};
+ e.ingresos[0].reject(error);await p;await settle(e);assert(!text(r.view).includes('stack tecnico'));assert(!text(r.view).includes('Ingreso autorizado'));assert(nodes(r.view,n=>n.props.role==='alert').length);
  assert.equal(e.refrescos,!status||status>=500?1:0);if(status===409)assert(text(r.view).includes('El QR venció'));
- assert.equal(button(r,'Ingreso').props.disabled,false);
+ assert(!button(r,'Ingreso').props.disabled);
 });
 await test('Lector desmontado ignora resultado/callback; nueva sesion inicia limpia',async()=>{
- const {e,r}=await lector();const p=escanear(r)({preventDefault(){}}),writes=r.writes;r.unmount();e.ingresos[0].resolve(accesoDto);await p;assert.equal(r.writes,writes);assert.equal(e.refrescos,0);
- const next=await runner('lector',e,{sedeId:13,sedeNombre:'Otra cuenta',onMovimiento(){}});assert(!text(next.view).includes('Titular real'));assert.equal(nodes(next.view,n=>n.type==='input')[0].props.value,'');
+ const {e,r}=await lector();const p=escanear(r),writes=r.writes;r.unmount();e.ingresos[0].resolve(accesoDto);await p;assert.equal(r.writes,writes);assert.equal(e.refrescos,0);
+ const next=await runner('lector',e,{sedeId:13,sedeNombre:'Otra cuenta',onMovimiento(){}});assert(!text(next.view).includes('Titular real'));assert.equal(nodes(next.view,n=>n.type==='input').length,0);
 });
 await test('Recepcion token nuevo remonta contexto sin sede/datos previos',async()=>{
  const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('recepcion',e);assert.equal(r.tree.key,'sesion-A');r.unmount();e.token='sesion-B';
- const next=await runner('recepcion',e);assert.equal(next.tree.key,'sesion-B');assert.equal(e.lectorProps.sedeId,undefined);assert.equal(e.lectorProps.bloqueado,true);assert(text(next.view).includes('Consultando tu sede'));
+ const next=await runner('recepcion',e);assert.equal(next.tree.key,'sesion-B');assert.equal(e.lectorProps.sedeNombre,undefined);assert.equal(e.lectorProps.bloqueado,true);assert(text(next.view).includes('Consultando tu sede'));
 });
 
 
@@ -700,12 +713,6 @@ await test('Cliente Canchas elige sede explicitamente sin fabricar recursos ni p
 for(const clases of [true,false])await test('Catalogo '+clases+' vacio real y respuesta ajena no se confunden con 501',async()=>{
  const e=env();e.shared={puedeAbrirQr:true,membresia:{estado:'cargada',datos:dto()}};const r=await runner('servicios',e,{clases},'VistaServicios');e.profiles[0].resolve({sedeId:12});e.sedes[0].resolve([{id:12,nombre:'Real'}]);await settle(e);e.actividades[0].resolve(clases?{items:[]}:[]);await settle(e);assert(text(r.view).includes('Sin resultados'));
  button(r,'Actualizar consulta').props.onClick();await settle(e);e.actividades[1].resolve(clases?{items:[{id:1,sedeId:99}]}:[{id:1,sedeId:99}]);await settle(e);assert(text(r.view).includes('no corresponde'));assert(!text(r.view).includes('Sin resultados'));
-});
-await test('Aforo separado conserva sede real y transporte M2 existente',async()=>{
- const e=env();e.user.rol='RECEPCIONISTA';const r=await runner('aforoLocal',e,{},'AforoLocal');e.profiles[0].resolve({sedeId:28,sedeNombre:'Sede operativa'});await settle(e);assert.equal(e.aforos[0].args[0],28);e.aforos[0].resolve({sedeId:28,ocupacionActual:2,capacidadMaxima:20,calculadoEn:'2026-10-30T12:00:00-03:00'});await settle(e);assert(text(r.view).includes('Sede operativa'));assert(text(r.view).includes('2'));r.unmount();
-});
-await test('Aforo separado no se ofrece por URL a usuario comercial',async()=>{
- const e=env();const r=await runner('aforoLocal',e);assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,'/perfil');assert.equal(e.profiles.length,0);
 });
 for(const rol of ['USUARIO','RECEPCIONISTA'])await test('Gerencia guard rechaza '+rol,async()=>{
  const e=env();e.user.rol=rol;const r=await runner('gerente',e);assert.equal(nodes(r.view,n=>n.type==='navigate')[0].props.to,'/perfil');assert.equal(e.gerencia,undefined);
@@ -922,30 +929,24 @@ await test('avatar usa blob autenticado, revoca recurso y no carga URLs externas
 });
 
 await test('Foto del titular proviene del movimiento; error de imagen y nuevo escaneo limpian el resultado',async()=>{
- const {e,r}=await lector();const foto='data:image/png;base64,AQID';let p=escanear(r)({preventDefault(){}});
+ const {e,r}=await lector();const foto='data:image/png;base64,AQID';let p=escanear(r);
  e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto}});await p;await settle(e);
  let imagen=nodes(r.view,n=>n.type==='img')[0];assert.equal(imagen.props.src,foto);assert(text(r.view).includes('Titular real'));
  imagen.props.onError();await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
- p=escanear(r)({preventDefault(){}});e.ingresos[1].resolve({...accesoDto,titular:{...accesoDto.titular,foto:'data:image/jpeg;base64,AQID'}});await p;await settle(e);
+ p=escanear(r);e.ingresos[1].resolve({...accesoDto,titular:{...accesoDto.titular,foto:'data:image/jpeg;base64,AQID'}});await p;await settle(e);
  assert.equal(nodes(r.view,n=>n.type==='img').length,1);button(r,'Salida').props.onClick();await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
 });
 await test('Lector no carga rutas propias ni imágenes externas de referencias históricas',async()=>{
  for(const foto of [null,'/usuarios/me/foto?version=anterior','https://foto.example.test/a.png','data:image/svg+xml;base64,AQID']){
- const {e,r}=await lector();const p=escanear(r)({preventDefault(){}});e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto}});await p;await settle(e);
+ const {e,r}=await lector();const p=escanear(r);e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto}});await p;await settle(e);
  assert.equal(nodes(r.view,n=>n.type==='img').length,0);assert(text(r.view).includes('Titular real'));
  }
 });
 await test('Rechazo después de foto válida no conserva la imagen de la persona anterior',async()=>{
- const {e,r}=await lector();let p=escanear(r)({preventDefault(){}});e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto:'data:image/png;base64,AQID'}});await p;await settle(e);
- assert.equal(nodes(r.view,n=>n.type==='img').length,1);p=escanear(r)({preventDefault(){}});e.ingresos[1].reject(err(403));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
+ const {e,r}=await lector();let p=escanear(r);e.ingresos[0].resolve({...accesoDto,titular:{...accesoDto.titular,foto:'data:image/png;base64,AQID'}});await p;await settle(e);
+ assert.equal(nodes(r.view,n=>n.type==='img').length,1);p=escanear(r);e.ingresos[1].reject(err(403));await p;await settle(e);assert.equal(nodes(r.view,n=>n.type==='img').length,0);
 });
 
-await test('Salida por número de ingreso usa contrato existente y valida el identificador',async()=>{
- const {e,r}=await lector();button(r,'Salida').props.onClick();await settle(e);
- nodes(r.view,n=>n.type==='select')[0].props.onChange({target:{value:'id'}});await settle(e);
- for(const codigo of ['abc','0','2147483648']){const p=escanear(r,codigo)({preventDefault(){}});await p;await settle(e);assert.equal(e.salidas.length,0);assert(text(r.view).includes('número de ingreso válido'));}
- const p=escanear(r,'88')({preventDefault(){}});assert.deepEqual(e.salidas[0].args,[null,88]);e.salidas[0].resolve(accesoDto);await p;await settle(e);assert(text(r.view).replace(/\s/g,'').includes('Ingreso#88'));assert(text(r.view).includes('Salida registrada'));
-});
 function entornoM4() {
  const e=env();e.user={rol:'USUARIO',email:'socio@test.invalid'};e.llamadasM4=[];
  e.services.consultarMiPerfil=async()=>({sedeId:1,sedeNombre:'Central'});

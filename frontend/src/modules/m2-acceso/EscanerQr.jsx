@@ -22,7 +22,7 @@ export default function EscanerQr({ onCerrar, onLeer }) {
 
     async function abrir() {
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-        setEstado({ error: true, mensaje: 'Para usar la cámara abrí FitZone por HTTPS. También podés pegar el QR o usar un lector 2D.' });
+        setEstado({ error: true, mensaje: 'Para usar la cámara abrí FitZone por HTTPS con un certificado de confianza.' });
         return;
       }
       try {

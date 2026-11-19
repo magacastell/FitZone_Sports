@@ -63,7 +63,7 @@ function PuestoAcceso() {
       if (contexto.estado === 'error') setConsulta(valor => valor + 1);
     }} lector={(procesarMovimiento, { copia, bloqueado }) =>
       <div className="access-overview-grid">
-        <LectorAcceso sedeId={sedeId ?? copia?.datos.sedeId} sedeNombre={sede?.nombre ?? copia?.sedeNombre} esGerente={esGerente}
+        <LectorAcceso sedeNombre={sede?.nombre ?? copia?.sedeNombre}
           bloqueado={bloqueado || (!sede && !(copia && contexto.sinTransporte))} procesarMovimiento={procesarMovimiento} onMovimiento={actualizarAforo} />
         {sede && <div id="aforo"><TarjetaAforo aforo={aforo} refrescar={actualizarAforo} sedeNombre={sede.nombre} /></div>}
       </div>} />
@@ -74,7 +74,7 @@ function PuestoAcceso() {
         {recientes.estado === 'cargado' && !recientes.items.length && <p>Sin movimientos en las últimas 24 horas.</p>}
         {!!recientes.items.length && <ul>{recientes.items.map(movimiento =>
           <li key={`${movimiento.accesoId}:${movimiento.tipo}`}>
-            <strong>{movimiento.tipo === 'INGRESO' ? 'Ingreso' : 'Egreso'} #{movimiento.accesoId}</strong>
+            <strong>{movimiento.tipo === 'INGRESO' ? 'Ingreso' : 'Egreso'}</strong>
             {' · '}{movimiento.titular}{' · '}
             {new Date(movimiento.instante).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false })}
           </li>)}</ul>}

@@ -20,23 +20,32 @@ en ese escenario. Para acreditar el porcentaje hace falta una medición operativ
 
 `ControlAccesoSede` obtiene la sede del operador. `LectorAcceso` llama a los
 servicios centrales de ingreso y salida. El backend verifica al operador, sede,
-QR, membresía y presencia. `useAforoSede` consulta el contador central y fuerza
-una actualización tras un movimiento para descartar lecturas anteriores. La
-salida admite QR o número de ingreso, incluso si la membresía venció. El lector
-acepta el QR de la cámara, pegado o un lector 2D que opere como teclado. En
-cámara usa `qr-scanner` (MIT, carga diferida), prioriza la cámara trasera y
-libera las pistas tras la primera lectura, cancelación o error. En móvil
+QR, membresía y presencia. El operador elige **Ingreso** o **Salida** y pulsa
+**Escanear QR**. La primera lectura cierra la cámara y envía automáticamente
+la operación seleccionada. Cada apertura admite una sola lectura. El aviso
+del resultado dura cuatro segundos y el lector permite comenzar otro escaneo
+cuando termina el envío. La interfaz requiere un QR vigente para ambos
+movimientos. El contrato de egreso del backend conserva las opciones previas
+para sus integraciones autorizadas.
+
+El escáner usa `qr-scanner` (MIT, carga diferida), prioriza la cámara trasera
+y libera las pistas tras la primera lectura, cancelación o error. En móvil
 requiere un origen HTTPS de confianza y permiso en el navegador.
 
+`useAforoSede` comparte la consulta en curso. Tras confirmar un movimiento
+descarta una lectura anterior y programa una única consulta posterior si
+había una en curso. El número mostrado siempre proviene del servidor.
+
 El panel combina lector, aforo y movimientos confirmados de la sede. Clases y
-mantenimiento mantienen sus pantallas específicas. El enlace directo anterior
-de aforo permanece disponible, fuera del menú de Recepción.
+mantenimiento mantienen sus pantallas específicas. Las rutas anteriores
+`/recepcion/aforo` y `/terminal-offline` redirigen al panel de Recepción.
 
 `GET /accesos/sedes/{sedeId}/movimientos` lista hasta 12 eventos de la sede del
 recepcionista de las últimas 24 horas. `GET /accesos/me/movimientos` consulta sólo
 la cuenta autenticada, a partir de una marca del reloj central obtenida al
 abrir Mi QR. Mi QR consulta cada tres segundos mientras está abierto, descarta
-lecturas repetidas por ID y tipo y cancela la consulta al cerrar. El historial
+lecturas repetidas por ID y tipo, muestra el aviso con la sede durante cuatro
+segundos y cancela la consulta al cerrar. El historial
 incluye egresos asentados por cierre diario. En desconexión el socio recibe
 confirmación sólo después de la reconciliación, si el evento es posterior a la
 apertura de su seguimiento y Mi QR sigue abierto.
@@ -45,8 +54,9 @@ apertura de su seguimiento y Mi QR sigue abierto.
 
 El mismo lector del panel pasa a contingencia cuando la sonda confirma una
 falla de transporte y la copia firmada sigue vigente. Una terminal sin copia
-válida muestra el motivo y deja el lector bloqueado. La PWA conserva
-`/terminal-offline` como acceso autónomo de recuperación. El backend emite las ventanas QR de hasta 60 s
+válida muestra el motivo y deja el lector bloqueado. La PWA permite volver
+al mismo panel durante un corte con el navegador preparado y la sesión
+de Recepción vigente. El backend emite las ventanas QR de hasta 60 s
 por un horizonte acotado y firma con RSA/RS256. Solo el backend recibe y conserva
 la clave privada persistente. El socio selecciona un QR vigente en el navegador
 sin firmar uno nuevo. Recepción verifica con la clave pública aprovisionada, revisa
@@ -97,6 +107,7 @@ de transporte o timeout permite intentar la validación local con copia vigente.
 | Validar acceso y consultar aforo y movimientos | Recepción | Acceso denegado a otra sede. El endpoint de movimientos requiere Recepción. |
 | Consultar y gestionar agenda | Recepción | Acceso denegado para la operación de sede ajena. |
 | Inhabilitar cancha por mantenimiento | Recepción | Acceso denegado para una cancha de otra sede. |
+| Alta de cancha de un tipo existente | Recepción en su sede o Gerencia | Recepción recibe 403 al enviar una sede ajena. Se conserva la [regla operativa de M4](../canchas-pagos-backend.md#reglas-operativas). |
 | Crear sedes, editar tarifas globales y consultar reportes de cadena | Gerencia | Acceso denegado a Recepción. |
 | Ver avisos de ingreso y egreso de Mi QR | Socio autenticado | El servidor deriva la identidad de la sesión. Otras cuentas obtienen sus propios movimientos. |
 
@@ -104,7 +115,26 @@ El comportamiento de aforo sigue RF-05. El contador compara ocupación y
 capacidad, e informa si se alcanzó el máximo. El requisito original no define
 un rechazo automático de ingresos por ese umbral.
 
-### Verificación de la integración
+### Verificación del flujo final
+
+- El 19/11/2026 pasaron 72 pruebas focalizadas de membresía, acceso offline y
+  canchas con PostgreSQL aislado. Pasaron también las seis suites frontend
+  (201 casos de dominio), el build PWA y `git diff --check`.
+- El E2E con Chrome, Spring Boot y PostgreSQL aislado
+  (`target/e2e-m2/f8fb34c1-9681-4f71-a23d-001da97db709/resultado.json`)
+  comprobó el envío desde el escáner, avisos temporales, aforo y rechazo de
+  duplicados. Comprobó también QR vencido, reapertura durante el corte,
+  persistencia de pendientes, reconexión automática y recuperación sin
+  duplicados tras perder la respuesta. Las rutas anteriores devolvieron al
+  mismo panel. La cámara era virtual y la detección del QR se inyectó en
+  Chrome. La validación del QR, los permisos HTTP y la persistencia usaron
+  el backend real.
+- Se verificaron alta de cancha y mantenimiento en sede propia, y los
+  rechazos de administración ajena, alta de sede, tarifa global, recargo
+  pico y reportes consolidados para Recepción. El escaneo óptico con dos
+  dispositivos queda pendiente.
+
+### Evidencia de la integración anterior
 
 - En `f0d6c67`, el E2E M2 con Chrome, Spring Boot y PostgreSQL aislado
   (`target/e2e-m2/ee2d94ae-b810-456b-9779-a44b3c9c007d/resultado.json`)
@@ -160,7 +190,9 @@ utilizaron un teléfono físico ni un lector óptico.
   reenviar al recuperar red y la sesión del operador original.
 - Para producción quedan pendientes una política de protección del equipo y su
   perfil, rotación de claves, resolución operativa de conflictos y medición de
-  disponibilidad. La prueba con QR pegado no acredita escaneo óptico.
+  disponibilidad. El E2E automatiza la interacción con el escáner utilizando
+  video de prueba y detección inyectada. El escaneo óptico queda pendiente en
+  el celular.
 
 ## Procedimiento operativo y transferencia
 

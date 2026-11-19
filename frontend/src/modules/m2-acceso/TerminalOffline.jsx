@@ -4,16 +4,14 @@ import { prepararTerminal,consultarConexionTerminal } from '../../services/offli
 import { db,copiaActual,cuentaActual } from '../../services/offline/db';
 import { registrarLocal } from '../../services/offline/movimientos';
 import { sincronizar } from '../../services/offline/sync';
-import EscanerQr from './EscanerQr';
 import './OfflineAcceso.css';
 
 const REVISION_CENTRAL = 'movimiento-central-en-revision';
 const RECHAZOS_CENTRALES = [400,401,403,404,409,422];
 
-export default function TerminalOffline({autonomo=false,onMovimiento,onReconectar,lector,sedeId}) {
+export default function TerminalOffline({onMovimiento,onReconectar,lector,sedeId}) {
   const [vista,setVista]=useState({}),[mensaje,setMensaje]=useState(''),[conexion,setConexion]=useState('consultando');
-  const [codigo,setCodigo]=useState(''),[tipo,setTipo]=useState('INGRESO'),[porId,setPorId]=useState(false),[ocupado,setOcupado]=useState(false);
-  const [camara,setCamara]=useState(false);
+  const [ocupado,setOcupado]=useState(false);
   const vivo=useRef(false),enviando=useRef(false);
   const revisando=useRef(false);
   const conectado=useRef(false);
@@ -23,7 +21,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
     try {
       let copia,error;
       try{
-        copia=(await copiaActual(autonomo)).copia;
+        copia=(await copiaActual()).copia;
         if(sedeId && copia.datos.sedeId!==sedeId) {
           copia=null;
           error='La copia pertenece a otra sede.';
@@ -37,7 +35,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
       const revisionCentral=await db.meta.get(REVISION_CENTRAL);
       if(vivo.current)setVista({copia,error,pendientes:cola.length,provisionales,conflictos,aforo,resultados,revisionCentral});
     } catch(e){if(vivo.current)setVista({error:e.message});}
-  },[autonomo,sedeId]);
+  },[sedeId]);
   useEffect(()=>{
     vivo.current=true;
     const revisar=async()=>{
@@ -114,7 +112,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
       await guardar.catch(()=>{});
     }
   }
-  async function procesar(tipo,lectura,porId,enLinea) {
+  async function procesar(tipo,lectura,enLinea) {
       const sesion=localStorage.getItem('token');
       const estado=await consultarConexionTerminal();
       if(!vivo.current || sesion!==localStorage.getItem('token'))throw rechazo(401,'Cambió la sesión.');
@@ -123,7 +121,7 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
       if(estado==='respuesta no verificada')throw rechazo(423,'El servidor no confirmó que esta terminal pueda operar. Consultá el estado antes de registrar un movimiento.');
       if(await db.meta.get(REVISION_CENTRAL))throw rechazo(423,'El movimiento anterior requiere verificación central.');
       // Una falla del POST central se informa como resultado desconocido. No se reenvía al circuito local.
-      if(estado==='disponible' && enLinea) {
+      if(estado==='disponible') {
         try { await sincronizar(); }
         catch { throw rechazo(423,'No se pudieron reconciliar los pendientes. Reintentá la sincronización antes de registrar otro movimiento.'); }
         if(await db.movimientos.where('estado').equals('PENDIENTE').count())
@@ -131,16 +129,8 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
         if(!vivo.current || sesion!==localStorage.getItem('token'))throw rechazo(401,'Cambió la sesión.');
         return {acceso:await enviarCentral(enLinea)};
       }
-      if(estado==='disponible' && tipo==='INGRESO') {
-        await sincronizar();
-        if(await db.movimientos.where('estado').equals('PENDIENTE').count())throw Error('Sincronizá los pendientes antes de preparar un nuevo ingreso con conexión; los egresos siguen disponibles.');
-        // Con central disponible se renueva la copia: no autorizar con una suspensión vieja.
-        await prepararTerminal();
-      }
-      if(sesion!==localStorage.getItem('token'))throw Error('Cambió la sesión. Volvé a verificar el movimiento.');
-      if(!vivo.current)return;
-      let movimiento;
-      try { movimiento=await registrarLocal(tipo,lectura,porId,autonomo,sedeId); }
+      if(!vivo.current || sesion!==localStorage.getItem('token'))throw rechazo(401,'Cambió la sesión.');
+      try { await registrarLocal(tipo,lectura,false,false,sedeId); }
       catch(error){
         if(error.code==='ERR_JWT_EXPIRED')throw rechazo(409,'El QR venció. Escaneá el código vigente.');
         if(/^ERR_(JWT|JWS|JOSE)_/.test(error.code || ''))
@@ -148,17 +138,9 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
         throw rechazo(409,error.message);
       }
       const provisional=`${tipo==='INGRESO'?'Ingreso':'Egreso'} provisional guardado. Consultá el estado de sincronización en este panel.`;
-      if(enLinea)return {mensaje:provisional};
-      if(vivo.current){setCodigo('');setMensaje(provisional);}
-      if(estado==='disponible') {
-        try {
-          const resultados=await sincronizar();const resultado=resultados.find(r=>r.id===movimiento.id);
-          if(vivo.current)setMensaje(resultado?.estado==='CONFIRMADO'?'Movimiento confirmado por el servidor.':resultado?`${resultado.estado}: ${resultado.detalle}`:'Pendiente de confirmación central.');
-        } catch(e){if(vivo.current)setMensaje(`Movimiento provisional guardado; sin confirmación central. ${e.message}`);}
-      }
-      onMovimiento?.();
+      return {mensaje:provisional};
   }
-  const capturar=(tipo,lectura,porId,enLinea)=>ejecutar(()=>procesar(tipo,lectura,porId,enLinea),true);
+  const capturar=(tipo,lectura,enLinea)=>ejecutar(()=>procesar(tipo,lectura,enLinea),true);
   const sinRed=conexion==='sin comunicación';
   const contingencia=sinRed && !!vista.copia;
   return <>{sinRed && <p className="access-connectivity-note" role="status">{contingencia
@@ -182,18 +164,11 @@ export default function TerminalOffline({autonomo=false,onMovimiento,onReconecta
     {!!vista.provisionales?.length && <ul aria-label="Movimientos provisionales">{vista.provisionales.map(m=><li key={m.id}>
       {m.tipo==='INGRESO'?'Ingreso':'Egreso'} provisional · {new Date(m.instante).toLocaleString('es-AR')}
     </li>)}</ul>}
-    {autonomo && <p><a href="/recepcion/acceso">Volver a Recepción</a></p>}
     {vista.copia&&<><p>Sede: {vista.copia.sedeNombre}. Copia del {new Date(vista.copia.servidorAhora).toLocaleString()} · vence {new Date(vista.copia.datos.exp*1000).toLocaleString()}.</p>
       <p>Última respuesta de sincronización: {vista.copia.ultimaSincronizacion?new Date(vista.copia.ultimaSincronizacion).toLocaleString():'Sin confirmación todavía'}.</p>
       {!vista.copia.persistente&&<p>El navegador no concedió persistencia protegida: no borres sus datos ni uses modo privado. Los pendientes se conservan al cerrar normalmente.</p>}
-      <p>Aforo local provisional: <strong data-testid="aforo-local">{vista.aforo}</strong> / {vista.copia.datos.capacidad}. Incluye presencia conocida y movimientos locales; puede diferir del central.</p>
-      {!lector && <form onSubmit={e=>{e.preventDefault();ejecutar(()=>procesar(tipo,codigo.trim(),porId));}}><label>Movimiento<select aria-label="Movimiento offline" value={tipo} disabled={ocupado} onChange={e=>{setTipo(e.target.value);setPorId(false);}}><option value="INGRESO">Ingreso</option><option value="SALIDA">Egreso</option></select></label>
-        {tipo==='SALIDA'&&<label><input type="checkbox" checked={porId} onChange={e=>setPorId(e.target.checked)}/>Usar ID de visita o número de ingreso central</label>}
-        <label>{porId?'ID de visita o número central':'QR de acceso'}<input aria-label="Código offline" value={codigo} required disabled={ocupado} onChange={e=>setCodigo(e.target.value)} autoComplete="off"/></label>
-        <AppButton type="submit" disabled={ocupado||!!vista.revisionCentral||!codigo.trim()}>Registrar movimiento preparado</AppButton>
-        {!porId && <AppButton type="button" disabled={ocupado||!!vista.revisionCentral} onClick={()=>setCamara(true)}>Escanear QR</AppButton>}
-        {camara && <EscanerQr onCerrar={()=>setCamara(false)} onLeer={lectura=>{setCamara(false);ejecutar(()=>procesar(tipo,lectura,false));}} />}
-      </form>}</>}
+      {(sinRed || vista.pendientes>0) && <p>Aforo local provisional: <strong data-testid="aforo-local">{vista.aforo}</strong> / {vista.copia.datos.capacidad}. Incluye presencia conocida y movimientos locales; puede diferir del central.</p>}</>}
+
     <p role="status">{mensaje}</p>
   </section></>;
 }
