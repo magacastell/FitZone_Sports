@@ -32,6 +32,8 @@ Se conserva una copia firmada y acotada en IndexedDB, se capturan movimientos co
 
 [TerminalOffline.jsx](../../frontend/src/modules/m2-acceso/TerminalOffline.jsx) permite preparación inicial autenticada, intenta sincronizar al abrir, al evento `online`, cada **10 s** y manualmente, y renueva la copia cuando tiene al menos **un minuto** y no hay pendientes. Con central disponible, antes de un ingreso sincroniza pendientes y vuelve a preparar. La frecuencia es un intento condicionado por red/sesión/pestaña activa, no una garantía en segundo plano ni un SLA. No hay Background Sync de Workbox. La copia expirada impide capturas nuevas, pero no elimina eventos anteriores.
 
+**Nota de vigencia (19/11/2026).** La preparación de otra copia antes de cada ingreso conectado corresponde al flujo anterior. En el [lector unificado vigente](../m2-cierre/alcance-decisiones-recepcion.md), con el central disponible se sincronizan los pendientes antes de enviar el movimiento al backend. La copia se refresca por separado en las revisiones de conectividad cuando tiene al menos un minuto y la cola está vacía. El resultado incierto de un envío al central requiere revisión antes de habilitar otro movimiento.
+
 ### Captura y almacenamiento local
 
 [db.js](../../frontend/src/services/offline/db.js) define Dexie `fitzone-m2-offline`, versión 1, con stores `meta`, `movimientos`, `presencias` y `usos`. [registrarLocal](../../frontend/src/services/offline/movimientos.js) escribe evento, presencia, consumo del `jti` y secuencia en una transacción que comparte esos stores. Dos pestañas no pueden confirmar el mismo ingreso conocido; un fallo de almacenamiento no produce éxito en UI. Se solicita persistencia al navegador y se informa si no la concede.
